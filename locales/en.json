@@ -1,0 +1,162 @@
+{
+  "common": {
+    "play": "Play",
+    "pause": "Pause",
+    "ok": "OK",
+    "stop": "Stop",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "settings": "Settings",
+    "back": "Back",
+    "error": "Error",
+    "saved": "Saved",
+    "options": "Options",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites"
+  },
+  "tabs": {
+    "home": "Home",
+    "explore": "Explore",
+    "mixer": "Mixer",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "NeuroSound",
+    "subtitle": "Focus, Relax, Listen",
+    "quickStart": "Quick Start",
+    "quickStartDesc": "Popular presets to get started",
+    "favorites": "Favorites",
+    "recentlyPlayed": "Recently Played",
+    "categories": "Categories",
+    "headphoneWarning": "Use headphones for binaural beats",
+    "headphoneWarningDesc": "Binaural beats require headphones to work properly. Each ear receives a slightly different frequency to create the beat effect."
+  },
+  "explore": {
+    "title": "Explore Frequencies",
+    "categories": {
+      "binaural": "Binaural Beats",
+      "solfeggio": "Solfeggio",
+      "noise": "Ambient Sounds"
+    },
+    "binauralDescription": "Binaural beats work by playing slightly different frequencies in each ear. Your brain perceives a third tone at the difference frequency.",
+    "solfeggioDescription": "Solfeggio frequencies are tones traditionally associated with relaxation and spiritual harmony. Effects are personal; no medical benefit is claimed or scientifically proven.",
+    "noiseDescription": "Background noise can help mask distracting sounds and improve focus or sleep quality.",
+    "binauralTypes": {
+      "delta": "Delta (0.5-4 Hz)",
+      "deltaDesc": "Deep sleep, healing",
+      "theta": "Theta (4-8 Hz)",
+      "thetaDesc": "Meditation, creativity",
+      "alpha": "Alpha (8-14 Hz)",
+      "alphaDesc": "Relaxation, calmness",
+      "beta": "Beta (14-30 Hz)",
+      "betaDesc": "Focus, concentration",
+      "gamma": "Gamma (30-100 Hz)",
+      "gammaDesc": "Higher cognitive functions"
+    },
+    "solfeggioFreqs": {
+      "40": "40 Hz - Gamma Focus",
+      "111": "111 Hz - Deep Calm",
+      "174": "174 Hz - Relaxation",
+      "285": "285 Hz - Renewal",
+      "396": "396 Hz - Liberation from Fear",
+      "417": "417 Hz - Facilitating Change",
+      "432": "432 Hz - Natural Harmony",
+      "440": "440 Hz - Standard Pitch",
+      "528": "528 Hz - Love Frequency",
+      "639": "639 Hz - Relationships",
+      "741": "741 Hz - Expression",
+      "777": "777 Hz - Divine Luck",
+      "852": "852 Hz - Intuition",
+      "888": "888 Hz - Abundance",
+      "963": "963 Hz - Cosmic Consciousness"
+    },
+    "noiseTypes": {
+      "white": "White Noise",
+      "whiteDesc": "All frequencies equal, focus aid",
+      "pink": "Pink Noise",
+      "pinkDesc": "Natural, balanced, sleep friendly",
+      "brown": "Brown Noise",
+      "brownDesc": "Deep rumble, like thunder",
+      "rain": "Rain",
+      "rainDesc": "Gentle rainfall for relaxation",
+      "thunder": "Thunderstorm",
+      "thunderDesc": "Rain with distant thunder",
+      "ocean": "Ocean Waves",
+      "oceanDesc": "Rhythmic waves on the shore",
+      "wind": "Wind",
+      "windDesc": "Gentle breeze through trees",
+      "fire": "Fireplace",
+      "fireDesc": "Crackling fire sounds",
+      "forest": "Forest",
+      "forestDesc": "Birds and nature sounds",
+      "stream": "Stream",
+      "streamDesc": "Babbling brook water sounds",
+      "fan": "Fan",
+      "fanDesc": "Steady electric fan hum",
+      "airplane": "Airplane Cabin",
+      "airplaneDesc": "Jet engine white noise",
+      "train": "Train",
+      "trainDesc": "Rhythmic train on tracks"
+    }
+  },
+  "mixer": {
+    "title": "Sound Mixer",
+    "description": "Create your custom mix by combining multiple sounds. Save it for quick access later.",
+    "addSound": "Add Sound",
+    "volume": "Volume",
+    "savePreset": "Save Preset",
+    "presetName": "Preset Name",
+    "namePlaceholder": "My Custom Mix",
+    "myMixes": "My Mixes",
+    "activeChannels": "Active Sounds",
+    "sounds": "sounds",
+    "maxChannels": "Maximum Channels",
+    "maxChannelsDesc": "You can only have 4 channels in a mix.",
+    "enterName": "Please enter a name for your mix.",
+    "addSoundFirst": "Add at least one sound to save a mix.",
+    "mixSaved": "Your mix has been saved!",
+    "deleteMix": "Delete mix"
+  },
+  "player": {
+    "nowPlaying": "Now Playing",
+    "paused": "Paused",
+    "duration": "Duration",
+    "timer": "Timer",
+    "timerOptions": {
+      "none": "None",
+      "15min": "15 minutes",
+      "30min": "30 minutes",
+      "1hour": "1 hour",
+      "2hours": "2 hours"
+    },
+    "baseFrequency": "Base Frequency",
+    "beatFrequency": "Beat Frequency"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
+    },
+    "reduceMotion": "Reduce Motion",
+    "lowContrast": "Low Contrast",
+    "language": "Language",
+    "audio": "Audio",
+    "maxVolume": "Maximum Volume",
+    "about": "About",
+    "version": "Version",
+    "epilepsyWarning": "Epilepsy Warning",
+    "epilepsyText": "This app may contain visual effects. Use with caution if you have epilepsy."
+  },
+  "accessibility": {
+    "playButton": "Play button",
+    "pauseButton": "Pause button",
+    "volumeSlider": "Volume slider",
+    "frequencyCard": "Frequency card",
+    "expandPlayer": "Tap to expand player"
+  }
+}

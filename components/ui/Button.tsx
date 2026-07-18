@@ -1,0 +1,130 @@
+/**
+ * Accessible Button Component
+ * - Minimum 48x48 touch target
+ * - Supports reduced motion
+ * - Clear visual feedback
+ */
+
+import React from 'react';
+import {
+  TouchableOpacity,
+  Text,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
+import { useThemeColors } from '@/hooks/use-theme-colors';
+import { AccessibilitySize, Spacing } from '@/constants/theme';
+import { useSettingsStore } from '@/stores/settingsStore';
+
+interface ButtonProps {
+  title: string;
+  onPress: () => void;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'small' | 'medium' | 'large';
+  disabled?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
+}
+
+export function Button({
+  title,
+  onPress,
+  variant = 'primary',
+  size = 'medium',
+  disabled = false,
+  icon,
+  iconPosition = 'left',
+  accessibilityLabel,
+  accessibilityHint,
+  style,
+  textStyle,
+}: ButtonProps) {
+  const { reduceMotion } = useSettingsStore();
+
+  const colors = useThemeColors();
+
+  const getButtonStyle = (): ViewStyle => {
+    const baseStyle: ViewStyle = {
+      minHeight: AccessibilitySize.minTouchTarget,
+      minWidth: AccessibilitySize.minTouchTarget,
+      borderRadius: AccessibilitySize.borderRadius,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: iconPosition === 'right' ? 'row-reverse' : 'row',
+      gap: Spacing.sm,
+      opacity: disabled ? 0.5 : 1,
+    };
+
+    // Size variants
+    const sizeStyles: Record<string, ViewStyle> = {
+      small: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm },
+      medium: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
+      large: { paddingHorizontal: Spacing.xl, paddingVertical: Spacing.lg },
+    };
+
+    // Variant styles
+    const variantStyles: Record<string, ViewStyle> = {
+      primary: {
+        backgroundColor: colors.primary,
+      },
+      secondary: {
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderColor: colors.primary,
+      },
+      ghost: {
+        backgroundColor: 'transparent',
+      },
+    };
+
+    return {
+      ...baseStyle,
+      ...sizeStyles[size],
+      ...variantStyles[variant],
+    };
+  };
+
+  const getTextStyle = (): TextStyle => {
+    const baseStyle: TextStyle = {
+      fontWeight: '600',
+    };
+
+    const sizeStyles: Record<string, TextStyle> = {
+      small: { fontSize: 14 },
+      medium: { fontSize: 16 },
+      large: { fontSize: 18 },
+    };
+
+    const variantStyles: Record<string, TextStyle> = {
+      primary: { color: '#FFFFFF' },
+      secondary: { color: colors.primary },
+      ghost: { color: colors.primary },
+    };
+
+    return {
+      ...baseStyle,
+      ...sizeStyles[size],
+      ...variantStyles[variant],
+    };
+  };
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      style={[getButtonStyle(), style]}
+      activeOpacity={reduceMotion ? 1 : 0.7}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
+    >
+      {icon}
+      <Text style={[getTextStyle(), textStyle]}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
