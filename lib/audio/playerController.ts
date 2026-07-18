@@ -71,11 +71,18 @@ export function loadPreset(preset: FrequencyPreset): void {
   useAudioStore.getState().setCurrentPreset(preset);
 }
 
+let playPending = false;
+
 export async function play(): Promise<void> {
-  if (!generator) return;
-  generator.setVolume(effectiveVolume());
-  await generator.play();
-  useAudioStore.getState().setIsPlaying(true);
+  if (!generator || playPending) return;
+  playPending = true;
+  try {
+    generator.setVolume(effectiveVolume());
+    await generator.play();
+    useAudioStore.getState().setIsPlaying(true);
+  } finally {
+    playPending = false;
+  }
 }
 
 export function pause(): void {
@@ -151,14 +158,29 @@ export const MAX_MIXER_CHANNELS = 4;
 
 const mixerGenerators = new Map<string, Generator>();
 
+let mixerStartPending = false;
+
 /** Start (or resume) all mixer channels. Silences the single-preset player. */
 export async function mixerStart(): Promise<void> {
+  if (mixerStartPending) return;
   unload(); // mutual exclusion: MiniPlayer preset off
 
   const { mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
   if (mixerChannels.length === 0) return;
 
+  mixerStartPending = true;
+  try {
+    await startMixerChannels(mixerChannels, maxVolume);
+  } finally {
+    mixerStartPending = false;
+  }
+}
+
+async function startMixerChannels(
+  mixerChannels: { id: string; preset: FrequencyPreset; volume: number }[],
+  maxVolume: number
+): Promise<void> {
   for (const ch of mixerChannels) {
     let gen = mixerGenerators.get(ch.id);
     if (!gen) {

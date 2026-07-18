@@ -5,7 +5,7 @@
  * - Accessibility support
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -65,14 +65,19 @@ export function Slider({
     [sliderWidth, min, max, step, onValueChange]
   );
 
+  // Track from the grant point + cumulative dx: locationX jumps to
+  // child-relative coordinates when the finger lands on the thumb.
+  const startXRef = useRef(0);
+
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: (evt) => {
-      handleValueFromPosition(evt.nativeEvent.locationX);
+      startXRef.current = evt.nativeEvent.locationX;
+      handleValueFromPosition(startXRef.current);
     },
-    onPanResponderMove: (evt) => {
-      handleValueFromPosition(evt.nativeEvent.locationX);
+    onPanResponderMove: (_evt, gestureState) => {
+      handleValueFromPosition(startXRef.current + gestureState.dx);
     },
   });
 
@@ -141,7 +146,7 @@ export function Slider({
             styles.thumb,
             {
               backgroundColor: colors.sliderThumb,
-              left: Math.max(0, thumbPosition - 12),
+              left: Math.max(0, Math.min(sliderWidth - 24, thumbPosition - 12)),
             },
           ]}
         />

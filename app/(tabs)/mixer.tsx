@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
+  Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -292,7 +293,11 @@ export default function MixerScreen() {
       </ScrollView>
 
       {/* Preset Picker Modal */}
-      {showPresetPicker && (
+      <Modal
+        visible={showPresetPicker}
+        animationType={reduceMotion ? 'none' : 'slide'}
+        onRequestClose={() => setShowPresetPicker(false)}
+      >
         <View style={[styles.modal, { backgroundColor: colors.background }]}>
           <SafeAreaView style={styles.modalInner}>
             <View style={styles.modalHeader}>
@@ -333,10 +338,14 @@ export default function MixerScreen() {
             </ScrollView>
           </SafeAreaView>
         </View>
-      )}
+      </Modal>
 
       {/* Save Dialog Modal */}
-      {showSaveDialog && (
+      <Modal
+        visible={showSaveDialog}
+        animationType={reduceMotion ? 'none' : 'slide'}
+        onRequestClose={() => setShowSaveDialog(false)}
+      >
         <View style={[styles.modal, { backgroundColor: colors.background }]}>
           <SafeAreaView style={styles.modalInner}>
             <View style={styles.modalHeader}>
@@ -372,7 +381,7 @@ export default function MixerScreen() {
             </View>
           </SafeAreaView>
         </View>
-      )}
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -507,12 +516,7 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
   },
   modal: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 100,
+    flex: 1,
   },
   modalInner: {
     flex: 1,

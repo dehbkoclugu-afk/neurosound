@@ -90,21 +90,10 @@ export default function ExploreScreen() {
     router.push(`/player/${presetId}`);
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header with back button and category title */}
+      {/* Header with category title — Explore is a tab, so no back button */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={handleBack}
-          style={styles.backButton}
-          accessibilityLabel={t('common.back')}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
         <View style={styles.headerTitle}>
           <Ionicons
             name={activeTab.iconName as any}
@@ -116,7 +105,6 @@ export default function ExploreScreen() {
             {t(activeTab.labelKey)}
           </Text>
         </View>
-        <View style={styles.headerSpacer} />
       </View>
 
       {/* Category Tabs */}
@@ -205,12 +193,6 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.xl,
     paddingBottom: Spacing.md,
   },
-  backButton: {
-    width: AccessibilitySize.minTouchTarget,
-    height: AccessibilitySize.minTouchTarget,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   headerTitle: {
     flex: 1,
     flexDirection: 'row',
@@ -222,9 +204,6 @@ const styles = StyleSheet.create({
   },
   title: {
     ...Typography.title1,
-  },
-  headerSpacer: {
-    width: AccessibilitySize.minTouchTarget,
   },
   tabsContainer: {
     paddingBottom: Spacing.md,
