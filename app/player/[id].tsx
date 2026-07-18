@@ -336,7 +336,7 @@ export default function PlayerScreen() {
                     {t(option.labelKey)}
                   </Text>
                   {isSelected && (
-                    <Ionicons name="checkmark" size={24} color="#1DB954" />
+                    <Ionicons name="checkmark" size={24} color="#D99A4E" />
                   )}
                 </TouchableOpacity>
               );
@@ -518,14 +518,14 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   timerOptionSelected: {
-    backgroundColor: 'rgba(29, 185, 84, 0.15)',
+    backgroundColor: 'rgba(217, 154, 78, 0.15)',
   },
   timerOptionText: {
     ...Typography.body,
     color: 'rgba(255,255,255,0.8)',
   },
   timerOptionTextSelected: {
-    color: '#1DB954',
+    color: '#D99A4E',
     fontWeight: '600',
   },
 });
