@@ -20,15 +20,34 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, Shadows, GradientColors } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, Shadows, GradientColors, FontFamily } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Button } from '@/components/ui/Button';
 import { Slider } from '@/components/ui/Slider';
-import { allPresets, FrequencyPreset } from '@/lib/frequencies';
+import {
+  binauralPresets,
+  solfeggioPresets,
+  noisePresets,
+  FrequencyPreset,
+} from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
+
+// Preset picker groups — 33 flat items is unusable; group by category
+const pickerGroups = [
+  { titleKey: 'explore.categories.binaural', presets: binauralPresets },
+  { titleKey: 'explore.categories.solfeggio', presets: solfeggioPresets },
+  { titleKey: 'explore.categories.noise', presets: noisePresets },
+];
+
+// One-tap sample mix for the empty state
+const SAMPLE_MIX = [
+  { presetId: 'noise-rain', volume: 0.6 },
+  { presetId: 'noise-brown', volume: 0.35 },
+  { presetId: 'binaural-alpha', volume: 0.5 },
+];
 
 const getGradientColors = (preset: FrequencyPreset): string[] => {
   if (preset.type === 'binaural' && preset.binauralType) {
@@ -135,7 +154,29 @@ export default function MixerScreen() {
 
         {/* Active Channels */}
         <View style={styles.section}>
-          <CategoryHeader title={t('mixer.activeChannels')} />
+          <CategoryHeader
+            title={t('mixer.activeChannels')}
+            subtitle={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
+          />
+
+          {/* Empty state teaches the mixer with a one-tap sample */}
+          {channels.length === 0 && (
+            <View style={[styles.emptyState, { backgroundColor: colors.backgroundSecondary }]}>
+              <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+                {t('mixer.emptyDesc')}
+              </Text>
+              <TouchableOpacity
+                onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
+                style={[styles.sampleButton, { backgroundColor: colors.primary + '22' }]}
+                accessibilityRole="button"
+              >
+                <Ionicons name="sparkles" size={16} color={colors.primary} />
+                <Text style={[styles.sampleButtonText, { color: colors.primary }]}>
+                  {t('mixer.trySample')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {channels.map(channel => {
             const gradientColors = getGradientColors(channel.preset);
@@ -312,29 +353,36 @@ export default function MixerScreen() {
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.presetList}>
-              {allPresets.map(preset => {
-                const gradientColors = getGradientColors(preset);
-                return (
-                  <TouchableOpacity
-                    key={preset.id}
-                    onPress={() => handleAddChannel(preset)}
-                    activeOpacity={reduceMotion ? 1 : 0.8}
-                    style={[styles.presetItem, Shadows.small]}
-                  >
-                    <LinearGradient
-                      colors={gradientColors as [string, string, ...string[]]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.presetItemGradient}
-                    >
-                      <Text style={styles.presetItemName}>
-                        {t(preset.nameKey)}
-                      </Text>
-                      <Ionicons name="add-circle" size={24} color="rgba(255,255,255,0.8)" />
-                    </LinearGradient>
-                  </TouchableOpacity>
-                );
-              })}
+              {pickerGroups.map(group => (
+                <View key={group.titleKey}>
+                  <Text style={[styles.pickerGroupTitle, { color: colors.textSecondary }]}>
+                    {t(group.titleKey)}
+                  </Text>
+                  {group.presets.map(preset => {
+                    const gradientColors = getGradientColors(preset);
+                    return (
+                      <TouchableOpacity
+                        key={preset.id}
+                        onPress={() => handleAddChannel(preset)}
+                        activeOpacity={reduceMotion ? 1 : 0.8}
+                        style={[styles.presetItem, Shadows.small]}
+                      >
+                        <LinearGradient
+                          colors={gradientColors as [string, string, ...string[]]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={styles.presetItemGradient}
+                        >
+                          <Text style={styles.presetItemName}>
+                            {t(preset.nameKey)}
+                          </Text>
+                          <Ionicons name="add-circle" size={24} color="rgba(255,255,255,0.8)" />
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ))}
             </ScrollView>
           </SafeAreaView>
         </View>
@@ -540,6 +588,35 @@ const styles = StyleSheet.create({
   },
   presetList: {
     flex: 1,
+  },
+  pickerGroupTitle: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  emptyState: {
+    padding: Spacing.md,
+    borderRadius: 16,
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  emptyStateText: {
+    ...Typography.subhead,
+    lineHeight: 21,
+  },
+  sampleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.sm,
+    borderRadius: 12,
+    minHeight: 44,
+  },
+  sampleButtonText: {
+    ...Typography.subhead,
+    fontFamily: FontFamily.semibold,
   },
   presetItem: {
     borderRadius: 12,

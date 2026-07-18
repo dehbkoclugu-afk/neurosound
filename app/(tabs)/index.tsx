@@ -1,9 +1,9 @@
 /**
- * Home Screen - Modern Grid Layout with Categories
- * Spotify/Apple Music inspired design
+ * Home Screen - Intent-first entry ("what do you need?"), then history,
+ * favorites, and the technical categories for power users.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography } from '@/constants/theme';
@@ -24,11 +25,9 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
-import {
-  binauralPresets,
-  getPresetById,
-  FrequencyPreset,
-} from '@/lib/frequencies';
+import { Icon } from '@/components/ui/Icon';
+import { intents } from '@/lib/intents';
+import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
 
 // Category data for grid cards
@@ -48,24 +47,25 @@ const categories = [
   {
     key: 'noise',
     titleKey: 'explore.categories.noise',
-    iconName: 'water',
+    iconName: 'volume-medium',
     color: '#3B82F6',
   },
 ];
 
-// Quick start presets - popular choices
-const quickStartPresets: FrequencyPreset[] = [
-  binauralPresets.find(p => p.binauralType === 'alpha'),
-  binauralPresets.find(p => p.binauralType === 'theta'),
-].filter((p): p is FrequencyPreset => p !== undefined);
-
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning } = useSettingsStore();
+  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, hasSeenOnboarding } = useSettingsStore();
   const { favoriteIds, recentlyPlayed, isFavorite } = usePresetsStore();
 
   const colors = useThemeColors();
+
+  // First run: route into onboarding once
+  useEffect(() => {
+    if (!hasSeenOnboarding) {
+      router.push('/onboarding');
+    }
+  }, [hasSeenOnboarding, router]);
 
   const handlePresetPress = (presetId: string) => {
     const preset = getPresetById(presetId);
@@ -135,37 +135,32 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Categories Section */}
+        {/* Intent Section — primary entry */}
         <View style={styles.section}>
-          <CategoryHeader title={t('home.categories')} />
-          <View style={styles.categoryGrid}>
-            {categories.map((category) => (
-              <CategoryCard
-                key={category.key}
-                title={t(category.titleKey)}
-                iconName={category.iconName}
-                color={category.color}
-                onPress={() => handleCategoryPress(category.key)}
-              />
-            ))}
-          </View>
-        </View>
-
-        {/* Quick Start Section */}
-        <View style={styles.section}>
-          <CategoryHeader
-            title={t('home.quickStart')}
-            subtitle={t('home.quickStartDesc')}
-          />
-          <View style={styles.presetGrid}>
-            {quickStartPresets.map((preset) => (
-              <PresetCard
-                key={preset.id}
-                preset={preset}
-                onPress={() => handlePresetPress(preset.id)}
-                isFavorite={isFavorite(preset.id)}
-                size="medium"
-              />
+          <CategoryHeader title={t('home.intentsTitle')} />
+          <View style={styles.intentGrid}>
+            {intents.map((intent) => (
+              <TouchableOpacity
+                key={intent.id}
+                onPress={() => router.push(`/intent/${intent.id}`)}
+                activeOpacity={0.85}
+                style={styles.intentCard}
+                accessibilityRole="button"
+                accessibilityLabel={t(intent.nameKey)}
+              >
+                <LinearGradient
+                  colors={intent.gradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.intentGradient}
+                >
+                  <Icon icon={intent.icon} size={26} color="rgba(255,255,255,0.95)" />
+                  <Text style={styles.intentName}>{t(intent.nameKey)}</Text>
+                  <Text style={styles.intentDesc} numberOfLines={2}>
+                    {t(intent.descKey)}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -191,13 +186,10 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Favorites Section */}
-        {favoritePresets.length > 0 && (
-          <View style={styles.section}>
-            <CategoryHeader
-              title={t('home.favorites')}
-              iconName="heart"
-            />
+        {/* Favorites Section — teaches the heart affordance when empty */}
+        <View style={styles.section}>
+          <CategoryHeader title={t('home.favorites')} iconName="heart" />
+          {favoritePresets.length > 0 ? (
             <View style={styles.presetGrid}>
               {favoritePresets.slice(0, 4).map((preset) => (
                 <PresetCard
@@ -209,8 +201,31 @@ export default function HomeScreen() {
                 />
               ))}
             </View>
+          ) : (
+            <View style={[styles.emptyState, { backgroundColor: colors.backgroundSecondary }]}>
+              <Ionicons name="heart-outline" size={22} color={colors.textSecondary} />
+              <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+                {t('home.favoritesEmpty')}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Categories Section — technical taxonomy for power users */}
+        <View style={styles.section}>
+          <CategoryHeader title={t('home.categories')} />
+          <View style={styles.categoryGrid}>
+            {categories.map((category) => (
+              <CategoryCard
+                key={category.key}
+                title={t(category.titleKey)}
+                iconName={category.iconName}
+                color={category.color}
+                onPress={() => handleCategoryPress(category.key)}
+              />
+            ))}
           </View>
-        )}
+        </View>
 
       </ScrollView>
     </SafeAreaView>
@@ -269,6 +284,43 @@ const styles = StyleSheet.create({
   },
   categoryGrid: {
     gap: Spacing.sm,
+  },
+  intentGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  intentCard: {
+    flexBasis: '48%',
+    flexGrow: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  intentGradient: {
+    padding: Spacing.md,
+    minHeight: 120,
+    justifyContent: 'flex-end',
+    gap: 4,
+  },
+  intentName: {
+    ...Typography.headline,
+    color: '#FFFFFF',
+    marginTop: Spacing.sm,
+  },
+  intentDesc: {
+    ...Typography.caption1,
+    color: 'rgba(255,255,255,0.75)',
+  },
+  emptyState: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    padding: Spacing.md,
+    borderRadius: 16,
+  },
+  emptyStateText: {
+    ...Typography.subhead,
+    flex: 1,
   },
   presetGrid: {
     flexDirection: 'row',

@@ -30,7 +30,9 @@
     "recentlyPlayed": "Recently Played",
     "categories": "Categories",
     "headphoneWarning": "Use headphones for binaural beats",
-    "headphoneWarningDesc": "Binaural beats require headphones to work properly. Each ear receives a slightly different frequency to create the beat effect."
+    "headphoneWarningDesc": "Binaural beats require headphones to work properly. Each ear receives a slightly different frequency to create the beat effect.",
+    "intentsTitle": "What do you need right now?",
+    "favoritesEmpty": "Tap the heart on any sound you like; it will collect here."
   },
   "explore": {
     "title": "Explore Frequencies",
@@ -116,7 +118,9 @@
     "enterName": "Please enter a name for your mix.",
     "addSoundFirst": "Add at least one sound to save a mix.",
     "mixSaved": "Your mix has been saved!",
-    "deleteMix": "Delete mix"
+    "deleteMix": "Delete mix",
+    "emptyDesc": "Layer multiple sounds: rain + brown noise + alpha, for example.",
+    "trySample": "Try a sample mix"
   },
   "player": {
     "nowPlaying": "Now Playing",
@@ -131,7 +135,8 @@
       "2hours": "2 hours"
     },
     "baseFrequency": "Base Frequency",
-    "beatFrequency": "Beat Frequency"
+    "beatFrequency": "Beat Frequency",
+    "playbackError": "Could not start audio. Please try again."
   },
   "settings": {
     "title": "Settings",
@@ -140,7 +145,8 @@
     "themes": {
       "light": "Light",
       "dark": "Dark",
-      "auto": "Auto"
+      "auto": "Auto",
+      "night": "Night"
     },
     "reduceMotion": "Reduce Motion",
     "lowContrast": "Low Contrast",
@@ -158,5 +164,25 @@
     "volumeSlider": "Volume slider",
     "frequencyCard": "Frequency card",
     "expandPlayer": "Tap to expand player"
+  },
+  "intents": {
+    "sleep": "Sleep",
+    "sleepDesc": "Sounds that help you drift into deep sleep",
+    "focus": "Focus",
+    "focusDesc": "Rhythms and noise for concentration",
+    "relax": "Relax",
+    "relaxDesc": "Nature sounds and soft tones to unwind",
+    "meditate": "Meditate",
+    "meditateDesc": "Deep, calm tones for turning inward"
+  },
+  "onboarding": {
+    "step1Title": "Tune into sound",
+    "step1Desc": "Sleep, focus, and relax with binaural beats, pure tones, and ambient sounds.",
+    "step2Title": "Use headphones",
+    "step2Desc": "Binaural beats send a different frequency to each ear; headphones are required to hear the effect.",
+    "step3Title": "Protect your hearing",
+    "step3Desc": "Keep the volume at a comfortable level and take breaks if you feel discomfort. This app is not a medical product.",
+    "next": "Next",
+    "start": "Get started"
   }
 }

@@ -1,5 +1,7 @@
 /**
- * Custom useColorScheme hook that respects user's theme preference
+ * Custom useColorScheme hook that respects the user's theme preference.
+ * 'night' resolves to 'dark' here; the dedicated night palette is applied
+ * by useThemeColors.
  */
 
 import { useColorScheme as useSystemColorScheme } from 'react-native';
@@ -9,11 +11,13 @@ export function useColorScheme(): 'light' | 'dark' {
   const systemColorScheme = useSystemColorScheme();
   const { theme } = useSettingsStore();
 
-  // If user selected auto, use system preference
   if (theme === 'auto') {
-    return systemColorScheme ?? 'light';
+    return systemColorScheme ?? 'dark';
   }
 
-  // Otherwise use user's explicit choice
+  if (theme === 'night') {
+    return 'dark';
+  }
+
   return theme;
 }

@@ -13,6 +13,7 @@ import {
   StatusBar,
   Modal,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -59,6 +60,18 @@ const getGradientColors = (preset: FrequencyPreset): string[] => {
   return [GradientColors.solfeggio[0], GradientColors.solfeggio[1], '#000000'];
 };
 
+// Visual pulse tempo follows the sound: slow breathing for delta,
+// fine shimmer for gamma, slow drift for ambient noise, steady for tones.
+const getVisualTempoMs = (preset: FrequencyPreset): number => {
+  if (preset.type === 'binaural' && preset.beatFrequency) {
+    return 2000 + 8000 / preset.beatFrequency;
+  }
+  if (preset.type === 'noise') {
+    return 4500;
+  }
+  return 3000;
+};
+
 const getPlayerPresetIcon = (preset: FrequencyPreset): IconConfig => {
   if (preset.type === 'binaural' && preset.binauralType) {
     return getPresetIconConfig('binaural', preset.binauralType);
@@ -75,7 +88,7 @@ export default function PlayerScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { maxVolume, reduceMotion } = useSettingsStore();
-  const { isPlaying, volume, setVolume, timerRemaining, timerDuration } = useAudioStore();
+  const { isPlaying, isLoading, playbackError, volume, setVolume, timerRemaining, timerDuration } = useAudioStore();
   const { favoriteIds, addFavorite, removeFavorite, addRecentlyPlayed } = usePresetsStore();
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
@@ -202,6 +215,7 @@ export default function PlayerScreen() {
                   isPlaying={isPlaying}
                   color={preset.color}
                   intensity={volume}
+                  tempoMs={getVisualTempoMs(preset)}
                   style={styles.visualizer}
                 />
                 <Icon
@@ -222,6 +236,10 @@ export default function PlayerScreen() {
               <Text style={styles.presetDescription}>
                 {t(preset.descriptionKey)}
               </Text>
+            )}
+
+            {playbackError && (
+              <Text style={styles.playbackError}>{t('player.playbackError')}</Text>
             )}
           </View>
         </View>
@@ -263,16 +281,22 @@ export default function PlayerScreen() {
             {/* Play Button */}
             <TouchableOpacity
               onPress={handlePlayPause}
+              disabled={isLoading}
               activeOpacity={reduceMotion ? 1 : 0.8}
               style={[styles.playButton, Shadows.large]}
               accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
+              accessibilityState={{ busy: isLoading }}
             >
-              <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
-                size={44}
-                color="#000000"
-                style={isPlaying ? undefined : { marginLeft: 4 }}
-              />
+              {isLoading ? (
+                <ActivityIndicator size="large" color="#000000" />
+              ) : (
+                <Ionicons
+                  name={isPlaying ? 'pause' : 'play'}
+                  size={44}
+                  color="#000000"
+                  style={isPlaying ? undefined : { marginLeft: 4 }}
+                />
+              )}
             </TouchableOpacity>
 
             {/* Placeholder for symmetry */}
@@ -413,6 +437,12 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.6)',
     textAlign: 'center',
     lineHeight: 22,
+  },
+  playbackError: {
+    ...Typography.subhead,
+    color: '#E07A5F',
+    textAlign: 'center',
+    marginTop: Spacing.md,
   },
   controls: {
     paddingHorizontal: Spacing.xl,

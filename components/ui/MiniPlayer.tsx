@@ -12,6 +12,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,7 +31,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const { reduceMotion } = useSettingsStore();
-  const { currentPreset, isPlaying } = useAudioStore();
+  const { currentPreset, isPlaying, isLoading } = useAudioStore();
 
   const colors = useThemeColors();
 
@@ -115,18 +116,24 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         <View style={styles.rightSection}>
           <TouchableOpacity
             onPress={handlePlayPause}
+            disabled={isLoading}
             activeOpacity={reduceMotion ? 1 : 0.7}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
             accessibilityRole="button"
             accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
+            accessibilityState={{ busy: isLoading }}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons
-              name={isPlaying ? 'pause' : 'play'}
-              size={20}
-              color="#FFFFFF"
-              style={isPlaying ? undefined : { marginLeft: 2 }}
-            />
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Ionicons
+                name={isPlaying ? 'pause' : 'play'}
+                size={20}
+                color="#FFFFFF"
+                style={isPlaying ? undefined : { marginLeft: 2 }}
+              />
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleStop}

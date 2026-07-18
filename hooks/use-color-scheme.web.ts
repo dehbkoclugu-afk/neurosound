@@ -5,6 +5,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 /**
  * Same as the native hook (respects the user's theme setting), plus a
  * hydration guard so static web rendering matches the client first paint.
+ * 'night' resolves to 'dark' here; useThemeColors applies the night palette.
  */
 export function useColorScheme(): 'light' | 'dark' {
   const [hasHydrated, setHasHydrated] = useState(false);
@@ -17,11 +18,15 @@ export function useColorScheme(): 'light' | 'dark' {
   const { theme } = useSettingsStore();
 
   if (!hasHydrated) {
-    return 'light';
+    return 'dark';
   }
 
   if (theme === 'auto') {
-    return systemColorScheme ?? 'light';
+    return systemColorScheme ?? 'dark';
+  }
+
+  if (theme === 'night') {
+    return 'dark';
   }
 
   return theme;

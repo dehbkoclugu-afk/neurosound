@@ -9,6 +9,8 @@ export interface PlaybackState {
   // Current playback
   currentPreset: FrequencyPreset | null;
   isPlaying: boolean;
+  isLoading: boolean;
+  playbackError: boolean;
   volume: number;
 
   // Timer
@@ -23,6 +25,8 @@ export interface PlaybackState {
   // Actions
   setCurrentPreset: (preset: FrequencyPreset | null) => void;
   setIsPlaying: (playing: boolean) => void;
+  setIsLoading: (loading: boolean) => void;
+  setPlaybackError: (error: boolean) => void;
   setVolume: (volume: number) => void;
   setTimer: (duration: number | null) => void;
   updateTimerRemaining: (remaining: number | null) => void;
@@ -44,6 +48,8 @@ export interface MixerChannelState {
 const initialState = {
   currentPreset: null,
   isPlaying: false,
+  isLoading: false,
+  playbackError: false,
   volume: 0.5,
   timerDuration: null,
   timerRemaining: null,
@@ -58,6 +64,10 @@ export const useAudioStore = create<PlaybackState>((set) => ({
   setCurrentPreset: (preset) => set({ currentPreset: preset }),
 
   setIsPlaying: (isPlaying) => set({ isPlaying }),
+
+  setIsLoading: (isLoading) => set({ isLoading }),
+
+  setPlaybackError: (playbackError) => set({ playbackError }),
 
   setVolume: (volume) => set({ volume: Math.max(0, Math.min(1, volume)) }),
 

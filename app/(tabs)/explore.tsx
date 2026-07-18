@@ -58,7 +58,7 @@ const categories: CategoryTab[] = [
     key: 'noise',
     labelKey: 'explore.categories.noise',
     descriptionKey: 'explore.noiseDescription',
-    iconName: 'water',
+    iconName: 'volume-medium',
     presets: noisePresets,
   },
 ];

@@ -1,24 +1,30 @@
 /**
  * NeuroSound Theme Configuration
- * Modern Minimalist Design - Spotify/Apple Music Style
- * Accessibility-friendly colors with support for reduced contrast mode
+ *
+ * Identity: "Kor" — calm warm amber on deep warm neutrals.
+ * Dark-first (primary use case: at night, in a dark room, before sleep).
+ * The amber accent is a functional choice: low blue-light stimulation.
+ *
+ * Variants: light, dark (default), night (OLED, dimmed for bedtime),
+ * lowContrastLight / lowContrastDark (visual sensitivity — primary stays
+ * a muted amber so selected states remain readable, never gray).
  */
 
 import { Platform } from 'react-native';
 
-// Primary brand colors - Modern Minimalist
-const primary = '#1DB954'; // Spotify green (or keep #6366F1 for indigo)
-const primaryLight = '#1ED760';
-const primaryDark = '#1AA34A';
+// Primary brand colors — calm amber
+const primary = '#D99A4E';
+const primaryLight = '#E8B573';
+const primaryDark = '#B57C35';
 
-// Category icons for UI (using Ionicons names)
+// Category icons for UI (rendered via components/ui/Icon)
 export const CategoryIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
   binaural: { name: 'pulse', library: 'ionicon' },
   solfeggio: { name: 'musical-notes', library: 'ionicon' },
-  noise: { name: 'water', library: 'ionicon' },
+  noise: { name: 'volume-medium', library: 'ionicon' },
 };
 
-// Binaural type icons (using Ionicons/MaterialCommunityIcons names)
+// Binaural type icons — each unique
 export const BinauralIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
   delta: { name: 'moon', library: 'ionicon' },
   theta: { name: 'meditation', library: 'material' },
@@ -27,7 +33,7 @@ export const BinauralIcons: Record<string, { name: string; library: 'ionicon' | 
   gamma: { name: 'trending-up', library: 'ionicon' },
 };
 
-// Noise type icons
+// Noise type icons — no icon reused across meanings
 export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
   white: { name: 'radio', library: 'ionicon' },
   pink: { name: 'flower', library: 'ionicon' },
@@ -35,11 +41,11 @@ export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'ma
   rain: { name: 'rainy', library: 'ionicon' },
   thunder: { name: 'thunderstorm', library: 'ionicon' },
   ocean: { name: 'water', library: 'ionicon' },
-  wind: { name: 'leaf', library: 'ionicon' },
+  wind: { name: 'weather-windy', library: 'material' },
   fire: { name: 'flame', library: 'ionicon' },
-  forest: { name: 'leaf', library: 'ionicon' },
-  stream: { name: 'water', library: 'ionicon' },
-  fan: { name: 'sync', library: 'ionicon' },
+  forest: { name: 'pine-tree', library: 'material' },
+  stream: { name: 'waves', library: 'material' },
+  fan: { name: 'fan', library: 'material' },
   airplane: { name: 'airplane', library: 'ionicon' },
   train: { name: 'train', library: 'ionicon' },
 };
@@ -47,7 +53,7 @@ export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'ma
 // Solfeggio icon
 export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const };
 
-// Frequency category colors
+// Frequency category colors (preset identity coding — not the brand accent)
 export const FrequencyColors = {
   binaural: {
     delta: '#3B82F6', // Blue - sleep
@@ -64,7 +70,7 @@ export const FrequencyColors = {
   },
 };
 
-// Gradient backgrounds for presets
+// Gradient backgrounds for presets (player screen identity per sound)
 export const GradientColors: Record<string, string[]> = {
   // Binaural
   delta: ['#1e3a5f', '#3B82F6'],
@@ -109,93 +115,118 @@ export const GradientColors: Record<string, string[]> = {
 
 export const Colors = {
   light: {
-    text: '#1A1A1A',
-    textSecondary: '#6B7280',
-    background: '#FAFAFA',
-    backgroundSecondary: '#F3F4F6',
+    text: '#201B15',
+    textSecondary: '#6E655A',
+    background: '#FAF7F2',
+    backgroundSecondary: '#F1ECE3',
     card: '#FFFFFF',
-    cardBorder: '#E5E7EB',
+    cardBorder: '#E5DFD3',
     cardElevated: '#FFFFFF',
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
-    icon: '#6B7280',
-    tabIconDefault: '#9CA3AF',
-    tabIconSelected: primary,
-    success: '#10B981',
-    warning: '#F59E0B',
-    error: '#EF4444',
-    slider: '#E5E7EB',
-    sliderThumb: primary,
+    icon: '#6E655A',
+    tabIconDefault: '#A99F91',
+    tabIconSelected: primaryDark,
+    success: '#4C9A57',
+    warning: '#C77F2C',
+    error: '#C4553B',
+    slider: '#E5DFD3',
+    sliderThumb: primaryDark,
     overlay: 'rgba(0, 0, 0, 0.5)',
     miniPlayer: '#FFFFFF',
   },
   dark: {
-    text: '#FFFFFF',
-    textSecondary: '#B3B3B3',
-    background: '#121212',
-    backgroundSecondary: '#1E1E1E',
-    card: '#1E1E1E',
-    cardBorder: '#282828',
-    cardElevated: '#282828',
+    text: '#F5EFE6',
+    textSecondary: '#A69B8C',
+    background: '#131110',
+    backgroundSecondary: '#1C1917',
+    card: '#1C1917',
+    cardBorder: '#2A2521',
+    cardElevated: '#252019',
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
-    icon: '#B3B3B3',
-    tabIconDefault: '#535353',
+    icon: '#A69B8C',
+    tabIconDefault: '#5C544A',
     tabIconSelected: primary,
-    success: '#1DB954',
-    warning: '#FBBF24',
-    error: '#F87171',
-    slider: '#535353',
+    success: '#7FB069',
+    warning: '#E8B573',
+    error: '#E07A5F',
+    slider: '#3A332C',
     sliderThumb: primary,
     overlay: 'rgba(0, 0, 0, 0.7)',
-    miniPlayer: '#282828',
+    miniPlayer: '#1C1917',
   },
-  // Low contrast mode for visual sensitivity
+  // Night mode — OLED true-dark, everything dimmed and amber-shifted for
+  // bedtime use. Low-contrast setting is intentionally ignored here.
+  night: {
+    text: '#CDBFA9',
+    textSecondary: '#7A6F5F',
+    background: '#050403',
+    backgroundSecondary: '#12100D',
+    card: '#12100D',
+    cardBorder: '#1D1915',
+    cardElevated: '#171310',
+    tint: '#A87C3F',
+    primary: '#A87C3F',
+    primaryLight: '#C1954F',
+    icon: '#7A6F5F',
+    tabIconDefault: '#453E35',
+    tabIconSelected: '#A87C3F',
+    success: '#6E9463',
+    warning: '#C1954F',
+    error: '#B56A54',
+    slider: '#241F1A',
+    sliderThumb: '#A87C3F',
+    overlay: 'rgba(0, 0, 0, 0.8)',
+    miniPlayer: '#0C0A08',
+  },
+  // Low contrast mode for visual sensitivity — primary stays a muted amber
+  // so selected/active states remain distinguishable (never plain gray).
   lowContrastLight: {
-    text: '#4B5563',
-    textSecondary: '#9CA3AF',
-    background: '#F9FAFB',
-    backgroundSecondary: '#F3F4F6',
-    card: '#F9FAFB',
-    cardBorder: '#E5E7EB',
+    text: '#4E463C',
+    textSecondary: '#948A7C',
+    background: '#F8F5F0',
+    backgroundSecondary: '#F1ECE3',
+    card: '#F8F5F0',
+    cardBorder: '#E5DFD3',
     cardElevated: '#FFFFFF',
-    tint: '#9CA3AF',
-    primary: '#9CA3AF',
-    primaryLight: '#D1D5DB',
-    icon: '#9CA3AF',
-    tabIconDefault: '#D1D5DB',
-    tabIconSelected: '#6B7280',
-    success: '#6EE7B7',
-    warning: '#FCD34D',
-    error: '#FCA5A5',
-    slider: '#E5E7EB',
-    sliderThumb: '#9CA3AF',
+    tint: '#B59B72',
+    primary: '#B59B72',
+    primaryLight: '#CBB699',
+    icon: '#948A7C',
+    tabIconDefault: '#C9C0B2',
+    tabIconSelected: '#94794F',
+    success: '#8FB894',
+    warning: '#D6B27C',
+    error: '#D19582',
+    slider: '#E5DFD3',
+    sliderThumb: '#B59B72',
     overlay: 'rgba(0, 0, 0, 0.3)',
-    miniPlayer: '#F9FAFB',
+    miniPlayer: '#F8F5F0',
   },
   lowContrastDark: {
-    text: '#D1D5DB',
-    textSecondary: '#6B7280',
-    background: '#1F2937',
-    backgroundSecondary: '#374151',
-    card: '#374151',
-    cardBorder: '#4B5563',
-    cardElevated: '#4B5563',
-    tint: '#6B7280',
-    primary: '#6B7280',
-    primaryLight: '#9CA3AF',
-    icon: '#6B7280',
-    tabIconDefault: '#4B5563',
-    tabIconSelected: '#9CA3AF',
-    success: '#6EE7B7',
-    warning: '#FCD34D',
-    error: '#FCA5A5',
-    slider: '#4B5563',
-    sliderThumb: '#6B7280',
+    text: '#C9C0B2',
+    textSecondary: '#7D746A',
+    background: '#1B1815',
+    backgroundSecondary: '#26221E',
+    card: '#26221E',
+    cardBorder: '#332E28',
+    cardElevated: '#332E28',
+    tint: '#8F7A5C',
+    primary: '#8F7A5C',
+    primaryLight: '#A69072',
+    icon: '#7D746A',
+    tabIconDefault: '#4A443C',
+    tabIconSelected: '#A69072',
+    success: '#7F9C7B',
+    warning: '#BFA477',
+    error: '#B08672',
+    slider: '#332E28',
+    sliderThumb: '#8F7A5C',
     overlay: 'rgba(0, 0, 0, 0.5)',
-    miniPlayer: '#374151',
+    miniPlayer: '#26221E',
   },
 };
 
@@ -254,74 +285,84 @@ export const Shadows = {
   }),
 };
 
-// Typography scale
+// Font families — Nunito Sans, loaded in app/_layout.tsx via expo-font
+export const FontFamily = {
+  regular: 'NunitoSans_400Regular',
+  semibold: 'NunitoSans_600SemiBold',
+  bold: 'NunitoSans_700Bold',
+};
+
+// Typography scale (product register: tight ratio, hierarchy via weight)
 export const Typography = {
   largeTitle: {
-    fontSize: 34,
-    fontWeight: '700' as const,
-    lineHeight: 41,
+    fontSize: 32,
+    fontFamily: FontFamily.bold,
+    lineHeight: 39,
   },
   title1: {
-    fontSize: 28,
-    fontWeight: '700' as const,
-    lineHeight: 34,
+    fontSize: 27,
+    fontFamily: FontFamily.bold,
+    lineHeight: 33,
   },
   title2: {
     fontSize: 22,
-    fontWeight: '600' as const,
+    fontFamily: FontFamily.semibold,
     lineHeight: 28,
   },
   title3: {
     fontSize: 20,
-    fontWeight: '600' as const,
+    fontFamily: FontFamily.semibold,
     lineHeight: 25,
   },
   headline: {
     fontSize: 17,
-    fontWeight: '600' as const,
+    fontFamily: FontFamily.semibold,
     lineHeight: 22,
   },
   body: {
     fontSize: 17,
-    fontWeight: '400' as const,
-    lineHeight: 22,
+    fontFamily: FontFamily.regular,
+    lineHeight: 23,
   },
   callout: {
     fontSize: 16,
-    fontWeight: '400' as const,
+    fontFamily: FontFamily.regular,
     lineHeight: 21,
   },
   subhead: {
     fontSize: 15,
-    fontWeight: '400' as const,
+    fontFamily: FontFamily.regular,
     lineHeight: 20,
   },
   footnote: {
     fontSize: 13,
-    fontWeight: '400' as const,
+    fontFamily: FontFamily.regular,
     lineHeight: 18,
   },
   caption1: {
     fontSize: 12,
-    fontWeight: '400' as const,
+    fontFamily: FontFamily.regular,
     lineHeight: 16,
   },
   caption2: {
     fontSize: 11,
-    fontWeight: '400' as const,
+    fontFamily: FontFamily.regular,
     lineHeight: 13,
+  },
+  // For Hz values, timers, counters — tabular figures
+  mono: {
+    fontSize: 15,
+    fontFamily: FontFamily.semibold,
+    lineHeight: 20,
+    fontVariant: ['tabular-nums'] as const,
   },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {

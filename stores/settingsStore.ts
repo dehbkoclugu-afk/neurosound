@@ -37,7 +37,7 @@ const safeStorage: StateStorage = {
   },
 };
 
-export type ThemeMode = 'light' | 'dark' | 'auto';
+export type ThemeMode = 'light' | 'dark' | 'night' | 'auto';
 export type Language = 'tr' | 'en';
 
 interface SettingsState {
@@ -72,7 +72,8 @@ interface SettingsState {
 }
 
 const initialState = {
-  theme: 'auto' as ThemeMode,
+  // Dark-first: the primary use case is at night, in a dark room
+  theme: 'dark' as ThemeMode,
   reduceMotion: false,
   lowContrast: false,
   language: 'tr' as Language,

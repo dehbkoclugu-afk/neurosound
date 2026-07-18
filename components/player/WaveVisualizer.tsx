@@ -15,6 +15,9 @@ interface WaveVisualizerProps {
   isPlaying: boolean;
   color?: string;
   intensity?: number; // 0-1
+  /** Full breathing-cycle duration. Derived from the sound: slow for delta,
+   *  fast shimmer for gamma, long drift for ambient noise. */
+  tempoMs?: number;
   style?: ViewStyle;
 }
 
@@ -24,6 +27,7 @@ export function WaveVisualizer({
   isPlaying,
   color,
   intensity = 0.5,
+  tempoMs = 4000,
   style,
 }: WaveVisualizerProps) {
   const colorScheme = useColorScheme() ?? 'light';
@@ -48,19 +52,21 @@ export function WaveVisualizer({
       return;
     }
 
-    // Start wave animations with staggered delays
+    // Half cycle per direction; outer rings breathe slightly behind the core
+    const halfCycle = tempoMs / 2;
     const animations = waveAnimations.map((anim, index) => {
+      const duration = halfCycle + index * halfCycle * 0.25;
       return Animated.loop(
         Animated.sequence([
           Animated.timing(anim, {
             toValue: 1,
-            duration: 2000 + index * 500,
+            duration,
             easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
           Animated.timing(anim, {
             toValue: 0,
-            duration: 2000 + index * 500,
+            duration,
             easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
@@ -68,17 +74,18 @@ export function WaveVisualizer({
       );
     });
 
-    // Start with staggered delays
-    animations.forEach((animation, index) => {
+    // Start with staggered delays proportional to the tempo
+    const timeouts = animations.map((animation, index) =>
       setTimeout(() => {
         animation.start();
-      }, index * 300);
-    });
+      }, index * tempoMs * 0.08)
+    );
 
     return () => {
+      timeouts.forEach(clearTimeout);
       animations.forEach((animation) => animation.stop());
     };
-  }, [isPlaying, reduceMotion, waveAnimations]);
+  }, [isPlaying, reduceMotion, waveAnimations, tempoMs]);
 
   // If reduced motion, show static indicator
   if (reduceMotion) {

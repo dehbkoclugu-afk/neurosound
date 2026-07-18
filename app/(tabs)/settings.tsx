@@ -24,6 +24,7 @@ import i18n from '@/i18n';
 const THEME_OPTIONS: { value: ThemeMode; labelKey: string }[] = [
   { value: 'light', labelKey: 'settings.themes.light' },
   { value: 'dark', labelKey: 'settings.themes.dark' },
+  { value: 'night', labelKey: 'settings.themes.night' },
   { value: 'auto', labelKey: 'settings.themes.auto' },
 ];
 

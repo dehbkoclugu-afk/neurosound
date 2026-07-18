@@ -30,7 +30,9 @@
     "recentlyPlayed": "Son Dinlenenler",
     "categories": "Kategoriler",
     "headphoneWarning": "Binaural beat'ler için kulaklık kullanın",
-    "headphoneWarningDesc": "Binaural beat'ler düzgün çalışması için kulaklık gerektirir. Her kulağa hafif farklı frekans gönderilerek beat efekti oluşturulur."
+    "headphoneWarningDesc": "Binaural beat'ler düzgün çalışması için kulaklık gerektirir. Her kulağa hafif farklı frekans gönderilerek beat efekti oluşturulur.",
+    "intentsTitle": "Ne yapmak istiyorsun?",
+    "favoritesEmpty": "Bir sesi beğendiğinde kalbe dokun; burada toplanır."
   },
   "explore": {
     "title": "Frekansları Keşfet",
@@ -116,7 +118,9 @@
     "enterName": "Lütfen karışımınız için bir ad girin.",
     "addSoundFirst": "Kaydetmek için en az bir ses ekleyin.",
     "mixSaved": "Karışımınız kaydedildi!",
-    "deleteMix": "Karışımı sil"
+    "deleteMix": "Karışımı sil",
+    "emptyDesc": "Birden fazla sesi üst üste bindir: yağmur + kahverengi gürültü + alpha gibi.",
+    "trySample": "Örnek karışımı dene"
   },
   "player": {
     "nowPlaying": "Şu an çalıyor",
@@ -131,7 +135,8 @@
       "2hours": "2 saat"
     },
     "baseFrequency": "Taban Frekans",
-    "beatFrequency": "Beat Frekansı"
+    "beatFrequency": "Beat Frekansı",
+    "playbackError": "Ses başlatılamadı. Tekrar deneyin."
   },
   "settings": {
     "title": "Ayarlar",
@@ -140,7 +145,8 @@
     "themes": {
       "light": "Aydınlık",
       "dark": "Karanlık",
-      "auto": "Otomatik"
+      "auto": "Otomatik",
+      "night": "Gece"
     },
     "reduceMotion": "Animasyonları Azalt",
     "lowContrast": "Düşük Kontrast",
@@ -158,5 +164,25 @@
     "volumeSlider": "Ses seviyesi ayarı",
     "frequencyCard": "Frekans kartı",
     "expandPlayer": "Oynatıcıyı genişletmek için dokun"
+  },
+  "intents": {
+    "sleep": "Uyku",
+    "sleepDesc": "Derin uykuya dalmana yardımcı sesler",
+    "focus": "Odak",
+    "focusDesc": "Dikkatini toplamak için ritim ve gürültü",
+    "relax": "Rahatlama",
+    "relaxDesc": "Gevşemek için doğa sesleri ve yumuşak tonlar",
+    "meditate": "Meditasyon",
+    "meditateDesc": "İçe dönmek için derin, sakin tonlar"
+  },
+  "onboarding": {
+    "step1Title": "Sese odaklan",
+    "step1Desc": "Binaural ritimler, saf tonlar ve ortam sesleriyle uyu, odaklan, rahatla.",
+    "step2Title": "Kulaklık tak",
+    "step2Desc": "Binaural ritimler her kulağa farklı bir frekans gönderir; etkiyi duymak için kulaklık gerekir.",
+    "step3Title": "Sesini koru",
+    "step3Desc": "Ses seviyesini rahat bir düzeyde tut, rahatsızlık hissedersen ara ver. Bu uygulama tıbbi bir ürün değildir.",
+    "next": "İleri",
+    "start": "Başla"
   }
 }

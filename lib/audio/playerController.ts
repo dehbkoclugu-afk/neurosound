@@ -53,6 +53,48 @@ function effectiveVolume(): number {
   return volume * maxVolume;
 }
 
+// ---------------------------------------------------------------------------
+// Volume ramps — abrupt starts/stops are jarring in a sleep/focus app
+// ---------------------------------------------------------------------------
+
+const FADE_IN_MS = 400;
+const FADE_OUT_MS = 250;
+const TIMER_FADE_WINDOW_S = 30; // sleep timer fades over the last 30 seconds
+
+let rampInterval: ReturnType<typeof setInterval> | null = null;
+let lastVolume = 0;
+
+function setGenVolume(v: number): void {
+  generator?.setVolume(v);
+  lastVolume = v;
+}
+
+function cancelRamp(): void {
+  if (rampInterval) {
+    clearInterval(rampInterval);
+    rampInterval = null;
+  }
+}
+
+function ramp(to: number, ms: number, onDone?: () => void): void {
+  cancelRamp();
+  if (!generator) {
+    onDone?.();
+    return;
+  }
+  const from = lastVolume;
+  const steps = Math.max(1, Math.round(ms / 30));
+  let i = 0;
+  rampInterval = setInterval(() => {
+    i++;
+    setGenVolume(from + (to - from) * (i / steps));
+    if (i >= steps) {
+      cancelRamp();
+      onDone?.();
+    }
+  }, 30);
+}
+
 /** Load a preset. Same preset = no-op so playback continues untouched. */
 export function loadPreset(preset: FrequencyPreset): void {
   if (currentId === preset.id && generator) return;
@@ -60,11 +102,13 @@ export function loadPreset(preset: FrequencyPreset): void {
   mixerStop(); // single preset and mixer are mutually exclusive
 
   if (generator) {
+    cancelRamp();
     generator.stop();
     generator.dispose();
     generator = null;
   }
   useAudioStore.getState().setIsPlaying(false);
+  useAudioStore.getState().setPlaybackError(false);
 
   generator = createGenerator(preset);
   currentId = preset.id;
@@ -76,18 +120,38 @@ let playPending = false;
 export async function play(): Promise<void> {
   if (!generator || playPending) return;
   playPending = true;
+  const store = useAudioStore.getState();
+  store.setIsLoading(true);
+  store.setPlaybackError(false);
   try {
-    generator.setVolume(effectiveVolume());
+    setGenVolume(0); // fade in from silence
     await generator.play();
+    if (!generator || !generator.getIsPlaying()) {
+      // generators swallow their own errors; surface the failure to the UI
+      useAudioStore.getState().setPlaybackError(true);
+      return;
+    }
+    ramp(effectiveVolume(), FADE_IN_MS);
     useAudioStore.getState().setIsPlaying(true);
   } finally {
+    useAudioStore.getState().setIsLoading(false);
     playPending = false;
   }
 }
 
-export function pause(): void {
-  generator?.stop();
+/** Fade out then stop. `immediate` skips the fade (unload/switching). */
+export function pause(immediate: boolean = false): void {
+  const gen = generator;
   useAudioStore.getState().setIsPlaying(false);
+  if (!gen) return;
+  if (immediate) {
+    cancelRamp();
+    gen.stop();
+    return;
+  }
+  ramp(0, FADE_OUT_MS, () => {
+    gen.stop();
+  });
 }
 
 export async function toggle(): Promise<void> {
@@ -100,7 +164,10 @@ export async function toggle(): Promise<void> {
 
 /** Re-apply store volume × maxVolume to all live generators. */
 export function syncVolume(): void {
-  generator?.setVolume(effectiveVolume());
+  if (!rampInterval) {
+    // don't fight an active fade
+    setGenVolume(effectiveVolume());
+  }
   const { mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
   mixerChannels.forEach((ch) =>
@@ -110,7 +177,7 @@ export function syncVolume(): void {
 
 /** Stop, dispose, and clear everything — MiniPlayer close button. */
 export function unload(): void {
-  pause();
+  pause(true);
   generator?.dispose();
   generator = null;
   currentId = null;
@@ -136,7 +203,7 @@ export function startTimer(minutes: number | null): void {
   if (!minutes) return;
 
   timerInterval = setInterval(() => {
-    const { timerRemaining, updateTimerRemaining } = useAudioStore.getState();
+    const { timerRemaining, updateTimerRemaining, isPlaying } = useAudioStore.getState();
     if (timerRemaining === null) {
       clearTimer();
       return;
@@ -144,8 +211,13 @@ export function startTimer(minutes: number | null): void {
     if (timerRemaining <= 1) {
       pause();
       clearTimer();
-    } else {
-      updateTimerRemaining(timerRemaining - 1);
+      return;
+    }
+    const next = timerRemaining - 1;
+    updateTimerRemaining(next);
+    // Gentle fade over the final window instead of an abrupt cut
+    if (isPlaying && next <= TIMER_FADE_WINDOW_S && !rampInterval) {
+      setGenVolume(effectiveVolume() * (next / TIMER_FADE_WINDOW_S));
     }
   }, 1000);
 }
