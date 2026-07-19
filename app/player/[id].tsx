@@ -16,6 +16,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
@@ -133,6 +134,14 @@ export default function PlayerScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Atmospheric wash — the sound's colour bleeds softly from the top */}
+      <LinearGradient
+        colors={[preset.color + '2E', preset.color + '0D', colors.background]}
+        locations={[0, 0.42, 0.82]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + Spacing.lg }]}>
         <TouchableOpacity
@@ -158,10 +167,12 @@ export default function PlayerScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Breathing ring — the sound's own colour, on a soft backdrop disc */}
+      {/* Breathing ring — the centerpiece, over a soft radial glow */}
       <View style={styles.content}>
         <View style={styles.visualWrap}>
-          <View style={[styles.backdropDisc, { backgroundColor: preset.color + '14' }]} />
+          <View style={[styles.glowOuter, { backgroundColor: preset.color + '0F' }]} />
+          <View style={[styles.glowMid, { backgroundColor: preset.color + '14' }]} />
+          <View style={[styles.glowInner, { backgroundColor: preset.color + '1C' }]} />
           <WaveVisualizer
             isPlaying={isPlaying}
             color={preset.color}
@@ -329,11 +340,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backdropDisc: {
+  glowOuter: {
     position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
+    width: 340,
+    height: 340,
+    borderRadius: 170,
+  },
+  glowMid: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+  },
+  glowInner: {
+    position: 'absolute',
+    width: 210,
+    height: 210,
+    borderRadius: 105,
   },
   infoContainer: {
     alignItems: 'center',

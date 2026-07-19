@@ -17,6 +17,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography } from '@/constants/theme';
@@ -105,6 +106,13 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Soft warm atmosphere at the top, fading into the background */}
+      <LinearGradient
+        colors={[colors.primary + '1A', colors.background]}
+        locations={[0, 0.4]}
+        style={styles.atmosphere}
+        pointerEvents="none"
+      />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -222,6 +230,13 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  atmosphere: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 280,
   },
   scrollView: {
     flex: 1,
