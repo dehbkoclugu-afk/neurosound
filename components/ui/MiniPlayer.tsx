@@ -1,8 +1,6 @@
 /**
- * MiniPlayer Component - Compact Player Bar
- * - Shows above tab bar when audio is playing
- * - Displays current preset with progress
- * - Tap to expand to full player
+ * MiniPlayer — quiet flat bar above the tab bar.
+ * Hairline top, typographic info, play/pause + dismiss.
  */
 
 import React from 'react';
@@ -11,13 +9,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Animated,
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Shadows } from '@/constants/theme';
+import { Spacing, Typography } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
@@ -35,7 +32,6 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
 
   const colors = useThemeColors();
 
-  // Don't render if no preset is playing
   if (!currentPreset) {
     return null;
   }
@@ -56,63 +52,41 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
     playerController.unload();
   };
 
-  const presetColor = currentPreset.color || colors.primary;
+  const subline =
+    currentPreset.type === 'binaural'
+      ? `${currentPreset.beatFrequency} Hz`
+      : currentPreset.type === 'solfeggio'
+        ? `${currentPreset.frequency} Hz`
+        : t('explore.categories.noise');
 
   return (
     <TouchableOpacity
       onPress={handlePress}
-      activeOpacity={reduceMotion ? 1 : 0.95}
+      activeOpacity={reduceMotion ? 1 : 0.9}
       style={[
         styles.container,
         {
-          backgroundColor: colors.miniPlayer,
+          backgroundColor: colors.background,
           borderTopColor: colors.cardBorder,
         },
-        Shadows.medium,
       ]}
       accessibilityRole="button"
       accessibilityLabel={`${t('player.nowPlaying')}: ${t(currentPreset.nameKey)}`}
       accessibilityHint={t('accessibility.expandPlayer')}
     >
-      {/* Progress indicator line */}
-      <View style={[styles.progressLine, { backgroundColor: presetColor }]} />
-
       <View style={styles.content}>
-        {/* Left: Playing indicator and title */}
-        <View style={styles.leftSection}>
-          {/* Animated playing indicator */}
-          <View style={[styles.playingIndicator, { backgroundColor: presetColor }]}>
-            {isPlaying ? (
-              <View style={styles.barsContainer}>
-                <Animated.View style={[styles.bar, { backgroundColor: '#fff' }]} />
-                <Animated.View style={[styles.bar, styles.barMedium, { backgroundColor: '#fff' }]} />
-                <Animated.View style={[styles.bar, styles.barShort, { backgroundColor: '#fff' }]} />
-              </View>
-            ) : (
-              <Ionicons name="musical-notes" size={16} color="#fff" />
-            )}
-          </View>
-
-          {/* Preset info */}
-          <View style={styles.infoContainer}>
-            <Text
-              style={[styles.presetName, { color: colors.text }]}
-              numberOfLines={1}
-            >
-              {t(currentPreset.nameKey)}
-            </Text>
-            <Text
-              style={[styles.presetType, { color: colors.textSecondary }]}
-              numberOfLines={1}
-            >
-              {currentPreset.type === 'binaural' && `${currentPreset.beatFrequency} Hz`}
-              {currentPreset.type === 'solfeggio' && `${currentPreset.frequency} Hz`}
-              {currentPreset.type === 'noise' && currentPreset.noiseType}
-            </Text>
-          </View>
+        <View style={styles.infoContainer}>
+          <Text style={[styles.presetName, { color: colors.text }]} numberOfLines={1}>
+            {t(currentPreset.nameKey)}
+          </Text>
+          <Text
+            style={[styles.presetType, { color: colors.textSecondary }]}
+            numberOfLines={1}
+          >
+            {subline}
+          </Text>
         </View>
 
-        {/* Right: Play/Pause + Stop buttons */}
         <View style={styles.rightSection}>
           <TouchableOpacity
             onPress={handlePlayPause}
@@ -125,12 +99,12 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator size="small" color="#1A140C" />
             ) : (
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
-                size={20}
-                color="#FFFFFF"
+                size={18}
+                color="#1A140C"
                 style={isPlaying ? undefined : { marginLeft: 2 }}
               />
             )}
@@ -143,7 +117,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             accessibilityLabel={t('common.stop')}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="close" size={22} color={colors.textSecondary} />
+            <Ionicons name="close" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -158,11 +132,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderTopWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
-  },
-  progressLine: {
-    height: 2,
-    width: '100%',
   },
   content: {
     flexDirection: 'row',
@@ -172,48 +141,17 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     minHeight: 56,
   },
-  leftSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginRight: Spacing.md,
-  },
-  playingIndicator: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.sm,
-  },
-  barsContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 2,
-    height: 16,
-  },
-  bar: {
-    width: 3,
-    height: 16,
-    borderRadius: 1.5,
-  },
-  barMedium: {
-    height: 10,
-  },
-  barShort: {
-    height: 6,
-  },
   infoContainer: {
     flex: 1,
+    marginRight: Spacing.md,
+    gap: 1,
   },
   presetName: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...Typography.subhead,
   },
   presetType: {
-    fontSize: 12,
-    marginTop: 1,
-    textTransform: 'capitalize',
+    ...Typography.caption1,
+    fontVariant: ['tabular-nums'],
   },
   rightSection: {
     flexDirection: 'row',

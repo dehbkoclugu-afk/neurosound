@@ -17,10 +17,9 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, Shadows, GradientColors, FontFamily } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -48,20 +47,6 @@ const SAMPLE_MIX = [
   { presetId: 'noise-brown', volume: 0.35 },
   { presetId: 'binaural-alpha', volume: 0.5 },
 ];
-
-const getGradientColors = (preset: FrequencyPreset): string[] => {
-  if (preset.type === 'binaural' && preset.binauralType) {
-    return GradientColors[preset.binauralType] || [preset.color, preset.color];
-  }
-  if (preset.type === 'noise' && preset.noiseType) {
-    return GradientColors[preset.noiseType] || [preset.color, preset.color];
-  }
-  if (preset.type === 'solfeggio') {
-    // Use preset-specific gradient if available
-    return GradientColors[preset.id] || GradientColors.solfeggio || [preset.color, preset.color];
-  }
-  return GradientColors.solfeggio;
-};
 
 export default function MixerScreen() {
   const { t } = useTranslation();
@@ -142,15 +127,10 @@ export default function MixerScreen() {
           </Text>
         </View>
 
-        {/* Info Banner */}
-        <View style={[styles.infoBanner, { backgroundColor: colors.backgroundSecondary }]}>
-          <View style={[styles.infoIcon, { backgroundColor: colors.primary + '20' }]}>
-            <Ionicons name="musical-notes" size={20} color={colors.primary} />
-          </View>
-          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            {t('mixer.description')}
-          </Text>
-        </View>
+        {/* Quiet description */}
+        <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+          {t('mixer.description')}
+        </Text>
 
         {/* Active Channels */}
         <View style={styles.section}>
@@ -161,16 +141,15 @@ export default function MixerScreen() {
 
           {/* Empty state teaches the mixer with a one-tap sample */}
           {channels.length === 0 && (
-            <View style={[styles.emptyState, { backgroundColor: colors.backgroundSecondary }]}>
+            <View style={styles.emptyState}>
               <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
                 {t('mixer.emptyDesc')}
               </Text>
               <TouchableOpacity
                 onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
-                style={[styles.sampleButton, { backgroundColor: colors.primary + '22' }]}
+                style={styles.sampleButton}
                 accessibilityRole="button"
               >
-                <Ionicons name="sparkles" size={16} color={colors.primary} />
                 <Text style={[styles.sampleButtonText, { color: colors.primary }]}>
                   {t('mixer.trySample')}
                 </Text>
@@ -178,64 +157,43 @@ export default function MixerScreen() {
             </View>
           )}
 
-          {channels.map(channel => {
-            const gradientColors = getGradientColors(channel.preset);
-            return (
-              <View
-                key={channel.id}
-                style={[styles.channelCard, Shadows.small]}
-              >
-                <LinearGradient
-                  colors={gradientColors as [string, string, ...string[]]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.channelGradient}
+          {channels.map(channel => (
+            <View
+              key={channel.id}
+              style={[styles.channelRow, { borderBottomColor: colors.cardBorder }]}
+            >
+              <View style={styles.channelHeader}>
+                <Text style={[styles.channelName, { color: colors.text }]}>
+                  {t(channel.preset.nameKey)}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => handleRemoveChannel(channel.id)}
+                  style={styles.removeButton}
+                  accessibilityLabel={t('common.delete')}
                 >
-                  <View style={styles.channelHeader}>
-                    <Text style={styles.channelName}>
-                      {t(channel.preset.nameKey)}
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => handleRemoveChannel(channel.id)}
-                      style={styles.removeButton}
-                      accessibilityLabel={t('common.delete')}
-                    >
-                      <Ionicons name="close-circle" size={24} color="rgba(255,255,255,0.8)" />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.channelSlider}>
-                    <Ionicons name="volume-low" size={16} color="rgba(255,255,255,0.7)" />
-                    <View style={styles.sliderWrapper}>
-                      <Slider
-                        value={channel.volume}
-                        onValueChange={(v) => handleVolumeChange(channel.id, v)}
-                        max={1}
-                        accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
-                      />
-                    </View>
-                    <Ionicons name="volume-high" size={16} color="rgba(255,255,255,0.7)" />
-                  </View>
-                </LinearGradient>
+                  <Ionicons name="close" size={20} color={colors.textSecondary} />
+                </TouchableOpacity>
               </View>
-            );
-          })}
+              <Slider
+                value={channel.volume}
+                onValueChange={(v) => handleVolumeChange(channel.id, v)}
+                max={1}
+                showValue={false}
+                accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
+              />
+            </View>
+          ))}
 
-          {/* Add Channel Button */}
+          {/* Add Channel — text row */}
           {channels.length < playerController.MAX_MIXER_CHANNELS && (
             <TouchableOpacity
               onPress={() => setShowPresetPicker(true)}
-              activeOpacity={reduceMotion ? 1 : 0.8}
-              style={[
-                styles.addButton,
-                {
-                  borderColor: colors.primary,
-                  backgroundColor: colors.primary + '10',
-                },
-              ]}
+              activeOpacity={reduceMotion ? 1 : 0.6}
+              style={styles.addRow}
               accessibilityLabel={t('mixer.addSound')}
             >
-              <Ionicons name="add-circle" size={32} color={colors.primary} />
-              <Text style={[styles.addButtonText, { color: colors.primary }]}>
+              <Ionicons name="add" size={20} color={colors.primary} />
+              <Text style={[styles.addRowText, { color: colors.primary }]}>
                 {t('mixer.addSound')}
               </Text>
             </TouchableOpacity>
@@ -248,23 +206,16 @@ export default function MixerScreen() {
             <TouchableOpacity
               onPress={handlePlayPause}
               activeOpacity={reduceMotion ? 1 : 0.8}
-              style={[
-                styles.playButton,
-                { backgroundColor: colors.primary },
-                Shadows.large,
-              ]}
+              style={[styles.playButton, { backgroundColor: colors.primary }]}
               accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
             >
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
                 size={32}
-                color="#FFFFFF"
+                color="#1A140C"
                 style={isPlaying ? undefined : { marginLeft: 4 }}
               />
             </TouchableOpacity>
-            <Text style={[styles.playText, { color: colors.textSecondary }]}>
-              {isPlaying ? t('common.pause') : t('common.play')}
-            </Text>
           </View>
         )}
 
@@ -287,25 +238,16 @@ export default function MixerScreen() {
               <TouchableOpacity
                 key={mix.id}
                 onPress={() => handleLoadMix(mix)}
-                activeOpacity={reduceMotion ? 1 : 0.8}
-                style={[
-                  styles.mixCard,
-                  {
-                    backgroundColor: colors.card,
-                    borderColor: colors.cardBorder,
-                  },
-                ]}
+                activeOpacity={reduceMotion ? 1 : 0.6}
+                style={[styles.mixRow, { borderBottomColor: colors.cardBorder }]}
               >
-                <View style={styles.mixInfo}>
-                  <Ionicons name="layers" size={24} color={colors.primary} />
-                  <View style={styles.mixTextContainer}>
-                    <Text style={[styles.mixName, { color: colors.text }]}>
-                      {mix.name}
-                    </Text>
-                    <Text style={[styles.mixChannels, { color: colors.textSecondary }]}>
-                      {mix.channels.length} {t('mixer.sounds')}
-                    </Text>
-                  </View>
+                <View style={styles.mixTextContainer}>
+                  <Text style={[styles.mixName, { color: colors.text }]}>
+                    {mix.name}
+                  </Text>
+                  <Text style={[styles.mixChannels, { color: colors.textSecondary }]}>
+                    {mix.channels.length} {t('mixer.sounds')}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => {
@@ -358,29 +300,19 @@ export default function MixerScreen() {
                   <Text style={[styles.pickerGroupTitle, { color: colors.textSecondary }]}>
                     {t(group.titleKey)}
                   </Text>
-                  {group.presets.map(preset => {
-                    const gradientColors = getGradientColors(preset);
-                    return (
-                      <TouchableOpacity
-                        key={preset.id}
-                        onPress={() => handleAddChannel(preset)}
-                        activeOpacity={reduceMotion ? 1 : 0.8}
-                        style={[styles.presetItem, Shadows.small]}
-                      >
-                        <LinearGradient
-                          colors={gradientColors as [string, string, ...string[]]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={styles.presetItemGradient}
-                        >
-                          <Text style={styles.presetItemName}>
-                            {t(preset.nameKey)}
-                          </Text>
-                          <Ionicons name="add-circle" size={24} color="rgba(255,255,255,0.8)" />
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    );
-                  })}
+                  {group.presets.map(preset => (
+                    <TouchableOpacity
+                      key={preset.id}
+                      onPress={() => handleAddChannel(preset)}
+                      activeOpacity={reduceMotion ? 1 : 0.6}
+                      style={[styles.presetItem, { borderBottomColor: colors.cardBorder }]}
+                    >
+                      <Text style={[styles.presetItemName, { color: colors.text }]}>
+                        {t(preset.nameKey)}
+                      </Text>
+                      <Ionicons name="add" size={22} color={colors.primary} />
+                    </TouchableOpacity>
+                  ))}
                 </View>
               ))}
             </ScrollView>
@@ -452,74 +384,44 @@ const styles = StyleSheet.create({
   title: {
     ...Typography.largeTitle,
   },
-  infoBanner: {
-    flexDirection: 'row',
-    padding: Spacing.md,
-    borderRadius: 16,
-    marginBottom: Spacing.lg,
-    alignItems: 'center',
-  },
-  infoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.sm,
-  },
   infoText: {
-    flex: 1,
     ...Typography.subhead,
-    lineHeight: 20,
+    lineHeight: 21,
+    marginBottom: Spacing.md,
   },
   section: {
     marginBottom: Spacing.lg,
   },
-  channelCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginBottom: Spacing.md,
-  },
-  channelGradient: {
-    padding: Spacing.md,
+  channelRow: {
+    paddingVertical: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: Spacing.sm,
   },
   channelHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
   },
   channelName: {
     ...Typography.headline,
-    color: '#FFFFFF',
   },
   removeButton: {
     padding: Spacing.xs,
   },
-  channelSlider: {
+  addRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+    minHeight: 52,
   },
-  sliderWrapper: {
-    flex: 1,
-  },
-  addButton: {
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderRadius: 16,
-    padding: Spacing.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 100,
-    gap: Spacing.sm,
-  },
-  addButtonText: {
+  addRowText: {
     ...Typography.headline,
   },
   playSection: {
     alignItems: 'center',
     marginBottom: Spacing.xl,
+    marginTop: Spacing.md,
   },
   playButton: {
     width: 72,
@@ -527,38 +429,26 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Spacing.sm,
-  },
-  playText: {
-    ...Typography.subhead,
-    fontWeight: '500',
   },
   saveSection: {
     marginBottom: Spacing.xl,
   },
-  mixCard: {
+  mixRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Spacing.md,
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: Spacing.sm,
-  },
-  mixInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   mixTextContainer: {
-    marginLeft: Spacing.md,
+    flex: 1,
+    gap: 2,
   },
   mixName: {
     ...Typography.headline,
   },
   mixChannels: {
     ...Typography.caption1,
-    marginTop: 2,
   },
   deleteButton: {
     padding: Spacing.sm,
@@ -596,9 +486,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   emptyState: {
-    padding: Spacing.md,
-    borderRadius: 16,
-    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+    gap: Spacing.sm,
     marginBottom: Spacing.md,
   },
   emptyStateText: {
@@ -606,32 +495,24 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   sampleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.xs,
     paddingVertical: Spacing.sm,
-    borderRadius: 12,
     minHeight: 44,
+    justifyContent: 'center',
   },
   sampleButtonText: {
     ...Typography.subhead,
     fontFamily: FontFamily.semibold,
   },
   presetItem: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: Spacing.sm,
-  },
-  presetItemGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    minHeight: 52,
   },
   presetItemName: {
-    ...Typography.headline,
-    color: '#FFFFFF',
+    ...Typography.body,
   },
   saveForm: {
     gap: Spacing.md,

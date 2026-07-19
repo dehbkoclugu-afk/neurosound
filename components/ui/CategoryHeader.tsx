@@ -1,8 +1,6 @@
 /**
- * CategoryHeader Component - Section Title with Modern Styling
- * - Bold section title
- * - Optional "See All" button
- * - Clean minimalist design
+ * Section header — quiet, typographic. Small secondary label, no icons.
+ * CategoryCard is a plain text row with a chevron (no icon tiles).
  */
 
 import React from 'react';
@@ -15,7 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography } from '@/constants/theme';
+import { Spacing, Typography, FontFamily } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 interface CategoryHeaderProps {
@@ -23,7 +21,7 @@ interface CategoryHeaderProps {
   subtitle?: string;
   onSeeAll?: () => void;
   seeAllText?: string;
-  iconName?: string;
+  iconName?: string; // kept for API compat, unused
   style?: ViewStyle;
 }
 
@@ -32,37 +30,25 @@ export function CategoryHeader({
   subtitle,
   onSeeAll,
   seeAllText = 'See All',
-  iconName,
   style,
 }: CategoryHeaderProps) {
   const { reduceMotion } = useSettingsStore();
-
   const colors = useThemeColors();
 
   return (
     <View style={[styles.container, style]}>
-      <View style={styles.titleContainer}>
-        {iconName && (
-          <Ionicons
-            name={iconName as any}
-            size={22}
-            color={colors.primary}
-            style={styles.icon}
-          />
+      <View style={styles.textContainer}>
+        <Text style={[styles.title, { color: colors.textSecondary }]}>{title}</Text>
+        {subtitle && (
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            {subtitle}
+          </Text>
         )}
-        <View style={styles.textContainer}>
-          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-          {subtitle && (
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-              {subtitle}
-            </Text>
-          )}
-        </View>
       </View>
       {onSeeAll && (
         <TouchableOpacity
           onPress={onSeeAll}
-          activeOpacity={reduceMotion ? 1 : 0.7}
+          activeOpacity={reduceMotion ? 1 : 0.6}
           style={styles.seeAllButton}
           accessibilityRole="button"
           accessibilityLabel={seeAllText}
@@ -70,53 +56,39 @@ export function CategoryHeader({
           <Text style={[styles.seeAllText, { color: colors.primary }]}>
             {seeAllText}
           </Text>
-          <Ionicons name="chevron-forward" size={16} color={colors.primary} />
         </TouchableOpacity>
       )}
     </View>
   );
 }
 
-// Large category card for homepage
+// Plain text row for category navigation
 interface CategoryCardProps {
   title: string;
-  iconName: string;
-  color: string;
+  iconName?: string; // kept for API compat, unused
+  color?: string; // kept for API compat, unused
   onPress: () => void;
   style?: ViewStyle;
 }
 
 export function CategoryCard({
   title,
-  iconName,
-  color,
   onPress,
   style,
 }: CategoryCardProps) {
   const { reduceMotion } = useSettingsStore();
-
   const colors = useThemeColors();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.8}
-      style={[
-        styles.categoryCard,
-        {
-          backgroundColor: colors.card,
-          borderColor: colors.cardBorder,
-        },
-        style,
-      ]}
+      activeOpacity={reduceMotion ? 1 : 0.6}
+      style={[styles.categoryRow, { borderBottomColor: colors.cardBorder }, style]}
       accessibilityRole="button"
       accessibilityLabel={title}
     >
-      <View style={[styles.categoryIconContainer, { backgroundColor: color + '20' }]}>
-        <Ionicons name={iconName as any} size={24} color={color} />
-      </View>
       <Text style={[styles.categoryTitle, { color: colors.text }]}>{title}</Text>
-      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+      <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 }
@@ -124,57 +96,39 @@ export function CategoryCard({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
-    marginBottom: Spacing.md,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  icon: {
-    marginRight: Spacing.sm,
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.lg,
   },
   textContainer: {
     flex: 1,
+    gap: 2,
   },
   title: {
-    ...Typography.title2,
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
   },
   subtitle: {
-    ...Typography.subhead,
-    marginTop: 2,
+    ...Typography.caption1,
   },
   seeAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingVertical: Spacing.xs,
     paddingLeft: Spacing.sm,
   },
   seeAllText: {
     ...Typography.subhead,
-    fontWeight: '600',
+    fontFamily: FontFamily.semibold,
   },
-  // Category card styles
-  categoryCard: {
+  categoryRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing.md,
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: Spacing.sm,
-  },
-  categoryIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.md,
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    minHeight: 52,
   },
   categoryTitle: {
     ...Typography.headline,
-    flex: 1,
   },
 });

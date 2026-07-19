@@ -1,6 +1,6 @@
 /**
- * Player Screen - Full-screen Spotify-style Audio Player
- * Large gradient background, centered visual, bottom controls
+ * Player Screen — quiet instrument.
+ * Flat surface, one breathing ring, typographic info, single amber accent.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -9,21 +9,17 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
-  StatusBar,
   Modal,
   Pressable,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, Shadows, GradientColors } from '@/constants/theme';
-import { Icon, getPresetIcon as getPresetIconConfig, IconConfig } from '@/components/ui/Icon';
+import { Spacing, Typography, FontFamily } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
@@ -41,25 +37,6 @@ const TIMER_OPTIONS = [
   { labelKey: 'player.timerOptions.2hours', value: 120 },
 ];
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-const getGradientColors = (preset: FrequencyPreset): string[] => {
-  if (preset.type === 'binaural' && preset.binauralType) {
-    const colors = GradientColors[preset.binauralType];
-    return [colors[0], colors[1], '#000000'];
-  }
-  if (preset.type === 'noise' && preset.noiseType) {
-    const colors = GradientColors[preset.noiseType];
-    return [colors[0], colors[1], '#000000'];
-  }
-  if (preset.type === 'solfeggio') {
-    // Use preset-specific gradient if available
-    const colors = GradientColors[preset.id] || GradientColors.solfeggio;
-    return [colors[0], colors[1], '#000000'];
-  }
-  return [GradientColors.solfeggio[0], GradientColors.solfeggio[1], '#000000'];
-};
-
 // Visual pulse tempo follows the sound: slow breathing for delta,
 // fine shimmer for gamma, slow drift for ambient noise, steady for tones.
 const getVisualTempoMs = (preset: FrequencyPreset): number => {
@@ -72,14 +49,14 @@ const getVisualTempoMs = (preset: FrequencyPreset): number => {
   return 3000;
 };
 
-const getPlayerPresetIcon = (preset: FrequencyPreset): IconConfig => {
-  if (preset.type === 'binaural' && preset.binauralType) {
-    return getPresetIconConfig('binaural', preset.binauralType);
+const getFrequencyLine = (preset: FrequencyPreset): string | null => {
+  if (preset.type === 'binaural' && preset.baseFrequency && preset.beatFrequency) {
+    return `${preset.baseFrequency} Hz · ${preset.beatFrequency} Hz`;
   }
-  if (preset.type === 'noise' && preset.noiseType) {
-    return getPresetIconConfig('noise', preset.noiseType);
+  if (preset.type === 'solfeggio' && preset.frequency) {
+    return `${preset.frequency} Hz`;
   }
-  return getPresetIconConfig('solfeggio');
+  return null;
 };
 
 export default function PlayerScreen() {
@@ -87,14 +64,13 @@ export default function PlayerScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const colors = useThemeColors();
   const { maxVolume, reduceMotion } = useSettingsStore();
   const { isPlaying, isLoading, playbackError, volume, setVolume, timerRemaining, timerDuration } = useAudioStore();
   const { favoriteIds, addFavorite, removeFavorite, addRecentlyPlayed } = usePresetsStore();
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
   const [showTimerModal, setShowTimerModal] = useState(false);
-
-  const colors = useThemeColors();
 
   // Load preset into the global controller (same preset = keeps playing)
   useEffect(() => {
@@ -137,7 +113,6 @@ export default function PlayerScreen() {
     router.back();
   }, [router]);
 
-  // Format timer
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -148,162 +123,133 @@ export default function PlayerScreen() {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={[styles.errorText, { color: colors.text }]}>
-          Preset not found
+          {t('common.error')}
         </Text>
       </View>
     );
   }
 
-  const gradientColors = getGradientColors(preset);
-  const presetIconConfig = getPlayerPresetIcon(preset);
+  const frequencyLine = getFrequencyLine(preset);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: insets.top + Spacing.lg }]}>
+        <TouchableOpacity
+          onPress={handleClose}
+          style={styles.headerButton}
+          accessibilityLabel={t('common.back')}
+        >
+          <Ionicons name="chevron-down" size={26} color={colors.textSecondary} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>
+          {isPlaying ? t('player.nowPlaying') : t('player.paused')}
+        </Text>
+        <TouchableOpacity
+          onPress={handleFavoriteToggle}
+          style={styles.headerButton}
+          accessibilityLabel={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
+        >
+          <Ionicons
+            name={isFavorite ? 'heart' : 'heart-outline'}
+            size={22}
+            color={isFavorite ? colors.primary : colors.textSecondary}
+          />
+        </TouchableOpacity>
+      </View>
 
-      {/* Gradient Background */}
-      <LinearGradient
-        colors={gradientColors as [string, string, ...string[]]}
-        style={styles.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-      >
-        {/* Header with extra top padding */}
-        <View style={[styles.header, { paddingTop: insets.top + Spacing.xl }]}>
-          <TouchableOpacity
-            onPress={handleClose}
-            style={styles.headerButton}
-            accessibilityLabel={t('common.back')}
-          >
-            <Ionicons name="chevron-down" size={28} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            {isPlaying ? t('player.nowPlaying') : t('player.paused')}
+      {/* Breathing ring — the single organic element */}
+      <View style={styles.content}>
+        <WaveVisualizer
+          isPlaying={isPlaying}
+          color={colors.primary}
+          intensity={volume}
+          tempoMs={getVisualTempoMs(preset)}
+        />
+
+        <View style={styles.infoContainer}>
+          <Text style={[styles.presetName, { color: colors.text }]}>
+            {t(preset.nameKey)}
           </Text>
+
+          {frequencyLine && (
+            <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
+              {frequencyLine}
+            </Text>
+          )}
+
+          {preset.type !== 'solfeggio' && (
+            <Text style={[styles.presetDescription, { color: colors.textSecondary }]}>
+              {t(preset.descriptionKey)}
+            </Text>
+          )}
+
+          {playbackError && (
+            <Text style={[styles.playbackError, { color: colors.error }]}>
+              {t('player.playbackError')}
+            </Text>
+          )}
+        </View>
+      </View>
+
+      {/* Controls */}
+      <View style={[styles.controls, { paddingBottom: insets.bottom + Spacing.xl }]}>
+        <View style={styles.volumeContainer}>
+          <Ionicons name="volume-low" size={18} color={colors.textSecondary} />
+          <View style={styles.sliderWrapper}>
+            <Slider
+              value={volume}
+              onValueChange={setVolume}
+              max={1}
+              showValue={false}
+              accessibilityLabel={t('accessibility.volumeSlider')}
+            />
+          </View>
+          <Ionicons name="volume-high" size={18} color={colors.textSecondary} />
+        </View>
+
+        <View style={styles.mainControls}>
           <TouchableOpacity
-            onPress={handleFavoriteToggle}
-            style={styles.headerButton}
-            accessibilityLabel={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
+            onPress={() => setShowTimerModal(true)}
+            style={styles.sideButton}
+            accessibilityLabel={t('player.timer')}
           >
             <Ionicons
-              name={isFavorite ? 'heart' : 'heart-outline'}
+              name="timer-outline"
               size={24}
-              color={isFavorite ? '#FF4B4B' : 'rgba(255,255,255,0.8)'}
+              color={timerDuration ? colors.primary : colors.textSecondary}
             />
-          </TouchableOpacity>
-        </View>
-
-        {/* Main Content - More spacious */}
-        <View style={styles.content}>
-          {/* Large Visual Card with Glow Effect */}
-          <View style={styles.visualCardContainer}>
-            {/* Outermost separator ring with dark background for contrast */}
-            <View style={[styles.outerSeparator, { borderColor: preset.color + '60', backgroundColor: 'rgba(0,0,0,0.3)' }]} />
-            {/* Outer glow ring */}
-            <View style={[styles.glowRing, { backgroundColor: preset.color + '15' }]} />
-            <View style={[styles.glowRingInner, { backgroundColor: preset.color + '25' }]} />
-
-            {/* Main card */}
-            <View style={[styles.visualCard, { borderColor: preset.color + '40' }]}>
-              <LinearGradient
-                colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)', 'rgba(0,0,0,0.1)']}
-                style={styles.visualCardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <WaveVisualizer
-                  isPlaying={isPlaying}
-                  color={preset.color}
-                  intensity={volume}
-                  tempoMs={getVisualTempoMs(preset)}
-                  style={styles.visualizer}
-                />
-                <Icon
-                  icon={presetIconConfig}
-                  size={72}
-                  color="rgba(255, 255, 255, 0.95)"
-                />
-              </LinearGradient>
-            </View>
-          </View>
-
-          {/* Preset Info - More spacious */}
-          <View style={styles.infoContainer}>
-            <Text style={styles.presetName}>{t(preset.nameKey)}</Text>
-
-            {/* Description - only show if different from name (not for solfeggio) */}
-            {preset.type !== 'solfeggio' && (
-              <Text style={styles.presetDescription}>
-                {t(preset.descriptionKey)}
+            {timerRemaining !== null && timerRemaining > 0 && (
+              <Text style={[styles.timerBadge, { color: colors.primary }]}>
+                {formatTime(timerRemaining)}
               </Text>
             )}
+          </TouchableOpacity>
 
-            {playbackError && (
-              <Text style={styles.playbackError}>{t('player.playbackError')}</Text>
-            )}
-          </View>
-        </View>
-
-        {/* Bottom Controls - More spacious */}
-        <View style={[styles.controls, { paddingBottom: insets.bottom + Spacing.xl }]}>
-          {/* Volume Slider */}
-          <View style={styles.volumeContainer}>
-            <Ionicons name="volume-low" size={22} color="rgba(255,255,255,0.7)" />
-            <View style={styles.sliderWrapper}>
-              <Slider
-                value={volume}
-                onValueChange={setVolume}
-                max={1}
-                accessibilityLabel={t('accessibility.volumeSlider')}
-              />
-            </View>
-            <Ionicons name="volume-high" size={22} color="rgba(255,255,255,0.7)" />
-          </View>
-
-          {/* Main Controls Row */}
-          <View style={styles.mainControls}>
-            {/* Timer Icon Button */}
-            <TouchableOpacity
-              onPress={() => setShowTimerModal(true)}
-              style={styles.sideButton}
-              accessibilityLabel={t('player.timer')}
-            >
+          <TouchableOpacity
+            onPress={handlePlayPause}
+            disabled={isLoading}
+            activeOpacity={reduceMotion ? 1 : 0.8}
+            style={[styles.playButton, { backgroundColor: colors.primary }]}
+            accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
+            accessibilityState={{ busy: isLoading }}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#1A140C" />
+            ) : (
               <Ionicons
-                name="timer-outline"
-                size={28}
-                color={timerDuration ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
+                name={isPlaying ? 'pause' : 'play'}
+                size={38}
+                color="#1A140C"
+                style={isPlaying ? undefined : { marginLeft: 3 }}
               />
-              {timerRemaining !== null && timerRemaining > 0 && (
-                <Text style={styles.timerBadge}>{formatTime(timerRemaining)}</Text>
-              )}
-            </TouchableOpacity>
+            )}
+          </TouchableOpacity>
 
-            {/* Play Button */}
-            <TouchableOpacity
-              onPress={handlePlayPause}
-              disabled={isLoading}
-              activeOpacity={reduceMotion ? 1 : 0.8}
-              style={[styles.playButton, Shadows.large]}
-              accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
-              accessibilityState={{ busy: isLoading }}
-            >
-              {isLoading ? (
-                <ActivityIndicator size="large" color="#000000" />
-              ) : (
-                <Ionicons
-                  name={isPlaying ? 'pause' : 'play'}
-                  size={44}
-                  color="#000000"
-                  style={isPlaying ? undefined : { marginLeft: 4 }}
-                />
-              )}
-            </TouchableOpacity>
-
-            {/* Placeholder for symmetry */}
-            <View style={styles.sideButton} />
-          </View>
+          {/* Placeholder for symmetry */}
+          <View style={styles.sideButton} />
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Timer Modal */}
       <Modal
@@ -313,30 +259,30 @@ export default function PlayerScreen() {
         onRequestClose={() => setShowTimerModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
+          style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}
           onPress={() => setShowTimerModal(false)}
         >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t('player.timer')}</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.backgroundSecondary }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('player.timer')}</Text>
             {TIMER_OPTIONS.map((option) => {
               const isSelected = timerDuration === option.value;
               return (
                 <TouchableOpacity
                   key={option.labelKey}
                   onPress={() => handleSelectTimer(option.value)}
-                  style={[
-                    styles.timerOption,
-                    isSelected && styles.timerOptionSelected,
-                  ]}
+                  style={[styles.timerOption, { borderBottomColor: colors.cardBorder }]}
                 >
-                  <Text style={[
-                    styles.timerOptionText,
-                    isSelected && styles.timerOptionTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.timerOptionText,
+                      { color: isSelected ? colors.primary : colors.text },
+                      isSelected && styles.timerOptionTextSelected,
+                    ]}
+                  >
                     {t(option.labelKey)}
                   </Text>
                   {isSelected && (
-                    <Ionicons name="checkmark" size={24} color="#D99A4E" />
+                    <Ionicons name="checkmark" size={20} color={colors.primary} />
                   )}
                 </TouchableOpacity>
               );
@@ -351,18 +297,13 @@ export default function PlayerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
-  },
-  gradient: {
-    flex: 1,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.xxl,
-    marginBottom: Spacing.lg,
+    paddingBottom: Spacing.lg,
   },
   headerButton: {
     width: 48,
@@ -371,87 +312,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    ...Typography.subhead,
-    color: 'rgba(255,255,255,0.7)',
-    fontWeight: '600',
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
   },
   content: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
-    justifyContent: 'center',
-  },
-  visualCardContainer: {
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.xxl,
-  },
-  outerSeparator: {
-    position: 'absolute',
-    width: 340,
-    height: 340,
-    borderRadius: 170,
-    borderWidth: 2.5,
-  },
-  glowRing: {
-    position: 'absolute',
-    width: 320,
-    height: 320,
-    borderRadius: 160,
-  },
-  glowRingInner: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-  },
-  visualCard: {
-    width: SCREEN_WIDTH - Spacing.xl * 2,
-    aspectRatio: 1,
-    maxWidth: 260,
-    maxHeight: 260,
-    borderRadius: 130,
-    borderWidth: 1.5,
-    overflow: 'hidden',
-  },
-  visualCardGradient: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  visualizer: {
-    position: 'absolute',
+    gap: Spacing.xxl,
   },
   infoContainer: {
     alignItems: 'center',
-    paddingHorizontal: Spacing.md,
+    gap: Spacing.sm,
   },
   presetName: {
     ...Typography.title1,
-    color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: Spacing.sm,
+  },
+  frequencyLine: {
+    ...Typography.subhead,
+    fontVariant: ['tabular-nums'],
   },
   presetDescription: {
-    ...Typography.body,
-    color: 'rgba(255,255,255,0.6)',
+    ...Typography.subhead,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 21,
+    maxWidth: 300,
   },
   playbackError: {
     ...Typography.subhead,
-    color: '#E07A5F',
     textAlign: 'center',
-    marginTop: Spacing.md,
+    marginTop: Spacing.sm,
   },
   controls: {
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.xl,
   },
   volumeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.xxl,
+    marginBottom: Spacing.xl,
     gap: Spacing.md,
   },
   sliderWrapper: {
@@ -471,14 +371,13 @@ const styles = StyleSheet.create({
   },
   timerBadge: {
     ...Typography.caption2,
-    color: '#FFFFFF',
+    fontVariant: ['tabular-nums'],
     marginTop: 2,
   },
   playButton: {
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -487,45 +386,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.xxl,
   },
-  // Modal styles
+  // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: Spacing.xl,
   },
   modalContent: {
-    backgroundColor: '#1E1E1E',
     borderRadius: 20,
     padding: Spacing.lg,
     width: '100%',
     maxWidth: 320,
   },
   modalTitle: {
-    ...Typography.title2,
-    color: '#FFFFFF',
+    ...Typography.title3,
     textAlign: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   timerOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    borderRadius: 12,
-    marginBottom: Spacing.xs,
-  },
-  timerOptionSelected: {
-    backgroundColor: 'rgba(217, 154, 78, 0.15)',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   timerOptionText: {
     ...Typography.body,
-    color: 'rgba(255,255,255,0.8)',
   },
   timerOptionTextSelected: {
-    color: '#D99A4E',
-    fontWeight: '600',
+    fontFamily: FontFamily.semibold,
   },
 });

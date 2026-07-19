@@ -14,10 +14,9 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
@@ -94,60 +93,42 @@ export default function ExploreScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header with category title — Explore is a tab, so no back button */}
       <View style={styles.header}>
-        <View style={styles.headerTitle}>
-          <Ionicons
-            name={activeTab.iconName as any}
-            size={24}
-            color={colors.primary}
-            style={styles.headerIcon}
-          />
-          <Text style={[styles.title, { color: colors.text }]}>
-            {t(activeTab.labelKey)}
-          </Text>
-        </View>
+        <Text style={[styles.title, { color: colors.text }]}>
+          {t('explore.title')}
+        </Text>
       </View>
 
-      {/* Category Tabs */}
-      <View style={styles.tabsContainer}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabs}
-        >
-          {categories.map(category => {
-            const isActive = category.key === activeCategory;
-            return (
-              <TouchableOpacity
-                key={category.key}
-                onPress={() => setActiveCategory(category.key)}
-                activeOpacity={reduceMotion ? 1 : 0.7}
+      {/* Category Tabs — text with amber underline */}
+      <View style={[styles.tabsContainer, { borderBottomColor: colors.cardBorder }]}>
+        {categories.map(category => {
+          const isActive = category.key === activeCategory;
+          return (
+            <TouchableOpacity
+              key={category.key}
+              onPress={() => setActiveCategory(category.key)}
+              activeOpacity={reduceMotion ? 1 : 0.6}
+              style={styles.tab}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: isActive }}
+            >
+              <Text
                 style={[
-                  styles.tab,
-                  {
-                    backgroundColor: isActive ? colors.primary : colors.backgroundSecondary,
-                    borderColor: isActive ? colors.primary : colors.cardBorder,
-                  },
+                  styles.tabText,
+                  { color: isActive ? colors.text : colors.textSecondary },
+                  isActive && styles.tabTextActive,
                 ]}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: isActive }}
               >
-                <Ionicons
-                  name={category.iconName as any}
-                  size={16}
-                  color={isActive ? '#fff' : colors.text}
-                />
-                <Text
-                  style={[
-                    styles.tabText,
-                    { color: isActive ? '#fff' : colors.text },
-                  ]}
-                >
-                  {t(category.labelKey)}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+                {t(category.labelKey)}
+              </Text>
+              <View
+                style={[
+                  styles.tabUnderline,
+                  { backgroundColor: isActive ? colors.primary : 'transparent' },
+                ]}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       {/* Preset Grid */}
@@ -156,23 +137,19 @@ export default function ExploreScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Category Description */}
-        <View style={[styles.descriptionCard, { backgroundColor: colors.backgroundSecondary }]}>
-          <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
-            {t(activeTab.descriptionKey)}
-          </Text>
-        </View>
+        {/* Category Description — plain paragraph, no box */}
+        <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
+          {t(activeTab.descriptionKey)}
+        </Text>
 
-        {/* 2-Column Grid */}
-        <View style={styles.presetGrid}>
+        {/* Preset list */}
+        <View>
           {activeTab.presets.map(preset => (
             <PresetCard
               key={preset.id}
               preset={preset}
               onPress={() => handlePresetPress(preset.id)}
               isFavorite={isFavorite(preset.id)}
-              showFrequency={true}
-              size="medium"
             />
           ))}
         </View>
@@ -187,44 +164,34 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xl,
     paddingBottom: Spacing.md,
-  },
-  headerTitle: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerIcon: {
-    marginRight: Spacing.sm,
   },
   title: {
     ...Typography.title1,
   },
   tabsContainer: {
-    paddingBottom: Spacing.md,
-  },
-  tabs: {
+    flexDirection: 'row',
     paddingHorizontal: Spacing.md,
-    gap: Spacing.sm,
+    gap: Spacing.lg,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   tab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: 24,
-    borderWidth: 1,
+    paddingTop: Spacing.sm,
     minHeight: AccessibilitySize.minTouchTarget,
-    gap: Spacing.xs,
+    justifyContent: 'flex-end',
+    gap: Spacing.sm,
   },
   tabText: {
     ...Typography.subhead,
-    fontWeight: '600',
+  },
+  tabTextActive: {
+    fontFamily: FontFamily.semibold,
+  },
+  tabUnderline: {
+    height: 2,
+    borderRadius: 1,
   },
   scrollView: {
     flex: 1,
@@ -233,18 +200,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingBottom: 20,
   },
-  descriptionCard: {
-    padding: Spacing.md,
-    borderRadius: 12,
-    marginBottom: Spacing.lg,
-  },
   descriptionText: {
     ...Typography.subhead,
     lineHeight: 22,
-  },
-  presetGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.md,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
 });

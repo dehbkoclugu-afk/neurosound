@@ -17,7 +17,6 @@ import {
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography } from '@/constants/theme';
@@ -25,7 +24,6 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
-import { Icon } from '@/components/ui/Icon';
 import { intents } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
@@ -56,7 +54,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, hasSeenOnboarding } = useSettingsStore();
-  const { favoriteIds, recentlyPlayed, isFavorite } = usePresetsStore();
+  const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
 
@@ -125,41 +123,34 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Headphone reminder */}
-        <View style={[styles.reminder, { backgroundColor: colors.backgroundSecondary }]}>
-          <View style={[styles.reminderIcon, { backgroundColor: colors.primary + '20' }]}>
-            <Ionicons name="headset" size={20} color={colors.primary} />
-          </View>
-          <Text style={[styles.reminderText, { color: colors.textSecondary }]}>
-            {t('home.headphoneWarning')}
-          </Text>
-        </View>
-
-        {/* Intent Section — primary entry */}
+        {/* Intent Section — primary entry, typographic */}
         <View style={styles.section}>
-          <CategoryHeader title={t('home.intentsTitle')} />
-          <View style={styles.intentGrid}>
-            {intents.map((intent) => (
+          <Text style={[styles.intentsTitle, { color: colors.text }]}>
+            {t('home.intentsTitle')}
+          </Text>
+          <View>
+            {intents.map((intent, index) => (
               <TouchableOpacity
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
-                activeOpacity={0.85}
-                style={styles.intentCard}
+                activeOpacity={0.6}
+                style={[
+                  styles.intentRow,
+                  { borderBottomColor: colors.cardBorder },
+                  index === 0 && { borderTopColor: colors.cardBorder, borderTopWidth: StyleSheet.hairlineWidth },
+                ]}
                 accessibilityRole="button"
                 accessibilityLabel={t(intent.nameKey)}
               >
-                <LinearGradient
-                  colors={intent.gradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.intentGradient}
-                >
-                  <Icon icon={intent.icon} size={26} color="rgba(255,255,255,0.95)" />
-                  <Text style={styles.intentName}>{t(intent.nameKey)}</Text>
-                  <Text style={styles.intentDesc} numberOfLines={2}>
+                <View style={styles.intentText}>
+                  <Text style={[styles.intentName, { color: colors.text }]}>
+                    {t(intent.nameKey)}
+                  </Text>
+                  <Text style={[styles.intentDesc, { color: colors.textSecondary }]} numberOfLines={1}>
                     {t(intent.descKey)}
                   </Text>
-                </LinearGradient>
+                </View>
+                <Ionicons name="arrow-forward" size={20} color={colors.primary} />
               </TouchableOpacity>
             ))}
           </View>
@@ -190,42 +181,41 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <CategoryHeader title={t('home.favorites')} iconName="heart" />
           {favoritePresets.length > 0 ? (
-            <View style={styles.presetGrid}>
+            <View>
               {favoritePresets.slice(0, 4).map((preset) => (
                 <PresetCard
                   key={preset.id}
                   preset={preset}
                   onPress={() => handlePresetPress(preset.id)}
                   isFavorite={true}
-                  size="medium"
                 />
               ))}
             </View>
           ) : (
-            <View style={[styles.emptyState, { backgroundColor: colors.backgroundSecondary }]}>
-              <Ionicons name="heart-outline" size={22} color={colors.textSecondary} />
-              <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-                {t('home.favoritesEmpty')}
-              </Text>
-            </View>
+            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+              {t('home.favoritesEmpty')}
+            </Text>
           )}
         </View>
 
         {/* Categories Section — technical taxonomy for power users */}
         <View style={styles.section}>
           <CategoryHeader title={t('home.categories')} />
-          <View style={styles.categoryGrid}>
+          <View>
             {categories.map((category) => (
               <CategoryCard
                 key={category.key}
                 title={t(category.titleKey)}
-                iconName={category.iconName}
-                color={category.color}
                 onPress={() => handleCategoryPress(category.key)}
               />
             ))}
           </View>
         </View>
+
+        {/* Quiet headphone note */}
+        <Text style={[styles.headphoneNote, { color: colors.textSecondary }]}>
+          {t('home.headphoneWarning')}
+        </Text>
 
       </ScrollView>
     </SafeAreaView>
@@ -260,72 +250,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  reminder: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: Spacing.md,
-    borderRadius: 16,
-    marginBottom: Spacing.lg,
-  },
-  reminderIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.sm,
-  },
-  reminderText: {
-    ...Typography.subhead,
-    flex: 1,
-  },
   section: {
     marginBottom: Spacing.xl,
   },
-  categoryGrid: {
-    gap: Spacing.sm,
+  intentsTitle: {
+    ...Typography.title1,
+    marginBottom: Spacing.lg,
   },
-  intentGrid: {
+  intentRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
+    alignItems: 'center',
+    paddingVertical: Spacing.lg,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: Spacing.md,
   },
-  intentCard: {
-    flexBasis: '48%',
-    flexGrow: 1,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  intentGradient: {
-    padding: Spacing.md,
-    minHeight: 120,
-    justifyContent: 'flex-end',
+  intentText: {
+    flex: 1,
     gap: 4,
   },
   intentName: {
-    ...Typography.headline,
-    color: '#FFFFFF',
-    marginTop: Spacing.sm,
+    ...Typography.title2,
   },
   intentDesc: {
-    ...Typography.caption1,
-    color: 'rgba(255,255,255,0.75)',
-  },
-  emptyState: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    padding: Spacing.md,
-    borderRadius: 16,
+    ...Typography.footnote,
   },
   emptyStateText: {
     ...Typography.subhead,
-    flex: 1,
+    lineHeight: 21,
+    paddingVertical: Spacing.sm,
   },
-  presetGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.md,
+  headphoneNote: {
+    ...Typography.footnote,
+    textAlign: 'center',
+    marginTop: Spacing.md,
+    marginBottom: Spacing.lg,
   },
   horizontalList: {
     paddingRight: Spacing.md,

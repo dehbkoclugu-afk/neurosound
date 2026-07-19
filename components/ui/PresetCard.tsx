@@ -1,8 +1,6 @@
 /**
- * PresetCard Component - Modern Grid Card Design
- * - Square card with gradient background
- * - Icon, name, frequency info
- * - Favorite indicator
+ * Preset rows — typographic list items, no cards, no gradients.
+ * Name carries the hierarchy; a quiet subline gives type and frequency.
  */
 
 import React from 'react';
@@ -12,24 +10,13 @@ import {
   Text,
   StyleSheet,
   ViewStyle,
-  Dimensions,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import {
-  Spacing,
-  Shadows,
-  AccessibilitySize,
-  GradientColors,
-} from '@/constants/theme';
+import { Spacing, Typography, FontFamily } from '@/constants/theme';
+import { useThemeColors } from '@/hooks/use-theme-colors';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset } from '@/lib/frequencies';
-import { Icon, getPresetIcon, IconConfig } from './Icon';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_GAP = Spacing.md;
-const CARD_WIDTH = (SCREEN_WIDTH - Spacing.md * 3) / 2;
 
 interface PresetCardProps {
   preset: FrequencyPreset;
@@ -37,122 +24,53 @@ interface PresetCardProps {
   isFavorite?: boolean;
   showFrequency?: boolean;
   style?: ViewStyle;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large'; // kept for API compat, unused
 }
 
-const getGradientColors = (preset: FrequencyPreset): string[] => {
-  if (preset.type === 'binaural' && preset.binauralType) {
-    return GradientColors[preset.binauralType] || [preset.color, preset.color];
-  }
-  if (preset.type === 'noise' && preset.noiseType) {
-    return GradientColors[preset.noiseType] || [preset.color, preset.color];
-  }
-  if (preset.type === 'solfeggio') {
-    // Use preset-specific gradient if available
-    return GradientColors[preset.id] || GradientColors.solfeggio || [preset.color, preset.color];
-  }
-  return [preset.color, preset.color];
-};
-
-const getPresetIconConfig = (preset: FrequencyPreset): IconConfig => {
-  if (preset.type === 'binaural' && preset.binauralType) {
-    return getPresetIcon('binaural', preset.binauralType);
-  }
-  if (preset.type === 'noise' && preset.noiseType) {
-    return getPresetIcon('noise', preset.noiseType);
-  }
-  if (preset.type === 'solfeggio') {
-    return getPresetIcon('solfeggio');
-  }
-  return { name: 'headset', library: 'ionicon' };
-};
-
-const getFrequencyText = (preset: FrequencyPreset): string | null => {
+function getSubline(preset: FrequencyPreset, t: (k: string) => string): string {
   if (preset.type === 'binaural' && preset.beatFrequency) {
-    return `${preset.beatFrequency} Hz`;
+    return `${t('explore.categories.binaural')} · ${preset.beatFrequency} Hz`;
   }
-  // Solfeggio frequency is already in the name, so no need to show it again
-  return null;
-};
+  if (preset.type === 'solfeggio' && preset.frequency) {
+    return `${preset.frequency} Hz`;
+  }
+  return t('explore.categories.noise');
+}
 
 export function PresetCard({
   preset,
   onPress,
   isFavorite = false,
-  showFrequency = true,
   style,
-  size = 'medium',
 }: PresetCardProps) {
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
-
-  const gradientColors = getGradientColors(preset);
-  const iconConfig = getPresetIconConfig(preset);
-  const frequencyText = showFrequency ? getFrequencyText(preset) : null;
-
-  const sizeStyles = {
-    small: { width: 100, height: 100, iconSize: 28 },
-    medium: { width: CARD_WIDTH, height: CARD_WIDTH, iconSize: 40 },
-    large: { width: CARD_WIDTH * 2 + CARD_GAP, height: CARD_WIDTH, iconSize: 48 },
-  };
-
-  const currentSize = sizeStyles[size];
+  const colors = useThemeColors();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.8}
-      style={[
-        styles.container,
-        {
-          width: currentSize.width,
-          height: currentSize.height,
-        },
-        Shadows.medium,
-        style,
-      ]}
+      activeOpacity={reduceMotion ? 1 : 0.6}
+      style={[styles.row, { borderBottomColor: colors.cardBorder }, style]}
       accessibilityRole="button"
       accessibilityLabel={t(preset.nameKey)}
     >
-      <LinearGradient
-        colors={gradientColors as [string, string, ...string[]]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradient}
-      >
-        <View style={styles.content}>
-          {/* Icon */}
-          <View style={styles.iconContainer}>
-            <Icon
-              icon={iconConfig}
-              size={currentSize.iconSize}
-              color="rgba(255, 255, 255, 0.9)"
-            />
-          </View>
-
-          {/* Preset Info */}
-          <View style={styles.infoContainer}>
-            <Text style={styles.name} numberOfLines={2}>
-              {t(preset.nameKey)}
-            </Text>
-            {frequencyText && (
-              <Text style={styles.frequency}>{frequencyText}</Text>
-            )}
-          </View>
-
-          {/* Favorite Indicator */}
-          {isFavorite && (
-            <View style={styles.favoriteContainer}>
-              <Ionicons name="heart" size={16} color="#FFFFFF" />
-            </View>
-          )}
-        </View>
-      </LinearGradient>
+      <View style={styles.rowText}>
+        <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+          {t(preset.nameKey)}
+        </Text>
+        <Text style={[styles.subline, { color: colors.textSecondary }]} numberOfLines={1}>
+          {getSubline(preset, t)}
+        </Text>
+      </View>
+      {isFavorite && (
+        <Ionicons name="heart" size={16} color={colors.primary} />
+      )}
     </TouchableOpacity>
   );
 }
 
-// Horizontal scroll variant for recent items
+// Compact chip for horizontal "recently played" strips — text only
 interface PresetCardSmallProps {
   preset: FrequencyPreset;
   name: string;
@@ -161,96 +79,60 @@ interface PresetCardSmallProps {
 }
 
 export function PresetCardSmall({
-  preset,
   name,
   onPress,
   style,
 }: PresetCardSmallProps) {
   const { reduceMotion } = useSettingsStore();
-  const gradientColors = getGradientColors(preset);
-  const iconConfig = getPresetIconConfig(preset);
+  const colors = useThemeColors();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.8}
-      style={[styles.smallContainer, Shadows.small, style]}
+      activeOpacity={reduceMotion ? 1 : 0.6}
+      style={[styles.chip, { borderColor: colors.cardBorder }, style]}
       accessibilityRole="button"
       accessibilityLabel={name}
     >
-      <LinearGradient
-        colors={gradientColors as [string, string, ...string[]]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.smallGradient}
-      >
-        <Icon
-          icon={iconConfig}
-          size={32}
-          color="rgba(255, 255, 255, 0.9)"
-        />
-        <Text style={styles.smallName} numberOfLines={1}>
-          {name}
-        </Text>
-      </LinearGradient>
+      <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
+        {name}
+      </Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    borderRadius: AccessibilitySize.borderRadiusLarge,
-    overflow: 'hidden',
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    paddingVertical: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: Spacing.md,
+    minHeight: 56,
   },
-  gradient: {
+  rowText: {
     flex: 1,
-    padding: Spacing.md,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  iconContainer: {
-    marginBottom: Spacing.sm,
-  },
-  infoContainer: {
-    marginTop: 'auto',
+    gap: 2,
   },
   name: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 2,
+    ...Typography.headline,
   },
-  frequency: {
-    fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '500',
+  subline: {
+    ...Typography.footnote,
+    fontVariant: ['tabular-nums'],
   },
-  favoriteContainer: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-  },
-  // Small card styles
-  smallContainer: {
-    width: 100,
-    height: 120,
-    borderRadius: AccessibilitySize.borderRadius,
-    overflow: 'hidden',
+  chip: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 20,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
     marginRight: Spacing.sm,
-  },
-  smallGradient: {
-    flex: 1,
-    padding: Spacing.sm,
-    alignItems: 'center',
+    minHeight: 40,
     justifyContent: 'center',
-    gap: Spacing.xs,
   },
-  smallName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    textAlign: 'center',
+  chipText: {
+    ...Typography.subhead,
+    fontFamily: FontFamily.semibold,
   },
 });

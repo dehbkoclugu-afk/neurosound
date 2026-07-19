@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize } from '@/constants/theme';
@@ -60,10 +59,6 @@ export default function OnboardingScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.content}>
-        <View style={[styles.iconCircle, { backgroundColor: colors.primary + '22' }]}>
-          <Ionicons name={current.icon} size={44} color={colors.primary} />
-        </View>
-
         <Text style={[styles.title, { color: colors.text }]}>{t(current.titleKey)}</Text>
         <Text style={[styles.description, { color: colors.textSecondary }]}>
           {t(current.descKey)}
@@ -112,18 +107,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
   },
-  iconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.xl,
-  },
   title: {
-    ...Typography.title1,
+    ...Typography.largeTitle,
     textAlign: 'center',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.lg,
   },
   description: {
     ...Typography.body,

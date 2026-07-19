@@ -76,7 +76,7 @@ export default function SettingsScreen() {
           </Text>
 
           {/* Theme */}
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <Text style={[styles.cardTitle, { color: colors.text }]}>
               {t('settings.theme')}
             </Text>
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* Reduce Motion */}
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.switchRow}>
               <View style={styles.switchLabel}>
                 <Ionicons name="sparkles-outline" size={24} color={colors.icon} />
@@ -127,7 +127,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* Low Contrast */}
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.switchRow}>
               <View style={styles.switchLabel}>
                 <Ionicons name="contrast-outline" size={24} color={colors.icon} />
@@ -151,7 +151,7 @@ export default function SettingsScreen() {
             {t('settings.language')}
           </Text>
 
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.optionGroup}>
               {LANGUAGE_OPTIONS.map(option => (
                 <TouchableOpacity
@@ -187,7 +187,7 @@ export default function SettingsScreen() {
             {t('settings.audio')}
           </Text>
 
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <Slider
               value={maxVolume}
               onValueChange={setMaxVolume}
@@ -206,7 +206,7 @@ export default function SettingsScreen() {
             {t('settings.about')}
           </Text>
 
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.aboutRow}>
               <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
                 {t('settings.version')}
@@ -215,17 +215,14 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* Epilepsy Warning */}
-          <View style={[styles.warningCard, { backgroundColor: colors.backgroundSecondary }]}>
-            <Ionicons name="warning-outline" size={24} color={colors.warning} />
-            <View style={styles.warningContent}>
-              <Text style={[styles.warningTitle, { color: colors.text }]}>
-                {t('settings.epilepsyWarning')}
-              </Text>
-              <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-                {t('settings.epilepsyText')}
-              </Text>
-            </View>
+          {/* Epilepsy Warning — quiet text block */}
+          <View style={styles.warningCard}>
+            <Text style={[styles.warningTitle, { color: colors.text }]}>
+              {t('settings.epilepsyWarning')}
+            </Text>
+            <Text style={[styles.warningText, { color: colors.textSecondary }]}>
+              {t('settings.epilepsyText')}
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -262,10 +259,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   card: {
-    borderRadius: AccessibilitySize.borderRadiusLarge,
-    borderWidth: 1,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   cardTitle: {
     fontSize: 16,
@@ -313,13 +308,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   warningCard: {
-    flexDirection: 'row',
-    borderRadius: AccessibilitySize.borderRadiusLarge,
-    padding: Spacing.md,
-    gap: Spacing.md,
-  },
-  warningContent: {
-    flex: 1,
+    paddingVertical: Spacing.md,
+    gap: Spacing.xs,
   },
   warningTitle: {
     fontSize: 14,

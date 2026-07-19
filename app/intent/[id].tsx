@@ -21,7 +21,6 @@ import { Spacing, Typography, AccessibilitySize } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
-import { Icon } from '@/components/ui/Icon';
 import { getIntentById } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
@@ -74,9 +73,6 @@ export default function IntentScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <View style={[styles.intentBadge, { backgroundColor: intent.color + '22' }]}>
-          <Icon icon={intent.icon} size={20} color={intent.color} />
-        </View>
         <Text style={[styles.title, { color: colors.text }]}>{t(intent.nameKey)}</Text>
       </View>
 
@@ -89,15 +85,13 @@ export default function IntentScreen() {
           {t(intent.descKey)}
         </Text>
 
-        <View style={styles.presetGrid}>
+        <View>
           {presets.map((preset) => (
             <PresetCard
               key={preset.id}
               preset={preset}
               onPress={() => handlePresetPress(preset.id)}
               isFavorite={isFavorite(preset.id)}
-              showFrequency={true}
-              size="medium"
             />
           ))}
         </View>

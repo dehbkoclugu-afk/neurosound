@@ -7,7 +7,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Easing, ViewStyle } from 'react-native';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { useSettingsStore } from '@/stores/settingsStore';
 
@@ -30,7 +29,6 @@ export function WaveVisualizer({
   tempoMs = 4000,
   style,
 }: WaveVisualizerProps) {
-  const colorScheme = useColorScheme() ?? 'light';
   const { reduceMotion } = useSettingsStore();
 
   const colors = useThemeColors();
@@ -87,21 +85,17 @@ export function WaveVisualizer({
     };
   }, [isPlaying, reduceMotion, waveAnimations, tempoMs]);
 
-  // If reduced motion, show static indicator
+  // If reduced motion, show a static ring
   if (reduceMotion) {
     return (
       <View style={[styles.container, style]}>
-        <View style={[styles.staticIndicator, { backgroundColor: waveColor }]}>
-          <View
-            style={[
-              styles.staticDot,
-              {
-                backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
-                opacity: isPlaying ? 1 : 0.3,
-              },
-            ]}
-          />
-        </View>
+        <View
+          style={[
+            styles.wave,
+            { borderColor: waveColor, opacity: isPlaying ? 0.8 : 0.3 },
+          ]}
+        />
+        <View style={[styles.centerDot, { backgroundColor: waveColor }]} />
       </View>
     );
   }
@@ -116,7 +110,7 @@ export function WaveVisualizer({
 
         const opacity = anim.interpolate({
           inputRange: [0, 0.5, 1],
-          outputRange: [0.3, 0.6, 0.3],
+          outputRange: [0.25, 0.7, 0.25],
         });
 
         return (
@@ -125,50 +119,40 @@ export function WaveVisualizer({
             style={[
               styles.wave,
               {
-                backgroundColor: waveColor,
+                borderColor: waveColor,
                 transform: [{ scale }],
-                opacity: isPlaying ? opacity : 0.2,
+                opacity: isPlaying ? opacity : 0.15,
               },
             ]}
           />
         );
       })}
 
-      {/* Center dot */}
-      <View style={[styles.centerDot, { backgroundColor: waveColor }]} />
+      {/* Quiet core */}
+      <View style={[styles.centerDot, { backgroundColor: waveColor, opacity: isPlaying ? 1 : 0.4 }]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: 200,
-    height: 200,
+    width: 240,
+    height: 240,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Thin stroke rings, not filled discs
   wave: {
     position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 90,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    borderWidth: 1.5,
+    backgroundColor: 'transparent',
   },
   centerDot: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    zIndex: 10,
-  },
-  staticIndicator: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  staticDot: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
 });
