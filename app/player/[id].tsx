@@ -158,14 +158,17 @@ export default function PlayerScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Breathing ring — the single organic element */}
+      {/* Breathing ring — the sound's own colour, on a soft backdrop disc */}
       <View style={styles.content}>
-        <WaveVisualizer
-          isPlaying={isPlaying}
-          color={colors.primary}
-          intensity={volume}
-          tempoMs={getVisualTempoMs(preset)}
-        />
+        <View style={styles.visualWrap}>
+          <View style={[styles.backdropDisc, { backgroundColor: preset.color + '14' }]} />
+          <WaveVisualizer
+            isPlaying={isPlaying}
+            color={preset.color}
+            intensity={volume}
+            tempoMs={getVisualTempoMs(preset)}
+          />
+        </View>
 
         <View style={styles.infoContainer}>
           <Text style={[styles.presetName, { color: colors.text }]}>
@@ -321,6 +324,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
     gap: Spacing.xxl,
+  },
+  visualWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backdropDisc: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    borderRadius: 150,
   },
   infoContainer: {
     alignItems: 'center',

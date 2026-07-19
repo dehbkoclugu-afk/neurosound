@@ -24,6 +24,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
+import { Icon } from '@/components/ui/Icon';
 import { intents } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
@@ -128,17 +129,13 @@ export default function HomeScreen() {
           <Text style={[styles.intentsTitle, { color: colors.text }]}>
             {t('home.intentsTitle')}
           </Text>
-          <View>
-            {intents.map((intent, index) => (
+          <View style={styles.intentStack}>
+            {intents.map((intent) => (
               <TouchableOpacity
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
-                activeOpacity={0.6}
-                style={[
-                  styles.intentRow,
-                  { borderBottomColor: colors.cardBorder },
-                  index === 0 && { borderTopColor: colors.cardBorder, borderTopWidth: StyleSheet.hairlineWidth },
-                ]}
+                activeOpacity={0.8}
+                style={[styles.intentBlock, { backgroundColor: intent.color + '1E' }]}
                 accessibilityRole="button"
                 accessibilityLabel={t(intent.nameKey)}
               >
@@ -150,7 +147,7 @@ export default function HomeScreen() {
                     {t(intent.descKey)}
                   </Text>
                 </View>
-                <Ionicons name="arrow-forward" size={20} color={colors.primary} />
+                <Icon icon={intent.icon} size={26} color={intent.color} />
               </TouchableOpacity>
             ))}
           </View>
@@ -257,11 +254,15 @@ const styles = StyleSheet.create({
     ...Typography.title1,
     marginBottom: Spacing.lg,
   },
-  intentRow: {
+  intentStack: {
+    gap: Spacing.sm,
+  },
+  intentBlock: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: Spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 20,
     gap: Spacing.md,
   },
   intentText: {

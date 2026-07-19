@@ -17,6 +17,17 @@ import { Spacing, Typography, FontFamily } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset } from '@/lib/frequencies';
+import { Icon, getPresetIcon, IconConfig } from './Icon';
+
+function presetIcon(preset: FrequencyPreset): IconConfig {
+  if (preset.type === 'binaural' && preset.binauralType) {
+    return getPresetIcon('binaural', preset.binauralType);
+  }
+  if (preset.type === 'noise' && preset.noiseType) {
+    return getPresetIcon('noise', preset.noiseType);
+  }
+  return getPresetIcon('solfeggio');
+}
 
 interface PresetCardProps {
   preset: FrequencyPreset;
@@ -55,6 +66,8 @@ export function PresetCard({
       accessibilityRole="button"
       accessibilityLabel={t(preset.nameKey)}
     >
+      {/* Naked icon — no tinted box */}
+      <Icon icon={presetIcon(preset)} size={20} color={colors.textSecondary} />
       <View style={styles.rowText}>
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
           {t(preset.nameKey)}
@@ -79,6 +92,7 @@ interface PresetCardSmallProps {
 }
 
 export function PresetCardSmall({
+  preset,
   name,
   onPress,
   style,
@@ -94,6 +108,7 @@ export function PresetCardSmall({
       accessibilityRole="button"
       accessibilityLabel={name}
     >
+      <Icon icon={presetIcon(preset)} size={15} color={colors.textSecondary} />
       <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
         {name}
       </Text>
@@ -123,13 +138,15 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 20,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     marginRight: Spacing.sm,
     minHeight: 40,
-    justifyContent: 'center',
   },
   chipText: {
     ...Typography.subhead,
