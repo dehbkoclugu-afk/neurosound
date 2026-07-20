@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography } from '@/constants/theme';
@@ -142,20 +143,34 @@ export default function HomeScreen() {
               <TouchableOpacity
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
-                activeOpacity={0.8}
-                style={[styles.intentBlock, { backgroundColor: intent.color + '1E' }]}
+                activeOpacity={0.85}
+                style={styles.intentBlock}
                 accessibilityRole="button"
                 accessibilityLabel={t(intent.nameKey)}
               >
-                <View style={styles.intentText}>
-                  <Text style={[styles.intentName, { color: colors.text }]}>
-                    {t(intent.nameKey)}
-                  </Text>
-                  <Text style={[styles.intentDesc, { color: colors.textSecondary }]} numberOfLines={1}>
-                    {t(intent.descKey)}
-                  </Text>
+                <Image
+                  source={{ uri: intent.image }}
+                  style={StyleSheet.absoluteFill}
+                  contentFit="cover"
+                  transition={300}
+                />
+                {/* Scrim: tint toward the intent colour, darken for text contrast */}
+                <LinearGradient
+                  colors={[intent.color + '66', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.72)']}
+                  locations={[0, 0.45, 1]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={styles.intentRow}>
+                  <View style={styles.intentText}>
+                    <Text style={styles.intentName}>{t(intent.nameKey)}</Text>
+                    <Text style={styles.intentDesc} numberOfLines={1}>
+                      {t(intent.descKey)}
+                    </Text>
+                  </View>
+                  <Icon icon={intent.icon} size={26} color="rgba(255,255,255,0.95)" />
                 </View>
-                <Icon icon={intent.icon} size={26} color={intent.color} />
               </TouchableOpacity>
             ))}
           </View>
@@ -273,22 +288,29 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   intentBlock: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing.md,
+    height: 108,
     borderRadius: 20,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  intentRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
     gap: Spacing.md,
   },
   intentText: {
     flex: 1,
-    gap: 4,
+    gap: 2,
   },
   intentName: {
     ...Typography.title2,
+    color: '#FFFFFF',
   },
   intentDesc: {
     ...Typography.footnote,
+    color: 'rgba(255,255,255,0.85)',
   },
   emptyStateText: {
     ...Typography.subhead,

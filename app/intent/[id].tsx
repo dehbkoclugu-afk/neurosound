@@ -15,6 +15,9 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize } from '@/constants/theme';
@@ -27,6 +30,7 @@ import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 export default function IntentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const colors = useThemeColors();
   const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning } = useSettingsStore();
@@ -64,28 +68,39 @@ export default function IntentScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-          accessibilityLabel={t('common.back')}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.title, { color: colors.text }]}>{t(intent.nameKey)}</Text>
-      </View>
-
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.description, { color: colors.textSecondary }]}>
-          {t(intent.descKey)}
-        </Text>
+        {/* Full-bleed hero — image, scrim, title overlaid */}
+        <View style={styles.hero}>
+          <Image
+            source={{ uri: intent.image }}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+            transition={300}
+          />
+          <LinearGradient
+            colors={[intent.color + '55', 'rgba(0,0,0,0.35)', colors.background]}
+            locations={[0, 0.5, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={[styles.backButton, { top: insets.top + Spacing.sm }]}
+            accessibilityLabel={t('common.back')}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.heroText}>
+            <Text style={styles.heroTitle}>{t(intent.nameKey)}</Text>
+            <Text style={styles.heroDesc}>{t(intent.descKey)}</Text>
+          </View>
+        </View>
 
-        <View>
+        <View style={styles.list}>
           {presets.map((preset) => (
             <PresetCard
               key={preset.id}
@@ -96,7 +111,7 @@ export default function IntentScreen() {
           ))}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -104,46 +119,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xl,
-    paddingBottom: Spacing.md,
-    gap: Spacing.sm,
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    paddingBottom: Spacing.xl,
+  },
+  hero: {
+    height: 260,
+    justifyContent: 'flex-end',
+    marginBottom: Spacing.md,
   },
   backButton: {
+    position: 'absolute',
+    left: Spacing.sm,
     width: AccessibilitySize.minTouchTarget,
     height: AccessibilitySize.minTouchTarget,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  intentBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    ...Typography.title1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
+  heroText: {
     paddingHorizontal: Spacing.md,
-    paddingBottom: Spacing.xl,
+    paddingBottom: Spacing.md,
+    gap: Spacing.xs,
   },
-  description: {
+  heroTitle: {
+    ...Typography.largeTitle,
+    color: '#FFFFFF',
+  },
+  heroDesc: {
     ...Typography.subhead,
-    lineHeight: 21,
-    marginBottom: Spacing.lg,
+    color: 'rgba(255,255,255,0.85)',
+    maxWidth: 320,
   },
-  presetGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.md,
+  list: {
+    paddingHorizontal: Spacing.md,
   },
   emptyText: {
     ...Typography.body,
