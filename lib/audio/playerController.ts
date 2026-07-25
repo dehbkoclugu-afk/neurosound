@@ -8,7 +8,7 @@
 
 import { AppState } from 'react-native';
 
-import { useAudioStore } from '@/stores/audioStore';
+import { useAudioStore, MixerChannelState } from '@/stores/audioStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset, getPresetById } from '../frequencies';
 import {
@@ -173,7 +173,7 @@ export function syncVolume(): void {
   const { mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
   mixerChannels.forEach((ch) =>
-    mixerGenerators.get(ch.id)?.setVolume(ch.volume * maxVolume)
+    mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume))
   );
 }
 
@@ -271,7 +271,7 @@ export async function mixerStart(): Promise<void> {
 }
 
 async function startMixerChannels(
-  mixerChannels: { id: string; preset: FrequencyPreset; volume: number }[],
+  mixerChannels: MixerChannelState[],
   maxVolume: number
 ): Promise<void> {
   for (const ch of mixerChannels) {
@@ -282,7 +282,7 @@ async function startMixerChannels(
       gen = created;
       mixerGenerators.set(ch.id, gen);
     }
-    gen.setVolume(ch.volume * maxVolume);
+    gen.setVolume(channelVolume(ch, maxVolume));
     await gen.play();
   }
   useAudioStore.getState().setIsMixerPlaying(true);
@@ -295,6 +295,26 @@ export function mixerStop(): void {
   });
   mixerGenerators.clear();
   useAudioStore.getState().setIsMixerPlaying(false);
+}
+
+/** A muted channel outputs nothing but keeps its level, so unmuting restores
+ *  exactly what the user set. */
+function channelVolume(
+  ch: { volume: number; muted: boolean },
+  maxVolume: number
+): number {
+  return ch.muted ? 0 : ch.volume * maxVolume;
+}
+
+export function mixerSetChannelMuted(channelId: string, muted: boolean): void {
+  useAudioStore.getState().setMixerChannelMuted(channelId, muted);
+  const ch = useAudioStore
+    .getState()
+    .mixerChannels.find((c) => c.id === channelId);
+  if (!ch) return;
+  mixerGenerators
+    .get(channelId)
+    ?.setVolume(channelVolume(ch, useSettingsStore.getState().maxVolume));
 }
 
 /** Stop the mixer and discard its channels — the MiniPlayer close button.
@@ -311,7 +331,8 @@ export async function mixerAddChannel(preset: FrequencyPreset): Promise<boolean>
   if (store.mixerChannels.length >= MAX_MIXER_CHANNELS) return false;
 
   const id = `channel-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-  store.addMixerChannel({ id, preset, volume: 0.5 });
+  store.addMixerChannel({ id, preset, volume: 0.5, muted: false });
+  store.setActiveMixId(null);
 
   if (store.isMixerPlaying) {
     const gen = createGenerator(preset);
@@ -332,22 +353,34 @@ export function mixerRemoveChannel(channelId: string): void {
     mixerGenerators.delete(channelId);
   }
   useAudioStore.getState().removeMixerChannel(channelId);
+  useAudioStore.getState().setActiveMixId(null);
   if (useAudioStore.getState().mixerChannels.length === 0) {
     useAudioStore.getState().setIsMixerPlaying(false);
   }
 }
 
 export function mixerSetChannelVolume(channelId: string, volume: number): void {
-  useAudioStore.getState().updateMixerChannelVolume(channelId, volume);
+  const store = useAudioStore.getState();
+  store.updateMixerChannelVolume(channelId, volume);
+  // Moving a muted channel's level unmutes it — otherwise the slider moves and
+  // nothing happens, which reads as broken.
+  store.setMixerChannelMuted(channelId, false);
   mixerGenerators
     .get(channelId)
     ?.setVolume(volume * useSettingsStore.getState().maxVolume);
 }
 
-/** Replace all channels from a saved mix (stops current mixer playback). */
-export function mixerLoadChannels(
-  channels: { presetId: string; volume: number }[]
-): void {
+/**
+ * Replace all channels from a saved mix and start playing.
+ *
+ * Loading used to swap the channels silently: no sound, no scroll, no
+ * confirmation — the change happened off-screen above the list the user had
+ * just tapped, so tapping a saved mix appeared to do nothing at all.
+ */
+export async function mixerLoadChannels(
+  channels: { presetId: string; volume: number }[],
+  mixId?: string
+): Promise<void> {
   mixerStop();
   const store = useAudioStore.getState();
   store.clearMixerChannels();
@@ -358,7 +391,10 @@ export function mixerLoadChannels(
         id: `channel-${Date.now()}-${index}`,
         preset,
         volume: ch.volume,
+        muted: false,
       });
     }
   });
+  store.setActiveMixId(mixId ?? null);
+  await mixerStart();
 }

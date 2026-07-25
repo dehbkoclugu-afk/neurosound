@@ -55,7 +55,11 @@ export default function MixerScreen() {
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
   const { addCustomMix, customMixes, deleteCustomMix } = usePresetsStore();
-  const { mixerChannels: channels, isMixerPlaying: isPlaying } = useAudioStore();
+  const {
+    mixerChannels: channels,
+    isMixerPlaying: isPlaying,
+    activeMixId,
+  } = useAudioStore();
 
   const [showPresetPicker, setShowPresetPicker] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -63,6 +67,9 @@ export default function MixerScreen() {
 
   const colors = useThemeColors();
   const miniPlayerInset = useMiniPlayerInset();
+
+  const isEmpty = channels.length === 0;
+  const isFull = channels.length >= playerController.MAX_MIXER_CHANNELS;
 
   const handlePlayPause = useCallback(async () => {
     haptics.commit();
@@ -90,6 +97,18 @@ export default function MixerScreen() {
     playerController.mixerSetChannelVolume(channelId, volume);
   }, []);
 
+  const handleToggleMute = useCallback((channelId: string, muted: boolean) => {
+    haptics.select();
+    playerController.mixerSetChannelMuted(channelId, muted);
+  }, []);
+
+  const closeSaveDialog = useCallback(() => {
+    // Clear the draft on dismiss too, not only on a successful save — stale
+    // text reappearing next time reads as a bug.
+    setMixName('');
+    setShowSaveDialog(false);
+  }, []);
+
   const handleSaveMix = useCallback(() => {
     if (!mixName.trim()) {
       Alert.alert(t('common.error'), t('mixer.enterName'));
@@ -109,14 +128,30 @@ export default function MixerScreen() {
       })),
     });
 
+    haptics.save();
     setMixName('');
     setShowSaveDialog(false);
     Alert.alert(t('common.saved'), t('mixer.mixSaved'));
   }, [mixName, channels, addCustomMix, t]);
 
-  const handleLoadMix = useCallback((mix: typeof customMixes[0]) => {
-    playerController.mixerLoadChannels(mix.channels);
+  const handleLoadMix = useCallback(async (mix: typeof customMixes[0]) => {
+    haptics.commit();
+    await playerController.mixerLoadChannels(mix.channels, mix.id);
   }, []);
+
+  const handleDeleteMix = useCallback(
+    (mixId: string, name: string) => {
+      Alert.alert(t('common.delete'), `${t('mixer.deleteMix')} "${name}"?`, [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: () => deleteCustomMix(mixId),
+        },
+      ]);
+    },
+    [t, deleteCustomMix]
+  );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -168,113 +203,155 @@ export default function MixerScreen() {
               style={[styles.channelRow, { borderBottomColor: colors.cardBorder }]}
             >
               <View style={styles.channelHeader}>
-                <Text style={[styles.channelName, { color: colors.text }]}>
+                <Text
+                  style={[
+                    styles.channelName,
+                    { color: channel.muted ? colors.textSecondary : colors.text },
+                  ]}
+                  numberOfLines={1}
+                >
                   {t(channel.preset.nameKey)}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleRemoveChannel(channel.id)}
-                  style={styles.removeButton}
-                  accessibilityLabel={t('common.delete')}
-                >
-                  <Ionicons name="close" size={20} color={colors.textSecondary} />
-                </TouchableOpacity>
+                <View style={styles.channelActions}>
+                  <TouchableOpacity
+                    onPress={() => handleToggleMute(channel.id, !channel.muted)}
+                    style={styles.channelActionButton}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: channel.muted }}
+                    accessibilityLabel={`${t('mixer.mute')} ${t(channel.preset.nameKey)}`}
+                  >
+                    <Ionicons
+                      name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
+                      size={20}
+                      color={channel.muted ? colors.primary : colors.textSecondary}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveChannel(channel.id)}
+                    style={styles.channelActionButton}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('common.delete')} ${t(channel.preset.nameKey)}`}
+                  >
+                    <Ionicons name="close" size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <Slider
-                value={channel.volume}
-                onValueChange={(v) => handleVolumeChange(channel.id, v)}
-                max={1}
-                showValue={false}
-                accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
-              />
+              <View style={channel.muted ? styles.mutedSlider : undefined}>
+                <Slider
+                  value={channel.volume}
+                  onValueChange={(v) => handleVolumeChange(channel.id, v)}
+                  max={1}
+                  showValue={false}
+                  accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
+                />
+              </View>
             </View>
           ))}
 
-          {/* Add Channel — text row */}
-          {channels.length < playerController.MAX_MIXER_CHANNELS && (
-            <TouchableOpacity
-              onPress={() => setShowPresetPicker(true)}
-              activeOpacity={0.6}
-              style={styles.addRow}
-              accessibilityLabel={t('mixer.addSound')}
+          {/* Add Channel — always rendered. Letting it vanish at 4/4 left the
+              user hunting for a button that had silently removed itself. */}
+          <TouchableOpacity
+            onPress={() => setShowPresetPicker(true)}
+            activeOpacity={0.6}
+            disabled={isFull}
+            style={styles.addRow}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isFull }}
+            accessibilityLabel={isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
+          >
+            <Ionicons
+              name={isFull ? 'information-circle-outline' : 'add'}
+              size={20}
+              color={isFull ? colors.textSecondary : colors.primary}
+            />
+            <Text
+              style={[
+                styles.addRowText,
+                { color: isFull ? colors.textSecondary : colors.primary },
+              ]}
             >
-              <Ionicons name="add" size={20} color={colors.primary} />
-              <Text style={[styles.addRowText, { color: colors.primary }]}>
-                {t('mixer.addSound')}
-              </Text>
-            </TouchableOpacity>
-          )}
+              {isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Play/Pause Button */}
-        {channels.length > 0 && (
-          <View style={styles.playSection}>
-            <PressableScale
-              onPress={handlePlayPause}
-              style={[styles.playButton, { backgroundColor: colors.primary }]}
-              accessibilityRole="button"
-              accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
-            >
-              <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
-                size={32}
-                color={onPrimary}
-                style={isPlaying ? undefined : { marginLeft: 4 }}
-              />
-            </PressableScale>
-          </View>
-        )}
-
-        {/* Save Button */}
-        {channels.length > 0 && (
-          <View style={styles.saveSection}>
-            <Button
-              title={t('mixer.savePreset')}
-              onPress={() => setShowSaveDialog(true)}
-              variant="secondary"
+        {/* Transport — always present. Showing and hiding play/save as the
+            first channel arrived made the whole page jump under the finger. */}
+        <View style={styles.transport}>
+          <PressableScale
+            onPress={handlePlayPause}
+            disabled={isEmpty}
+            style={[styles.playButton, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isEmpty }}
+            accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
+          >
+            <Ionicons
+              name={isPlaying ? 'pause' : 'play'}
+              size={32}
+              color={onPrimary}
+              style={isPlaying ? undefined : { marginLeft: 4 }}
             />
-          </View>
-        )}
+          </PressableScale>
+
+          <Button
+            title={t('mixer.savePreset')}
+            onPress={() => setShowSaveDialog(true)}
+            disabled={isEmpty}
+            variant="secondary"
+          />
+        </View>
 
         {/* Saved Mixes */}
         {customMixes.length > 0 && (
           <View style={styles.section}>
             <CategoryHeader title={t('mixer.myMixes')} />
-            {customMixes.map(mix => (
-              <TouchableOpacity
-                key={mix.id}
-                onPress={() => handleLoadMix(mix)}
-                activeOpacity={0.6}
-                style={[styles.mixRow, { borderBottomColor: colors.cardBorder }]}
-              >
-                <View style={styles.mixTextContainer}>
-                  <Text style={[styles.mixName, { color: colors.text }]}>
-                    {mix.name}
-                  </Text>
-                  <Text style={[styles.mixChannels, { color: colors.textSecondary }]}>
-                    {mix.channels.length} {t('mixer.sounds')}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    Alert.alert(
-                      t('common.delete'),
-                      `${t('mixer.deleteMix')} "${mix.name}"?`,
-                      [
-                        { text: t('common.cancel'), style: 'cancel' },
-                        {
-                          text: t('common.delete'),
-                          style: 'destructive',
-                          onPress: () => deleteCustomMix(mix.id),
-                        },
-                      ]
-                    );
-                  }}
-                  style={styles.deleteButton}
+            {customMixes.map(mix => {
+              const isActive = mix.id === activeMixId;
+              return (
+                /* Row and delete are siblings, not nested touchables — the
+                   delete button used to live inside the row's own pressable,
+                   so the two targets overlapped. */
+                <View
+                  key={mix.id}
+                  style={[styles.mixRow, { borderBottomColor: colors.cardBorder }]}
                 >
-                  <Ionicons name="trash-outline" size={20} color={colors.error} />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            ))}
+                  <TouchableOpacity
+                    onPress={() => handleLoadMix(mix)}
+                    activeOpacity={0.6}
+                    style={styles.mixMain}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isActive }}
+                    accessibilityLabel={`${mix.name}, ${mix.channels.length} ${t('mixer.sounds')}`}
+                  >
+                    <View style={styles.mixTextContainer}>
+                      <Text
+                        style={[
+                          styles.mixName,
+                          { color: isActive ? colors.primary : colors.text },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {mix.name}
+                      </Text>
+                      <Text style={[styles.mixChannels, { color: colors.textSecondary }]}>
+                        {isActive
+                          ? t('mixer.loaded')
+                          : `${mix.channels.length} ${t('mixer.sounds')}`}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteMix(mix.id, mix.name)}
+                    style={styles.deleteButton}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('common.delete')} ${mix.name}`}
+                  >
+                    <Ionicons name="trash-outline" size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
         )}
 
@@ -330,7 +407,7 @@ export default function MixerScreen() {
       <Modal
         visible={showSaveDialog}
         animationType={reduceMotion ? 'none' : 'slide'}
-        onRequestClose={() => setShowSaveDialog(false)}
+        onRequestClose={closeSaveDialog}
         accessibilityViewIsModal
       >
         <View style={[styles.modal, { backgroundColor: colors.background }]}>
@@ -340,8 +417,10 @@ export default function MixerScreen() {
                 {t('mixer.savePreset')}
               </Text>
               <TouchableOpacity
-                onPress={() => setShowSaveDialog(false)}
+                onPress={closeSaveDialog}
                 style={styles.closeButton}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.cancel')}
               >
                 <Ionicons name="close" size={28} color={colors.text} />
               </TouchableOpacity>
@@ -412,8 +491,19 @@ const styles = StyleSheet.create({
   channelName: {
     ...Typography.headline,
   },
-  removeButton: {
-    padding: Spacing.xs,
+  channelActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  channelActionButton: {
+    width: AccessibilitySize.minTouchTarget,
+    height: AccessibilitySize.minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Muted reads as "still here, just silent" — dimmed, not removed.
+  mutedSlider: {
+    opacity: 0.4,
   },
   addRow: {
     flexDirection: 'row',
@@ -425,10 +515,11 @@ const styles = StyleSheet.create({
   addRowText: {
     ...Typography.headline,
   },
-  playSection: {
+  transport: {
     alignItems: 'center',
+    gap: Spacing.md,
+    marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
-    marginTop: Spacing.md,
   },
   playButton: {
     width: 72,
@@ -437,15 +528,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  saveSection: {
-    marginBottom: Spacing.xl,
-  },
   mixRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  mixMain: {
+    flex: 1,
+    paddingVertical: Spacing.md,
+    justifyContent: 'center',
+    minHeight: 56,
   },
   mixTextContainer: {
     flex: 1,
@@ -458,7 +550,10 @@ const styles = StyleSheet.create({
     ...Typography.caption1,
   },
   deleteButton: {
-    padding: Spacing.sm,
+    width: AccessibilitySize.minTouchTarget,
+    height: AccessibilitySize.minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modal: {
     flex: 1,

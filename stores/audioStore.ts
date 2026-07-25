@@ -27,6 +27,9 @@ export interface PlaybackState {
   // Mixer
   isMixerPlaying: boolean;
   mixerChannels: MixerChannelState[];
+  /** Saved mix the current channels came from, so the list can show which one
+   *  is loaded. Cleared as soon as the structure is edited. */
+  activeMixId: string | null;
 
   // Actions
   setCurrentPreset: (preset: FrequencyPreset | null) => void;
@@ -40,7 +43,9 @@ export interface PlaybackState {
   addMixerChannel: (channel: MixerChannelState) => void;
   removeMixerChannel: (channelId: string) => void;
   updateMixerChannelVolume: (channelId: string, volume: number) => void;
+  setMixerChannelMuted: (channelId: string, muted: boolean) => void;
   clearMixerChannels: () => void;
+  setActiveMixId: (id: string | null) => void;
   reset: () => void;
 }
 
@@ -48,6 +53,9 @@ export interface MixerChannelState {
   id: string;
   preset: FrequencyPreset;
   volume: number;
+  /** Silences the channel without losing its level — the whole point of a
+   *  mute. Dragging the slider to zero would destroy the setting. */
+  muted: boolean;
 }
 
 const initialState = {
@@ -61,6 +69,7 @@ const initialState = {
   timerEndsAt: null,
   isMixerPlaying: false,
   mixerChannels: [],
+  activeMixId: null,
 };
 
 export const useAudioStore = create<PlaybackState>((set) => ({
@@ -104,7 +113,16 @@ export const useAudioStore = create<PlaybackState>((set) => ({
       ),
     })),
 
-  clearMixerChannels: () => set({ mixerChannels: [] }),
+  setMixerChannelMuted: (channelId, muted) =>
+    set((state) => ({
+      mixerChannels: state.mixerChannels.map((c) =>
+        c.id === channelId ? { ...c, muted } : c
+      ),
+    })),
+
+  clearMixerChannels: () => set({ mixerChannels: [], activeMixId: null }),
+
+  setActiveMixId: (activeMixId) => set({ activeMixId }),
 
   reset: () => set(initialState),
 }));

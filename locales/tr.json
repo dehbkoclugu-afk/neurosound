@@ -120,7 +120,10 @@
     "mixSaved": "Karışımınız kaydedildi!",
     "deleteMix": "Karışımı sil",
     "emptyDesc": "Birden fazla sesi üst üste bindir: yağmur + kahverengi gürültü + alpha gibi.",
-    "trySample": "Örnek karışımı dene"
+    "trySample": "Örnek karışımı dene",
+    "mute": "Sustur",
+    "channelsFull": "4/4 dolu — eklemek için birini çıkar",
+    "loaded": "Yüklü"
   },
   "player": {
     "nowPlaying": "Şu an çalıyor",
