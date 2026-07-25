@@ -163,7 +163,9 @@
     "pauseButton": "Duraklat butonu",
     "volumeSlider": "Ses seviyesi ayarı",
     "frequencyCard": "Frekans kartı",
-    "expandPlayer": "Oynatıcıyı genişletmek için dokun"
+    "expandPlayer": "Oynatıcıyı genişletmek için dokun",
+    "increase": "Artır",
+    "decrease": "Azalt"
   },
   "intents": {
     "sleep": "Uyku",

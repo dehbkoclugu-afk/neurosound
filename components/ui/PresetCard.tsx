@@ -15,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Spacing, Typography, FontFamily } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
 
@@ -55,13 +54,12 @@ export function PresetCard({
   style,
 }: PresetCardProps) {
   const { t } = useTranslation();
-  const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.6}
+      activeOpacity={0.6}
       style={[styles.row, { borderBottomColor: colors.cardBorder }, style]}
       accessibilityRole="button"
       accessibilityLabel={t(preset.nameKey)}
@@ -97,13 +95,12 @@ export function PresetCardSmall({
   onPress,
   style,
 }: PresetCardSmallProps) {
-  const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.6}
+      activeOpacity={0.6}
       style={[styles.chip, { borderColor: colors.cardBorder }, style]}
       accessibilityRole="button"
       accessibilityLabel={name}

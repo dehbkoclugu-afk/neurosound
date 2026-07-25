@@ -13,8 +13,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, Spacing } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { AccessibilitySize, Spacing, Typography, onPrimary } from '@/constants/theme';
 
 interface ButtonProps {
   title: string;
@@ -43,8 +42,6 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
-  const { reduceMotion } = useSettingsStore();
-
   const colors = useThemeColors();
 
   const getButtonStyle = (): ViewStyle => {
@@ -89,8 +86,11 @@ export function Button({
   };
 
   const getTextStyle = (): TextStyle => {
+    // fontWeight does nothing for the loaded Nunito Sans faces — React Native
+    // does not synthesize weights for custom fonts, it silently falls back to
+    // the system font. Weight has to come from fontFamily.
     const baseStyle: TextStyle = {
-      fontWeight: '600',
+      fontFamily: Typography.headline.fontFamily,
     };
 
     const sizeStyles: Record<string, TextStyle> = {
@@ -100,7 +100,7 @@ export function Button({
     };
 
     const variantStyles: Record<string, TextStyle> = {
-      primary: { color: '#FFFFFF' },
+      primary: { color: onPrimary },
       secondary: { color: colors.primary },
       ghost: { color: colors.primary },
     };
@@ -117,7 +117,7 @@ export function Button({
       onPress={onPress}
       disabled={disabled}
       style={[getButtonStyle(), style]}
-      activeOpacity={reduceMotion ? 1 : 0.7}
+      activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
       accessibilityHint={accessibilityHint}

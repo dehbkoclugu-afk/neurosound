@@ -15,7 +15,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 const STEPS = [
@@ -140,6 +140,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...Typography.headline,
-    color: '#1A140C',
+    color: onPrimary,
   },
 });

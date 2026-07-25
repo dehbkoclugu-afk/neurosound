@@ -15,8 +15,9 @@ import {
   ViewStyle,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, Spacing } from '@/constants/theme';
+import { AccessibilitySize, Spacing, Typography } from '@/constants/theme';
 
 interface SliderProps {
   value: number;
@@ -44,6 +45,7 @@ export function Slider({
   style,
 }: SliderProps) {
   const [sliderWidth, setSliderWidth] = useState(0);
+  const { t } = useTranslation();
 
   const colors = useThemeColors();
 
@@ -115,8 +117,8 @@ export function Slider({
           text: formatValue(value),
         }}
         accessibilityActions={[
-          { name: 'increment', label: 'Artır' },
-          { name: 'decrement', label: 'Azalt' },
+          { name: 'increment', label: t('accessibility.increase') },
+          { name: 'decrement', label: t('accessibility.decrease') },
         ]}
         onAccessibilityAction={(event) => {
           switch (event.nativeEvent.actionName) {
@@ -166,11 +168,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
+    ...Typography.subhead,
+    fontFamily: Typography.headline.fontFamily,
   },
   value: {
-    fontSize: 14,
+    ...Typography.subhead,
+    fontVariant: ['tabular-nums'],
   },
   sliderContainer: {
     height: AccessibilitySize.minTouchTarget,

@@ -6,6 +6,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import i18n, { deviceLanguageOrDefault } from '@/i18n';
+
 const isClient = typeof window !== 'undefined';
 
 // Safe storage wrapper
@@ -76,7 +78,8 @@ const initialState = {
   theme: 'dark' as ThemeMode,
   reduceMotion: false,
   lowContrast: false,
-  language: 'tr' as Language,
+  // Seeded from the device locale so a first launch agrees with i18n
+  language: deviceLanguageOrDefault as Language,
   maxVolume: 0.8,
   defaultVolume: 0.5,
   hasSeenOnboarding: false,
@@ -103,6 +106,14 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'neurosound-settings',
       storage: createJSONStorage(() => safeStorage),
+      // Storage is async, so the restored language lands after i18n has already
+      // initialised from the device locale. Re-apply it or the user's choice is
+      // silently dropped on every cold start.
+      onRehydrateStorage: () => (state) => {
+        if (state?.language && i18n.language !== state.language) {
+          i18n.changeLanguage(state.language).catch(() => {});
+        }
+      },
     }
   )
 );

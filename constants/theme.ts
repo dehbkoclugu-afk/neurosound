@@ -17,6 +17,13 @@ const primary = '#D99A4E';
 const primaryLight = '#E8B573';
 const primaryDark = '#B57C35';
 
+/**
+ * Text/icon colour for anything sitting ON a filled primary surface.
+ * White on amber is 2.4:1 — well below WCAG AA. This warm near-black is
+ * 7.6:1 on #D99A4E and 5.9:1 on the dimmed night amber.
+ */
+export const onPrimary = '#1A140C';
+
 // Category icons for UI (rendered via components/ui/Icon)
 export const CategoryIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
   binaural: { name: 'pulse', library: 'ionicon' },
@@ -162,7 +169,9 @@ export const Colors = {
   // bedtime use. Low-contrast setting is intentionally ignored here.
   night: {
     text: '#CDBFA9',
-    textSecondary: '#7A6F5F',
+    // 4.7:1 on #050403 — the smallest bump that clears AA. Night mode stays
+    // as dim as compliance allows; footnotes were unreadable at 4.15:1.
+    textSecondary: '#827764',
     background: '#050403',
     backgroundSecondary: '#12100D',
     card: '#12100D',
@@ -184,9 +193,11 @@ export const Colors = {
   },
   // Low contrast mode for visual sensitivity — primary stays a muted amber
   // so selected/active states remain distinguishable (never plain gray).
+  // "Low contrast" softens the *ceiling* (no near-black on near-white); it
+  // must never push text under AA. Secondary text stays at or above 4.5:1.
   lowContrastLight: {
     text: '#4E463C',
-    textSecondary: '#948A7C',
+    textSecondary: '#756B5D', // 4.8:1 on #F8F5F0 (was #948A7C at 3.1:1)
     background: '#F8F5F0',
     backgroundSecondary: '#F1ECE3',
     card: '#F8F5F0',
@@ -208,7 +219,7 @@ export const Colors = {
   },
   lowContrastDark: {
     text: '#C9C0B2',
-    textSecondary: '#7D746A',
+    textSecondary: '#8D8478', // 4.8:1 on #1B1815 (was #7D746A at 3.9:1)
     background: '#1B1815',
     backgroundSecondary: '#26221E',
     card: '#26221E',

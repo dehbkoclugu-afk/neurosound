@@ -163,7 +163,9 @@
     "pauseButton": "Pause button",
     "volumeSlider": "Volume slider",
     "frequencyCard": "Frequency card",
-    "expandPlayer": "Tap to expand player"
+    "expandPlayer": "Tap to expand player",
+    "increase": "Increase",
+    "decrease": "Decrease"
   },
   "intents": {
     "sleep": "Sleep",

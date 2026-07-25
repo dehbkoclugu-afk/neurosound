@@ -14,9 +14,10 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, AccessibilitySize } from '@/constants/theme';
+import { Spacing, AccessibilitySize, Typography, FontFamily, onPrimary } from '@/constants/theme';
 import { useSettingsStore, ThemeMode, Language } from '@/stores/settingsStore';
 import { Slider } from '@/components/ui/Slider';
 import i18n from '@/i18n';
@@ -98,7 +99,7 @@ export default function SettingsScreen() {
                   <Text
                     style={[
                       styles.optionText,
-                      { color: theme === option.value ? '#fff' : colors.text },
+                      { color: theme === option.value ? onPrimary : colors.text },
                     ]}
                   >
                     {t(option.labelKey)}
@@ -170,7 +171,7 @@ export default function SettingsScreen() {
                   <Text
                     style={[
                       styles.optionText,
-                      { color: language === option.value ? '#fff' : colors.text },
+                      { color: language === option.value ? onPrimary : colors.text },
                     ]}
                   >
                     {option.label}
@@ -211,7 +212,9 @@ export default function SettingsScreen() {
               <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
                 {t('settings.version')}
               </Text>
-              <Text style={[styles.aboutValue, { color: colors.text }]}>1.0.0</Text>
+              <Text style={[styles.aboutValue, { color: colors.text }]}>
+                {Constants.expoConfig?.version ?? '—'}
+              </Text>
             </View>
           </View>
 
@@ -246,16 +249,18 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
     marginTop: Spacing.lg,
   },
+  // Everything below uses Typography tokens. Raw fontWeight is a silent bug
+  // here: React Native does not synthesize weights for the loaded Nunito Sans
+  // faces, so `fontWeight: '700'` rendered this whole screen in the system
+  // font while every other screen used Nunito.
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    ...Typography.largeTitle,
   },
   section: {
     marginBottom: Spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...Typography.title3,
     marginBottom: Spacing.md,
   },
   card: {
@@ -263,8 +268,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    ...Typography.callout,
+    fontFamily: FontFamily.semibold,
     marginBottom: Spacing.sm,
   },
   optionGroup: {
@@ -281,8 +286,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   optionText: {
-    fontSize: 14,
-    fontWeight: '500',
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
   },
   switchRow: {
     flexDirection: 'row',
@@ -301,23 +306,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   aboutLabel: {
-    fontSize: 14,
+    ...Typography.footnote,
   },
   aboutValue: {
-    fontSize: 14,
-    fontWeight: '500',
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+    fontVariant: ['tabular-nums'],
   },
   warningCard: {
     paddingVertical: Spacing.md,
     gap: Spacing.xs,
   },
   warningTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
     marginBottom: Spacing.xs,
   },
   warningText: {
-    fontSize: 13,
-    lineHeight: 18,
+    ...Typography.footnote,
   },
 });

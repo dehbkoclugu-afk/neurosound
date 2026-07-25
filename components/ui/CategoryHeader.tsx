@@ -14,7 +14,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, FontFamily } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
 
 interface CategoryHeaderProps {
   title: string;
@@ -32,7 +31,6 @@ export function CategoryHeader({
   seeAllText = 'See All',
   style,
 }: CategoryHeaderProps) {
-  const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
 
   return (
@@ -48,7 +46,7 @@ export function CategoryHeader({
       {onSeeAll && (
         <TouchableOpacity
           onPress={onSeeAll}
-          activeOpacity={reduceMotion ? 1 : 0.6}
+          activeOpacity={0.6}
           style={styles.seeAllButton}
           accessibilityRole="button"
           accessibilityLabel={seeAllText}
@@ -76,13 +74,12 @@ export function CategoryCard({
   onPress,
   style,
 }: CategoryCardProps) {
-  const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.6}
+      activeOpacity={0.6}
       style={[styles.categoryRow, { borderBottomColor: colors.cardBorder }, style]}
       accessibilityRole="button"
       accessibilityLabel={title}

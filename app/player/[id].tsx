@@ -20,7 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
@@ -243,18 +243,18 @@ export default function PlayerScreen() {
           <TouchableOpacity
             onPress={handlePlayPause}
             disabled={isLoading}
-            activeOpacity={reduceMotion ? 1 : 0.8}
+            activeOpacity={0.8}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
             accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
             accessibilityState={{ busy: isLoading }}
           >
             {isLoading ? (
-              <ActivityIndicator size="large" color="#1A140C" />
+              <ActivityIndicator size="large" color={onPrimary} />
             ) : (
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
                 size={38}
-                color="#1A140C"
+                color={onPrimary}
                 style={isPlaying ? undefined : { marginLeft: 3 }}
               />
             )}
@@ -269,8 +269,9 @@ export default function PlayerScreen() {
       <Modal
         visible={showTimerModal}
         transparent
-        animationType="fade"
+        animationType={reduceMotion ? 'none' : 'fade'}
         onRequestClose={() => setShowTimerModal(false)}
+        accessibilityViewIsModal
       >
         <Pressable
           style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}

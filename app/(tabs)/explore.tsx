@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
 import {
@@ -66,7 +65,6 @@ export default function ExploreScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
-  const { reduceMotion } = useSettingsStore();
   const { isFavorite } = usePresetsStore();
 
   // Initialize with params or default
@@ -106,7 +104,7 @@ export default function ExploreScreen() {
             <TouchableOpacity
               key={category.key}
               onPress={() => setActiveCategory(category.key)}
-              activeOpacity={reduceMotion ? 1 : 0.6}
+              activeOpacity={0.6}
               style={styles.tab}
               accessibilityRole="tab"
               accessibilityState={{ selected: isActive }}

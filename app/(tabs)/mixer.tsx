@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -188,7 +188,7 @@ export default function MixerScreen() {
           {channels.length < playerController.MAX_MIXER_CHANNELS && (
             <TouchableOpacity
               onPress={() => setShowPresetPicker(true)}
-              activeOpacity={reduceMotion ? 1 : 0.6}
+              activeOpacity={0.6}
               style={styles.addRow}
               accessibilityLabel={t('mixer.addSound')}
             >
@@ -205,14 +205,14 @@ export default function MixerScreen() {
           <View style={styles.playSection}>
             <TouchableOpacity
               onPress={handlePlayPause}
-              activeOpacity={reduceMotion ? 1 : 0.8}
+              activeOpacity={0.8}
               style={[styles.playButton, { backgroundColor: colors.primary }]}
               accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
             >
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
                 size={32}
-                color="#1A140C"
+                color={onPrimary}
                 style={isPlaying ? undefined : { marginLeft: 4 }}
               />
             </TouchableOpacity>
@@ -238,7 +238,7 @@ export default function MixerScreen() {
               <TouchableOpacity
                 key={mix.id}
                 onPress={() => handleLoadMix(mix)}
-                activeOpacity={reduceMotion ? 1 : 0.6}
+                activeOpacity={0.6}
                 style={[styles.mixRow, { borderBottomColor: colors.cardBorder }]}
               >
                 <View style={styles.mixTextContainer}>
@@ -280,6 +280,7 @@ export default function MixerScreen() {
         visible={showPresetPicker}
         animationType={reduceMotion ? 'none' : 'slide'}
         onRequestClose={() => setShowPresetPicker(false)}
+        accessibilityViewIsModal
       >
         <View style={[styles.modal, { backgroundColor: colors.background }]}>
           <SafeAreaView style={styles.modalInner}>
@@ -304,7 +305,7 @@ export default function MixerScreen() {
                     <TouchableOpacity
                       key={preset.id}
                       onPress={() => handleAddChannel(preset)}
-                      activeOpacity={reduceMotion ? 1 : 0.6}
+                      activeOpacity={0.6}
                       style={[styles.presetItem, { borderBottomColor: colors.cardBorder }]}
                     >
                       <Text style={[styles.presetItemName, { color: colors.text }]}>
@@ -325,6 +326,7 @@ export default function MixerScreen() {
         visible={showSaveDialog}
         animationType={reduceMotion ? 'none' : 'slide'}
         onRequestClose={() => setShowSaveDialog(false)}
+        accessibilityViewIsModal
       >
         <View style={[styles.modal, { backgroundColor: colors.background }]}>
           <SafeAreaView style={styles.modalInner}>

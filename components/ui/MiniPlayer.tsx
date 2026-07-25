@@ -14,8 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { Spacing, Typography, onPrimary } from '@/constants/theme';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +26,6 @@ interface MiniPlayerProps {
 export function MiniPlayer({ onPress }: MiniPlayerProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { reduceMotion } = useSettingsStore();
   const { currentPreset, isPlaying, isLoading } = useAudioStore();
 
   const colors = useThemeColors();
@@ -62,7 +60,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
   return (
     <TouchableOpacity
       onPress={handlePress}
-      activeOpacity={reduceMotion ? 1 : 0.9}
+      activeOpacity={0.9}
       style={[
         styles.container,
         {
@@ -91,7 +89,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           <TouchableOpacity
             onPress={handlePlayPause}
             disabled={isLoading}
-            activeOpacity={reduceMotion ? 1 : 0.7}
+            activeOpacity={0.7}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
             accessibilityRole="button"
             accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
@@ -99,19 +97,19 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="#1A140C" />
+              <ActivityIndicator size="small" color={onPrimary} />
             ) : (
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
                 size={18}
-                color="#1A140C"
+                color={onPrimary}
                 style={isPlaying ? undefined : { marginLeft: 2 }}
               />
             )}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleStop}
-            activeOpacity={reduceMotion ? 1 : 0.7}
+            activeOpacity={0.7}
             style={styles.stopButton}
             accessibilityRole="button"
             accessibilityLabel={t('common.stop')}
