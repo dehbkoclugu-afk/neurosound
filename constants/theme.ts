@@ -82,6 +82,23 @@ export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'ma
 export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const };
 
 /**
+ * Category markers — the one place a sound's own colour still shows.
+ *
+ * The app used to carry 22 distinct preset colours and paint whole screens
+ * with them, which fought the single-amber identity this file declares. Colour
+ * now identifies the *kind* of sound and nothing more: a tinted row icon, a dot
+ * beside the frequency. Everything structural is amber.
+ *
+ * Each clears 3:1 against all nine surfaces across the five palettes, so one
+ * value works everywhere rather than five sets of three.
+ */
+export const CategoryColors: Record<'binaural' | 'solfeggio' | 'noise', string> = {
+  binaural: '#6578AD',
+  solfeggio: '#AA6482',
+  noise: '#4E8474',
+};
+
+/**
  * Accent colour for text and standalone glyphs — links, "See all", the timer
  * badge, secondary button labels.
  *

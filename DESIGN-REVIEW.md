@@ -7,6 +7,10 @@ Mercek: Impeccable (critique + native audit), Emil Kowalski design engineering, 
 
 ---
 
+> **Durum (güncelleme):** #1 karara bağlandı — tek amber aksan. Player amber'a
+> çekildi, 22 preset rengi üç kategori işaretine indi. Aşağıdaki teşhis, karar
+> öncesi hali anlatıyor; kayıt olarak duruyor.
+
 ## Teşhis
 
 Uygulamanın tek en büyük problemi **kimlik çatallanması**. `constants/theme.ts` başlığında yazan söz ("Kor — tek amber aksan, sakin, karanlık öncelikli") liste ekranlarında tutuluyor ama Player'da tutulmuyor: orada 33 presetin her biri kendi rengiyle (mavi, mor, yeşil, kırmızı, pembe, fuşya...) ekranı yıkıyor. İki sistem arasında köprü kuran hiçbir ekran yok. İkinci büyük problem: **uygulama "preset çalar" olarak tasarlanmış, ama kullanım senaryosu "uyku seansı"**. Uyuyan kullanıcı için kritik olan her şey (zamanlayıcı kalıcılığı, kilit ekranı kontrolü, ses seviyesi hafızası, mixer'ın global kontrolü) eksik ya da kırık.

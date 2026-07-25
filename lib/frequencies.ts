@@ -33,8 +33,6 @@ export interface FrequencyPreset {
   frequency?: number;
   // For noise
   noiseType?: NoiseType;
-  // Visual
-  color: string;
 }
 
 // Binaural beat presets
@@ -48,7 +46,6 @@ export const binauralPresets: FrequencyPreset[] = [
     baseFrequency: 200,
     beatFrequency: 2, // 0.5-4 Hz range, using 2 Hz
     binauralType: 'delta',
-    color: '#3B82F6',
   },
   {
     id: 'binaural-theta',
@@ -59,7 +56,6 @@ export const binauralPresets: FrequencyPreset[] = [
     baseFrequency: 200,
     beatFrequency: 6, // 4-8 Hz range
     binauralType: 'theta',
-    color: '#8B5CF6',
   },
   {
     id: 'binaural-alpha',
@@ -70,7 +66,6 @@ export const binauralPresets: FrequencyPreset[] = [
     baseFrequency: 200,
     beatFrequency: 10, // 8-14 Hz range
     binauralType: 'alpha',
-    color: '#10B981',
   },
   {
     id: 'binaural-beta',
@@ -81,7 +76,6 @@ export const binauralPresets: FrequencyPreset[] = [
     baseFrequency: 200,
     beatFrequency: 20, // 14-30 Hz range
     binauralType: 'beta',
-    color: '#F59E0B',
   },
   {
     id: 'binaural-gamma',
@@ -92,7 +86,6 @@ export const binauralPresets: FrequencyPreset[] = [
     baseFrequency: 200,
     beatFrequency: 40, // 30-100 Hz range
     binauralType: 'gamma',
-    color: '#EF4444',
   },
 ];
 
@@ -105,7 +98,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.40',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 40,
-    color: '#F59E0B', // Amber - Focus/Energy
   },
   {
     id: 'solfeggio-111',
@@ -114,7 +106,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.111',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 111,
-    color: '#10B981', // Emerald - Healing
   },
   {
     id: 'solfeggio-174',
@@ -123,7 +114,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.174',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 174,
-    color: '#EF4444', // Red - Pain relief
   },
   {
     id: 'solfeggio-285',
@@ -132,7 +122,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.285',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 285,
-    color: '#F97316', // Orange - Tissue healing
   },
   {
     id: 'solfeggio-396',
@@ -141,7 +130,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.396',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 396,
-    color: '#8B5CF6', // Violet - Liberation
   },
   {
     id: 'solfeggio-417',
@@ -150,7 +138,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.417',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 417,
-    color: '#F472B6', // Pink - Change
   },
   {
     id: 'solfeggio-432',
@@ -159,7 +146,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.432',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 432,
-    color: '#22C55E', // Green - Natural harmony
   },
   {
     id: 'solfeggio-440',
@@ -168,7 +154,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.440',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 440,
-    color: '#3B82F6', // Blue - Standard
   },
   {
     id: 'solfeggio-528',
@@ -177,7 +162,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.528',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 528,
-    color: '#EC4899', // Pink - Love frequency
   },
   {
     id: 'solfeggio-639',
@@ -186,7 +170,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.639',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 639,
-    color: '#06B6D4', // Cyan - Connection
   },
   {
     id: 'solfeggio-741',
@@ -195,7 +178,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.741',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 741,
-    color: '#0EA5E9', // Sky blue - Expression
   },
   {
     id: 'solfeggio-777',
@@ -204,7 +186,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.777',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 777,
-    color: '#FBBF24', // Yellow/Gold - Divine luck
   },
   {
     id: 'solfeggio-852',
@@ -213,7 +194,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.852',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 852,
-    color: '#6366F1', // Indigo - Intuition
   },
   {
     id: 'solfeggio-888',
@@ -222,7 +202,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.888',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 888,
-    color: '#A855F7', // Purple - Abundance
   },
   {
     id: 'solfeggio-963',
@@ -231,7 +210,6 @@ export const solfeggioPresets: FrequencyPreset[] = [
     nameKey: 'explore.solfeggioFreqs.963',
     descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 963,
-    color: '#D946EF', // Fuchsia - Cosmic
   },
 ];
 
@@ -245,7 +223,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.white',
     descriptionKey: 'explore.noiseTypes.whiteDesc',
     noiseType: 'white',
-    color: '#94A3B8',
   },
   {
     id: 'noise-pink',
@@ -254,7 +231,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.pink',
     descriptionKey: 'explore.noiseTypes.pinkDesc',
     noiseType: 'pink',
-    color: '#F472B6',
   },
   {
     id: 'noise-brown',
@@ -263,7 +239,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.brown',
     descriptionKey: 'explore.noiseTypes.brownDesc',
     noiseType: 'brown',
-    color: '#A78BFA',
   },
   // Nature sounds
   {
@@ -273,7 +248,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.rain',
     descriptionKey: 'explore.noiseTypes.rainDesc',
     noiseType: 'rain',
-    color: '#60A5FA',
   },
   {
     id: 'noise-thunder',
@@ -282,7 +256,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.thunder',
     descriptionKey: 'explore.noiseTypes.thunderDesc',
     noiseType: 'thunder',
-    color: '#6366F1',
   },
   {
     id: 'noise-ocean',
@@ -291,7 +264,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.ocean',
     descriptionKey: 'explore.noiseTypes.oceanDesc',
     noiseType: 'ocean',
-    color: '#06B6D4',
   },
   {
     id: 'noise-wind',
@@ -300,7 +272,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.wind',
     descriptionKey: 'explore.noiseTypes.windDesc',
     noiseType: 'wind',
-    color: '#8B5CF6',
   },
   {
     id: 'noise-fire',
@@ -309,7 +280,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.fire',
     descriptionKey: 'explore.noiseTypes.fireDesc',
     noiseType: 'fire',
-    color: '#F97316',
   },
   {
     id: 'noise-forest',
@@ -318,7 +288,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.forest',
     descriptionKey: 'explore.noiseTypes.forestDesc',
     noiseType: 'forest',
-    color: '#22C55E',
   },
   {
     id: 'noise-stream',
@@ -327,7 +296,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.stream',
     descriptionKey: 'explore.noiseTypes.streamDesc',
     noiseType: 'stream',
-    color: '#14B8A6',
   },
   // Machine sounds
   {
@@ -337,7 +305,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.fan',
     descriptionKey: 'explore.noiseTypes.fanDesc',
     noiseType: 'fan',
-    color: '#64748B',
   },
   {
     id: 'noise-airplane',
@@ -346,7 +313,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.airplane',
     descriptionKey: 'explore.noiseTypes.airplaneDesc',
     noiseType: 'airplane',
-    color: '#475569',
   },
   {
     id: 'noise-train',
@@ -355,7 +321,6 @@ export const noisePresets: FrequencyPreset[] = [
     nameKey: 'explore.noiseTypes.train',
     descriptionKey: 'explore.noiseTypes.trainDesc',
     noiseType: 'train',
-    color: '#78716C',
   },
 ];
 

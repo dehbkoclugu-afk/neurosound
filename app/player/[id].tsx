@@ -19,7 +19,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, onPrimary, withAlpha } from '@/constants/theme';
+import {
+  Spacing,
+  Typography,
+  FontFamily,
+  onPrimary,
+  withAlpha,
+  CategoryColors,
+} from '@/constants/theme';
 import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -145,7 +152,11 @@ export default function PlayerScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Atmospheric wash — the sound's colour bleeds softly from the top */}
       <LinearGradient
-        colors={[withAlpha(preset.color, 0.18), withAlpha(preset.color, 0.05), colors.background]}
+        colors={[
+          withAlpha(colors.primary, 0.16),
+          withAlpha(colors.primary, 0.04),
+          colors.background,
+        ]}
         locations={[0, 0.42, 0.82]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
@@ -186,14 +197,14 @@ export default function PlayerScreen() {
       <View style={styles.content}>
         <View style={styles.visualWrap}>
           <View
-            style={[styles.glowOuter, { backgroundColor: withAlpha(preset.color, 0.05) }]}
+            style={[styles.glowOuter, { backgroundColor: withAlpha(colors.primary, 0.05) }]}
           />
           <View
-            style={[styles.glowInner, { backgroundColor: withAlpha(preset.color, 0.09) }]}
+            style={[styles.glowInner, { backgroundColor: withAlpha(colors.primary, 0.09) }]}
           />
           <WaveVisualizer
             isPlaying={isPlaying}
-            color={preset.color}
+            color={colors.primary}
             intensity={volume}
             tempoMs={getVisualTempoMs(preset)}
           />
@@ -207,11 +218,20 @@ export default function PlayerScreen() {
             {t(preset.nameKey)}
           </Text>
 
-          {frequencyLine && (
+          <View style={styles.metaRow}>
+            {/* The only place the sound's own colour still appears. */}
+            <View
+              style={[
+                styles.categoryDot,
+                { backgroundColor: CategoryColors[preset.type] },
+              ]}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
             <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
-              {frequencyLine}
+              {frequencyLine ?? t(`explore.categories.${preset.type}`)}
             </Text>
-          )}
+          </View>
 
           <Text
             style={[
@@ -405,6 +425,16 @@ const styles = StyleSheet.create({
   presetName: {
     ...Typography.title1,
     textAlign: 'center',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  categoryDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   frequencyLine: {
     ...Typography.subhead,

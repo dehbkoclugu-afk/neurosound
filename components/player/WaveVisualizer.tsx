@@ -45,7 +45,12 @@ export function WaveVisualizer({
   tempoMs = 4000,
   style,
 }: WaveVisualizerProps) {
-  const { reduceMotion } = useSettingsStore();
+  const { reduceMotion, theme } = useSettingsStore();
+
+  // Night mode exists to emit as little changing light as possible before
+  // sleep. A ring that keeps breathing is the one thing on screen still
+  // moving, so the palette and the motion have to agree.
+  const still = reduceMotion || theme === 'night';
 
   const colors = useThemeColors();
 
@@ -71,7 +76,7 @@ export function WaveVisualizer({
   }, [isPlaying, presence]);
 
   useEffect(() => {
-    if (reduceMotion || !isPlaying) {
+    if (still || !isPlaying) {
       // Reset animations when stopped or reduced motion is on
       waveAnimations.forEach((anim) => {
         anim.stopAnimation();
@@ -127,10 +132,10 @@ export function WaveVisualizer({
       clearTimeout(settle);
       animations.forEach((animation) => animation.stop());
     };
-  }, [isPlaying, reduceMotion, waveAnimations, tempoMs]);
+  }, [isPlaying, still, waveAnimations, tempoMs]);
 
-  // If reduced motion, show a static ring
-  if (reduceMotion) {
+  // Static ring: reduced motion, or night mode
+  if (still) {
     return (
       <View style={[styles.container, style]}>
         <View

@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Spacing, Typography, FontFamily } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, CategoryColors } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
@@ -74,7 +74,7 @@ export function PresetCard({
         .join(', ')}
     >
       {/* Naked icon — no tinted box */}
-      <Icon icon={presetIcon(preset)} size={20} color={colors.textSecondary} />
+      <Icon icon={presetIcon(preset)} size={20} color={CategoryColors[preset.type]} />
       <View style={styles.rowText}>
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
           {t(preset.nameKey)}
@@ -120,7 +120,7 @@ export function PresetCardSmall({
       accessibilityRole="button"
       accessibilityLabel={name}
     >
-      <Icon icon={presetIcon(preset)} size={15} color={colors.textSecondary} />
+      <Icon icon={presetIcon(preset)} size={15} color={CategoryColors[preset.type]} />
       <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
         {name}
       </Text>
