@@ -3,7 +3,7 @@
  * Flat surface, one breathing ring, typographic info, single amber accent.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Modal,
   Pressable,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +27,8 @@ import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { WaveVisualizer } from '@/components/player/WaveVisualizer';
 import { Slider } from '@/components/ui/Slider';
+import { PressableScale } from '@/components/ui/PressableScale';
+import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
 
@@ -90,24 +93,45 @@ export default function PlayerScreen() {
   }, [volume, maxVolume]);
 
   const handlePlayPause = useCallback(async () => {
+    haptics.commit();
     await playerController.toggle();
   }, []);
 
   const handleSelectTimer = useCallback((value: number | null) => {
+    haptics.select();
     playerController.startTimer(value);
     setShowTimerModal(false);
   }, []);
 
   const isFavorite = id ? favoriteIds.includes(id) : false;
 
+  // Favouriting is rare and rewarding — the one place a little delight earns
+  // its keep. Removing gets no pop; it is not an achievement.
+  const heartScale = useRef(new Animated.Value(1)).current;
+
   const handleFavoriteToggle = useCallback(() => {
     if (!id) return;
     if (favoriteIds.includes(id)) {
+      haptics.commit();
       removeFavorite(id);
-    } else {
-      addFavorite(id);
+      return;
     }
-  }, [id, favoriteIds, addFavorite, removeFavorite]);
+
+    haptics.save();
+    addFavorite(id);
+
+    if (reduceMotion) return;
+    heartScale.setValue(1);
+    Animated.sequence([
+      Animated.timing(heartScale, { toValue: 1.3, duration: 120, useNativeDriver: true }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        friction: 4,
+        tension: 180,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [id, favoriteIds, addFavorite, removeFavorite, reduceMotion, heartScale]);
 
   // Close only dismisses the modal — audio keeps playing, MiniPlayer takes over
   const handleClose = useCallback(() => {
@@ -159,11 +183,13 @@ export default function PlayerScreen() {
           style={styles.headerButton}
           accessibilityLabel={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
         >
-          <Ionicons
-            name={isFavorite ? 'heart' : 'heart-outline'}
-            size={22}
-            color={isFavorite ? colors.primary : colors.textSecondary}
-          />
+          <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={22}
+              color={isFavorite ? colors.primary : colors.textSecondary}
+            />
+          </Animated.View>
         </TouchableOpacity>
       </View>
 
@@ -240,11 +266,11 @@ export default function PlayerScreen() {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePlayPause}
             disabled={isLoading}
-            activeOpacity={0.8}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
             accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
             accessibilityState={{ busy: isLoading }}
           >
@@ -258,7 +284,7 @@ export default function PlayerScreen() {
                 style={isPlaying ? undefined : { marginLeft: 3 }}
               />
             )}
-          </TouchableOpacity>
+          </PressableScale>
 
           {/* Placeholder for symmetry */}
           <View style={styles.sideButton} />

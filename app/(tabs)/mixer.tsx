@@ -25,6 +25,8 @@ import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Button } from '@/components/ui/Button';
+import { PressableScale } from '@/components/ui/PressableScale';
+import * as haptics from '@/lib/haptics';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import {
@@ -63,6 +65,7 @@ export default function MixerScreen() {
   const miniPlayerInset = useMiniPlayerInset();
 
   const handlePlayPause = useCallback(async () => {
+    haptics.commit();
     if (isPlaying) {
       playerController.mixerStop();
     } else {
@@ -205,10 +208,10 @@ export default function MixerScreen() {
         {/* Play/Pause Button */}
         {channels.length > 0 && (
           <View style={styles.playSection}>
-            <TouchableOpacity
+            <PressableScale
               onPress={handlePlayPause}
-              activeOpacity={0.8}
               style={[styles.playButton, { backgroundColor: colors.primary }]}
+              accessibilityRole="button"
               accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
             >
               <Ionicons
@@ -217,7 +220,7 @@ export default function MixerScreen() {
                 color={onPrimary}
                 style={isPlaying ? undefined : { marginLeft: 4 }}
               />
-            </TouchableOpacity>
+            </PressableScale>
           </View>
         )}
 

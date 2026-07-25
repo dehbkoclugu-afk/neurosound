@@ -6,12 +6,9 @@
  */
 
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { Text, ViewStyle, TextStyle } from 'react-native';
+
+import { PressableScale } from './PressableScale';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { AccessibilitySize, Spacing, Typography, onPrimary } from '@/constants/theme';
 
@@ -53,7 +50,8 @@ export function Button({
       justifyContent: 'center',
       flexDirection: iconPosition === 'right' ? 'row-reverse' : 'row',
       gap: Spacing.sm,
-      opacity: disabled ? 0.5 : 1,
+      // Disabled opacity is owned by PressableScale — it composes press
+      // feedback on top of the resting value.
     };
 
     // Size variants
@@ -113,11 +111,10 @@ export function Button({
   };
 
   return (
-    <TouchableOpacity
+    <PressableScale
       onPress={onPress}
       disabled={disabled}
       style={[getButtonStyle(), style]}
-      activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
       accessibilityHint={accessibilityHint}
@@ -125,6 +122,6 @@ export function Button({
     >
       {icon}
       <Text style={[getTextStyle(), textStyle]}>{title}</Text>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

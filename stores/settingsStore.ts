@@ -47,6 +47,7 @@ interface SettingsState {
   theme: ThemeMode;
   reduceMotion: boolean;
   lowContrast: boolean;
+  haptics: boolean;
 
   // Language
   language: Language;
@@ -64,6 +65,7 @@ interface SettingsState {
   setTheme: (theme: ThemeMode) => void;
   setReduceMotion: (reduce: boolean) => void;
   setLowContrast: (low: boolean) => void;
+  setHaptics: (enabled: boolean) => void;
   setLanguage: (language: Language) => void;
   setMaxVolume: (volume: number) => void;
   setDefaultVolume: (volume: number) => void;
@@ -78,6 +80,7 @@ const initialState = {
   theme: 'dark' as ThemeMode,
   reduceMotion: false,
   lowContrast: false,
+  haptics: true,
   // Seeded from the device locale so a first launch agrees with i18n
   language: deviceLanguageOrDefault as Language,
   maxVolume: 0.8,
@@ -95,6 +98,7 @@ export const useSettingsStore = create<SettingsState>()(
       setTheme: (theme) => set({ theme }),
       setReduceMotion: (reduceMotion) => set({ reduceMotion }),
       setLowContrast: (lowContrast) => set({ lowContrast }),
+      setHaptics: (haptics) => set({ haptics }),
       setLanguage: (language) => set({ language }),
       setMaxVolume: (maxVolume) => set({ maxVolume: Math.max(0.1, Math.min(1, maxVolume)) }),
       setDefaultVolume: (defaultVolume) => set({ defaultVolume: Math.max(0, Math.min(1, defaultVolume)) }),

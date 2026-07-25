@@ -156,7 +156,8 @@
     "about": "Hakkında",
     "version": "Sürüm",
     "epilepsyWarning": "Epilepsi Uyarısı",
-    "epilepsyText": "Bu uygulama görsel efektler içerebilir. Epilepsiniz varsa dikkatli kullanın."
+    "epilepsyText": "Bu uygulama görsel efektler içerebilir. Epilepsiniz varsa dikkatli kullanın.",
+    "haptics": "Titreşim"
   },
   "accessibility": {
     "playButton": "Oynat butonu",

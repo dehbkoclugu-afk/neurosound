@@ -44,6 +44,8 @@ export default function SettingsScreen() {
     setReduceMotion,
     lowContrast,
     setLowContrast,
+    haptics,
+    setHaptics,
     language,
     setLanguage,
     maxVolume,
@@ -141,6 +143,24 @@ export default function SettingsScreen() {
               <Switch
                 value={lowContrast}
                 onValueChange={setLowContrast}
+                trackColor={{ false: colors.slider, true: colors.primary }}
+                thumbColor="#fff"
+              />
+            </View>
+          </View>
+
+          {/* Haptics */}
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchLabel}>
+                <Ionicons name="phone-portrait-outline" size={24} color={colors.icon} />
+                <Text style={[styles.cardTitle, { color: colors.text }]}>
+                  {t('settings.haptics')}
+                </Text>
+              </View>
+              <Switch
+                value={haptics}
+                onValueChange={setHaptics}
                 trackColor={{ false: colors.slider, true: colors.primary }}
                 thumbColor="#fff"
               />

@@ -27,6 +27,7 @@ import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
 import { Icon } from '@/components/ui/Icon';
+import { PressableScale } from '@/components/ui/PressableScale';
 import { intents } from '@/lib/intents';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
@@ -142,13 +143,16 @@ export default function HomeScreen() {
           </Text>
           <View style={styles.intentStack}>
             {intents.map((intent) => (
-              <TouchableOpacity
+              <PressableScale
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
-                activeOpacity={0.85}
+                // Large surfaces need less travel than buttons to read as
+                // pressed rather than shrinking.
+                scaleTo={0.985}
+                pressedOpacity={0.9}
                 style={styles.intentBlock}
                 accessibilityRole="button"
-                accessibilityLabel={t(intent.nameKey)}
+                accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
                 <Image
                   source={{ uri: intent.image }}
@@ -173,7 +177,7 @@ export default function HomeScreen() {
                   </View>
                   <Icon icon={intent.icon} size={26} color="rgba(255,255,255,0.95)" />
                 </View>
-              </TouchableOpacity>
+              </PressableScale>
             ))}
           </View>
         </View>

@@ -156,7 +156,8 @@
     "about": "About",
     "version": "Version",
     "epilepsyWarning": "Epilepsy Warning",
-    "epilepsyText": "This app may contain visual effects. Use with caution if you have epilepsy."
+    "epilepsyText": "This app may contain visual effects. Use with caution if you have epilepsy.",
+    "haptics": "Haptics"
   },
   "accessibility": {
     "playButton": "Play button",

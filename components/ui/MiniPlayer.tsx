@@ -17,6 +17,8 @@ import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, onPrimary } from '@/constants/theme';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
+import * as haptics from '@/lib/haptics';
+import { PressableScale } from './PressableScale';
 import { useTranslation } from 'react-i18next';
 
 interface MiniPlayerProps {
@@ -63,6 +65,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
   };
 
   const handlePlayPause = () => {
+    haptics.commit();
     if (currentPreset) {
       playerController.toggle();
     } else if (isMixerPlaying) {
@@ -109,10 +112,9 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         </View>
 
         <View style={styles.rightSection}>
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePlayPause}
             disabled={isLoading}
-            activeOpacity={0.7}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
             accessibilityRole="button"
             accessibilityLabel={playing ? t('accessibility.pauseButton') : t('accessibility.playButton')}
@@ -129,7 +131,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
                 style={playing ? undefined : { marginLeft: 2 }}
               />
             )}
-          </TouchableOpacity>
+          </PressableScale>
           <TouchableOpacity
             onPress={handleStop}
             activeOpacity={0.7}

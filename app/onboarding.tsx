@@ -3,13 +3,14 @@
  * Sets hasSeenOnboarding + hasSeenEpilepsyWarning on completion.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   SafeAreaView,
-  TouchableOpacity,
+  Animated,
+  Easing,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 const STEPS = [
   {
@@ -40,11 +42,47 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const colors = useThemeColors();
-  const { setHasSeenOnboarding, setHasSeenEpilepsyWarning } = useSettingsStore();
+  const { setHasSeenOnboarding, setHasSeenEpilepsyWarning, reduceMotion } =
+    useSettingsStore();
 
   const [step, setStep] = useState(0);
   const isLast = step === STEPS.length - 1;
   const current = STEPS[step];
+
+  // One value drives every dot; each interpolates its own width from the
+  // distance to the current step, so the indicator glides instead of snapping.
+  const stepAnim = useRef(new Animated.Value(0)).current;
+
+  // Entering copy: fade up. Enter-only — the outgoing text is already gone by
+  // the time this runs, and animating both ways would just add latency to a
+  // screen the user wants to get through.
+  const contentAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (reduceMotion) {
+      stepAnim.setValue(step);
+      contentAnim.setValue(1);
+      return;
+    }
+
+    Animated.timing(stepAnim, {
+      toValue: step,
+      duration: 240,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false, // width is a layout property
+    }).start();
+
+    contentAnim.setValue(0);
+    const content = Animated.timing(contentAnim, {
+      toValue: 1,
+      duration: 260,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    content.start();
+
+    return () => content.stop();
+  }, [step, reduceMotion, stepAnim, contentAnim]);
 
   const handleNext = () => {
     if (isLast) {
@@ -58,31 +96,57 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>{t(current.titleKey)}</Text>
+      <Animated.View
+        style={[
+          styles.content,
+          {
+            opacity: contentAnim,
+            transform: reduceMotion
+              ? []
+              : [
+                  {
+                    translateY: contentAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [10, 0],
+                    }),
+                  },
+                ],
+          },
+        ]}
+      >
+        <Text
+          style={[styles.title, { color: colors.text }]}
+          accessibilityRole="header"
+        >
+          {t(current.titleKey)}
+        </Text>
         <Text style={[styles.description, { color: colors.textSecondary }]}>
           {t(current.descKey)}
         </Text>
-      </View>
+      </Animated.View>
 
       <View style={styles.footer}>
         {/* Step indicator */}
         <View style={styles.dots}>
           {STEPS.map((_, i) => (
-            <View
+            <Animated.View
               key={i}
               style={[
                 styles.dot,
                 {
                   backgroundColor: i === step ? colors.primary : colors.slider,
-                  width: i === step ? 22 : 8,
+                  width: stepAnim.interpolate({
+                    inputRange: [i - 1, i, i + 1],
+                    outputRange: [8, 22, 8],
+                    extrapolate: 'clamp',
+                  }),
                 },
               ]}
             />
           ))}
         </View>
 
-        <TouchableOpacity
+        <PressableScale
           onPress={handleNext}
           style={[styles.button, { backgroundColor: colors.primary }]}
           accessibilityRole="button"
@@ -91,7 +155,7 @@ export default function OnboardingScreen() {
           <Text style={styles.buttonText}>
             {isLast ? t('onboarding.start') : t('onboarding.next')}
           </Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
     </SafeAreaView>
   );
