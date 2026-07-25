@@ -28,6 +28,7 @@ import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
 import { Icon } from '@/components/ui/Icon';
 import { intents } from '@/lib/intents';
+import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
 
@@ -60,6 +61,7 @@ export default function HomeScreen() {
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
+  const miniPlayerInset = useMiniPlayerInset();
 
   // First run: route into onboarding once
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function HomeScreen() {
       />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header with proper spacing */}

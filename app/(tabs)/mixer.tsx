@@ -26,6 +26,7 @@ import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Button } from '@/components/ui/Button';
 import { Slider } from '@/components/ui/Slider';
+import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import {
   binauralPresets,
   solfeggioPresets,
@@ -59,6 +60,7 @@ export default function MixerScreen() {
   const [mixName, setMixName] = useState('');
 
   const colors = useThemeColors();
+  const miniPlayerInset = useMiniPlayerInset();
 
   const handlePlayPause = useCallback(async () => {
     if (isPlaying) {
@@ -117,7 +119,7 @@ export default function MixerScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}

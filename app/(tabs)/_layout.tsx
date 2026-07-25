@@ -13,12 +13,12 @@ import { HapticTab } from '@/components/haptic-tab';
 import { MiniPlayer } from '@/components/ui/MiniPlayer';
 import { Spacing, Shadows } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { useAudioStore } from '@/stores/audioStore';
+import { useMiniPlayerVisible, MINI_PLAYER_HEIGHT } from '@/hooks/use-mini-player';
 
 export default function TabLayout() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const { currentPreset } = useAudioStore();
+  const miniPlayerVisible = useMiniPlayerVisible();
 
   const colors = useThemeColors();
 
@@ -32,7 +32,7 @@ export default function TabLayout() {
             backgroundColor: colors.background,
             borderTopColor: colors.cardBorder,
             borderTopWidth: StyleSheet.hairlineWidth,
-            height: 56 + insets.bottom,
+            height: MINI_PLAYER_HEIGHT + insets.bottom,
             paddingBottom: insets.bottom,
             paddingTop: Spacing.xs,
             ...Shadows.small,
@@ -104,8 +104,13 @@ export default function TabLayout() {
       </Tabs>
 
       {/* MiniPlayer overlay above tab bar */}
-      {currentPreset && (
-        <View style={[styles.miniPlayerContainer, { bottom: 56 + insets.bottom }]}>
+      {miniPlayerVisible && (
+        <View
+          style={[
+            styles.miniPlayerContainer,
+            { bottom: MINI_PLAYER_HEIGHT + insets.bottom },
+          ]}
+        >
           <MiniPlayer />
         </View>
       )}

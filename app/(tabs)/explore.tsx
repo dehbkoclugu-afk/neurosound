@@ -19,6 +19,7 @@ import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/theme';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
+import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import {
   binauralPresets,
   solfeggioPresets,
@@ -80,6 +81,7 @@ export default function ExploreScreen() {
   }, [params.category]);
 
   const colors = useThemeColors();
+  const miniPlayerInset = useMiniPlayerInset();
 
   const activeTab = categories.find(c => c.key === activeCategory)!;
 
@@ -132,7 +134,7 @@ export default function ExploreScreen() {
       {/* Preset Grid */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Category Description — plain paragraph, no box */}

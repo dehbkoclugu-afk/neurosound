@@ -26,36 +26,59 @@ interface MiniPlayerProps {
 export function MiniPlayer({ onPress }: MiniPlayerProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { currentPreset, isPlaying, isLoading } = useAudioStore();
+  const { currentPreset, isPlaying, isLoading, isMixerPlaying, mixerChannels } =
+    useAudioStore();
 
   const colors = useThemeColors();
 
-  if (!currentPreset) {
+  // The mixer is a second, independent source of playback. Without this branch
+  // it had no global control at all: leaving the Mixer tab mid-playback left
+  // the user with no way to pause and no sign that anything was playing.
+  const isMixerSession = !currentPreset && mixerChannels.length > 0;
+
+  if (!currentPreset && !isMixerSession) {
     return null;
   }
+
+  const title = currentPreset ? t(currentPreset.nameKey) : t('mixer.title');
+
+  const subline = currentPreset
+    ? currentPreset.type === 'binaural'
+      ? `${currentPreset.beatFrequency} Hz`
+      : currentPreset.type === 'solfeggio'
+        ? `${currentPreset.frequency} Hz`
+        : t('explore.categories.noise')
+    : `${mixerChannels.length} ${t('mixer.sounds')}`;
+
+  const playing = currentPreset ? isPlaying : isMixerPlaying;
 
   const handlePress = () => {
     if (onPress) {
       onPress();
-    } else {
+    } else if (currentPreset) {
       router.push(`/player/${currentPreset.id}`);
+    } else {
+      router.push('/(tabs)/mixer');
     }
   };
 
   const handlePlayPause = () => {
-    playerController.toggle();
+    if (currentPreset) {
+      playerController.toggle();
+    } else if (isMixerPlaying) {
+      playerController.mixerStop();
+    } else {
+      playerController.mixerStart();
+    }
   };
 
   const handleStop = () => {
-    playerController.unload();
+    if (currentPreset) {
+      playerController.unload();
+    } else {
+      playerController.mixerClear();
+    }
   };
-
-  const subline =
-    currentPreset.type === 'binaural'
-      ? `${currentPreset.beatFrequency} Hz`
-      : currentPreset.type === 'solfeggio'
-        ? `${currentPreset.frequency} Hz`
-        : t('explore.categories.noise');
 
   return (
     <TouchableOpacity
@@ -69,13 +92,13 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         },
       ]}
       accessibilityRole="button"
-      accessibilityLabel={`${t('player.nowPlaying')}: ${t(currentPreset.nameKey)}`}
+      accessibilityLabel={`${t('player.nowPlaying')}: ${title}`}
       accessibilityHint={t('accessibility.expandPlayer')}
     >
       <View style={styles.content}>
         <View style={styles.infoContainer}>
           <Text style={[styles.presetName, { color: colors.text }]} numberOfLines={1}>
-            {t(currentPreset.nameKey)}
+            {title}
           </Text>
           <Text
             style={[styles.presetType, { color: colors.textSecondary }]}
@@ -92,7 +115,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             activeOpacity={0.7}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
             accessibilityRole="button"
-            accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
+            accessibilityLabel={playing ? t('accessibility.pauseButton') : t('accessibility.playButton')}
             accessibilityState={{ busy: isLoading }}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -100,10 +123,10 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
               <ActivityIndicator size="small" color={onPrimary} />
             ) : (
               <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
+                name={playing ? 'pause' : 'play'}
                 size={18}
                 color={onPrimary}
-                style={isPlaying ? undefined : { marginLeft: 2 }}
+                style={playing ? undefined : { marginLeft: 2 }}
               />
             )}
           </TouchableOpacity>

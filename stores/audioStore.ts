@@ -15,8 +15,14 @@ export interface PlaybackState {
 
   // Timer
   timerDuration: number | null; // in minutes, null = no timer
-  timerRemaining: number | null; // in seconds
-  timerStartedAt: number | null;
+  timerRemaining: number | null; // in seconds, derived from timerEndsAt for display
+  /**
+   * Absolute wall-clock deadline (ms). The countdown is derived from this, not
+   * accumulated by decrementing a counter: JS timers get throttled while the
+   * app is backgrounded, so a decrementing counter drifts and a sleep timer
+   * fires late — the exact failure a sleep app cannot afford.
+   */
+  timerEndsAt: number | null;
 
   // Mixer
   isMixerPlaying: boolean;
@@ -30,7 +36,6 @@ export interface PlaybackState {
   setVolume: (volume: number) => void;
   setTimer: (duration: number | null) => void;
   updateTimerRemaining: (remaining: number | null) => void;
-  setTimerStartedAt: (timestamp: number | null) => void;
   setIsMixerPlaying: (playing: boolean) => void;
   addMixerChannel: (channel: MixerChannelState) => void;
   removeMixerChannel: (channelId: string) => void;
@@ -53,7 +58,7 @@ const initialState = {
   volume: 0.5,
   timerDuration: null,
   timerRemaining: null,
-  timerStartedAt: null,
+  timerEndsAt: null,
   isMixerPlaying: false,
   mixerChannels: [],
 };
@@ -75,12 +80,10 @@ export const useAudioStore = create<PlaybackState>((set) => ({
     set({
       timerDuration: duration,
       timerRemaining: duration ? duration * 60 : null,
-      timerStartedAt: duration ? Date.now() : null,
+      timerEndsAt: duration ? Date.now() + duration * 60_000 : null,
     }),
 
   updateTimerRemaining: (remaining) => set({ timerRemaining: remaining }),
-
-  setTimerStartedAt: (timestamp) => set({ timerStartedAt: timestamp }),
 
   setIsMixerPlaying: (isMixerPlaying) => set({ isMixerPlaying }),
 

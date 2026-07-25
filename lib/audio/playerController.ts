@@ -6,6 +6,8 @@
  * in audioStore; this module is the only writer for playback actions.
  */
 
+import { AppState } from 'react-native';
+
 import { useAudioStore } from '@/stores/audioStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset, getPresetById } from '../frequencies';
@@ -193,6 +195,35 @@ function clearTimer(): void {
   useAudioStore.getState().setTimer(null);
 }
 
+/**
+ * Advance the sleep timer against the wall clock. Called on every tick and
+ * again whenever the app returns to the foreground, so a throttled or fully
+ * suspended JS timer can never let playback run past its deadline — it just
+ * catches up on the next evaluation.
+ */
+function evaluateTimer(): void {
+  const { timerEndsAt, updateTimerRemaining, isPlaying } = useAudioStore.getState();
+  if (timerEndsAt === null) {
+    clearTimer();
+    return;
+  }
+
+  const remaining = Math.max(0, Math.round((timerEndsAt - Date.now()) / 1000));
+
+  if (remaining <= 0) {
+    pause();
+    clearTimer();
+    return;
+  }
+
+  updateTimerRemaining(remaining);
+
+  // Gentle fade over the final window instead of an abrupt cut
+  if (isPlaying && remaining <= TIMER_FADE_WINDOW_S && !rampInterval) {
+    setGenVolume(effectiveVolume() * (remaining / TIMER_FADE_WINDOW_S));
+  }
+}
+
 /** Sleep timer: counts down globally, pauses playback when done. */
 export function startTimer(minutes: number | null): void {
   if (timerInterval) {
@@ -202,25 +233,15 @@ export function startTimer(minutes: number | null): void {
   useAudioStore.getState().setTimer(minutes);
   if (!minutes) return;
 
-  timerInterval = setInterval(() => {
-    const { timerRemaining, updateTimerRemaining, isPlaying } = useAudioStore.getState();
-    if (timerRemaining === null) {
-      clearTimer();
-      return;
-    }
-    if (timerRemaining <= 1) {
-      pause();
-      clearTimer();
-      return;
-    }
-    const next = timerRemaining - 1;
-    updateTimerRemaining(next);
-    // Gentle fade over the final window instead of an abrupt cut
-    if (isPlaying && next <= TIMER_FADE_WINDOW_S && !rampInterval) {
-      setGenVolume(effectiveVolume() * (next / TIMER_FADE_WINDOW_S));
-    }
-  }, 1000);
+  timerInterval = setInterval(evaluateTimer, 1000);
 }
+
+// A suspended JS thread stops ticking; re-evaluating on resume closes the gap.
+AppState.addEventListener('change', (next) => {
+  if (next === 'active' && useAudioStore.getState().timerEndsAt !== null) {
+    evaluateTimer();
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Mixer - up to MAX_MIXER_CHANNELS layered generators, channel list in store
@@ -274,6 +295,13 @@ export function mixerStop(): void {
   });
   mixerGenerators.clear();
   useAudioStore.getState().setIsMixerPlaying(false);
+}
+
+/** Stop the mixer and discard its channels — the MiniPlayer close button.
+ *  Mirrors `unload()` for the single-preset player. */
+export function mixerClear(): void {
+  mixerStop();
+  useAudioStore.getState().clearMixerChannels();
 }
 
 /** Add a channel. Returns false when the channel limit is reached.
