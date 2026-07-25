@@ -95,7 +95,7 @@ export function TimerModal({ visible, onClose }: TimerModalProps) {
                 <Text
                   style={[
                     styles.optionText,
-                    { color: isSelected ? colors.primary : colors.text },
+                    { color: isSelected ? colors.accent : colors.text },
                     isSelected && styles.optionTextSelected,
                   ]}
                 >
@@ -105,7 +105,7 @@ export function TimerModal({ visible, onClose }: TimerModalProps) {
                   <Ionicons
                     name="checkmark"
                     size={20}
-                    color={colors.primary}
+                    color={colors.accent}
                     accessibilityElementsHidden
                     importantForAccessibility="no-hide-descendants"
                   />

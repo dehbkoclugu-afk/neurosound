@@ -235,7 +235,7 @@ export default function MixerScreen() {
                     <Ionicons
                       name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
                       size={20}
-                      color={channel.muted ? colors.primary : colors.textSecondary}
+                      color={channel.muted ? colors.accent : colors.textSecondary}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -381,7 +381,7 @@ export default function MixerScreen() {
                       <Text
                         style={[
                           styles.mixName,
-                          { color: isActive ? colors.primary : colors.text },
+                          { color: isActive ? colors.accent : colors.text },
                         ]}
                         numberOfLines={1}
                       >
@@ -451,7 +451,7 @@ export default function MixerScreen() {
                       <Text style={[styles.presetItemName, { color: colors.text }]}>
                         {t(preset.nameKey)}
                       </Text>
-                      <Ionicons name="add" size={22} color={colors.primary} />
+                      <Ionicons name="add" size={22} color={colors.accent} />
                     </TouchableOpacity>
                   ))}
                 </View>

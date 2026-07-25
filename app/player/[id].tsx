@@ -176,7 +176,7 @@ export default function PlayerScreen() {
             <Ionicons
               name={isFavorite ? 'heart' : 'heart-outline'}
               size={22}
-              color={isFavorite ? colors.primary : colors.textSecondary}
+              color={isFavorite ? colors.accent : colors.textSecondary}
             />
           </Animated.View>
         </TouchableOpacity>
@@ -308,7 +308,7 @@ export default function PlayerScreen() {
             <Ionicons
               name="timer-outline"
               size={24}
-              color={timerDuration ? colors.primary : colors.textSecondary}
+              color={timerDuration ? colors.accent : colors.textSecondary}
             />
             {timerRemaining !== null && timerRemaining > 0 && (
               <Text

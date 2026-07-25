@@ -102,13 +102,13 @@ export const Colors = {
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
-    accent: '#9B6421', // 4.6:1 on #FAF7F2
+    accent: '#925E1F', // AA on both surface levels
     icon: '#6E655A',
     tabIconDefault: '#A99F91',
     tabIconSelected: primaryDark,
     success: '#4C9A57',
-    warning: '#9B6322', // 4.7:1 on #FAF7F2 — used as text, so it must clear AA
-    error: '#B85037', // 4.6:1 on #FAF7F2
+    warning: '#935E20', // AA on both surface levels
+    error: '#AE4B34', // AA on both surface levels
     slider: '#E5DFD3',
     sliderThumb: primaryDark,
     overlay: 'rgba(0, 0, 0, 0.5)',
@@ -125,7 +125,7 @@ export const Colors = {
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
-    accent: primary, // 7.8:1 on #131110 — the fill already reads as text here
+    accent: primary, // AA on both surface levels
     icon: '#A69B8C',
     tabIconDefault: '#5C544A',
     tabIconSelected: primary,
@@ -141,9 +141,9 @@ export const Colors = {
   // bedtime use. Low-contrast setting is intentionally ignored here.
   night: {
     text: '#CDBFA9',
-    // 4.7:1 on #050403 — the smallest bump that clears AA. Night mode stays
+    // AA on both surface levels
     // as dim as compliance allows; footnotes were unreadable at 4.15:1.
-    textSecondary: '#827764',
+    textSecondary: '#877C68',
     background: '#050403',
     backgroundSecondary: '#12100D',
     card: '#12100D',
@@ -152,7 +152,7 @@ export const Colors = {
     tint: '#A87C3F',
     primary: '#A87C3F',
     primaryLight: '#C1954F',
-    accent: '#A87C3F', // 5.5:1 on #050403
+    accent: '#A87C3F', // AA on both surface levels
     icon: '#7A6F5F',
     tabIconDefault: '#453E35',
     tabIconSelected: '#A87C3F',
@@ -170,7 +170,7 @@ export const Colors = {
   // must never push text under AA. Secondary text stays at or above 4.5:1.
   lowContrastLight: {
     text: '#4E463C',
-    textSecondary: '#756B5D', // 4.8:1 on #F8F5F0 (was #948A7C at 3.1:1)
+    textSecondary: '#72685B', // AA on both surface levels
     background: '#F8F5F0',
     backgroundSecondary: '#F1ECE3',
     card: '#F8F5F0',
@@ -179,13 +179,13 @@ export const Colors = {
     tint: '#B59B72',
     primary: '#B59B72',
     primaryLight: '#CBB699',
-    accent: '#846B45', // 4.6:1 on #F8F5F0
+    accent: '#7E6642', // AA on both surface levels
     icon: '#948A7C',
     tabIconDefault: '#C9C0B2',
     tabIconSelected: '#94794F',
     success: '#8FB894',
-    warning: '#8E672C', // 4.7:1 on #F8F5F0 (was 1.8:1 — never used as text before)
-    error: '#A9583E', // 4.7:1 on #F8F5F0
+    warning: '#88632A', // AA on both surface levels
+    error: '#A2543C', // AA on both surface levels
     slider: '#E5DFD3',
     sliderThumb: '#B59B72',
     overlay: 'rgba(0, 0, 0, 0.3)',
@@ -193,7 +193,7 @@ export const Colors = {
   },
   lowContrastDark: {
     text: '#C9C0B2',
-    textSecondary: '#8D8478', // 4.8:1 on #1B1815 (was #7D746A at 3.9:1)
+    textSecondary: '#928A7E', // AA on both surface levels
     background: '#1B1815',
     backgroundSecondary: '#26221E',
     card: '#26221E',
@@ -202,7 +202,7 @@ export const Colors = {
     tint: '#8F7A5C',
     primary: '#8F7A5C',
     primaryLight: '#A69072',
-    accent: '#957F60', // 4.6:1 on #1B1815
+    accent: '#9E8868', // AA on both surface levels
     icon: '#7D746A',
     tabIconDefault: '#4A443C',
     tabIconSelected: '#A69072',

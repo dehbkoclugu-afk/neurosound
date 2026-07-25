@@ -87,7 +87,7 @@ export function PresetCard({
         <Ionicons
           name="heart"
           size={16}
-          color={colors.primary}
+          color={colors.accent}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         />

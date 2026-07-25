@@ -141,7 +141,7 @@ export default function OnboardingScreen() {
                 style={[
                   styles.languageText,
                   {
-                    color: language === code ? colors.primary : colors.textSecondary,
+                    color: language === code ? colors.accent : colors.textSecondary,
                   },
                 ]}
               >
@@ -184,7 +184,7 @@ export default function OnboardingScreen() {
         <Ionicons
           name={current.icon}
           size={40}
-          color={colors.primary}
+          color={colors.accent}
           style={styles.stepIcon}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
