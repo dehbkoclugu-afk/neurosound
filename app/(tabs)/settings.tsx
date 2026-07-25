@@ -2,7 +2,7 @@
  * Settings Screen - User preferences and accessibility
  */
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   Switch,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +20,7 @@ import Constants from 'expo-constants';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, AccessibilitySize, Typography, FontFamily, onPrimary } from '@/constants/theme';
 import { useSettingsStore, ThemeMode, Language } from '@/stores/settingsStore';
+import { usePresetsStore } from '@/stores/presetsStore';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
@@ -51,10 +53,30 @@ export default function SettingsScreen() {
     setLanguage,
     maxVolume,
     setMaxVolume,
+    resetSettings,
   } = useSettingsStore();
+  const { favoriteIds, customMixes, reset: resetPresets } = usePresetsStore();
 
   const colors = useThemeColors();
   const miniPlayerInset = useMiniPlayerInset();
+
+  // resetSettings and presetsStore.reset both existed and were wired to
+  // nothing — there was no way to undo a bad theme, clear favourites, or hand
+  // the phone to someone else.
+  const handleReset = useCallback(() => {
+    Alert.alert(t('settings.resetTitle'), t('settings.resetConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('settings.reset'),
+        style: 'destructive',
+        onPress: () => {
+          resetPresets();
+          resetSettings();
+          i18n.changeLanguage(useSettingsStore.getState().language);
+        },
+      },
+    ]);
+  }, [t, resetPresets, resetSettings]);
 
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);
@@ -93,7 +115,7 @@ export default function SettingsScreen() {
 
           {/* Theme */}
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <Text style={[styles.cardTitle, { color: colors.text }]}>
+            <Text style={[styles.cardTitle, styles.cardTitleSpaced, { color: colors.text }]}>
               {t('settings.theme')}
             </Text>
             <View style={styles.optionGroup}>
@@ -135,9 +157,14 @@ export default function SettingsScreen() {
                   accessibilityElementsHidden
                   importantForAccessibility="no-hide-descendants"
                 />
-                <Text style={[styles.cardTitle, { color: colors.text }]}>
-                  {t('settings.reduceMotion')}
-                </Text>
+                <View style={styles.switchText}>
+                  <Text style={[styles.cardTitle, { color: colors.text }]}>
+                    {t('settings.reduceMotion')}
+                  </Text>
+                  <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
+                    {t('settings.reduceMotionHint')}
+                  </Text>
+                </View>
               </View>
               <Switch
                 value={reduceMotion}
@@ -146,6 +173,26 @@ export default function SettingsScreen() {
                 thumbColor="#fff"
               />
             </View>
+          </View>
+
+          {/* Sits with Reduce Motion because that is the control that
+              answers it — the warning is about the breathing ring. */}
+          <View style={styles.warningCard}>
+            <View style={styles.warningHeading}>
+              <Ionicons
+                name="warning-outline"
+                size={16}
+                color={colors.warning}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+              <Text style={[styles.warningTitle, { color: colors.warning }]}>
+                {t('settings.epilepsyWarning')}
+              </Text>
+            </View>
+            <Text style={[styles.warningText, { color: colors.textSecondary }]}>
+              {t('settings.epilepsyText')}
+            </Text>
           </View>
 
           {/* Low Contrast */}
@@ -159,9 +206,14 @@ export default function SettingsScreen() {
                   accessibilityElementsHidden
                   importantForAccessibility="no-hide-descendants"
                 />
-                <Text style={[styles.cardTitle, { color: colors.text }]}>
-                  {t('settings.lowContrast')}
-                </Text>
+                <View style={styles.switchText}>
+                  <Text style={[styles.cardTitle, { color: colors.text }]}>
+                    {t('settings.lowContrast')}
+                  </Text>
+                  <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
+                    {t('settings.lowContrastHint')}
+                  </Text>
+                </View>
               </View>
               <Switch
                 value={lowContrast}
@@ -183,9 +235,14 @@ export default function SettingsScreen() {
                   accessibilityElementsHidden
                   importantForAccessibility="no-hide-descendants"
                 />
-                <Text style={[styles.cardTitle, { color: colors.text }]}>
-                  {t('settings.haptics')}
-                </Text>
+                <View style={styles.switchText}>
+                  <Text style={[styles.cardTitle, { color: colors.text }]}>
+                    {t('settings.haptics')}
+                  </Text>
+                  <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
+                    {t('settings.hapticsHint')}
+                  </Text>
+                </View>
               </View>
               <Switch
                 value={haptics}
@@ -267,6 +324,25 @@ export default function SettingsScreen() {
             {t('settings.about')}
           </Text>
 
+          <TouchableOpacity
+            onPress={handleReset}
+            style={[styles.card, styles.resetRow, { borderBottomColor: colors.cardBorder }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('settings.reset')}
+          >
+            <View style={styles.switchText}>
+              <Text style={[styles.cardTitle, { color: colors.error }]}>
+                {t('settings.reset')}
+              </Text>
+              <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
+                {t('settings.resetHint', {
+                  favorites: favoriteIds.length,
+                  mixes: customMixes.length,
+                })}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.aboutRow}>
               <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
@@ -278,24 +354,6 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* Epilepsy Warning — quiet text block */}
-          <View style={styles.warningCard}>
-            <View style={styles.warningHeading}>
-              <Ionicons
-                name="warning-outline"
-                size={16}
-                color={colors.warning}
-                accessibilityElementsHidden
-                importantForAccessibility="no-hide-descendants"
-              />
-              <Text style={[styles.warningTitle, { color: colors.warning }]}>
-                {t('settings.epilepsyWarning')}
-              </Text>
-            </View>
-            <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-              {t('settings.epilepsyText')}
-            </Text>
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -339,6 +397,8 @@ const styles = StyleSheet.create({
   cardTitle: {
     ...Typography.callout,
     fontFamily: FontFamily.semibold,
+  },
+  cardTitleSpaced: {
     marginBottom: Spacing.sm,
   },
   optionGroup: {
@@ -368,6 +428,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     flex: 1,
+    paddingRight: Spacing.md,
+  },
+  switchText: {
+    flex: 1,
+    gap: 2,
+  },
+  cardHint: {
+    ...Typography.footnote,
+  },
+  resetRow: {
+    minHeight: AccessibilitySize.minTouchTarget,
+    justifyContent: 'center',
   },
   aboutRow: {
     flexDirection: 'row',

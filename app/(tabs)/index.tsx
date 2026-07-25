@@ -167,7 +167,7 @@ export default function HomeScreen() {
                 <View style={styles.intentRow}>
                   <View style={styles.intentText}>
                     <Text style={styles.intentName}>{t(intent.nameKey)}</Text>
-                    <Text style={styles.intentDesc} numberOfLines={1}>
+                    <Text style={styles.intentDesc} numberOfLines={2}>
                       {t(intent.descKey)}
                     </Text>
                   </View>

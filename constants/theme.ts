@@ -240,27 +240,33 @@ export const FontFamily = {
   bold: 'NunitoSans_700Bold',
 };
 
-// Typography scale (product register: tight ratio, hierarchy via weight)
+// Typography scale (product register: tight ratio, hierarchy via weight).
+// Tracking is size-specific: negative as type grows, slightly open as it
+// shrinks. One value for every size is wrong somewhere.
 export const Typography = {
   largeTitle: {
     fontSize: 32,
     fontFamily: FontFamily.bold,
     lineHeight: 39,
+    letterSpacing: -0.5,
   },
   title1: {
     fontSize: 27,
     fontFamily: FontFamily.bold,
     lineHeight: 33,
+    letterSpacing: -0.4,
   },
   title2: {
     fontSize: 22,
     fontFamily: FontFamily.semibold,
     lineHeight: 28,
+    letterSpacing: -0.3,
   },
   title3: {
     fontSize: 20,
     fontFamily: FontFamily.semibold,
     lineHeight: 25,
+    letterSpacing: -0.2,
   },
   headline: {
     fontSize: 17,
@@ -286,16 +292,19 @@ export const Typography = {
     fontSize: 13,
     fontFamily: FontFamily.regular,
     lineHeight: 18,
+    letterSpacing: 0.1,
   },
   caption1: {
     fontSize: 12,
     fontFamily: FontFamily.regular,
     lineHeight: 16,
+    letterSpacing: 0.15,
   },
   caption2: {
     fontSize: 11,
     fontFamily: FontFamily.regular,
     lineHeight: 13,
+    letterSpacing: 0.2,
   },
 };
 

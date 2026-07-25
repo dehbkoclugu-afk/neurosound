@@ -161,7 +161,7 @@
       "night": "Gece"
     },
     "reduceMotion": "Animasyonları Azalt",
-    "lowContrast": "Düşük Kontrast",
+    "lowContrast": "Yumuşak kontrast",
     "language": "Dil",
     "audio": "Ses",
     "maxVolume": "Maksimum Ses",
@@ -169,7 +169,14 @@
     "version": "Sürüm",
     "epilepsyWarning": "Epilepsi Uyarısı",
     "epilepsyText": "Bu uygulama görsel efektler içerebilir. Epilepsiniz varsa dikkatli kullanın.",
-    "haptics": "Titreşim"
+    "haptics": "Titreşim",
+    "lowContrastHint": "Metin ve arka plan arasındaki sertliği azaltır. Gece modunda kullanılmaz.",
+    "reduceMotionHint": "Nefes alan halkayı ve ekran geçişlerini durdurur.",
+    "hapticsHint": "Dokunma geri bildirimi için hafif titreşim.",
+    "reset": "Verileri sıfırla",
+    "resetTitle": "Verileri sıfırla",
+    "resetConfirm": "Favoriler, karışımlar ve tüm ayarlar silinecek. Bu geri alınamaz.",
+    "resetHint": "{{favorites}} favori, {{mixes}} karışım"
   },
   "accessibility": {
     "playButton": "Oynat butonu",

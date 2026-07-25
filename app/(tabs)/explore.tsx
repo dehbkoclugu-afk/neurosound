@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.md,
   },
   title: {
-    ...Typography.title1,
+    ...Typography.largeTitle,
   },
   tabsContainer: {
     flexDirection: 'row',

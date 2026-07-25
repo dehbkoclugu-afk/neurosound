@@ -161,7 +161,7 @@
       "night": "Night"
     },
     "reduceMotion": "Reduce Motion",
-    "lowContrast": "Low Contrast",
+    "lowContrast": "Softer contrast",
     "language": "Language",
     "audio": "Audio",
     "maxVolume": "Maximum Volume",
@@ -169,7 +169,14 @@
     "version": "Version",
     "epilepsyWarning": "Epilepsy Warning",
     "epilepsyText": "This app may contain visual effects. Use with caution if you have epilepsy.",
-    "haptics": "Haptics"
+    "haptics": "Haptics",
+    "lowContrastHint": "Eases the harshness between text and background. Not used in night mode.",
+    "reduceMotionHint": "Stops the breathing ring and screen transitions.",
+    "hapticsHint": "A light tap for touch feedback.",
+    "reset": "Reset data",
+    "resetTitle": "Reset data",
+    "resetConfirm": "Favourites, mixes and all settings will be deleted. This cannot be undone.",
+    "resetHint": "{{favorites}} favourites, {{mixes}} mixes"
   },
   "accessibility": {
     "playButton": "Play button",
