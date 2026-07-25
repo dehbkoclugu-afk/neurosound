@@ -124,7 +124,10 @@ export default function HomeScreen() {
       >
         {/* Header with proper spacing */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text
+            style={[styles.title, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             NeuroSound
           </Text>
           <TouchableOpacity

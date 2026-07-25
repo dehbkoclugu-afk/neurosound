@@ -69,14 +69,20 @@ export default function SettingsScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text
+            style={[styles.title, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('settings.title')}
           </Text>
         </View>
 
         {/* Appearance Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text
+            style={[styles.sectionTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('settings.appearance')}
           </Text>
 
@@ -117,7 +123,13 @@ export default function SettingsScreen() {
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.switchRow}>
               <View style={styles.switchLabel}>
-                <Ionicons name="sparkles-outline" size={24} color={colors.icon} />
+                <Ionicons
+                  name="sparkles-outline"
+                  size={24}
+                  color={colors.icon}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                />
                 <Text style={[styles.cardTitle, { color: colors.text }]}>
                   {t('settings.reduceMotion')}
                 </Text>
@@ -135,7 +147,13 @@ export default function SettingsScreen() {
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.switchRow}>
               <View style={styles.switchLabel}>
-                <Ionicons name="contrast-outline" size={24} color={colors.icon} />
+                <Ionicons
+                  name="contrast-outline"
+                  size={24}
+                  color={colors.icon}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                />
                 <Text style={[styles.cardTitle, { color: colors.text }]}>
                   {t('settings.lowContrast')}
                 </Text>
@@ -153,7 +171,13 @@ export default function SettingsScreen() {
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.switchRow}>
               <View style={styles.switchLabel}>
-                <Ionicons name="phone-portrait-outline" size={24} color={colors.icon} />
+                <Ionicons
+                  name="phone-portrait-outline"
+                  size={24}
+                  color={colors.icon}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                />
                 <Text style={[styles.cardTitle, { color: colors.text }]}>
                   {t('settings.haptics')}
                 </Text>
@@ -170,7 +194,10 @@ export default function SettingsScreen() {
 
         {/* Language Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text
+            style={[styles.sectionTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('settings.language')}
           </Text>
 
@@ -206,7 +233,10 @@ export default function SettingsScreen() {
 
         {/* Audio Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text
+            style={[styles.sectionTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('settings.audio')}
           </Text>
 
@@ -225,7 +255,10 @@ export default function SettingsScreen() {
 
         {/* About Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text
+            style={[styles.sectionTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('settings.about')}
           </Text>
 

@@ -62,7 +62,16 @@ export function PresetCard({
       activeOpacity={0.6}
       style={[styles.row, { borderBottomColor: colors.cardBorder }, style]}
       accessibilityRole="button"
-      accessibilityLabel={t(preset.nameKey)}
+      // The subline carries the category and the frequency, and the heart
+      // carries favourite state. Announcing the name alone dropped both, so a
+      // screen reader user could not tell 6 Hz from 40 Hz.
+      accessibilityLabel={[
+        t(preset.nameKey),
+        getSubline(preset, t),
+        isFavorite ? t('common.addedToFavorites') : null,
+      ]
+        .filter(Boolean)
+        .join(', ')}
     >
       {/* Naked icon — no tinted box */}
       <Icon icon={presetIcon(preset)} size={20} color={colors.textSecondary} />
@@ -75,7 +84,13 @@ export function PresetCard({
         </Text>
       </View>
       {isFavorite && (
-        <Ionicons name="heart" size={16} color={colors.primary} />
+        <Ionicons
+          name="heart"
+          size={16}
+          color={colors.primary}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
       )}
     </TouchableOpacity>
   );

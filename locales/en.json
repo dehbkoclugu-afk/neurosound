@@ -13,7 +13,8 @@
     "saved": "Saved",
     "options": "Options",
     "addToFavorites": "Add to favorites",
-    "removeFromFavorites": "Remove from favorites"
+    "removeFromFavorites": "Remove from favorites",
+    "addedToFavorites": "favourited"
   },
   "tabs": {
     "home": "Home",

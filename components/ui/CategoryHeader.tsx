@@ -36,7 +36,12 @@ export function CategoryHeader({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.textContainer}>
-        <Text style={[styles.title, { color: colors.textSecondary }]}>{title}</Text>
+        <Text
+          style={[styles.title, { color: colors.textSecondary }]}
+          accessibilityRole="header"
+        >
+          {title}
+        </Text>
         {subtitle && (
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             {subtitle}
@@ -85,7 +90,13 @@ export function CategoryCard({
       accessibilityLabel={title}
     >
       <Text style={[styles.categoryTitle, { color: colors.text }]}>{title}</Text>
-      <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+      <Ionicons
+        name="chevron-forward"
+        size={18}
+        color={colors.textSecondary}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      />
     </TouchableOpacity>
   );
 }

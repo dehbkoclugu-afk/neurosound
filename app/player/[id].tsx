@@ -133,15 +133,24 @@ export default function PlayerScreen() {
     ]).start();
   }, [id, favoriteIds, addFavorite, removeFavorite, reduceMotion, heartScale]);
 
-  // Close only dismisses the modal — audio keeps playing, MiniPlayer takes over
+  // Close only dismisses the modal — audio keeps playing, MiniPlayer takes over.
+  // Arriving here from a deep link means there is no history to pop, so back
+  // would exit the app instead of returning to it.
   const handleClose = useCallback(() => {
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
   }, [router]);
 
+  // Minutes-only overflowed past an hour: a 2 hour timer read "120:00".
   const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return hrs > 0 ? `${hrs}:${pad(mins)}:${pad(secs)}` : `${mins}:${pad(secs)}`;
   };
 
   if (!preset) {
@@ -175,7 +184,11 @@ export default function PlayerScreen() {
         >
           <Ionicons name="chevron-down" size={26} color={colors.textSecondary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>
+        <Text
+          style={[styles.headerTitle, { color: colors.textSecondary }]}
+          accessibilityLiveRegion="polite"
+          accessibilityRole="text"
+        >
           {isPlaying ? t('player.nowPlaying') : t('player.paused')}
         </Text>
         <TouchableOpacity
@@ -208,7 +221,10 @@ export default function PlayerScreen() {
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={[styles.presetName, { color: colors.text }]}>
+          <Text
+            style={[styles.presetName, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t(preset.nameKey)}
           </Text>
 
@@ -235,7 +251,13 @@ export default function PlayerScreen() {
       {/* Controls */}
       <View style={[styles.controls, { paddingBottom: insets.bottom + Spacing.xl }]}>
         <View style={styles.volumeContainer}>
-          <Ionicons name="volume-low" size={18} color={colors.textSecondary} />
+          <Ionicons
+            name="volume-low"
+            size={18}
+            color={colors.textSecondary}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
           <View style={styles.sliderWrapper}>
             <Slider
               value={volume}
@@ -245,14 +267,25 @@ export default function PlayerScreen() {
               accessibilityLabel={t('accessibility.volumeSlider')}
             />
           </View>
-          <Ionicons name="volume-high" size={18} color={colors.textSecondary} />
+          <Ionicons
+            name="volume-high"
+            size={18}
+            color={colors.textSecondary}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
         </View>
 
         <View style={styles.mainControls}>
           <TouchableOpacity
             onPress={() => setShowTimerModal(true)}
             style={styles.sideButton}
-            accessibilityLabel={t('player.timer')}
+            accessibilityRole="button"
+            accessibilityLabel={
+              timerRemaining !== null && timerRemaining > 0
+                ? `${t('player.timer')}, ${formatTime(timerRemaining)}`
+                : t('player.timer')
+            }
           >
             <Ionicons
               name="timer-outline"
@@ -260,7 +293,11 @@ export default function PlayerScreen() {
               color={timerDuration ? colors.primary : colors.textSecondary}
             />
             {timerRemaining !== null && timerRemaining > 0 && (
-              <Text style={[styles.timerBadge, { color: colors.primary }]}>
+              <Text
+                style={[styles.timerBadge, { color: colors.primary }]}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
                 {formatTime(timerRemaining)}
               </Text>
             )}

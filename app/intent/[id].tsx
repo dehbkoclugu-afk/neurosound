@@ -97,7 +97,9 @@ export default function IntentScreen() {
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <View style={styles.heroText}>
-            <Text style={styles.heroTitle}>{t(intent.nameKey)}</Text>
+            <Text style={styles.heroTitle} accessibilityRole="header">
+              {t(intent.nameKey)}
+            </Text>
             <Text style={styles.heroDesc}>{t(intent.descKey)}</Text>
           </View>
         </View>

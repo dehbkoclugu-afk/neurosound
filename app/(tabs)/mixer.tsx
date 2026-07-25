@@ -162,7 +162,10 @@ export default function MixerScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text
+            style={[styles.title, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('mixer.title')}
           </Text>
         </View>

@@ -20,9 +20,29 @@ interface IconProps {
   size?: number;
   color?: string;
   style?: StyleProp<TextStyle>;
+  /**
+   * Set when the icon carries meaning no neighbouring text conveys. Icons
+   * default to decorative: they sit next to a label inside an already-labelled
+   * row, and announcing them again just makes every row longer to listen to.
+   */
+  accessibilityLabel?: string;
 }
 
-export function Icon({ icon, size = 24, color = '#FFFFFF', style }: IconProps) {
+export function Icon({
+  icon,
+  size = 24,
+  color = '#FFFFFF',
+  style,
+  accessibilityLabel,
+}: IconProps) {
+  const decorative = !accessibilityLabel;
+  const a11y = decorative
+    ? ({
+        accessibilityElementsHidden: true,
+        importantForAccessibility: 'no-hide-descendants',
+      } as const)
+    : ({ accessibilityRole: 'image', accessibilityLabel } as const);
+
   if (icon.library === 'material') {
     return (
       <MaterialCommunityIcons
@@ -30,6 +50,7 @@ export function Icon({ icon, size = 24, color = '#FFFFFF', style }: IconProps) {
         size={size}
         color={color}
         style={style}
+        {...a11y}
       />
     );
   }
@@ -40,6 +61,7 @@ export function Icon({ icon, size = 24, color = '#FFFFFF', style }: IconProps) {
       size={size}
       color={color}
       style={style}
+      {...a11y}
     />
   );
 }

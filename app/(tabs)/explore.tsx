@@ -93,13 +93,19 @@ export default function ExploreScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header with category title — Explore is a tab, so no back button */}
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>
+        <Text
+          style={[styles.title, { color: colors.text }]}
+          accessibilityRole="header"
+        >
           {t('explore.title')}
         </Text>
       </View>
 
       {/* Category Tabs — text with amber underline */}
-      <View style={[styles.tabsContainer, { borderBottomColor: colors.cardBorder }]}>
+      <View
+        style={[styles.tabsContainer, { borderBottomColor: colors.cardBorder }]}
+        accessibilityRole="tablist"
+      >
         {categories.map(category => {
           const isActive = category.key === activeCategory;
           return (

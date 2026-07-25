@@ -13,7 +13,8 @@
     "saved": "Kaydedildi",
     "options": "Seçenekler",
     "addToFavorites": "Favorilere ekle",
-    "removeFromFavorites": "Favorilerden çıkar"
+    "removeFromFavorites": "Favorilerden çıkar",
+    "addedToFavorites": "favorilerde"
   },
   "tabs": {
     "home": "Ana Sayfa",
