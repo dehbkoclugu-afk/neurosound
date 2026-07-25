@@ -42,8 +42,12 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const colors = useThemeColors();
-  const { setHasSeenOnboarding, setHasSeenEpilepsyWarning, reduceMotion } =
-    useSettingsStore();
+  const {
+    setHasSeenOnboarding,
+    setHasSeenEpilepsyWarning,
+    setHasSeenHeadphoneWarning,
+    reduceMotion,
+  } = useSettingsStore();
 
   const [step, setStep] = useState(0);
   const isLast = step === STEPS.length - 1;
@@ -88,6 +92,9 @@ export default function OnboardingScreen() {
     if (isLast) {
       setHasSeenOnboarding(true);
       setHasSeenEpilepsyWarning(true);
+      // Step 2 already covered headphones; repeating it in an alert on the
+      // first binaural tap is the same sentence three times in two minutes.
+      setHasSeenHeadphoneWarning(true);
       router.back();
     } else {
       setStep(step + 1);

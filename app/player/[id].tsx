@@ -234,11 +234,15 @@ export default function PlayerScreen() {
             </Text>
           )}
 
-          {preset.type !== 'solfeggio' && (
-            <Text style={[styles.presetDescription, { color: colors.textSecondary }]}>
-              {t(preset.descriptionKey)}
-            </Text>
-          )}
+          <Text
+            style={[
+              styles.presetDescription,
+              { color: colors.textSecondary },
+              preset.type === 'solfeggio' && styles.disclaimer,
+            ]}
+          >
+            {t(preset.descriptionKey)}
+          </Text>
 
           {playbackError && (
             <Text style={[styles.playbackError, { color: colors.error }]}>
@@ -250,30 +254,50 @@ export default function PlayerScreen() {
 
       {/* Controls */}
       <View style={[styles.controls, { paddingBottom: insets.bottom + Spacing.xl }]}>
-        <View style={styles.volumeContainer}>
-          <Ionicons
-            name="volume-low"
-            size={18}
-            color={colors.textSecondary}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
-          <View style={styles.sliderWrapper}>
-            <Slider
-              value={volume}
-              onValueChange={setVolume}
-              max={1}
-              showValue={false}
-              accessibilityLabel={t('accessibility.volumeSlider')}
+        <View style={styles.volumeSection}>
+          <View style={styles.volumeContainer}>
+            <Ionicons
+              name="volume-low"
+              size={18}
+              color={colors.textSecondary}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <View style={styles.sliderWrapper}>
+              <Slider
+                value={volume}
+                onValueChange={setVolume}
+                max={1}
+                showValue={false}
+                accessibilityLabel={t('accessibility.volumeSlider')}
+              />
+            </View>
+            <Ionicons
+              name="volume-high"
+              size={18}
+              color={colors.textSecondary}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
             />
           </View>
-          <Ionicons
-            name="volume-high"
-            size={18}
-            color={colors.textSecondary}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
+
+          {/* The safety cap is invisible otherwise: the slider runs to 100%
+              while the output stops at maxVolume, so full travel sounds
+              quieter than it looks with no explanation anywhere. */}
+          {maxVolume < 1 && (
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/settings')}
+              style={styles.volumeCap}
+              accessibilityRole="button"
+              accessibilityLabel={`${t('player.volumeCapped', {
+                percent: Math.round(maxVolume * 100),
+              })}. ${t('common.settings')}`}
+            >
+              <Text style={[styles.volumeCapText, { color: colors.textSecondary }]}>
+                {t('player.volumeCapped', { percent: Math.round(maxVolume * 100) })}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.mainControls}>
@@ -440,6 +464,12 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     maxWidth: 300,
   },
+  // The disclaimer is context, not a claim about the sound — it sits back.
+  disclaimer: {
+    ...Typography.footnote,
+    lineHeight: 18,
+    maxWidth: 280,
+  },
   playbackError: {
     ...Typography.subhead,
     textAlign: 'center',
@@ -448,11 +478,23 @@ const styles = StyleSheet.create({
   controls: {
     paddingHorizontal: Spacing.xl,
   },
+  volumeSection: {
+    marginBottom: Spacing.xl,
+  },
   volumeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.xl,
     gap: Spacing.md,
+  },
+  volumeCap: {
+    alignSelf: 'center',
+    paddingTop: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    minHeight: 32,
+  },
+  volumeCapText: {
+    ...Typography.caption1,
+    fontVariant: ['tabular-nums'],
   },
   sliderWrapper: {
     flex: 1,

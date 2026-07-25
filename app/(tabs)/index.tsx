@@ -3,7 +3,7 @@
  * favorites, and the technical categories for power users.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
-  FlatList,
   TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -55,6 +54,9 @@ const categories = [
   },
 ];
 
+// How many favourites the home screen previews before offering the rest.
+const FAVORITES_PREVIEW = 4;
+
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -63,6 +65,7 @@ export default function HomeScreen() {
 
   const colors = useThemeColors();
   const miniPlayerInset = useMiniPlayerInset();
+  const [showAllFavorites, setShowAllFavorites] = useState(false);
 
   // First run: route into onboarding once
   useEffect(() => {
@@ -186,32 +189,50 @@ export default function HomeScreen() {
         </View>
 
         {/* Recently Played Section */}
-        {recentPresets.length > 0 && (
-          <View style={styles.section}>
-            <CategoryHeader title={t('home.recentlyPlayed')} />
-            <FlatList
-              data={recentPresets}
+        <View style={styles.section}>
+          <CategoryHeader title={t('home.recentlyPlayed')} />
+          {recentPresets.length > 0 ? (
+            /* A horizontal FlatList nested in a ScrollView cancels its own
+               virtualisation; ten chips do not need it. */
+            <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.horizontalList}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
+            >
+              {recentPresets.map((item) => (
                 <PresetCardSmall
+                  key={item.id}
                   preset={item}
                   name={t(item.nameKey)}
                   onPress={() => handlePresetPress(item.id)}
                 />
-              )}
-            />
-          </View>
-        )}
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+              {t('home.recentlyPlayedEmpty')}
+            </Text>
+          )}
+        </View>
 
         {/* Favorites Section — teaches the heart affordance when empty */}
         <View style={styles.section}>
-          <CategoryHeader title={t('home.favorites')} iconName="heart" />
+          <CategoryHeader
+            title={t('home.favorites')}
+            iconName="heart"
+            onSeeAll={
+              favoritePresets.length > FAVORITES_PREVIEW
+                ? () => setShowAllFavorites((v) => !v)
+                : undefined
+            }
+            seeAllText={showAllFavorites ? t('common.showLess') : t('common.seeAll')}
+          />
           {favoritePresets.length > 0 ? (
             <View>
-              {favoritePresets.slice(0, 4).map((preset) => (
+              {(showAllFavorites
+                ? favoritePresets
+                : favoritePresets.slice(0, FAVORITES_PREVIEW)
+              ).map((preset) => (
                 <PresetCard
                   key={preset.id}
                   preset={preset}
@@ -243,7 +264,7 @@ export default function HomeScreen() {
 
         {/* Quiet headphone note */}
         <Text style={[styles.headphoneNote, { color: colors.textSecondary }]}>
-          {t('home.headphoneWarning')}
+          {t('home.headphoneNote')}
         </Text>
 
       </ScrollView>

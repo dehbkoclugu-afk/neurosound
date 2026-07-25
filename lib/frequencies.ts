@@ -103,7 +103,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '40 Hz',
     nameKey: 'explore.solfeggioFreqs.40',
-    descriptionKey: 'explore.solfeggioFreqs.40',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 40,
     color: '#F59E0B', // Amber - Focus/Energy
   },
@@ -112,7 +112,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '111 Hz',
     nameKey: 'explore.solfeggioFreqs.111',
-    descriptionKey: 'explore.solfeggioFreqs.111',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 111,
     color: '#10B981', // Emerald - Healing
   },
@@ -121,7 +121,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '174 Hz',
     nameKey: 'explore.solfeggioFreqs.174',
-    descriptionKey: 'explore.solfeggioFreqs.174',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 174,
     color: '#EF4444', // Red - Pain relief
   },
@@ -130,7 +130,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '285 Hz',
     nameKey: 'explore.solfeggioFreqs.285',
-    descriptionKey: 'explore.solfeggioFreqs.285',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 285,
     color: '#F97316', // Orange - Tissue healing
   },
@@ -139,7 +139,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '396 Hz',
     nameKey: 'explore.solfeggioFreqs.396',
-    descriptionKey: 'explore.solfeggioFreqs.396',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 396,
     color: '#8B5CF6', // Violet - Liberation
   },
@@ -148,7 +148,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '417 Hz',
     nameKey: 'explore.solfeggioFreqs.417',
-    descriptionKey: 'explore.solfeggioFreqs.417',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 417,
     color: '#F472B6', // Pink - Change
   },
@@ -157,7 +157,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '432 Hz',
     nameKey: 'explore.solfeggioFreqs.432',
-    descriptionKey: 'explore.solfeggioFreqs.432',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 432,
     color: '#22C55E', // Green - Natural harmony
   },
@@ -166,7 +166,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '440 Hz',
     nameKey: 'explore.solfeggioFreqs.440',
-    descriptionKey: 'explore.solfeggioFreqs.440',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 440,
     color: '#3B82F6', // Blue - Standard
   },
@@ -175,7 +175,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '528 Hz',
     nameKey: 'explore.solfeggioFreqs.528',
-    descriptionKey: 'explore.solfeggioFreqs.528',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 528,
     color: '#EC4899', // Pink - Love frequency
   },
@@ -184,7 +184,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '639 Hz',
     nameKey: 'explore.solfeggioFreqs.639',
-    descriptionKey: 'explore.solfeggioFreqs.639',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 639,
     color: '#06B6D4', // Cyan - Connection
   },
@@ -193,7 +193,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '741 Hz',
     nameKey: 'explore.solfeggioFreqs.741',
-    descriptionKey: 'explore.solfeggioFreqs.741',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 741,
     color: '#0EA5E9', // Sky blue - Expression
   },
@@ -202,7 +202,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '777 Hz',
     nameKey: 'explore.solfeggioFreqs.777',
-    descriptionKey: 'explore.solfeggioFreqs.777',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 777,
     color: '#FBBF24', // Yellow/Gold - Divine luck
   },
@@ -211,7 +211,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '852 Hz',
     nameKey: 'explore.solfeggioFreqs.852',
-    descriptionKey: 'explore.solfeggioFreqs.852',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 852,
     color: '#6366F1', // Indigo - Intuition
   },
@@ -220,7 +220,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '888 Hz',
     nameKey: 'explore.solfeggioFreqs.888',
-    descriptionKey: 'explore.solfeggioFreqs.888',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 888,
     color: '#A855F7', // Purple - Abundance
   },
@@ -229,7 +229,7 @@ export const solfeggioPresets: FrequencyPreset[] = [
     type: 'solfeggio',
     name: '963 Hz',
     nameKey: 'explore.solfeggioFreqs.963',
-    descriptionKey: 'explore.solfeggioFreqs.963',
+    descriptionKey: 'explore.solfeggioDisclaimer',
     frequency: 963,
     color: '#D946EF', // Fuchsia - Cosmic
   },

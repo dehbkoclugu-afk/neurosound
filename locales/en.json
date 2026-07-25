@@ -14,7 +14,9 @@
     "options": "Options",
     "addToFavorites": "Add to favorites",
     "removeFromFavorites": "Remove from favorites",
-    "addedToFavorites": "favourited"
+    "addedToFavorites": "favourited",
+    "seeAll": "See all",
+    "showLess": "Show less"
   },
   "tabs": {
     "home": "Home",
@@ -33,7 +35,9 @@
     "headphoneWarning": "Use headphones for binaural beats",
     "headphoneWarningDesc": "Binaural beats require headphones to work properly. Each ear receives a slightly different frequency to create the beat effect.",
     "intentsTitle": "What do you need right now?",
-    "favoritesEmpty": "Tap the heart on any sound you like; it will collect here."
+    "favoritesEmpty": "Tap the heart on any sound you like; it will collect here.",
+    "headphoneNote": "Binaural beats need headphones to work.",
+    "recentlyPlayedEmpty": "Sounds you play will collect here."
   },
   "explore": {
     "title": "Explore Frequencies",
@@ -58,21 +62,21 @@
       "gammaDesc": "Higher cognitive functions"
     },
     "solfeggioFreqs": {
-      "40": "40 Hz - Gamma Focus",
-      "111": "111 Hz - Deep Calm",
-      "174": "174 Hz - Relaxation",
-      "285": "285 Hz - Renewal",
-      "396": "396 Hz - Liberation from Fear",
-      "417": "417 Hz - Facilitating Change",
-      "432": "432 Hz - Natural Harmony",
-      "440": "440 Hz - Standard Pitch",
-      "528": "528 Hz - Love Frequency",
-      "639": "639 Hz - Relationships",
-      "741": "741 Hz - Expression",
-      "777": "777 Hz - Divine Luck",
-      "852": "852 Hz - Intuition",
-      "888": "888 Hz - Abundance",
-      "963": "963 Hz - Cosmic Consciousness"
+      "40": "Gamma Focus",
+      "111": "Deep Calm",
+      "174": "Relaxation",
+      "285": "Renewal",
+      "396": "Liberation from Fear",
+      "417": "Facilitating Change",
+      "432": "Natural Harmony",
+      "440": "Standard Pitch",
+      "528": "Love Frequency",
+      "639": "Relationships",
+      "741": "Expression",
+      "777": "Divine Luck",
+      "852": "Intuition",
+      "888": "Abundance",
+      "963": "Cosmic Consciousness"
     },
     "noiseTypes": {
       "white": "White Noise",
@@ -101,7 +105,8 @@
       "airplaneDesc": "Jet engine white noise",
       "train": "Train",
       "trainDesc": "Rhythmic train on tracks"
-    }
+    },
+    "solfeggioDisclaimer": "A traditional tone. Effects are personal; no medical benefit is claimed."
   },
   "mixer": {
     "title": "Sound Mixer",
@@ -140,7 +145,8 @@
     },
     "baseFrequency": "Base Frequency",
     "beatFrequency": "Beat Frequency",
-    "playbackError": "Could not start audio. Please try again."
+    "playbackError": "Could not start audio. Please try again.",
+    "volumeCapped": "Volume capped at {{percent}}%"
   },
   "settings": {
     "title": "Settings",
