@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, FontFamily, onPrimary } from '@/constants/theme';
+import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
@@ -253,7 +254,13 @@ export default function PlayerScreen() {
       </View>
 
       {/* Controls */}
-      <View style={[styles.controls, { paddingBottom: insets.bottom + Spacing.xl }]}>
+      <View
+        style={[
+          styles.controls,
+          contentColumn,
+          { paddingBottom: insets.bottom + Spacing.xl },
+        ]}
+      >
         <View style={styles.volumeSection}>
           <View style={styles.volumeContainer}>
             <Ionicons

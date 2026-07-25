@@ -19,6 +19,7 @@ import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { PressableScale } from '@/components/ui/PressableScale';
+import { contentColumn } from '@/constants/layout';
 
 const STEPS = [
   {
@@ -132,7 +133,7 @@ export default function OnboardingScreen() {
         </Text>
       </Animated.View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, contentColumn]}>
         {/* Step indicator */}
         <View style={styles.dots}>
           {STEPS.map((_, i) => (

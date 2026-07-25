@@ -21,6 +21,7 @@ import { Spacing, AccessibilitySize, Typography, FontFamily, onPrimary } from '@
 import { useSettingsStore, ThemeMode, Language } from '@/stores/settingsStore';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import i18n from '@/i18n';
 
 const THEME_OPTIONS: { value: ThemeMode; labelKey: string }[] = [
@@ -64,7 +65,11 @@ export default function SettingsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
+        contentContainerStyle={[
+          styles.content,
+          contentColumn,
+          { paddingBottom: miniPlayerInset + Spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}

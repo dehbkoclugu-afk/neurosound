@@ -29,6 +29,7 @@ import { PressableScale } from '@/components/ui/PressableScale';
 import * as haptics from '@/lib/haptics';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import {
   binauralPresets,
   solfeggioPresets,
@@ -157,7 +158,11 @@ export default function MixerScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
+        contentContainerStyle={[
+          styles.content,
+          contentColumn,
+          { paddingBottom: miniPlayerInset + Spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}

@@ -10,8 +10,6 @@
  * a muted amber so selected states remain readable, never gray).
  */
 
-import { Platform } from 'react-native';
-
 // Primary brand colors — calm amber
 const primary = '#D99A4E';
 const primaryLight = '#E8B573';
@@ -59,66 +57,6 @@ export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'ma
 
 // Solfeggio icon
 export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const };
-
-// Frequency category colors (preset identity coding — not the brand accent)
-export const FrequencyColors = {
-  binaural: {
-    delta: '#3B82F6', // Blue - sleep
-    theta: '#8B5CF6', // Purple - meditation
-    alpha: '#10B981', // Green - relaxation
-    beta: '#F59E0B', // Amber - focus
-    gamma: '#EF4444', // Red - cognitive
-  },
-  solfeggio: '#EC4899', // Pink
-  noise: {
-    white: '#94A3B8',
-    pink: '#F472B6',
-    brown: '#A78BFA',
-  },
-};
-
-// Gradient backgrounds for presets (player screen identity per sound)
-export const GradientColors: Record<string, string[]> = {
-  // Binaural
-  delta: ['#1e3a5f', '#3B82F6'],
-  theta: ['#4c1d95', '#8B5CF6'],
-  alpha: ['#065f46', '#10B981'],
-  beta: ['#92400e', '#F59E0B'],
-  gamma: ['#991b1b', '#EF4444'],
-  // Solfeggio - each frequency has unique color
-  solfeggio: ['#831843', '#EC4899'], // Default fallback
-  'solfeggio-40': ['#78350f', '#F59E0B'],    // Amber
-  'solfeggio-111': ['#064e3b', '#10B981'],   // Emerald
-  'solfeggio-174': ['#7f1d1d', '#EF4444'],   // Red
-  'solfeggio-285': ['#7c2d12', '#F97316'],   // Orange
-  'solfeggio-396': ['#4c1d95', '#8B5CF6'],   // Violet
-  'solfeggio-417': ['#831843', '#F472B6'],   // Pink
-  'solfeggio-432': ['#14532d', '#22C55E'],   // Green
-  'solfeggio-440': ['#1e3a8a', '#3B82F6'],   // Blue
-  'solfeggio-528': ['#831843', '#EC4899'],   // Pink (Love)
-  'solfeggio-639': ['#164e63', '#06B6D4'],   // Cyan
-  'solfeggio-741': ['#0c4a6e', '#0EA5E9'],   // Sky blue
-  'solfeggio-777': ['#78350f', '#FBBF24'],   // Gold
-  'solfeggio-852': ['#312e81', '#6366F1'],   // Indigo
-  'solfeggio-888': ['#581c87', '#A855F7'],   // Purple
-  'solfeggio-963': ['#701a75', '#D946EF'],   // Fuchsia
-  // Noise - Classic
-  white: ['#475569', '#94A3B8'],
-  pink: ['#9d174d', '#F472B6'],
-  brown: ['#5b21b6', '#A78BFA'],
-  // Noise - Nature
-  rain: ['#1e3a5f', '#60A5FA'],
-  thunder: ['#312e81', '#6366F1'],
-  ocean: ['#164e63', '#06B6D4'],
-  wind: ['#4c1d95', '#8B5CF6'],
-  fire: ['#7c2d12', '#F97316'],
-  forest: ['#14532d', '#22C55E'],
-  stream: ['#134e4a', '#14B8A6'],
-  // Noise - Machines
-  fan: ['#334155', '#64748B'],
-  airplane: ['#1e293b', '#475569'],
-  train: ['#44403c', '#78716C'],
-};
 
 export const Colors = {
   light: {
@@ -244,11 +182,7 @@ export const Colors = {
 // Minimum touch target size for accessibility (48x48 dp)
 export const AccessibilitySize = {
   minTouchTarget: 48,
-  iconSize: 24,
-  iconSizeLarge: 32,
   borderRadius: 12,
-  borderRadiusLarge: 16,
-  borderRadiusXL: 24,
 };
 
 // Spacing constants - Modern generous spacing
@@ -260,40 +194,6 @@ export const Spacing = {
   xl: 32,
   xxl: 48,
   xxxl: 64,
-};
-
-// Shadow styles for elevation
-export const Shadows = {
-  small: Platform.select({
-    web: { boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)' },
-    default: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
-      elevation: 2,
-    },
-  }),
-  medium: Platform.select({
-    web: { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)' },
-    default: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-  }),
-  large: Platform.select({
-    web: { boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)' },
-    default: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 16,
-      elevation: 8,
-    },
-  }),
 };
 
 // Font families — Nunito Sans, loaded in app/_layout.tsx via expo-font
@@ -360,32 +260,5 @@ export const Typography = {
     fontFamily: FontFamily.regular,
     lineHeight: 13,
   },
-  // For Hz values, timers, counters — tabular figures
-  mono: {
-    fontSize: 15,
-    fontFamily: FontFamily.semibold,
-    lineHeight: 20,
-    fontVariant: ['tabular-nums'] as const,
-  },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    sans: 'system-ui',
-    serif: 'ui-serif',
-    rounded: 'ui-rounded',
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});

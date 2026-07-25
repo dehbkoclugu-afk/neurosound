@@ -29,29 +29,15 @@ import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { intents } from '@/lib/intents';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
 
 // Category data for grid cards
 const categories = [
-  {
-    key: 'binaural',
-    titleKey: 'explore.categories.binaural',
-    iconName: 'pulse',
-    color: '#8B5CF6',
-  },
-  {
-    key: 'solfeggio',
-    titleKey: 'explore.categories.solfeggio',
-    iconName: 'musical-notes',
-    color: '#EC4899',
-  },
-  {
-    key: 'noise',
-    titleKey: 'explore.categories.noise',
-    iconName: 'volume-medium',
-    color: '#3B82F6',
-  },
+  { key: 'binaural', titleKey: 'explore.categories.binaural' },
+  { key: 'solfeggio', titleKey: 'explore.categories.solfeggio' },
+  { key: 'noise', titleKey: 'explore.categories.noise' },
 ];
 
 // How many favourites the home screen previews before offering the rest.
@@ -122,7 +108,11 @@ export default function HomeScreen() {
       />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
+        contentContainerStyle={[
+          styles.content,
+          contentColumn,
+          { paddingBottom: miniPlayerInset + Spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header with proper spacing */}
@@ -318,7 +308,9 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   intentBlock: {
-    height: 108,
+    // minHeight, not height: the block holds a 22pt title over a 13pt line,
+    // and a fixed box clips both once the system text size grows.
+    minHeight: 108,
     borderRadius: 20,
     overflow: 'hidden',
     justifyContent: 'flex-end',

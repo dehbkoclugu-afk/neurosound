@@ -25,6 +25,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import { getIntentById } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
@@ -104,7 +105,7 @@ export default function IntentScreen() {
           </View>
         </View>
 
-        <View style={styles.list}>
+        <View style={[styles.list, contentColumn]}>
           {presets.map((preset) => (
             <PresetCard
               key={preset.id}

@@ -20,6 +20,7 @@ import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import {
   binauralPresets,
   solfeggioPresets,
@@ -92,7 +93,7 @@ export default function ExploreScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header with category title — Explore is a tab, so no back button */}
-      <View style={styles.header}>
+      <View style={[styles.header, contentColumn]}>
         <Text
           style={[styles.title, { color: colors.text }]}
           accessibilityRole="header"
@@ -103,7 +104,11 @@ export default function ExploreScreen() {
 
       {/* Category Tabs — text with amber underline */}
       <View
-        style={[styles.tabsContainer, { borderBottomColor: colors.cardBorder }]}
+        style={[
+          styles.tabsContainer,
+          contentColumn,
+          { borderBottomColor: colors.cardBorder },
+        ]}
         accessibilityRole="tablist"
       >
         {categories.map(category => {
@@ -140,7 +145,11 @@ export default function ExploreScreen() {
       {/* Preset Grid */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
+        contentContainerStyle={[
+          styles.content,
+          contentColumn,
+          { paddingBottom: miniPlayerInset + Spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Category Description — plain paragraph, no box */}

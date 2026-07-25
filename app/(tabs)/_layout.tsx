@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { MiniPlayerHost } from '@/components/ui/MiniPlayerHost';
-import { Spacing, Shadows } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { useMiniPlayerVisible, MINI_PLAYER_HEIGHT } from '@/hooks/use-mini-player';
 
@@ -35,7 +35,6 @@ export default function TabLayout() {
             height: MINI_PLAYER_HEIGHT + insets.bottom,
             paddingBottom: insets.bottom,
             paddingTop: Spacing.xs,
-            ...Shadows.small,
           },
           tabBarLabelStyle: {
             fontSize: 11,
