@@ -202,7 +202,7 @@ export default function MixerScreen() {
                 style={styles.sampleButton}
                 accessibilityRole="button"
               >
-                <Text style={[styles.sampleButtonText, { color: colors.primary }]}>
+                <Text style={[styles.sampleButtonText, { color: colors.accent }]}>
                   {t('mixer.trySample')}
                 </Text>
               </TouchableOpacity>
@@ -274,12 +274,12 @@ export default function MixerScreen() {
             <Ionicons
               name={isFull ? 'information-circle-outline' : 'add'}
               size={20}
-              color={isFull ? colors.textSecondary : colors.primary}
+              color={isFull ? colors.textSecondary : colors.accent}
             />
             <Text
               style={[
                 styles.addRowText,
-                { color: isFull ? colors.textSecondary : colors.primary },
+                { color: isFull ? colors.textSecondary : colors.accent },
               ]}
             >
               {isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
@@ -318,7 +318,7 @@ export default function MixerScreen() {
               />
               {timerRemaining !== null && timerRemaining > 0 && (
                 <Text
-                  style={[styles.timerBadge, { color: colors.primary }]}
+                  style={[styles.timerBadge, { color: colors.accent }]}
                   accessibilityElementsHidden
                   importantForAccessibility="no-hide-descendants"
                 >

@@ -22,6 +22,22 @@ interface WaveVisualizerProps {
 
 const WAVE_COUNT = 3;
 
+/**
+ * How long the ring keeps breathing before it settles to a still state.
+ *
+ * Delta runs a 6s cycle — 0.17 Hz — which is squarely in the band Apple's
+ * reduced-motion guidance warns about for slow looping oscillation, and it ran
+ * for as long as playback did: eight hours of a 220pt ring pulsing at someone
+ * trying to fall asleep. It now does its job during the settling-in period and
+ * then gets out of the way.
+ */
+const SETTLE_AFTER_MS = 90_000;
+
+/** Matches the audio ramps in playerController, so the ring and the sound
+ *  arrive and leave together instead of the visual snapping. */
+const PRESENCE_IN_MS = 400;
+const PRESENCE_OUT_MS = 250;
+
 export function WaveVisualizer({
   isPlaying,
   color,
@@ -39,6 +55,20 @@ export function WaveVisualizer({
   const waveAnimations = useRef(
     Array.from({ length: WAVE_COUNT }, () => new Animated.Value(0))
   ).current;
+
+  // 0 = silent and dim, 1 = playing. Cross-fades rather than cutting.
+  const presence = useRef(new Animated.Value(isPlaying ? 1 : 0)).current;
+
+  useEffect(() => {
+    const animation = Animated.timing(presence, {
+      toValue: isPlaying ? 1 : 0,
+      duration: isPlaying ? PRESENCE_IN_MS : PRESENCE_OUT_MS,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [isPlaying, presence]);
 
   useEffect(() => {
     if (reduceMotion || !isPlaying) {
@@ -79,8 +109,22 @@ export function WaveVisualizer({
       }, index * tempoMs * 0.08)
     );
 
+    // Come to rest rather than oscillating for the whole session.
+    const settle = setTimeout(() => {
+      animations.forEach((animation) => animation.stop());
+      waveAnimations.forEach((anim) =>
+        Animated.timing(anim, {
+          toValue: 0.5,
+          duration: 2000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }).start()
+      );
+    }, SETTLE_AFTER_MS);
+
     return () => {
       timeouts.forEach(clearTimeout);
+      clearTimeout(settle);
       animations.forEach((animation) => animation.stop());
     };
   }, [isPlaying, reduceMotion, waveAnimations, tempoMs]);
@@ -108,10 +152,17 @@ export function WaveVisualizer({
           outputRange: [0.6 + index * 0.1, 1 + intensity * 0.3],
         });
 
-        const opacity = anim.interpolate({
+        const pulseOpacity = anim.interpolate({
           inputRange: [0, 0.5, 1],
           outputRange: [0.25, 0.7, 0.25],
         });
+
+        // Pausing used to snap the ring to 0.15 on a single frame while the
+        // audio faded out over 250ms — the two came apart.
+        const opacity = Animated.multiply(
+          pulseOpacity,
+          presence.interpolate({ inputRange: [0, 1], outputRange: [0.2, 1] })
+        );
 
         return (
           <Animated.View
@@ -121,7 +172,7 @@ export function WaveVisualizer({
               {
                 borderColor: waveColor,
                 transform: [{ scale }],
-                opacity: isPlaying ? opacity : 0.15,
+                opacity,
               },
             ]}
           />
@@ -129,7 +180,18 @@ export function WaveVisualizer({
       })}
 
       {/* Quiet core */}
-      <View style={[styles.centerDot, { backgroundColor: waveColor, opacity: isPlaying ? 1 : 0.4 }]} />
+      <Animated.View
+        style={[
+          styles.centerDot,
+          {
+            backgroundColor: waveColor,
+            opacity: presence.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0.4, 1],
+            }),
+          },
+        ]}
+      />
     </View>
   );
 }

@@ -20,7 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography } from '@/constants/theme';
+import { Spacing, Typography, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
@@ -101,7 +101,7 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Soft warm atmosphere at the top, fading into the background */}
       <LinearGradient
-        colors={[colors.primary + '1A', colors.background]}
+        colors={[withAlpha(colors.primary, 0.1), colors.background]}
         locations={[0, 0.4]}
         style={styles.atmosphere}
         pointerEvents="none"
@@ -158,7 +158,7 @@ export default function HomeScreen() {
                 />
                 {/* Scrim: tint toward the intent colour, darken for text contrast */}
                 <LinearGradient
-                  colors={[intent.color + '66', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.72)']}
+                  colors={[withAlpha(intent.color, 0.4), 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.72)']}
                   locations={[0, 0.45, 1]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -253,7 +253,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Quiet headphone note */}
-        <Text style={[styles.headphoneNote, { color: colors.textSecondary }]}>
+        <Text style={[styles.headphoneNote, { color: colors.warning }]}>
           {t('home.headphoneNote')}
         </Text>
 

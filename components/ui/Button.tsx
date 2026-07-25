@@ -99,8 +99,8 @@ export function Button({
 
     const variantStyles: Record<string, TextStyle> = {
       primary: { color: onPrimary },
-      secondary: { color: colors.primary },
-      ghost: { color: colors.primary },
+      secondary: { color: colors.accent },
+      ghost: { color: colors.accent },
     };
 
     return {

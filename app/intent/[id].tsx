@@ -20,7 +20,7 @@ import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
@@ -86,7 +86,7 @@ export default function IntentScreen() {
             transition={300}
           />
           <LinearGradient
-            colors={[intent.color + '55', 'rgba(0,0,0,0.35)', colors.background]}
+            colors={[withAlpha(intent.color, 0.33), 'rgba(0,0,0,0.35)', colors.background]}
             locations={[0, 0.5, 1]}
             style={StyleSheet.absoluteFill}
           />

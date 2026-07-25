@@ -56,7 +56,7 @@ export function CategoryHeader({
           accessibilityRole="button"
           accessibilityLabel={seeAllText}
         >
-          <Text style={[styles.seeAllText, { color: colors.primary }]}>
+          <Text style={[styles.seeAllText, { color: colors.accent }]}>
             {seeAllText}
           </Text>
         </TouchableOpacity>

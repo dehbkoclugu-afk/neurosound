@@ -22,6 +22,29 @@ const primaryDark = '#B57C35';
  */
 export const onPrimary = '#1A140C';
 
+/**
+ * Overlay a colour at a given alpha.
+ *
+ * Call sites were building `preset.color + '2E'` by hand, which silently
+ * produces garbage for a 3-digit hex or an rgb() string and gives no hint
+ * about what "2E" means. Takes 0-1 and expands shorthand.
+ */
+export function withAlpha(color: string, alpha: number): string {
+  const hex = color.replace('#', '');
+  const full =
+    hex.length === 3
+      ? hex
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : hex;
+  if (full.length !== 6) return color; // not a hex we can extend — leave it alone
+  const a = Math.round(Math.max(0, Math.min(1, alpha)) * 255)
+    .toString(16)
+    .padStart(2, '0');
+  return `#${full}${a}`;
+}
+
 // Category icons for UI (rendered via components/ui/Icon)
 export const CategoryIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
   binaural: { name: 'pulse', library: 'ionicon' },
@@ -58,6 +81,15 @@ export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'ma
 // Solfeggio icon
 export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const };
 
+/**
+ * Accent colour for text and standalone glyphs — links, "See all", the timer
+ * badge, secondary button labels.
+ *
+ * `primary` is a fill colour: it works under `onPrimary` text and as a slider
+ * track, but as text on a light background it is 2.3:1. This is the same amber
+ * pushed until it clears AA on each palette's background. Fills keep `primary`;
+ * anything the user has to read uses this.
+ */
 export const Colors = {
   light: {
     text: '#201B15',
@@ -70,12 +102,13 @@ export const Colors = {
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
+    accent: '#9B6421', // 4.6:1 on #FAF7F2
     icon: '#6E655A',
     tabIconDefault: '#A99F91',
     tabIconSelected: primaryDark,
     success: '#4C9A57',
-    warning: '#C77F2C',
-    error: '#C4553B',
+    warning: '#9B6322', // 4.7:1 on #FAF7F2 — used as text, so it must clear AA
+    error: '#B85037', // 4.6:1 on #FAF7F2
     slider: '#E5DFD3',
     sliderThumb: primaryDark,
     overlay: 'rgba(0, 0, 0, 0.5)',
@@ -92,6 +125,7 @@ export const Colors = {
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
+    accent: primary, // 7.8:1 on #131110 — the fill already reads as text here
     icon: '#A69B8C',
     tabIconDefault: '#5C544A',
     tabIconSelected: primary,
@@ -118,6 +152,7 @@ export const Colors = {
     tint: '#A87C3F',
     primary: '#A87C3F',
     primaryLight: '#C1954F',
+    accent: '#A87C3F', // 5.5:1 on #050403
     icon: '#7A6F5F',
     tabIconDefault: '#453E35',
     tabIconSelected: '#A87C3F',
@@ -144,12 +179,13 @@ export const Colors = {
     tint: '#B59B72',
     primary: '#B59B72',
     primaryLight: '#CBB699',
+    accent: '#846B45', // 4.6:1 on #F8F5F0
     icon: '#948A7C',
     tabIconDefault: '#C9C0B2',
     tabIconSelected: '#94794F',
     success: '#8FB894',
-    warning: '#D6B27C',
-    error: '#D19582',
+    warning: '#8E672C', // 4.7:1 on #F8F5F0 (was 1.8:1 — never used as text before)
+    error: '#A9583E', // 4.7:1 on #F8F5F0
     slider: '#E5DFD3',
     sliderThumb: '#B59B72',
     overlay: 'rgba(0, 0, 0, 0.3)',
@@ -166,6 +202,7 @@ export const Colors = {
     tint: '#8F7A5C',
     primary: '#8F7A5C',
     primaryLight: '#A69072',
+    accent: '#957F60', // 4.6:1 on #1B1815
     icon: '#7D746A',
     tabIconDefault: '#4A443C',
     tabIconSelected: '#A69072',

@@ -19,7 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, onPrimary } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, onPrimary, withAlpha } from '@/constants/theme';
 import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -145,7 +145,7 @@ export default function PlayerScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Atmospheric wash — the sound's colour bleeds softly from the top */}
       <LinearGradient
-        colors={[preset.color + '2E', preset.color + '0D', colors.background]}
+        colors={[withAlpha(preset.color, 0.18), withAlpha(preset.color, 0.05), colors.background]}
         locations={[0, 0.42, 0.82]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
@@ -185,9 +185,12 @@ export default function PlayerScreen() {
       {/* Breathing ring — the centerpiece, over a soft radial glow */}
       <View style={styles.content}>
         <View style={styles.visualWrap}>
-          <View style={[styles.glowOuter, { backgroundColor: preset.color + '0F' }]} />
-          <View style={[styles.glowMid, { backgroundColor: preset.color + '14' }]} />
-          <View style={[styles.glowInner, { backgroundColor: preset.color + '1C' }]} />
+          <View
+            style={[styles.glowOuter, { backgroundColor: withAlpha(preset.color, 0.05) }]}
+          />
+          <View
+            style={[styles.glowInner, { backgroundColor: withAlpha(preset.color, 0.09) }]}
+          />
           <WaveVisualizer
             isPlaying={isPlaying}
             color={preset.color}
@@ -221,9 +224,18 @@ export default function PlayerScreen() {
           </Text>
 
           {playbackError && (
-            <Text style={[styles.playbackError, { color: colors.error }]}>
-              {t('player.playbackError')}
-            </Text>
+            <View style={styles.playbackError} accessibilityLiveRegion="assertive">
+              <Ionicons
+                name="alert-circle-outline"
+                size={16}
+                color={colors.error}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+              <Text style={[styles.playbackErrorText, { color: colors.error }]}>
+                {t('player.playbackError')}
+              </Text>
+            </View>
           )}
         </View>
       </View>
@@ -300,7 +312,7 @@ export default function PlayerScreen() {
             />
             {timerRemaining !== null && timerRemaining > 0 && (
               <Text
-                style={[styles.timerBadge, { color: colors.primary }]}
+                style={[styles.timerBadge, { color: colors.accent }]}
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               >
@@ -380,12 +392,6 @@ const styles = StyleSheet.create({
     height: 340,
     borderRadius: 170,
   },
-  glowMid: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-  },
   glowInner: {
     position: 'absolute',
     width: 210,
@@ -417,9 +423,14 @@ const styles = StyleSheet.create({
     maxWidth: 280,
   },
   playbackError: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.sm,
+  },
+  playbackErrorText: {
     ...Typography.subhead,
     textAlign: 'center',
-    marginTop: Spacing.sm,
   },
   controls: {
     paddingHorizontal: Spacing.xl,

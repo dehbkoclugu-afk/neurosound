@@ -280,9 +280,18 @@ export default function SettingsScreen() {
 
           {/* Epilepsy Warning — quiet text block */}
           <View style={styles.warningCard}>
-            <Text style={[styles.warningTitle, { color: colors.text }]}>
-              {t('settings.epilepsyWarning')}
-            </Text>
+            <View style={styles.warningHeading}>
+              <Ionicons
+                name="warning-outline"
+                size={16}
+                color={colors.warning}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+              <Text style={[styles.warningTitle, { color: colors.warning }]}>
+                {t('settings.epilepsyWarning')}
+              </Text>
+            </View>
             <Text style={[styles.warningText, { color: colors.textSecondary }]}>
               {t('settings.epilepsyText')}
             </Text>
@@ -377,10 +386,15 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     gap: Spacing.xs,
   },
+  warningHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginBottom: Spacing.xs,
+  },
   warningTitle: {
     ...Typography.footnote,
     fontFamily: FontFamily.semibold,
-    marginBottom: Spacing.xs,
   },
   warningText: {
     ...Typography.footnote,
