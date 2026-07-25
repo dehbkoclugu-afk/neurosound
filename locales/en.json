@@ -141,7 +141,9 @@
       "15min": "15 minutes",
       "30min": "30 minutes",
       "1hour": "1 hour",
-      "2hours": "2 hours"
+      "2hours": "2 hours",
+      "45min": "45 minutes",
+      "8hours": "8 hours"
     },
     "baseFrequency": "Base Frequency",
     "beatFrequency": "Beat Frequency",
@@ -196,6 +198,7 @@
     "step3Title": "Protect your hearing",
     "step3Desc": "Keep the volume at a comfortable level and take breaks if you feel discomfort. This app is not a medical product.",
     "next": "Next",
-    "start": "Get started"
+    "start": "Get started",
+    "skip": "Skip"
   }
 }

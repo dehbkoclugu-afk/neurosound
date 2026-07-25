@@ -9,15 +9,18 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
+  TouchableOpacity,
   Animated,
   Easing,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, onPrimary } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary } from '@/constants/theme';
+import { useSettingsStore, Language } from '@/stores/settingsStore';
+import i18n from '@/i18n';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { contentColumn } from '@/constants/layout';
 
@@ -48,6 +51,8 @@ export default function OnboardingScreen() {
     setHasSeenEpilepsyWarning,
     setHasSeenHeadphoneWarning,
     reduceMotion,
+    language,
+    setLanguage,
   } = useSettingsStore();
 
   const [step, setStep] = useState(0);
@@ -89,6 +94,20 @@ export default function OnboardingScreen() {
     return () => content.stop();
   }, [step, reduceMotion, stepAnim, contentAnim]);
 
+  // Skipping still records the flags: the alternative is re-showing all three
+  // screens on every launch to someone who has already said no.
+  const finish = () => {
+    setHasSeenOnboarding(true);
+    setHasSeenEpilepsyWarning(true);
+    setHasSeenHeadphoneWarning(true);
+    router.back();
+  };
+
+  const handleLanguage = (next: Language) => {
+    setLanguage(next);
+    i18n.changeLanguage(next);
+  };
+
   const handleNext = () => {
     if (isLast) {
       setHasSeenOnboarding(true);
@@ -104,6 +123,46 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.topBar}>
+        {/* Language lives here because the very first screen is already text
+            the user may not read — asking them to find Settings first is
+            backwards. */}
+        <View style={styles.languageRow}>
+          {(['tr', 'en'] as Language[]).map((code) => (
+            <TouchableOpacity
+              key={code}
+              onPress={() => handleLanguage(code)}
+              style={styles.languageButton}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: language === code }}
+              accessibilityLabel={code === 'tr' ? 'Türkçe' : 'English'}
+            >
+              <Text
+                style={[
+                  styles.languageText,
+                  {
+                    color: language === code ? colors.primary : colors.textSecondary,
+                  },
+                ]}
+              >
+                {code.toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity
+          onPress={finish}
+          style={styles.skipButton}
+          accessibilityRole="button"
+          accessibilityLabel={t('onboarding.skip')}
+        >
+          <Text style={[styles.skipText, { color: colors.textSecondary }]}>
+            {t('onboarding.skip')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <Animated.View
         style={[
           styles.content,
@@ -122,6 +181,14 @@ export default function OnboardingScreen() {
           },
         ]}
       >
+        <Ionicons
+          name={current.icon}
+          size={40}
+          color={colors.primary}
+          style={styles.stepIcon}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
         <Text
           style={[styles.title, { color: colors.text }]}
           accessibilityRole="header"
@@ -172,6 +239,38 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.sm,
+  },
+  languageRow: {
+    flexDirection: 'row',
+  },
+  languageButton: {
+    minWidth: AccessibilitySize.minTouchTarget,
+    height: AccessibilitySize.minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  languageText: {
+    ...Typography.subhead,
+    fontFamily: FontFamily.semibold,
+  },
+  skipButton: {
+    height: AccessibilitySize.minTouchTarget,
+    paddingHorizontal: Spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  skipText: {
+    ...Typography.subhead,
+  },
+  stepIcon: {
+    marginBottom: Spacing.lg,
   },
   content: {
     flex: 1,

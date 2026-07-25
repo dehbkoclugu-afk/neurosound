@@ -26,6 +26,7 @@ import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Button } from '@/components/ui/Button';
 import { PressableScale } from '@/components/ui/PressableScale';
+import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
 import * as haptics from '@/lib/haptics';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
@@ -60,10 +61,13 @@ export default function MixerScreen() {
     mixerChannels: channels,
     isMixerPlaying: isPlaying,
     activeMixId,
+    timerDuration,
+    timerRemaining,
   } = useAudioStore();
 
   const [showPresetPicker, setShowPresetPicker] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showTimerModal, setShowTimerModal] = useState(false);
   const [mixName, setMixName] = useState('');
 
   const colors = useThemeColors();
@@ -286,21 +290,62 @@ export default function MixerScreen() {
         {/* Transport — always present. Showing and hiding play/save as the
             first channel arrived made the whole page jump under the finger. */}
         <View style={styles.transport}>
-          <PressableScale
-            onPress={handlePlayPause}
-            disabled={isEmpty}
-            style={[styles.playButton, { backgroundColor: colors.primary }]}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: isEmpty }}
-            accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
-          >
-            <Ionicons
-              name={isPlaying ? 'pause' : 'play'}
-              size={32}
-              color={onPrimary}
-              style={isPlaying ? undefined : { marginLeft: 4 }}
-            />
-          </PressableScale>
+          <View style={styles.transportRow}>
+            {/* A mix is what people actually fall asleep to, and it had no
+                timer at all — it played until the battery died. */}
+            <TouchableOpacity
+              onPress={() => setShowTimerModal(true)}
+              disabled={isEmpty}
+              style={styles.timerButton}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isEmpty }}
+              accessibilityLabel={
+                timerRemaining !== null && timerRemaining > 0
+                  ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
+                  : t('player.timer')
+              }
+            >
+              <Ionicons
+                name="timer-outline"
+                size={24}
+                color={
+                  isEmpty
+                    ? colors.tabIconDefault
+                    : timerDuration
+                      ? colors.primary
+                      : colors.textSecondary
+                }
+              />
+              {timerRemaining !== null && timerRemaining > 0 && (
+                <Text
+                  style={[styles.timerBadge, { color: colors.primary }]}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                >
+                  {formatTimerValue(timerRemaining)}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <PressableScale
+              onPress={handlePlayPause}
+              disabled={isEmpty}
+              style={[styles.playButton, { backgroundColor: colors.primary }]}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isEmpty }}
+              accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
+            >
+              <Ionicons
+                name={isPlaying ? 'pause' : 'play'}
+                size={32}
+                color={onPrimary}
+                style={isPlaying ? undefined : { marginLeft: 4 }}
+              />
+            </PressableScale>
+
+            {/* Balances the timer slot so play stays centred. */}
+            <View style={styles.timerButton} />
+          </View>
 
           <Button
             title={t('mixer.savePreset')}
@@ -364,6 +409,11 @@ export default function MixerScreen() {
         )}
 
       </ScrollView>
+
+      <TimerModal
+        visible={showTimerModal}
+        onClose={() => setShowTimerModal(false)}
+      />
 
       {/* Preset Picker Modal */}
       <Modal
@@ -528,6 +578,23 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
     marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
+  },
+  transportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xl,
+  },
+  timerButton: {
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timerBadge: {
+    ...Typography.caption2,
+    fontVariant: ['tabular-nums'],
+    marginTop: 2,
   },
   playButton: {
     width: 72,

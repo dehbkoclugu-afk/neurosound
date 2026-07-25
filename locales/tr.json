@@ -141,7 +141,9 @@
       "15min": "15 dakika",
       "30min": "30 dakika",
       "1hour": "1 saat",
-      "2hours": "2 saat"
+      "2hours": "2 saat",
+      "45min": "45 dakika",
+      "8hours": "8 saat"
     },
     "baseFrequency": "Taban Frekans",
     "beatFrequency": "Beat Frekansı",
@@ -196,6 +198,7 @@
     "step3Title": "Sesini koru",
     "step3Desc": "Ses seviyesini rahat bir düzeyde tut, rahatsızlık hissedersen ara ver. Bu uygulama tıbbi bir ürün değildir.",
     "next": "İleri",
-    "start": "Başla"
+    "start": "Başla",
+    "skip": "Atla"
   }
 }

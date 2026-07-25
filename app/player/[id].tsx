@@ -9,8 +9,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Modal,
-  Pressable,
   ActivityIndicator,
   Animated,
 } from 'react-native';
@@ -28,19 +26,11 @@ import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { WaveVisualizer } from '@/components/player/WaveVisualizer';
 import { Slider } from '@/components/ui/Slider';
+import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
 import { PressableScale } from '@/components/ui/PressableScale';
 import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
-
-// Timer options
-const TIMER_OPTIONS = [
-  { labelKey: 'player.timerOptions.none', value: null },
-  { labelKey: 'player.timerOptions.15min', value: 15 },
-  { labelKey: 'player.timerOptions.30min', value: 30 },
-  { labelKey: 'player.timerOptions.1hour', value: 60 },
-  { labelKey: 'player.timerOptions.2hours', value: 120 },
-];
 
 // Visual pulse tempo follows the sound: slow breathing for delta,
 // fine shimmer for gamma, slow drift for ambient noise, steady for tones.
@@ -98,12 +88,6 @@ export default function PlayerScreen() {
     await playerController.toggle();
   }, []);
 
-  const handleSelectTimer = useCallback((value: number | null) => {
-    haptics.select();
-    playerController.startTimer(value);
-    setShowTimerModal(false);
-  }, []);
-
   const isFavorite = id ? favoriteIds.includes(id) : false;
 
   // Favouriting is rare and rewarding — the one place a little delight earns
@@ -144,15 +128,6 @@ export default function PlayerScreen() {
       router.replace('/(tabs)');
     }
   }, [router]);
-
-  // Minutes-only overflowed past an hour: a 2 hour timer read "120:00".
-  const formatTime = (seconds: number): string => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return hrs > 0 ? `${hrs}:${pad(mins)}:${pad(secs)}` : `${mins}:${pad(secs)}`;
-  };
 
   if (!preset) {
     return (
@@ -314,7 +289,7 @@ export default function PlayerScreen() {
             accessibilityRole="button"
             accessibilityLabel={
               timerRemaining !== null && timerRemaining > 0
-                ? `${t('player.timer')}, ${formatTime(timerRemaining)}`
+                ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
                 : t('player.timer')
             }
           >
@@ -329,7 +304,7 @@ export default function PlayerScreen() {
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               >
-                {formatTime(timerRemaining)}
+                {formatTimerValue(timerRemaining)}
               </Text>
             )}
           </TouchableOpacity>
@@ -359,46 +334,10 @@ export default function PlayerScreen() {
         </View>
       </View>
 
-      {/* Timer Modal */}
-      <Modal
+      <TimerModal
         visible={showTimerModal}
-        transparent
-        animationType={reduceMotion ? 'none' : 'fade'}
-        onRequestClose={() => setShowTimerModal(false)}
-        accessibilityViewIsModal
-      >
-        <Pressable
-          style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}
-          onPress={() => setShowTimerModal(false)}
-        >
-          <View style={[styles.modalContent, { backgroundColor: colors.backgroundSecondary }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('player.timer')}</Text>
-            {TIMER_OPTIONS.map((option) => {
-              const isSelected = timerDuration === option.value;
-              return (
-                <TouchableOpacity
-                  key={option.labelKey}
-                  onPress={() => handleSelectTimer(option.value)}
-                  style={[styles.timerOption, { borderBottomColor: colors.cardBorder }]}
-                >
-                  <Text
-                    style={[
-                      styles.timerOptionText,
-                      { color: isSelected ? colors.primary : colors.text },
-                      isSelected && styles.timerOptionTextSelected,
-                    ]}
-                  >
-                    {t(option.labelKey)}
-                  </Text>
-                  {isSelected && (
-                    <Ionicons name="checkmark" size={20} color={colors.primary} />
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </Pressable>
-      </Modal>
+        onClose={() => setShowTimerModal(false)}
+      />
     </View>
   );
 }
@@ -534,36 +473,5 @@ const styles = StyleSheet.create({
     ...Typography.body,
     textAlign: 'center',
     marginTop: Spacing.xxl,
-  },
-  // Modal
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: Spacing.xl,
-  },
-  modalContent: {
-    borderRadius: 20,
-    padding: Spacing.lg,
-    width: '100%',
-    maxWidth: 320,
-  },
-  modalTitle: {
-    ...Typography.title3,
-    textAlign: 'center',
-    marginBottom: Spacing.md,
-  },
-  timerOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  timerOptionText: {
-    ...Typography.body,
-  },
-  timerOptionTextSelected: {
-    fontFamily: FontFamily.semibold,
   },
 });

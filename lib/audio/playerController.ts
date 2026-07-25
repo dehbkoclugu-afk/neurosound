@@ -177,14 +177,19 @@ export function syncVolume(): void {
   );
 }
 
-/** Stop, dispose, and clear everything — MiniPlayer close button. */
-export function unload(): void {
+/** Tear down the single-preset generator, leaving the timer alone. */
+function disposePreset(): void {
   pause(true);
   generator?.dispose();
   generator = null;
   currentId = null;
-  clearTimer();
   useAudioStore.getState().setCurrentPreset(null);
+}
+
+/** Stop, dispose, and clear everything — MiniPlayer close button. */
+export function unload(): void {
+  disposePreset();
+  clearTimer();
 }
 
 function clearTimer(): void {
@@ -201,8 +206,31 @@ function clearTimer(): void {
  * suspended JS timer can never let playback run past its deadline — it just
  * catches up on the next evaluation.
  */
+/** Scale whatever is currently playing, for the timer's closing fade. */
+function applyTimerFade(ratio: number): void {
+  const { isPlaying, isMixerPlaying, mixerChannels } = useAudioStore.getState();
+  const { maxVolume } = useSettingsStore.getState();
+
+  if (isPlaying) {
+    setGenVolume(effectiveVolume() * ratio);
+  }
+  if (isMixerPlaying) {
+    mixerChannels.forEach((ch) =>
+      mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume) * ratio)
+    );
+  }
+}
+
+/** Stop whichever source the timer was counting down for. */
+function stopForTimer(): void {
+  const { isMixerPlaying } = useAudioStore.getState();
+  if (isMixerPlaying) mixerStop();
+  pause();
+}
+
 function evaluateTimer(): void {
-  const { timerEndsAt, updateTimerRemaining, isPlaying } = useAudioStore.getState();
+  const { timerEndsAt, updateTimerRemaining, isPlaying, isMixerPlaying } =
+    useAudioStore.getState();
   if (timerEndsAt === null) {
     clearTimer();
     return;
@@ -211,7 +239,7 @@ function evaluateTimer(): void {
   const remaining = Math.max(0, Math.round((timerEndsAt - Date.now()) / 1000));
 
   if (remaining <= 0) {
-    pause();
+    stopForTimer();
     clearTimer();
     return;
   }
@@ -219,8 +247,8 @@ function evaluateTimer(): void {
   updateTimerRemaining(remaining);
 
   // Gentle fade over the final window instead of an abrupt cut
-  if (isPlaying && remaining <= TIMER_FADE_WINDOW_S && !rampInterval) {
-    setGenVolume(effectiveVolume() * (remaining / TIMER_FADE_WINDOW_S));
+  if ((isPlaying || isMixerPlaying) && remaining <= TIMER_FADE_WINDOW_S && !rampInterval) {
+    applyTimerFade(remaining / TIMER_FADE_WINDOW_S);
   }
 }
 
@@ -256,7 +284,8 @@ let mixerStartPending = false;
 /** Start (or resume) all mixer channels. Silences the single-preset player. */
 export async function mixerStart(): Promise<void> {
   if (mixerStartPending) return;
-  unload(); // mutual exclusion: MiniPlayer preset off
+  // Mutual exclusion only — a sleep timer set for this session must survive.
+  disposePreset();
 
   const { mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
