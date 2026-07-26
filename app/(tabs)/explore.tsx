@@ -125,7 +125,7 @@ export default function ExploreScreen() {
               <Text
                 style={[
                   styles.tabText,
-                  { color: isActive ? colors.text : colors.textSecondary },
+                  { color: isActive ? colors.accent : colors.textSecondary },
                   isActive && styles.tabTextActive,
                 ]}
               >
@@ -134,7 +134,7 @@ export default function ExploreScreen() {
               <View
                 style={[
                   styles.tabUnderline,
-                  { backgroundColor: isActive ? colors.primary : 'transparent' },
+                  { backgroundColor: isActive ? colors.accent : 'transparent' },
                 ]}
               />
             </TouchableOpacity>

@@ -209,7 +209,7 @@ export default function OnboardingScreen() {
               style={[
                 styles.dot,
                 {
-                  backgroundColor: i === step ? colors.primary : colors.slider,
+                  backgroundColor: i === step ? colors.accent : colors.slider,
                   width: stepAnim.interpolate({
                     inputRange: [i - 1, i, i + 1],
                     outputRange: [8, 22, 8],

@@ -136,7 +136,7 @@ export function Slider({
           style={[
             styles.trackFill,
             {
-              backgroundColor: colors.primary,
+              backgroundColor: colors.accent,
               width: `${normalizedValue * 100}%`,
             },
           ]}

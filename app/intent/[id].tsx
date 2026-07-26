@@ -85,9 +85,16 @@ export default function IntentScreen() {
             contentFit="cover"
             transition={300}
           />
+          {/* Same split as the home blocks: colour is decorative, the
+              legibility floor is its own vertical pass. */}
           <LinearGradient
-            colors={[withAlpha(intent.color, 0.33), 'rgba(0,0,0,0.35)', colors.background]}
-            locations={[0, 0.5, 1]}
+            colors={[withAlpha(intent.color, 0.33), 'transparent']}
+            locations={[0, 0.6]}
+            style={StyleSheet.absoluteFill}
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.45)', colors.background]}
+            locations={[0.3, 0.72, 1]}
             style={StyleSheet.absoluteFill}
           />
           <TouchableOpacity

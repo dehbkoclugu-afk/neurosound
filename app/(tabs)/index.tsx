@@ -1,6 +1,7 @@
 /**
- * Home Screen - Intent-first entry ("what do you need?"), then history,
- * favorites, and the technical categories for power users.
+ * Home Screen — intent-first entry ("what do you need?"), then history
+ * and favourites. The technical taxonomy lives in Explore; duplicating it
+ * here gave two paths to one destination.
  */
 
 import React, { useEffect, useState } from 'react';
@@ -20,10 +21,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, withAlpha } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
-import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
+import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
 import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
@@ -34,12 +35,6 @@ import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
 
 // Category data for grid cards
-const categories = [
-  { key: 'binaural', titleKey: 'explore.categories.binaural' },
-  { key: 'solfeggio', titleKey: 'explore.categories.solfeggio' },
-  { key: 'noise', titleKey: 'explore.categories.noise' },
-];
-
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
 
@@ -81,13 +76,6 @@ export default function HomeScreen() {
     }
   };
 
-  const handleCategoryPress = (categoryKey: string) => {
-    router.push({
-      pathname: '/(tabs)/explore',
-      params: { category: categoryKey },
-    });
-  };
-
   const favoritePresets = favoriteIds
     .map(id => getPresetById(id))
     .filter((p): p is FrequencyPreset => p !== undefined);
@@ -117,10 +105,7 @@ export default function HomeScreen() {
       >
         {/* Header with proper spacing */}
         <View style={styles.header}>
-          <Text
-            style={[styles.title, { color: colors.text }]}
-            accessibilityRole="header"
-          >
+          <Text style={[styles.wordmark, { color: colors.textSecondary }]}>
             NeuroSound
           </Text>
           <TouchableOpacity
@@ -134,7 +119,10 @@ export default function HomeScreen() {
 
         {/* Intent Section — primary entry, typographic */}
         <View style={styles.section}>
-          <Text style={[styles.intentsTitle, { color: colors.text }]}>
+          <Text
+            style={[styles.intentsTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('home.intentsTitle')}
           </Text>
           <View style={styles.intentStack}>
@@ -156,12 +144,21 @@ export default function HomeScreen() {
                   contentFit="cover"
                   transition={300}
                 />
-                {/* Scrim: tint toward the intent colour, darken for text contrast */}
+                {/* Tint: decorative, diagonal, carries the intent's colour. */}
                 <LinearGradient
-                  colors={[withAlpha(intent.color, 0.4), 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.72)']}
-                  locations={[0, 0.45, 1]}
+                  colors={[withAlpha(intent.color, 0.4), 'transparent']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                {/* Legibility: vertical and separate, so the whole text band
+                    darkens evenly. A diagonal scrim left the bottom-LEFT — where
+                    the title actually sits — in its lightest stop, which is
+                    2.4:1 over a bright photo. Placeholder images are random, so
+                    the floor has to be guaranteed, not hoped for. */}
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.62)']}
+                  locations={[0.35, 0.7, 1]}
                   style={StyleSheet.absoluteFill}
                 />
                 <View style={styles.intentRow}>
@@ -238,20 +235,6 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Categories Section — technical taxonomy for power users */}
-        <View style={styles.section}>
-          <CategoryHeader title={t('home.categories')} />
-          <View>
-            {categories.map((category) => (
-              <CategoryCard
-                key={category.key}
-                title={t(category.titleKey)}
-                onPress={() => handleCategoryPress(category.key)}
-              />
-            ))}
-          </View>
-        </View>
-
         {/* Quiet headphone note */}
         <Text style={[styles.headphoneNote, { color: colors.warning }]}>
           {t('home.headphoneNote')}
@@ -288,8 +271,11 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
   },
-  title: {
-    ...Typography.largeTitle,
+  // Brand presence without spending the H1 on it.
+  wordmark: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+    letterSpacing: 0.4,
   },
   headerButton: {
     width: 44,
@@ -301,7 +287,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   intentsTitle: {
-    ...Typography.title1,
+    ...Typography.largeTitle,
     marginBottom: Spacing.lg,
   },
   intentStack: {

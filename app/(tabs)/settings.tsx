@@ -169,7 +169,7 @@ export default function SettingsScreen() {
               <Switch
                 value={reduceMotion}
                 onValueChange={setReduceMotion}
-                trackColor={{ false: colors.slider, true: colors.primary }}
+                trackColor={{ false: colors.slider, true: colors.accent }}
                 thumbColor="#fff"
               />
             </View>
@@ -218,7 +218,7 @@ export default function SettingsScreen() {
               <Switch
                 value={lowContrast}
                 onValueChange={setLowContrast}
-                trackColor={{ false: colors.slider, true: colors.primary }}
+                trackColor={{ false: colors.slider, true: colors.accent }}
                 thumbColor="#fff"
               />
             </View>
@@ -247,7 +247,7 @@ export default function SettingsScreen() {
               <Switch
                 value={haptics}
                 onValueChange={setHaptics}
-                trackColor={{ false: colors.slider, true: colors.primary }}
+                trackColor={{ false: colors.slider, true: colors.accent }}
                 thumbColor="#fff"
               />
             </View>
