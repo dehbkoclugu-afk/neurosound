@@ -53,7 +53,14 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="intent/[id]"
-            options={{ headerShown: false }}
+            options={{
+              headerShown: false,
+              // Home's intent block and this hero share the same image and
+              // colour; a hard horizontal push made that continuity invisible.
+              // A fade lets the shared imagery read as one surface settling
+              // in rather than a new screen sliding over the old one.
+              animation: 'fade',
+            }}
           />
           <Stack.Screen
             name="onboarding"

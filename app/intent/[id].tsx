@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, withAlpha } from '@/constants/theme';
@@ -36,7 +37,7 @@ export default function IntentScreen() {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const miniPlayerInset = useMiniPlayerInset();
-  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning } = useSettingsStore();
+  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, reduceMotion } = useSettingsStore();
   const { isFavorite } = usePresetsStore();
 
   const intent = id ? getIntentById(id) : undefined;
@@ -77,8 +78,13 @@ export default function IntentScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Full-bleed hero — image, scrim, title overlaid */}
-        <View style={styles.hero}>
+        {/* Full-bleed hero — image, scrim, title overlaid. Fades in as one
+            surface rather than snapping in under the screen's own fade
+            transition, echoing the block that was just tapped on Home. */}
+        <Animated.View
+          entering={reduceMotion ? undefined : FadeIn.duration(350)}
+          style={styles.hero}
+        >
           <Image
             source={{ uri: intent.image }}
             style={StyleSheet.absoluteFill}
@@ -110,7 +116,7 @@ export default function IntentScreen() {
             </Text>
             <Text style={styles.heroDesc}>{t(intent.descKey)}</Text>
           </View>
-        </View>
+        </Animated.View>
 
         <View style={[styles.list, contentColumn]}>
           {presets.map((preset) => (
