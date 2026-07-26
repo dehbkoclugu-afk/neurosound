@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  typecheck-and-lint:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,3 +17,4 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npx expo lint
+      - run: npm test -- --ci
