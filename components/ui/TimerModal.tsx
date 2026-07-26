@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     maxWidth: 320,
   },
   title: {
-    ...Typography.title3,
+    ...Typography.title,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },

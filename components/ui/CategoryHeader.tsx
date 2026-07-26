@@ -118,14 +118,14 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.semibold,
   },
   subtitle: {
-    ...Typography.caption1,
+    ...Typography.caption,
   },
   seeAllButton: {
     paddingVertical: Spacing.xs,
     paddingLeft: Spacing.sm,
   },
   seeAllText: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
   categoryRow: {

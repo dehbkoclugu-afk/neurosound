@@ -180,11 +180,11 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   chipText: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
   chipFrequency: {
-    ...Typography.caption2,
+    ...Typography.caption,
     fontVariant: ['tabular-nums'],
   },
 });

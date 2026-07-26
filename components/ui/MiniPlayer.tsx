@@ -170,10 +170,10 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   presetName: {
-    ...Typography.subhead,
+    ...Typography.body,
   },
   presetType: {
-    ...Typography.caption1,
+    ...Typography.caption,
     fontVariant: ['tabular-nums'],
   },
   rightSection: {

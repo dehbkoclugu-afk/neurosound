@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   presetName: {
-    ...Typography.title1,
+    ...Typography.title,
     textAlign: 'center',
   },
   metaRow: {
@@ -467,11 +467,11 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   frequencyLine: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontVariant: ['tabular-nums'],
   },
   presetDescription: {
-    ...Typography.subhead,
+    ...Typography.body,
     textAlign: 'center',
     lineHeight: 21,
     maxWidth: 300,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   playbackErrorText: {
-    ...Typography.subhead,
+    ...Typography.body,
     textAlign: 'center',
   },
   controls: {
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     minHeight: 32,
   },
   volumeCapText: {
-    ...Typography.caption1,
+    ...Typography.caption,
     fontVariant: ['tabular-nums'],
   },
   sliderWrapper: {
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timerBadge: {
-    ...Typography.caption2,
+    ...Typography.caption,
     fontVariant: ['tabular-nums'],
     marginTop: 2,
   },

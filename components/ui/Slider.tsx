@@ -168,11 +168,11 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   label: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontFamily: Typography.headline.fontFamily,
   },
   value: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontVariant: ['tabular-nums'],
   },
   sliderContainer: {

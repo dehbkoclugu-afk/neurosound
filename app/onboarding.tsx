@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   languageText: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
   skipButton: {
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   skipText: {
-    ...Typography.subhead,
+    ...Typography.body,
   },
   stepIcon: {
     marginBottom: Spacing.lg,

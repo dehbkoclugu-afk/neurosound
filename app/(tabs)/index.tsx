@@ -131,7 +131,7 @@ export default function HomeScreen() {
                 accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
                 <Image
-                  source={{ uri: intent.image }}
+                  source={intent.image}
                   style={StyleSheet.absoluteFill}
                   contentFit="cover"
                   transition={300}
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   intentName: {
-    ...Typography.title2,
+    ...Typography.title,
     color: '#FFFFFF',
   },
   intentDesc: {
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
   },
   emptyStateText: {
-    ...Typography.subhead,
+    ...Typography.body,
     lineHeight: 21,
     paddingVertical: Spacing.sm,
   },

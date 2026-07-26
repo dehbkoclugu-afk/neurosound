@@ -15,16 +15,17 @@ export interface Intent {
   icon: IconConfig;
   color: string;
   gradient: [string, string];
-  /** Atmospheric background. Placeholder (picsum seed) — swap for
-   *  art-directed photography before release. */
-  image: string;
+  /** Atmospheric background — a generated glow-and-grain gradient in the
+   *  intent's own colour (assets/images/intents/), not a photo. Swap for
+   *  art-directed photography if/when that's shot; the shape (require'd
+   *  local asset) stays the same either way. */
+  image: number;
   presetIds: string[];
+  /** One-tap "start session" duration, in minutes — preset + timer + a
+   *  comfortable volume together, instead of three separate steps every
+   *  time. First entry in `presetIds` is the recommended sound. */
+  recommendedMinutes: number;
 }
-
-// ponytail: picsum placeholders, not curated art. Replace `image` values
-// with real atmospheric photos (night sky / desk light / forest / dawn).
-const placeholder = (seed: string) =>
-  `https://picsum.photos/seed/${seed}/900/500`;
 
 export const intents: Intent[] = [
   {
@@ -34,7 +35,7 @@ export const intents: Intent[] = [
     icon: { name: 'moon', library: 'ionicon' },
     color: '#6D83C9',
     gradient: ['#1C2440', '#6D83C9'],
-    image: placeholder('neurosound-night-sky'),
+    image: require('@/assets/images/intents/sleep.jpg'),
     presetIds: [
       'binaural-delta',
       'noise-rain',
@@ -43,6 +44,7 @@ export const intents: Intent[] = [
       'noise-train',
       'solfeggio-174',
     ],
+    recommendedMinutes: 30,
   },
   {
     id: 'focus',
@@ -51,7 +53,7 @@ export const intents: Intent[] = [
     icon: { name: 'flash', library: 'ionicon' },
     color: '#D99A4E',
     gradient: ['#3D2A12', '#D99A4E'],
-    image: placeholder('neurosound-desk-light'),
+    image: require('@/assets/images/intents/focus.jpg'),
     presetIds: [
       'binaural-beta',
       'binaural-gamma',
@@ -59,6 +61,7 @@ export const intents: Intent[] = [
       'noise-airplane',
       'solfeggio-40',
     ],
+    recommendedMinutes: 45,
   },
   {
     id: 'relax',
@@ -67,7 +70,7 @@ export const intents: Intent[] = [
     icon: { name: 'leaf', library: 'ionicon' },
     color: '#7FB069',
     gradient: ['#1E2E18', '#7FB069'],
-    image: placeholder('neurosound-forest-fog'),
+    image: require('@/assets/images/intents/relax.jpg'),
     presetIds: [
       'binaural-alpha',
       'noise-ocean',
@@ -76,6 +79,7 @@ export const intents: Intent[] = [
       'noise-fire',
       'solfeggio-432',
     ],
+    recommendedMinutes: 20,
   },
   {
     id: 'meditate',
@@ -84,7 +88,7 @@ export const intents: Intent[] = [
     icon: { name: 'meditation', library: 'material' },
     color: '#A78BFA',
     gradient: ['#2A2244', '#A78BFA'],
-    image: placeholder('neurosound-mountain-dawn'),
+    image: require('@/assets/images/intents/meditate.jpg'),
     presetIds: [
       'binaural-theta',
       'solfeggio-528',
@@ -92,6 +96,7 @@ export const intents: Intent[] = [
       'solfeggio-963',
       'noise-wind',
     ],
+    recommendedMinutes: 15,
   },
 ];
 

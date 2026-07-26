@@ -6,8 +6,10 @@
  * in audioStore; this module is the only writer for playback actions.
  */
 
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
+import type { AudioPlayer } from 'expo-audio';
 
+import i18n from '@/i18n';
 import { useAudioStore, MixerChannelState } from '@/stores/audioStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset, getPresetById } from '../frequencies';
@@ -25,6 +27,45 @@ type Generator = BinauralPlayer | NoisePlayer | TonePlayer;
 let generator: Generator | null = null;
 let currentId: string | null = null;
 let timerInterval: ReturnType<typeof setInterval> | null = null;
+
+// ---------------------------------------------------------------------------
+// Lock screen / now-playing — a background sound app with no lock screen
+// control means unlocking the phone just to pause, which is exactly the
+// interaction someone falling asleep doesn't want. expo-audio exposes this
+// natively; no extra native module or build step needed.
+// ---------------------------------------------------------------------------
+
+let lockScreenPlayer: AudioPlayer | null = null;
+let lockScreenSubscription: { remove: () => void } | null = null;
+
+/** Mirrors a lock-screen-triggered play/pause back into the store, so the
+ *  in-app button reflects reality if the user opens the app again without
+ *  having touched it directly. */
+function watchLockScreenPlayer(player: AudioPlayer): void {
+  if (player === lockScreenPlayer) return;
+  lockScreenSubscription?.remove();
+  lockScreenPlayer = player;
+  lockScreenSubscription = player.addListener('playbackStatusUpdate', (status) => {
+    if (useAudioStore.getState().isMixerPlaying) return; // owned by the mixer path
+    useAudioStore.getState().setIsPlaying(status.playing);
+  });
+}
+
+function setNowPlaying(title: string): void {
+  if (Platform.OS === 'web') return;
+  const player = generator?.getNativePlayer() ?? null;
+  if (!player) return;
+  player.setActiveForLockScreen(true, { title, artist: 'NeuroSound' });
+  watchLockScreenPlayer(player);
+}
+
+function clearNowPlaying(): void {
+  if (Platform.OS === 'web') return;
+  lockScreenSubscription?.remove();
+  lockScreenSubscription = null;
+  lockScreenPlayer = null;
+  generator?.getNativePlayer()?.clearLockScreenControls();
+}
 
 function createGenerator(preset: FrequencyPreset): Generator | null {
   switch (preset.type) {
@@ -135,6 +176,8 @@ export async function play(): Promise<void> {
     }
     ramp(effectiveVolume(), FADE_IN_MS);
     useAudioStore.getState().setIsPlaying(true);
+    const preset = useAudioStore.getState().currentPreset;
+    if (preset) setNowPlaying(i18n.t(preset.nameKey));
   } finally {
     useAudioStore.getState().setIsLoading(false);
     playPending = false;
@@ -180,6 +223,7 @@ export function syncVolume(): void {
 /** Tear down the single-preset generator, leaving the timer alone. */
 function disposePreset(): void {
   pause(true);
+  clearNowPlaying();
   generator?.dispose();
   generator = null;
   currentId = null;

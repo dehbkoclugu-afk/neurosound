@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     maxWidth: '85%',
   },
   text: {
-    ...Typography.subhead,
+    ...Typography.body,
     textAlign: 'center',
   },
 });

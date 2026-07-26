@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, withAlpha } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
@@ -29,6 +29,9 @@ import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import { getIntentById } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
+import * as playerController from '@/lib/audio/playerController';
+import * as haptics from '@/lib/haptics';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 export default function IntentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -63,6 +66,34 @@ export default function IntentScreen() {
     }
   };
 
+  // One tap instead of three: pick the intent's recommended sound, start its
+  // sleep/focus timer, and open the player already playing — the "preset,
+  // then timer, then volume" ritual collapsed into a single entry point.
+  const handleStartSession = () => {
+    if (!intent) return;
+    const preset = getPresetById(intent.presetIds[0]);
+    if (!preset) return;
+
+    const start = () => {
+      haptics.commit();
+      playerController.loadPreset(preset);
+      playerController.startTimer(intent.recommendedMinutes);
+      playerController.play();
+      router.push(`/player/${preset.id}`);
+    };
+
+    if (preset.type === 'binaural' && !hasSeenHeadphoneWarning) {
+      Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
+        { text: t('common.ok'), onPress: () => {
+          setHasSeenHeadphoneWarning(true);
+          start();
+        } },
+      ]);
+    } else {
+      start();
+    }
+  };
+
   if (!intent) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -86,7 +117,7 @@ export default function IntentScreen() {
           style={styles.hero}
         >
           <Image
-            source={{ uri: intent.image }}
+            source={intent.image}
             style={StyleSheet.absoluteFill}
             contentFit="cover"
             transition={300}
@@ -117,6 +148,20 @@ export default function IntentScreen() {
             <Text style={styles.heroDesc}>{t(intent.descKey)}</Text>
           </View>
         </Animated.View>
+
+        <View style={[styles.startSection, contentColumn]}>
+          <PressableScale
+            onPress={handleStartSession}
+            style={[styles.startButton, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('intents.startSession', { minutes: intent.recommendedMinutes })}
+          >
+            <Ionicons name="play" size={18} color={onPrimary} style={styles.startButtonIcon} />
+            <Text style={[styles.startButtonText, { color: onPrimary }]}>
+              {t('intents.startSession', { minutes: intent.recommendedMinutes })}
+            </Text>
+          </PressableScale>
+        </View>
 
         <View style={[styles.list, contentColumn]}>
           {presets.map((preset) => (
@@ -166,9 +211,27 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   heroDesc: {
-    ...Typography.subhead,
+    ...Typography.body,
     color: 'rgba(255,255,255,0.85)',
     maxWidth: 320,
+  },
+  startSection: {
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: AccessibilitySize.minTouchTarget + 4,
+    borderRadius: 26,
+    gap: Spacing.sm,
+  },
+  startButtonIcon: {
+    marginLeft: -2,
+  },
+  startButtonText: {
+    ...Typography.headline,
   },
   list: {
     paddingHorizontal: Spacing.md,

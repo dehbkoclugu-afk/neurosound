@@ -202,7 +202,8 @@
     "relax": "Rahatlama",
     "relaxDesc": "Gevşemek için doğa sesleri ve yumuşak tonlar",
     "meditate": "Meditasyon",
-    "meditateDesc": "İçe dönmek için derin, sakin tonlar"
+    "meditateDesc": "İçe dönmek için derin, sakin tonlar",
+    "startSession": "{{minutes}} dk seans başlat"
   },
   "onboarding": {
     "step1Title": "Sese odaklan",

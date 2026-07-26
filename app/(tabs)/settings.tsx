@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   sectionTitle: {
-    ...Typography.title3,
+    ...Typography.title,
     marginBottom: Spacing.md,
   },
   card: {
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   cardTitle: {
-    ...Typography.callout,
+    ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
   cardTitleSpaced: {

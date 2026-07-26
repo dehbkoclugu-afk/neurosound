@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   tabText: {
-    ...Typography.subhead,
+    ...Typography.body,
   },
   tabTextActive: {
     fontFamily: FontFamily.semibold,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   descriptionText: {
-    ...Typography.subhead,
+    ...Typography.body,
     lineHeight: 22,
   },
   aboutButton: {

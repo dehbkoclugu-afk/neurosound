@@ -281,6 +281,13 @@ export class TonePlayer {
     this.isLoaded = false;
   }
 
+  /** The underlying native player, for OS-level integrations (lock screen
+   *  metadata) that live outside this class's web/native abstraction. Null
+   *  on web, where there's no lock screen to control. */
+  getNativePlayer(): AudioPlayer | null {
+    return this.player;
+  }
+
   getIsPlaying(): boolean {
     return this.isPlaying;
   }
@@ -455,6 +462,13 @@ export class BinauralPlayer {
     this.masterGain = null;
     this.isPlaying = false;
     this.isLoaded = false;
+  }
+
+  /** The underlying native player, for OS-level integrations (lock screen
+   *  metadata) that live outside this class's web/native abstraction. Null
+   *  on web, where there's no lock screen to control. */
+  getNativePlayer(): AudioPlayer | null {
+    return this.player;
   }
 
   getIsPlaying(): boolean {
@@ -924,6 +938,13 @@ export class NoisePlayer {
 
     this.isPlaying = false;
     this.isLoaded = false;
+  }
+
+  /** The underlying native player, for OS-level integrations (lock screen
+   *  metadata) that live outside this class's web/native abstraction. Null
+   *  on web, where there's no lock screen to control. */
+  getNativePlayer(): AudioPlayer | null {
+    return this.player;
   }
 
   getIsPlaying(): boolean {

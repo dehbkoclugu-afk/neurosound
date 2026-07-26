@@ -202,7 +202,8 @@
     "relax": "Relax",
     "relaxDesc": "Nature sounds and soft tones to unwind",
     "meditate": "Meditate",
-    "meditateDesc": "Deep, calm tones for turning inward"
+    "meditateDesc": "Deep, calm tones for turning inward",
+    "startSession": "Start {{minutes}} min session"
   },
   "onboarding": {
     "step1Title": "Tune into sound",

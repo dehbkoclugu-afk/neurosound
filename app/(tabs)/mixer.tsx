@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     ...Typography.largeTitle,
   },
   infoText: {
-    ...Typography.subhead,
+    ...Typography.body,
     lineHeight: 21,
     marginBottom: Spacing.md,
   },
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timerBadge: {
-    ...Typography.caption2,
+    ...Typography.caption,
     fontVariant: ['tabular-nums'],
     marginTop: 2,
   },
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
     ...Typography.headline,
   },
   mixChannels: {
-    ...Typography.caption1,
+    ...Typography.caption,
   },
   deleteButton: {
     width: AccessibilitySize.minTouchTarget,
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
   },
   modalTitle: {
-    ...Typography.title1,
+    ...Typography.title,
   },
   closeButton: {
     width: AccessibilitySize.minTouchTarget,
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   emptyStateText: {
-    ...Typography.subhead,
+    ...Typography.body,
     lineHeight: 21,
   },
   sampleButton: {
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sampleButtonText: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
   presetItem: {
@@ -824,6 +824,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   sheetTitle: {
-    ...Typography.title3,
+    ...Typography.title,
   },
 });

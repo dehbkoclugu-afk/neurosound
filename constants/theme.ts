@@ -260,6 +260,11 @@ export const FontFamily = {
 // Typography scale (product register: tight ratio, hierarchy via weight).
 // Tracking is size-specific: negative as type grows, slightly open as it
 // shrinks. One value for every size is wrong somewhere.
+// Six levels, not eleven: title1/2/3 were three sizes for one job (a
+// prominent-but-not-largeTitle heading) and callout/subhead sat 1-2px from
+// body and each other — distinctions that don't survive contact with a real
+// screen. headline and body both stay at 17 and lean on weight, not size, to
+// separate — the same trick Apple's own type scale uses at this step.
 export const Typography = {
   largeTitle: {
     fontSize: 32,
@@ -267,23 +272,11 @@ export const Typography = {
     lineHeight: 39,
     letterSpacing: -0.5,
   },
-  title1: {
-    fontSize: 27,
-    fontFamily: FontFamily.bold,
-    lineHeight: 33,
-    letterSpacing: -0.4,
-  },
-  title2: {
+  title: {
     fontSize: 22,
     fontFamily: FontFamily.semibold,
     lineHeight: 28,
     letterSpacing: -0.3,
-  },
-  title3: {
-    fontSize: 20,
-    fontFamily: FontFamily.semibold,
-    lineHeight: 25,
-    letterSpacing: -0.2,
   },
   headline: {
     fontSize: 17,
@@ -295,33 +288,17 @@ export const Typography = {
     fontFamily: FontFamily.regular,
     lineHeight: 23,
   },
-  callout: {
-    fontSize: 16,
-    fontFamily: FontFamily.regular,
-    lineHeight: 21,
-  },
-  subhead: {
-    fontSize: 15,
-    fontFamily: FontFamily.regular,
-    lineHeight: 20,
-  },
   footnote: {
     fontSize: 13,
     fontFamily: FontFamily.regular,
     lineHeight: 18,
     letterSpacing: 0.1,
   },
-  caption1: {
+  caption: {
     fontSize: 12,
     fontFamily: FontFamily.regular,
     lineHeight: 16,
     letterSpacing: 0.15,
-  },
-  caption2: {
-    fontSize: 11,
-    fontFamily: FontFamily.regular,
-    lineHeight: 13,
-    letterSpacing: 0.2,
   },
 };
 
