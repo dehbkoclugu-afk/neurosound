@@ -38,6 +38,11 @@ const SETTLE_AFTER_MS = 90_000;
 const PRESENCE_IN_MS = 400;
 const PRESENCE_OUT_MS = 250;
 
+/** Paused resting opacity for the breathing rings — matches the static
+ *  ring's own paused value so the two motion paths (reduced-motion/night vs.
+ *  the animated breathing rings) read as the same calm instrument at rest. */
+const RESTING_RING_OPACITY = 0.3;
+
 export function WaveVisualizer({
   isPlaying,
   color,
@@ -141,7 +146,7 @@ export function WaveVisualizer({
         <View
           style={[
             styles.wave,
-            { borderColor: waveColor, opacity: isPlaying ? 0.8 : 0.3 },
+            { borderColor: waveColor, opacity: isPlaying ? 0.8 : RESTING_RING_OPACITY },
           ]}
         />
         <View style={[styles.centerDot, { backgroundColor: waveColor }]} />
@@ -163,10 +168,15 @@ export function WaveVisualizer({
         });
 
         // Pausing used to snap the ring to 0.15 on a single frame while the
-        // audio faded out over 250ms — the two came apart.
-        const opacity = Animated.multiply(
-          pulseOpacity,
-          presence.interpolate({ inputRange: [0, 1], outputRange: [0.2, 1] })
+        // audio faded out over 250ms — the two came apart. Blending toward a
+        // calm-but-visible floor (rather than multiplying the pulse's own
+        // dimmest frame by a second dimming factor) keeps that smooth
+        // transition without the paused ring fading to a ~0.05 smudge that
+        // read as an empty screen — RESTING_RING_OPACITY matches the static
+        // ring's own paused opacity below, so playing and paused agree.
+        const opacity = Animated.add(
+          RESTING_RING_OPACITY,
+          Animated.multiply(presence, Animated.subtract(pulseOpacity, RESTING_RING_OPACITY))
         );
 
         return (

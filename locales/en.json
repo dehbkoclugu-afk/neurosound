@@ -114,7 +114,6 @@
   },
   "mixer": {
     "title": "Sound Mixer",
-    "description": "Create your custom mix by combining multiple sounds. Save it for quick access later.",
     "addSound": "Add Sound",
     "volume": "Volume",
     "savePreset": "Save Preset",
@@ -129,7 +128,7 @@
     "addSoundFirst": "Add at least one sound to save a mix.",
     "mixSaved": "Your mix has been saved!",
     "deleteMix": "Delete mix",
-    "emptyDesc": "Layer multiple sounds: rain + brown noise + alpha, for example.",
+    "emptyDesc": "Layer sounds like rain, brown noise, and alpha, then save the mix to play it again anytime.",
     "trySample": "Try a sample mix",
     "mute": "Mute",
     "channelsFull": "4 of 4 — remove one to add another",

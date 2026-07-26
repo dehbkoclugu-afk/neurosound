@@ -22,11 +22,13 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, CategoryColors, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
+import { Icon } from '@/components/ui/Icon';
+import { presetIcon } from '@/components/ui/PresetCard';
 import { Button } from '@/components/ui/Button';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
@@ -218,11 +220,6 @@ export default function MixerScreen() {
           </Text>
         </View>
 
-        {/* Quiet description */}
-        <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-          {t('mixer.description')}
-        </Text>
-
         {/* Active Channels */}
         <View style={styles.section}>
           <CategoryHeader
@@ -230,9 +227,14 @@ export default function MixerScreen() {
             subtitle={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
           />
 
-          {/* Empty state teaches the mixer with a one-tap sample */}
+          {/* Empty state teaches the mixer with a one-tap sample. An icon
+              anchor keeps the gap between "no channels yet" and the transport
+              row below from reading as blank/broken rather than intentional. */}
           {channels.length === 0 && (
             <View style={styles.emptyState}>
+              <View style={[styles.emptyStateIcon, { backgroundColor: withAlpha(colors.primary, 0.14) }]}>
+                <Ionicons name="layers-outline" size={28} color={colors.primary} />
+              </View>
               <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
                 {t('mixer.emptyDesc')}
               </Text>
@@ -253,48 +255,61 @@ export default function MixerScreen() {
               key={channel.id}
               style={[styles.channelRow, { borderBottomColor: colors.cardBorder }]}
             >
-              <View style={styles.channelHeader}>
-                <Text
-                  style={[
-                    styles.channelName,
-                    { color: channel.muted ? colors.textSecondary : colors.text },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {t(channel.preset.nameKey)}
-                </Text>
-                <View style={styles.channelActions}>
-                  <TouchableOpacity
-                    onPress={() => handleToggleMute(channel.id, !channel.muted)}
-                    style={styles.channelActionButton}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: channel.muted }}
-                    accessibilityLabel={`${t('mixer.mute')} ${t(channel.preset.nameKey)}`}
-                  >
-                    <Ionicons
-                      name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
-                      size={20}
-                      color={channel.muted ? colors.accent : colors.textSecondary}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleRemoveChannel(channel.id)}
-                    style={styles.channelActionButton}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${t('common.delete')} ${t(channel.preset.nameKey)}`}
-                  >
-                    <Ionicons name="close" size={20} color={colors.textSecondary} />
-                  </TouchableOpacity>
-                </View>
+              <View
+                style={[
+                  styles.channelIcon,
+                  {
+                    backgroundColor: withAlpha(CategoryColors[channel.preset.type], 0.16),
+                    opacity: channel.muted ? 0.5 : 1,
+                  },
+                ]}
+              >
+                <Icon icon={presetIcon(channel.preset)} size={18} color={CategoryColors[channel.preset.type]} />
               </View>
-              <View style={channel.muted ? styles.mutedSlider : undefined}>
-                <Slider
-                  value={channel.volume}
-                  onValueChange={(v) => handleVolumeChange(channel.id, v)}
-                  max={1}
-                  showValue={false}
-                  accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
-                />
+              <View style={styles.channelBody}>
+                <View style={styles.channelHeader}>
+                  <Text
+                    style={[
+                      styles.channelName,
+                      { color: channel.muted ? colors.textSecondary : colors.text },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {t(channel.preset.nameKey)}
+                  </Text>
+                  <View style={styles.channelActions}>
+                    <TouchableOpacity
+                      onPress={() => handleToggleMute(channel.id, !channel.muted)}
+                      style={styles.channelActionButton}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: channel.muted }}
+                      accessibilityLabel={`${t('mixer.mute')} ${t(channel.preset.nameKey)}`}
+                    >
+                      <Ionicons
+                        name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
+                        size={20}
+                        color={channel.muted ? colors.accent : colors.textSecondary}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleRemoveChannel(channel.id)}
+                      style={styles.channelActionButton}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('common.delete')} ${t(channel.preset.nameKey)}`}
+                    >
+                      <Ionicons name="close" size={20} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={channel.muted ? styles.mutedSlider : undefined}>
+                  <Slider
+                    value={channel.volume}
+                    onValueChange={(v) => handleVolumeChange(channel.id, v)}
+                    max={1}
+                    showValue={false}
+                    accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
+                  />
+                </View>
               </View>
             </View>
           ))}
@@ -511,6 +526,14 @@ export default function MixerScreen() {
                       activeOpacity={0.6}
                       style={[styles.presetItem, { borderBottomColor: colors.cardBorder }]}
                     >
+                      <View
+                        style={[
+                          styles.presetItemIcon,
+                          { backgroundColor: withAlpha(CategoryColors[preset.type], 0.16) },
+                        ]}
+                      >
+                        <Icon icon={presetIcon(preset)} size={17} color={CategoryColors[preset.type]} />
+                      </View>
                       <Text style={[styles.presetItemName, { color: colors.text }]}>
                         {t(preset.nameKey)}
                       </Text>
@@ -603,17 +626,25 @@ const styles = StyleSheet.create({
   title: {
     ...Typography.largeTitle,
   },
-  infoText: {
-    ...Typography.body,
-    lineHeight: 21,
-    marginBottom: Spacing.md,
-  },
   section: {
     marginBottom: Spacing.lg,
   },
   channelRow: {
+    flexDirection: 'row',
     paddingVertical: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: Spacing.md,
+  },
+  channelIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  channelBody: {
+    flex: 1,
     gap: Spacing.sm,
   },
   channelHeader: {
@@ -738,13 +769,23 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   emptyState: {
-    paddingVertical: Spacing.sm,
+    alignItems: 'center',
+    paddingVertical: Spacing.lg,
     gap: Spacing.sm,
     marginBottom: Spacing.md,
+  },
+  emptyStateIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.xs,
   },
   emptyStateText: {
     ...Typography.body,
     lineHeight: 21,
+    textAlign: 'center',
   },
   sampleButton: {
     paddingVertical: Spacing.sm,
@@ -758,13 +799,21 @@ const styles = StyleSheet.create({
   presetItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
+    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
     minHeight: 52,
   },
+  presetItemIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   presetItemName: {
     ...Typography.body,
+    flex: 1,
   },
   searchBar: {
     flexDirection: 'row',

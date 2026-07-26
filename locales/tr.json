@@ -114,7 +114,6 @@
   },
   "mixer": {
     "title": "Ses Karıştırıcı",
-    "description": "Birden fazla sesi birleştirerek özel karışımınızı oluşturun. Hızlı erişim için kaydedin.",
     "addSound": "Ses Ekle",
     "volume": "Ses Seviyesi",
     "savePreset": "Preset Kaydet",
@@ -129,7 +128,7 @@
     "addSoundFirst": "Kaydetmek için en az bir ses ekleyin.",
     "mixSaved": "Karışımınız kaydedildi!",
     "deleteMix": "Karışımı sil",
-    "emptyDesc": "Birden fazla sesi üst üste bindir: yağmur + kahverengi gürültü + alpha gibi.",
+    "emptyDesc": "Yağmur, kahverengi gürültü ve alpha gibi sesleri üst üste bindir; karışımı kaydet, ne zaman istersen tekrar çal.",
     "trySample": "Örnek karışımı dene",
     "mute": "Sustur",
     "channelsFull": "4/4 dolu — eklemek için birini çıkar",

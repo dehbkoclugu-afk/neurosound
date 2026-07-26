@@ -1,6 +1,9 @@
 /**
  * Preset rows — typographic list items, no cards, no gradients.
  * Name carries the hierarchy; a quiet subline gives type and frequency.
+ * The icon sits in a tinted circle rather than floating bare: a run of a
+ * dozen identical rows read as one grey paragraph without something for the
+ * eye to land on between them.
  */
 
 import React from 'react';
@@ -13,12 +16,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Spacing, Typography, FontFamily, CategoryColors } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, CategoryColors, withAlpha } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
 
-function presetIcon(preset: FrequencyPreset): IconConfig {
+export function presetIcon(preset: FrequencyPreset): IconConfig {
   if (preset.type === 'binaural' && preset.binauralType) {
     return getPresetIcon('binaural', preset.binauralType);
   }
@@ -81,8 +84,11 @@ export function PresetCard({
         .filter(Boolean)
         .join(', ')}
     >
-      {/* Naked icon — no tinted box */}
-      <Icon icon={presetIcon(preset)} size={20} color={CategoryColors[preset.type]} />
+      <View
+        style={[styles.iconBadge, { backgroundColor: withAlpha(CategoryColors[preset.type], 0.16) }]}
+      >
+        <Icon icon={presetIcon(preset)} size={19} color={CategoryColors[preset.type]} />
+      </View>
       <View style={styles.rowText}>
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
           {t(preset.nameKey)}
@@ -156,6 +162,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     gap: Spacing.md,
     minHeight: 56,
+  },
+  iconBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rowText: {
     flex: 1,
