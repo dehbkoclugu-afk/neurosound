@@ -14,6 +14,7 @@ import {
   Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 
@@ -41,6 +42,7 @@ const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const {
     theme,
     setTheme,
@@ -350,6 +352,18 @@ export default function SettingsScreen() {
                 })}
               </Text>
             </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/privacy')}
+            style={[styles.card, styles.aboutRow, { borderBottomColor: colors.cardBorder }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('settings.privacyPolicy')}
+          >
+            <Text style={[styles.aboutLabel, { color: colors.text }]}>
+              {t('settings.privacyPolicy')}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
 
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>

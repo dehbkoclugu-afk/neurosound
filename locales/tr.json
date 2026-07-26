@@ -184,7 +184,24 @@
     "reset": "Verileri sıfırla",
     "resetTitle": "Verileri sıfırla",
     "resetConfirm": "Favoriler, karışımlar ve tüm ayarlar silinecek. Bu geri alınamaz.",
-    "resetHint": "{{favorites}} favori, {{mixes}} karışım"
+    "resetHint": "{{favorites}} favori, {{mixes}} karışım",
+    "privacyPolicy": "Gizlilik Politikası"
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "updated": "Son güncelleme: {{date}}",
+    "summaryTitle": "Kısaca",
+    "summaryBody": "NeuroSound hiçbir verinizi toplamaz, saklamaz ya da başka bir yere göndermez. Uygulamada yaptığınız her şey — favoriler, özel karışımlar ve ayarlar — yalnızca cihazınızda kalır.",
+    "dataTitle": "Uygulama neyi saklıyor",
+    "dataBody": "Favorileriniz, kaydettiğiniz karışımlar ve tercihleriniz (tema, dil, ses seviyesi, erişilebilirlik ayarları) cihazınızda standart yerel depolama ile saklanır. Bu veriler cihazınızdan hiçbir zaman çıkmaz, bize ya da başka birine gönderilmez; uygulamayı kaldırdığınızda veya Ayarlar'daki Verileri sıfırla seçeneğini kullandığınızda otomatik olarak silinir.",
+    "networkTitle": "Ağ erişimi",
+    "networkBody": "NeuroSound hiçbir ağ isteği yapmaz. Tamamen çevrimdışı çalışır; hiçbir sunucu, analiz servisi ya da üçüncü tarafla iletişim kurmaz.",
+    "accountsTitle": "Hesaplar ve kimlikler",
+    "accountsBody": "Kullanıcı hesabı, giriş ya da takip kimliği yoktur. Sizi tanımlamamızın ya da kullanımınızı size bağlamamızın hiçbir yolu yoktur.",
+    "childrenTitle": "Çocuklar",
+    "childrenBody": "Kimseden hiçbir veri toplanmadığı için bu, her yaştan kullanıcı için aynı şekilde geçerlidir.",
+    "changesTitle": "Bu politikadaki değişiklikler",
+    "changesBody": "Bu politika değişirse, güncelleme yeni bir uygulama sürümüyle birlikte gelir ve yukarıdaki tarih buna göre değişir."
   },
   "accessibility": {
     "playButton": "Oynat butonu",

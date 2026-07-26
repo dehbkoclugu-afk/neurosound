@@ -67,6 +67,7 @@ export default function RootLayout() {
             name="onboarding"
             options={{ headerShown: false, gestureEnabled: false }}
           />
+          <Stack.Screen name="privacy" options={{ headerShown: false }} />
         </Stack>
         <ToastHost />
         <StatusBar style="auto" />

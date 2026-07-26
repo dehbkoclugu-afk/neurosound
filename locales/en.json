@@ -184,7 +184,24 @@
     "reset": "Reset data",
     "resetTitle": "Reset data",
     "resetConfirm": "Favourites, mixes and all settings will be deleted. This cannot be undone.",
-    "resetHint": "{{favorites}} favourites, {{mixes}} mixes"
+    "resetHint": "{{favorites}} favourites, {{mixes}} mixes",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: {{date}}",
+    "summaryTitle": "In short",
+    "summaryBody": "NeuroSound doesn't collect, store, or transmit any of your data. Everything you do in this app — favourites, custom mixes, and settings — stays on your device.",
+    "dataTitle": "What the app stores",
+    "dataBody": "Your favourites, saved mixes, and preferences (theme, language, volume, accessibility settings) are saved locally on your device using standard on-device storage. This data never leaves your device, is never sent to us or anyone else, and is deleted automatically if you uninstall the app or use Reset data in Settings.",
+    "networkTitle": "Network access",
+    "networkBody": "NeuroSound makes no network requests. It works fully offline and does not communicate with any server, analytics service, or third party.",
+    "accountsTitle": "Accounts and identifiers",
+    "accountsBody": "There are no user accounts, sign-ins, or tracking identifiers. We have no way to identify you or link your usage to you.",
+    "childrenTitle": "Children",
+    "childrenBody": "Since no data is collected from anyone, this applies equally to users of any age.",
+    "changesTitle": "Changes to this policy",
+    "changesBody": "If this policy ever changes, the update will ship with a new app version and the date above will change accordingly."
   },
   "accessibility": {
     "playButton": "Play button",
