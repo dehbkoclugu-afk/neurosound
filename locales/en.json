@@ -109,7 +109,8 @@
     "solfeggioDisclaimer": "A traditional tone. Effects are personal; no medical benefit is claimed.",
     "searchPlaceholder": "Search sounds",
     "favoritesOnly": "Favourites only",
-    "aboutCategory": "About this category"
+    "aboutCategory": "About this category",
+    "noResults": "No sounds match your search."
   },
   "mixer": {
     "title": "Sound Mixer",

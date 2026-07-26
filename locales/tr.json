@@ -109,7 +109,8 @@
     "solfeggioDisclaimer": "Geleneksel bir ton. Etkisi kişiseldir; tıbbi bir fayda iddia edilmez.",
     "searchPlaceholder": "Ses ara",
     "favoritesOnly": "Sadece favoriler",
-    "aboutCategory": "Bu kategori hakkında"
+    "aboutCategory": "Bu kategori hakkında",
+    "noResults": "Aramanızla eşleşen ses yok."
   },
   "mixer": {
     "title": "Ses Karıştırıcı",

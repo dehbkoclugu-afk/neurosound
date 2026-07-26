@@ -301,14 +301,20 @@ export default function ExploreScreen() {
               </View>
 
               <View>
-                {presets.map((preset) => (
-                  <PresetCard
-                    key={preset.id}
-                    preset={preset}
-                    onPress={() => handlePresetPress(preset.id)}
-                    isFavorite={isFavorite(preset.id)}
-                  />
-                ))}
+                {presets.length > 0 ? (
+                  presets.map((preset) => (
+                    <PresetCard
+                      key={preset.id}
+                      preset={preset}
+                      onPress={() => handlePresetPress(preset.id)}
+                      isFavorite={isFavorite(preset.id)}
+                    />
+                  ))
+                ) : (
+                  <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+                    {t('explore.noResults')}
+                  </Text>
+                )}
               </View>
             </ScrollView>
           );
@@ -347,6 +353,11 @@ const styles = StyleSheet.create({
   },
   tabTextActive: {
     fontFamily: FontFamily.semibold,
+  },
+  emptyStateText: {
+    ...Typography.body,
+    lineHeight: 21,
+    paddingVertical: Spacing.sm,
   },
   tabUnderline: {
     height: 2,
