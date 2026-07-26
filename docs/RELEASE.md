@@ -66,11 +66,27 @@ gerektiren maddeler):
 
 ## 5. Production build + gönderim
 
+Kendi bilgisayarından:
+
 ```bash
 npx eas build --profile production --platform all
 npx eas submit --platform ios       # TestFlight
 npx eas submit --platform android   # Internal testing
 ```
+
+Ya da GitHub Actions'tan (`api.expo.dev`'e çıkışı olmayan ortamlarda daha
+pratik): repo Settings → Secrets and variables → Actions'a `EXPO_TOKEN`
+secret'ını ekle (expo.dev → Account settings → Access Tokens), sonra
+Actions sekmesinden **"EAS Build"** workflow'unu `platform=all`,
+`profile=production` ile çalıştır. `submit` kutucuğunu işaretlersen build
+bitince otomatik `eas submit` da çalışır — bu geri dönüşü olmayan bir adım
+(mağaza incelemesine gönderir), o yüzden yalnız gerçekten hazır olduğunda
+işaretle.
+
+iOS'un ilk build'i için imzalama sertifikalarının EAS sunucularında
+kayıtlı olması gerekiyor — bunu bir kere kendi bilgisayarından
+`eas build --platform ios` çalıştırıp interaktif soruları cevaplayarak
+kur; sonrasında CI'daki `--non-interactive` build bunları otomatik bulur.
 
 - [ ] TestFlight / kapalı testte birkaç gün gerçek kullanım
 - [ ] Mağaza incelemesine gönder
