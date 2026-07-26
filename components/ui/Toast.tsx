@@ -19,7 +19,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography } from '@/constants/theme';
+import { Radius, Spacing, Typography } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 const VISIBLE_MS = 1800;
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     bottom: Spacing.xxl,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
-    borderRadius: 24,
+    borderRadius: Radius.card,
     maxWidth: '85%',
   },
   text: {

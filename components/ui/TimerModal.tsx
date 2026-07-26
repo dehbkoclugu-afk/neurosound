@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily } from '@/constants/theme';
+import { Radius, Spacing, Typography, FontFamily } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
   },
   sheet: {
-    borderRadius: 20,
+    borderRadius: Radius.sheet,
     padding: Spacing.lg,
     width: '100%',
     maxWidth: 320,

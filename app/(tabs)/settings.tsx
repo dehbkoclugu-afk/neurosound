@@ -182,6 +182,12 @@ export default function SettingsScreen() {
                 onValueChange={setReduceMotion}
                 trackColor={{ false: colors.slider, true: colors.accent }}
                 thumbColor="#fff"
+                // react-native-web's Switch reads *active*ThumbColor/TrackColor
+                // for the ON state instead of thumbColor/trackColor.true — not
+                // in RN's official type defs (web-only extension, harmless
+                // no-op on native), so it needs a cast rather than a prop.
+                // Left unset, web falls back to its hardcoded Material teal.
+                {...({ activeThumbColor: '#fff', activeTrackColor: colors.accent } as any)}
               />
             </View>
           </View>
@@ -231,6 +237,7 @@ export default function SettingsScreen() {
                 onValueChange={setLowContrast}
                 trackColor={{ false: colors.slider, true: colors.accent }}
                 thumbColor="#fff"
+                {...({ activeThumbColor: '#fff', activeTrackColor: colors.accent } as any)}
               />
             </View>
           </View>
@@ -260,6 +267,7 @@ export default function SettingsScreen() {
                 onValueChange={setHaptics}
                 trackColor={{ false: colors.slider, true: colors.accent }}
                 thumbColor="#fff"
+                {...({ activeThumbColor: '#fff', activeTrackColor: colors.accent } as any)}
               />
             </View>
           </View>

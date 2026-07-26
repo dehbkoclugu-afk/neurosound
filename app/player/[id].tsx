@@ -1,6 +1,7 @@
 /**
- * Player Screen — quiet instrument.
- * Flat surface, one breathing ring, typographic info, single amber accent.
+ * Player Screen — "Night Deck": a rotary dial instrument, not a flat card.
+ * The dial (components/ui/Dial.tsx) is both the play/pause control and the
+ * level visualizer; everything else stays typographic and quiet around it.
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -24,7 +25,6 @@ import {
   Spacing,
   Typography,
   FontFamily,
-  onPrimary,
   withAlpha,
   CategoryColors,
 } from '@/constants/theme';
@@ -32,26 +32,13 @@ import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
-import { WaveVisualizer } from '@/components/player/WaveVisualizer';
+import { Dial } from '@/components/ui/Dial';
 import { Slider } from '@/components/ui/Slider';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
-import { PressableScale } from '@/components/ui/PressableScale';
 import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
-
-// Visual pulse tempo follows the sound: slow breathing for delta,
-// fine shimmer for gamma, slow drift for ambient noise, steady for tones.
-const getVisualTempoMs = (preset: FrequencyPreset): number => {
-  if (preset.type === 'binaural' && preset.beatFrequency) {
-    return 2000 + 8000 / preset.beatFrequency;
-  }
-  if (preset.type === 'noise') {
-    return 4500;
-  }
-  return 3000;
-};
 
 const getFrequencyLine = (preset: FrequencyPreset): string | null => {
   if (preset.type === 'binaural' && preset.baseFrequency && preset.beatFrequency) {
@@ -209,21 +196,29 @@ export default function PlayerScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Breathing ring — the centerpiece, over a soft radial glow */}
+      {/* The dial — instrument, not icon. Tapping it plays/pauses; the
+          needle stands in for the old breathing rings. */}
       <View style={styles.content}>
         <View style={styles.visualWrap}>
-          <View
-            style={[styles.glowOuter, { backgroundColor: withAlpha(colors.primary, 0.05) }]}
-          />
-          <View
-            style={[styles.glowInner, { backgroundColor: withAlpha(colors.primary, 0.09) }]}
-          />
-          <WaveVisualizer
+          <Dial
             isPlaying={isPlaying}
+            isLoading={isLoading}
             color={colors.primary}
-            intensity={volume}
-            tempoMs={getVisualTempoMs(preset)}
+            reduceMotion={reduceMotion}
+            onPress={handlePlayPause}
+            accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
           />
+          <View style={styles.dialIconRow} pointerEvents="none">
+            <Ionicons
+              name={isPlaying ? 'pause' : 'play'}
+              size={16}
+              color={colors.textSecondary}
+              style={isPlaying ? undefined : { marginLeft: 2 }}
+            />
+            <Text style={[styles.dialIconLabel, { color: colors.textSecondary }]}>
+              {isPlaying ? t('common.pause') : t('common.play')}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.infoContainer}>
@@ -358,24 +353,6 @@ export default function PlayerScreen() {
             )}
           </TouchableOpacity>
 
-          <PressableScale
-            onPress={handlePlayPause}
-            disabled={isLoading}
-            style={[styles.playButton, { backgroundColor: colors.primary }]}
-            accessibilityRole="button"
-            accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
-            accessibilityState={{ busy: isLoading }}
-          >
-            {/* Sound generation isn't a spinner's kind of wait — the ring
-                already sits dim and starts breathing the moment it's ready. */}
-            <Ionicons
-              name={isPlaying ? 'pause' : 'play'}
-              size={38}
-              color={onPrimary}
-              style={isPlaying ? undefined : { marginLeft: 3 }}
-            />
-          </PressableScale>
-
           <TouchableOpacity
             onPress={handleAddToMixer}
             style={styles.sideButton}
@@ -426,18 +403,15 @@ const styles = StyleSheet.create({
   visualWrap: {
     alignItems: 'center',
     justifyContent: 'center',
+    gap: Spacing.sm,
   },
-  glowOuter: {
-    position: 'absolute',
-    width: 340,
-    height: 340,
-    borderRadius: 170,
+  dialIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
   },
-  glowInner: {
-    position: 'absolute',
-    width: 210,
-    height: 210,
-    borderRadius: 105,
+  dialIconLabel: {
+    ...Typography.footnote,
   },
   infoContainer: {
     alignItems: 'center',
@@ -459,7 +433,9 @@ const styles = StyleSheet.create({
   },
   frequencyLine: {
     ...Typography.body,
+    fontFamily: FontFamily.mono,
     fontVariant: ['tabular-nums'],
+    letterSpacing: 0.4,
   },
   presetDescription: {
     ...Typography.body,
@@ -502,6 +478,7 @@ const styles = StyleSheet.create({
   },
   volumeCapText: {
     ...Typography.caption,
+    fontFamily: FontFamily.mono,
     fontVariant: ['tabular-nums'],
   },
   sliderWrapper: {
@@ -510,8 +487,8 @@ const styles = StyleSheet.create({
   mainControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.lg,
+    justifyContent: 'center',
+    gap: Spacing.xxl,
   },
   sideButton: {
     width: 60,
@@ -521,15 +498,9 @@ const styles = StyleSheet.create({
   },
   timerBadge: {
     ...Typography.caption,
+    fontFamily: FontFamily.mono,
     fontVariant: ['tabular-nums'],
     marginTop: 2,
-  },
-  playButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   errorText: {
     ...Typography.body,

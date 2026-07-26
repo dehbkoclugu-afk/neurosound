@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   title: {
-    ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
+    ...Typography.label,
+    textTransform: 'uppercase',
   },
   subtitle: {
     ...Typography.caption,

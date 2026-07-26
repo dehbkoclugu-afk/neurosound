@@ -14,7 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, onPrimary } from '@/constants/theme';
+import { Radius, Spacing, Typography, onPrimary } from '@/constants/theme';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
 import * as haptics from '@/lib/haptics';
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   playButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: Radius.card,
     alignItems: 'center',
     justifyContent: 'center',
   },

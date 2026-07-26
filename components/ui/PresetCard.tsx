@@ -50,6 +50,33 @@ function getSubline(preset: FrequencyPreset, t: (k: string) => string): string {
   return t('explore.categories.noise');
 }
 
+// Same string as getSubline(), but with the Hz reading split into its own
+// nested Text so only the numeral gets the tape-counter mono treatment —
+// monospacing the category word alongside it read as a font glitch, not a
+// considered typographic choice.
+function Subline({ preset, color, t }: { preset: FrequencyPreset; color: string; t: (k: string) => string }) {
+  if (preset.type === 'binaural' && preset.beatFrequency) {
+    return (
+      <Text style={[styles.subline, { color }]} numberOfLines={1}>
+        {t('explore.categories.binaural')} ·{' '}
+        <Text style={styles.sublineFreq}>{preset.beatFrequency} Hz</Text>
+      </Text>
+    );
+  }
+  if (preset.type === 'solfeggio' && preset.frequency) {
+    return (
+      <Text style={[styles.subline, styles.sublineFreq, { color }]} numberOfLines={1}>
+        {preset.frequency} Hz
+      </Text>
+    );
+  }
+  return (
+    <Text style={[styles.subline, { color }]} numberOfLines={1}>
+      {t('explore.categories.noise')}
+    </Text>
+  );
+}
+
 // Chip already carries category through its icon and colour, so it only
 // needs the frequency — repeating "Binaural Beats · 6 Hz" would overflow.
 function getFrequencyOnly(preset: FrequencyPreset): string | null {
@@ -93,9 +120,7 @@ export function PresetCard({
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
           {t(preset.nameKey)}
         </Text>
-        <Text style={[styles.subline, { color: colors.textSecondary }]} numberOfLines={1}>
-          {getSubline(preset, t)}
-        </Text>
+        <Subline preset={preset} color={colors.textSecondary} t={t} />
       </View>
       {isFavorite && (
         <Ionicons
@@ -179,7 +204,11 @@ const styles = StyleSheet.create({
   },
   subline: {
     ...Typography.footnote,
+  },
+  sublineFreq: {
+    fontFamily: FontFamily.mono,
     fontVariant: ['tabular-nums'],
+    letterSpacing: 0.3,
   },
   chip: {
     flexDirection: 'row',
@@ -198,6 +227,7 @@ const styles = StyleSheet.create({
   },
   chipFrequency: {
     ...Typography.caption,
+    fontFamily: FontFamily.mono,
     fontVariant: ['tabular-nums'],
   },
 });

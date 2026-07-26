@@ -15,11 +15,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Image } from 'expo-image';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, withAlpha } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, Radius, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -85,13 +83,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Soft warm atmosphere at the top, fading into the background */}
-      <LinearGradient
-        colors={[withAlpha(colors.primary, 0.1), colors.background]}
-        locations={[0, 0.4]}
-        style={styles.atmosphere}
-        pointerEvents="none"
-      />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -122,45 +113,39 @@ export default function HomeScreen() {
               <PressableScale
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
-                // Large surfaces need less travel than buttons to read as
-                // pressed rather than shrinking.
-                scaleTo={0.985}
-                pressedOpacity={0.9}
-                style={styles.intentBlock}
+                scaleTo={0.99}
+                pressedOpacity={0.85}
+                style={[
+                  styles.intentCard,
+                  { backgroundColor: colors.card, borderColor: colors.cardBorder },
+                ]}
                 accessibilityRole="button"
                 accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
-                <Image
-                  source={intent.image}
-                  style={StyleSheet.absoluteFill}
-                  contentFit="cover"
-                  transition={300}
-                />
-                {/* Tint: decorative, diagonal, carries the intent's colour. */}
-                <LinearGradient
-                  colors={[withAlpha(intent.color, 0.4), 'transparent']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                {/* Legibility: vertical and separate, so the whole text band
-                    darkens evenly. A diagonal scrim left the bottom-LEFT — where
-                    the title actually sits — in its lightest stop, which is
-                    2.4:1 over a bright photo. Placeholder images are random, so
-                    the floor has to be guaranteed, not hoped for. */}
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.62)']}
-                  locations={[0.35, 0.7, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.intentRow}>
-                  <View style={styles.intentText}>
-                    <Text style={styles.intentName}>{t(intent.nameKey)}</Text>
-                    <Text style={styles.intentDesc} numberOfLines={2}>
-                      {t(intent.descKey)}
+                {/* Index-tab spine, like a coloured card-catalogue edge —
+                    the one place each intent's own colour still shows. */}
+                <View style={[styles.intentSpine, { backgroundColor: intent.color }]} />
+
+                <View style={styles.intentBody}>
+                  <View style={styles.intentTopRow}>
+                    <Text style={[styles.intentCatalog, { color: intent.color }]}>
+                      {intent.catalogCode}
                     </Text>
+                    <View
+                      style={[styles.intentIconTag, { backgroundColor: withAlpha(intent.color, 0.16) }]}
+                    >
+                      <Icon icon={intent.icon} size={18} color={intent.color} />
+                    </View>
                   </View>
-                  <Icon icon={intent.icon} size={26} color="rgba(255,255,255,0.95)" />
+                  <Text style={[styles.intentName, { color: colors.text }]}>
+                    {t(intent.nameKey)}
+                  </Text>
+                  <Text
+                    style={[styles.intentDesc, { color: colors.textSecondary }]}
+                    numberOfLines={2}
+                  >
+                    {t(intent.descKey)}
+                  </Text>
                 </View>
               </PressableScale>
             ))}
@@ -241,13 +226,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  atmosphere: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 280,
-  },
   scrollView: {
     flex: 1,
   },
@@ -276,32 +254,46 @@ const styles = StyleSheet.create({
   intentStack: {
     gap: Spacing.sm,
   },
-  intentBlock: {
-    // minHeight, not height: the block holds a 22pt title over a 13pt line,
-    // and a fixed box clips both once the system text size grows.
-    minHeight: 108,
-    borderRadius: 20,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  intentRow: {
+  // A flat printed card, not a photo block: a coloured spine on the left
+  // (like a card-catalogue tab) carries the intent's identity instead of a
+  // full-bleed gradient photo repeated four times down the page.
+  intentCard: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    gap: Spacing.md,
+    borderRadius: Radius.card,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
-  intentText: {
+  intentSpine: {
+    width: 6,
+  },
+  intentBody: {
     flex: 1,
-    gap: 2,
+    padding: Spacing.md,
+    gap: 4,
+  },
+  intentTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 2,
+  },
+  intentCatalog: {
+    ...Typography.label,
+    fontFamily: FontFamily.mono,
+    letterSpacing: 1.2,
+  },
+  intentIconTag: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   intentName: {
     ...Typography.title,
-    color: '#FFFFFF',
   },
   intentDesc: {
     ...Typography.footnote,
-    color: 'rgba(255,255,255,0.85)',
   },
   emptyStateText: {
     ...Typography.body,

@@ -13,13 +13,17 @@ export interface Intent {
   nameKey: string;
   descKey: string;
   icon: IconConfig;
+  /** Index-label colour — a muted ink tone, not the old saturated
+   *  photo-gradient hue. Clears 3:1 (icon/graphic bar) on every theme's
+   *  card and background surface. */
   color: string;
-  gradient: [string, string];
-  /** Atmospheric background — a generated glow-and-grain gradient in the
-   *  intent's own colour (assets/images/intents/), not a photo. Swap for
-   *  art-directed photography if/when that's shot; the shape (require'd
-   *  local asset) stays the same either way. */
+  /** Atmospheric background for the Intent detail hero only — a single
+   *  full-bleed moment earns the photo; the repeated Home card grid does
+   *  not (see DESIGN.md). */
   image: number;
+  /** Cosmetic catalog code for the Home label cards — a record-label
+   *  numbering convention, not a real product SKU. */
+  catalogCode: string;
   presetIds: string[];
   /** One-tap "start session" duration, in minutes — preset + timer + a
    *  comfortable volume together, instead of three separate steps every
@@ -33,9 +37,9 @@ export const intents: Intent[] = [
     nameKey: 'intents.sleep',
     descKey: 'intents.sleepDesc',
     icon: { name: 'moon', library: 'ionicon' },
-    color: '#6D83C9',
-    gradient: ['#1C2440', '#6D83C9'],
+    color: '#5A7FA2',
     image: require('@/assets/images/intents/sleep.jpg'),
+    catalogCode: 'ND-01',
     presetIds: [
       'binaural-delta',
       'noise-rain',
@@ -51,9 +55,9 @@ export const intents: Intent[] = [
     nameKey: 'intents.focus',
     descKey: 'intents.focusDesc',
     icon: { name: 'flash', library: 'ionicon' },
-    color: '#D99A4E',
-    gradient: ['#3D2A12', '#D99A4E'],
+    color: '#9A733A',
     image: require('@/assets/images/intents/focus.jpg'),
+    catalogCode: 'ND-02',
     presetIds: [
       'binaural-beta',
       'binaural-gamma',
@@ -68,9 +72,9 @@ export const intents: Intent[] = [
     nameKey: 'intents.relax',
     descKey: 'intents.relaxDesc',
     icon: { name: 'leaf', library: 'ionicon' },
-    color: '#7FB069',
-    gradient: ['#1E2E18', '#7FB069'],
+    color: '#6E8C61',
     image: require('@/assets/images/intents/relax.jpg'),
+    catalogCode: 'ND-03',
     presetIds: [
       'binaural-alpha',
       'noise-ocean',
@@ -86,9 +90,9 @@ export const intents: Intent[] = [
     nameKey: 'intents.meditate',
     descKey: 'intents.meditateDesc',
     icon: { name: 'meditation', library: 'material' },
-    color: '#A78BFA',
-    gradient: ['#2A2244', '#A78BFA'],
+    color: '#8F6C8C',
     image: require('@/assets/images/intents/meditate.jpg'),
+    catalogCode: 'ND-04',
     presetIds: [
       'binaural-theta',
       'solfeggio-528',
