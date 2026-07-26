@@ -18,14 +18,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
+import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import { getIntentById } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
+import * as playerController from '@/lib/audio/playerController';
+import * as haptics from '@/lib/haptics';
+import { PressableScale } from '@/components/ui/PressableScale';
 
 export default function IntentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -33,7 +39,8 @@ export default function IntentScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const colors = useThemeColors();
-  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning } = useSettingsStore();
+  const miniPlayerInset = useMiniPlayerInset();
+  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, reduceMotion } = useSettingsStore();
   const { isFavorite } = usePresetsStore();
 
   const intent = id ? getIntentById(id) : undefined;
@@ -59,6 +66,34 @@ export default function IntentScreen() {
     }
   };
 
+  // One tap instead of three: pick the intent's recommended sound, start its
+  // sleep/focus timer, and open the player already playing — the "preset,
+  // then timer, then volume" ritual collapsed into a single entry point.
+  const handleStartSession = () => {
+    if (!intent) return;
+    const preset = getPresetById(intent.presetIds[0]);
+    if (!preset) return;
+
+    const start = () => {
+      haptics.commit();
+      playerController.loadPreset(preset);
+      playerController.startTimer(intent.recommendedMinutes);
+      playerController.play();
+      router.push(`/player/${preset.id}`);
+    };
+
+    if (preset.type === 'binaural' && !hasSeenHeadphoneWarning) {
+      Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
+        { text: t('common.ok'), onPress: () => {
+          setHasSeenHeadphoneWarning(true);
+          start();
+        } },
+      ]);
+    } else {
+      start();
+    }
+  };
+
   if (!intent) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -71,20 +106,32 @@ export default function IntentScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Full-bleed hero — image, scrim, title overlaid */}
-        <View style={styles.hero}>
+        {/* Full-bleed hero — image, scrim, title overlaid. Fades in as one
+            surface rather than snapping in under the screen's own fade
+            transition, echoing the block that was just tapped on Home. */}
+        <Animated.View
+          entering={reduceMotion ? undefined : FadeIn.duration(350)}
+          style={styles.hero}
+        >
           <Image
-            source={{ uri: intent.image }}
+            source={intent.image}
             style={StyleSheet.absoluteFill}
             contentFit="cover"
             transition={300}
           />
+          {/* Same split as the home blocks: colour is decorative, the
+              legibility floor is its own vertical pass. */}
           <LinearGradient
-            colors={[intent.color + '55', 'rgba(0,0,0,0.35)', colors.background]}
-            locations={[0, 0.5, 1]}
+            colors={[withAlpha(intent.color, 0.33), 'transparent']}
+            locations={[0, 0.6]}
+            style={StyleSheet.absoluteFill}
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.45)', colors.background]}
+            locations={[0.3, 0.72, 1]}
             style={StyleSheet.absoluteFill}
           />
           <TouchableOpacity
@@ -95,12 +142,28 @@ export default function IntentScreen() {
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <View style={styles.heroText}>
-            <Text style={styles.heroTitle}>{t(intent.nameKey)}</Text>
+            <Text style={styles.heroTitle} accessibilityRole="header">
+              {t(intent.nameKey)}
+            </Text>
             <Text style={styles.heroDesc}>{t(intent.descKey)}</Text>
           </View>
+        </Animated.View>
+
+        <View style={[styles.startSection, contentColumn]}>
+          <PressableScale
+            onPress={handleStartSession}
+            style={[styles.startButton, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('intents.startSession', { minutes: intent.recommendedMinutes })}
+          >
+            <Ionicons name="play" size={18} color={onPrimary} style={styles.startButtonIcon} />
+            <Text style={[styles.startButtonText, { color: onPrimary }]}>
+              {t('intents.startSession', { minutes: intent.recommendedMinutes })}
+            </Text>
+          </PressableScale>
         </View>
 
-        <View style={styles.list}>
+        <View style={[styles.list, contentColumn]}>
           {presets.map((preset) => (
             <PresetCard
               key={preset.id}
@@ -148,9 +211,27 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   heroDesc: {
-    ...Typography.subhead,
+    ...Typography.body,
     color: 'rgba(255,255,255,0.85)',
     maxWidth: 320,
+  },
+  startSection: {
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: AccessibilitySize.minTouchTarget + 4,
+    borderRadius: 26,
+    gap: Spacing.sm,
+  },
+  startButtonIcon: {
+    marginLeft: -2,
+  },
+  startButtonText: {
+    ...Typography.headline,
   },
   list: {
     paddingHorizontal: Spacing.md,

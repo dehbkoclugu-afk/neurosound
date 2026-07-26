@@ -13,6 +13,7 @@ import {
 } from '@expo-google-fonts/nunito-sans';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ToastHost } from '@/components/ui/ToastHost';
 import i18n from '@/i18n';
 
 export const unstable_settings = {
@@ -53,13 +54,22 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="intent/[id]"
-            options={{ headerShown: false }}
+            options={{
+              headerShown: false,
+              // Home's intent block and this hero share the same image and
+              // colour; a hard horizontal push made that continuity invisible.
+              // A fade lets the shared imagery read as one surface settling
+              // in rather than a new screen sliding over the old one.
+              animation: 'fade',
+            }}
           />
           <Stack.Screen
             name="onboarding"
             options={{ headerShown: false, gestureEnabled: false }}
           />
+          <Stack.Screen name="privacy" options={{ headerShown: false }} />
         </Stack>
+        <ToastHost />
         <StatusBar style="auto" />
       </ThemeProvider>
     </I18nextProvider>

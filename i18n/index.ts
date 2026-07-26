@@ -10,6 +10,8 @@ const resources = {
   en: { translation: en },
 };
 
+export type SupportedLanguage = 'tr' | 'en';
+
 // Get device language safely, default to Turkish
 let deviceLanguage = 'tr';
 try {
@@ -21,7 +23,16 @@ try {
   console.log('Localization error:', e);
 }
 
-const supportedLanguage = ['tr', 'en'].includes(deviceLanguage) ? deviceLanguage : 'tr';
+/**
+ * Language used before anything is restored from storage. The settings store
+ * seeds its default from this too — otherwise a first launch would run i18n in
+ * the device language while Settings claimed Turkish was selected.
+ */
+export const deviceLanguageOrDefault: SupportedLanguage = ['tr', 'en'].includes(deviceLanguage)
+  ? (deviceLanguage as SupportedLanguage)
+  : 'tr';
+
+const supportedLanguage = deviceLanguageOrDefault;
 
 i18n
   .use(initReactI18next)

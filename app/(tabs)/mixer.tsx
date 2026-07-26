@@ -3,7 +3,7 @@
  * Modern card-based design with clean UI
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,18 +14,27 @@ import {
   Alert,
   TextInput,
   Modal,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Button } from '@/components/ui/Button';
+import { PressableScale } from '@/components/ui/PressableScale';
+import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
+import { useToastStore } from '@/stores/toastStore';
+import * as haptics from '@/lib/haptics';
 import { Slider } from '@/components/ui/Slider';
+import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import {
   binauralPresets,
   solfeggioPresets,
@@ -51,16 +60,45 @@ const SAMPLE_MIX = [
 export default function MixerScreen() {
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
-  const { addCustomMix, customMixes, deleteCustomMix } = usePresetsStore();
-  const { mixerChannels: channels, isMixerPlaying: isPlaying } = useAudioStore();
+  const { addCustomMix, updateCustomMix, customMixes, deleteCustomMix } = usePresetsStore();
+  const {
+    mixerChannels: channels,
+    isMixerPlaying: isPlaying,
+    activeMixId,
+    timerDuration,
+    timerRemaining,
+  } = useAudioStore();
 
   const [showPresetPicker, setShowPresetPicker] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showTimerModal, setShowTimerModal] = useState(false);
   const [mixName, setMixName] = useState('');
+  const [editingMixId, setEditingMixId] = useState<string | null>(null);
+  const [pickerQuery, setPickerQuery] = useState('');
+  const showToast = useToastStore((s) => s.show);
 
   const colors = useThemeColors();
+  const miniPlayerInset = useMiniPlayerInset();
+
+  const isEmpty = channels.length === 0;
+  const isFull = channels.length >= playerController.MAX_MIXER_CHANNELS;
+
+  // 33 presets in a flat scroll is unusable without a filter.
+  const filteredPickerGroups = useMemo(() => {
+    const query = pickerQuery.trim().toLowerCase();
+    if (!query) return pickerGroups;
+    return pickerGroups
+      .map((group) => ({
+        ...group,
+        presets: group.presets.filter((preset) =>
+          t(preset.nameKey).toLowerCase().includes(query)
+        ),
+      }))
+      .filter((group) => group.presets.length > 0);
+  }, [pickerQuery, t]);
 
   const handlePlayPause = useCallback(async () => {
+    haptics.commit();
     if (isPlaying) {
       playerController.mixerStop();
     } else {
@@ -74,6 +112,7 @@ export default function MixerScreen() {
       Alert.alert(t('mixer.maxChannels'), t('mixer.maxChannelsDesc'));
       return;
     }
+    setPickerQuery('');
     setShowPresetPicker(false);
   }, [t]);
 
@@ -85,9 +124,38 @@ export default function MixerScreen() {
     playerController.mixerSetChannelVolume(channelId, volume);
   }, []);
 
+  const handleToggleMute = useCallback((channelId: string, muted: boolean) => {
+    haptics.select();
+    playerController.mixerSetChannelMuted(channelId, muted);
+  }, []);
+
+  const closeSaveDialog = useCallback(() => {
+    // Clear the draft on dismiss too, not only on a successful save — stale
+    // text reappearing next time reads as a bug.
+    setMixName('');
+    setEditingMixId(null);
+    setShowSaveDialog(false);
+  }, []);
+
+  const handleRenameMix = useCallback((mix: typeof customMixes[0]) => {
+    setEditingMixId(mix.id);
+    setMixName(mix.name);
+    setShowSaveDialog(true);
+  }, []);
+
   const handleSaveMix = useCallback(() => {
     if (!mixName.trim()) {
       Alert.alert(t('common.error'), t('mixer.enterName'));
+      return;
+    }
+
+    if (editingMixId) {
+      updateCustomMix(editingMixId, { name: mixName.trim() });
+      haptics.save();
+      setMixName('');
+      setEditingMixId(null);
+      setShowSaveDialog(false);
+      showToast(t('mixer.mixRenamed'));
       return;
     }
 
@@ -104,25 +172,48 @@ export default function MixerScreen() {
       })),
     });
 
+    haptics.save();
     setMixName('');
     setShowSaveDialog(false);
-    Alert.alert(t('common.saved'), t('mixer.mixSaved'));
-  }, [mixName, channels, addCustomMix, t]);
+    showToast(t('mixer.mixSaved'));
+  }, [mixName, channels, addCustomMix, updateCustomMix, editingMixId, showToast, t]);
 
-  const handleLoadMix = useCallback((mix: typeof customMixes[0]) => {
-    playerController.mixerLoadChannels(mix.channels);
+  const handleLoadMix = useCallback(async (mix: typeof customMixes[0]) => {
+    haptics.commit();
+    await playerController.mixerLoadChannels(mix.channels, mix.id);
   }, []);
+
+  const handleDeleteMix = useCallback(
+    (mixId: string, name: string) => {
+      Alert.alert(t('common.delete'), `${t('mixer.deleteMix')} "${name}"?`, [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: () => deleteCustomMix(mixId),
+        },
+      ]);
+    },
+    [t, deleteCustomMix]
+  );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          contentColumn,
+          { paddingBottom: miniPlayerInset + Spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text
+            style={[styles.title, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('mixer.title')}
           </Text>
         </View>
@@ -150,7 +241,7 @@ export default function MixerScreen() {
                 style={styles.sampleButton}
                 accessibilityRole="button"
               >
-                <Text style={[styles.sampleButtonText, { color: colors.primary }]}>
+                <Text style={[styles.sampleButtonText, { color: colors.accent }]}>
                   {t('mixer.trySample')}
                 </Text>
               </TouchableOpacity>
@@ -163,123 +254,223 @@ export default function MixerScreen() {
               style={[styles.channelRow, { borderBottomColor: colors.cardBorder }]}
             >
               <View style={styles.channelHeader}>
-                <Text style={[styles.channelName, { color: colors.text }]}>
+                <Text
+                  style={[
+                    styles.channelName,
+                    { color: channel.muted ? colors.textSecondary : colors.text },
+                  ]}
+                  numberOfLines={1}
+                >
                   {t(channel.preset.nameKey)}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleRemoveChannel(channel.id)}
-                  style={styles.removeButton}
-                  accessibilityLabel={t('common.delete')}
-                >
-                  <Ionicons name="close" size={20} color={colors.textSecondary} />
-                </TouchableOpacity>
+                <View style={styles.channelActions}>
+                  <TouchableOpacity
+                    onPress={() => handleToggleMute(channel.id, !channel.muted)}
+                    style={styles.channelActionButton}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: channel.muted }}
+                    accessibilityLabel={`${t('mixer.mute')} ${t(channel.preset.nameKey)}`}
+                  >
+                    <Ionicons
+                      name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
+                      size={20}
+                      color={channel.muted ? colors.accent : colors.textSecondary}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveChannel(channel.id)}
+                    style={styles.channelActionButton}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('common.delete')} ${t(channel.preset.nameKey)}`}
+                  >
+                    <Ionicons name="close" size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <Slider
-                value={channel.volume}
-                onValueChange={(v) => handleVolumeChange(channel.id, v)}
-                max={1}
-                showValue={false}
-                accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
-              />
+              <View style={channel.muted ? styles.mutedSlider : undefined}>
+                <Slider
+                  value={channel.volume}
+                  onValueChange={(v) => handleVolumeChange(channel.id, v)}
+                  max={1}
+                  showValue={false}
+                  accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
+                />
+              </View>
             </View>
           ))}
 
-          {/* Add Channel — text row */}
-          {channels.length < playerController.MAX_MIXER_CHANNELS && (
-            <TouchableOpacity
-              onPress={() => setShowPresetPicker(true)}
-              activeOpacity={reduceMotion ? 1 : 0.6}
-              style={styles.addRow}
-              accessibilityLabel={t('mixer.addSound')}
+          {/* Add Channel — always rendered. Letting it vanish at 4/4 left the
+              user hunting for a button that had silently removed itself. */}
+          <TouchableOpacity
+            onPress={() => setShowPresetPicker(true)}
+            activeOpacity={0.6}
+            disabled={isFull}
+            style={styles.addRow}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isFull }}
+            accessibilityLabel={isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
+          >
+            <Ionicons
+              name={isFull ? 'information-circle-outline' : 'add'}
+              size={20}
+              color={isFull ? colors.textSecondary : colors.accent}
+            />
+            <Text
+              style={[
+                styles.addRowText,
+                { color: isFull ? colors.textSecondary : colors.accent },
+              ]}
             >
-              <Ionicons name="add" size={20} color={colors.primary} />
-              <Text style={[styles.addRowText, { color: colors.primary }]}>
-                {t('mixer.addSound')}
-              </Text>
-            </TouchableOpacity>
-          )}
+              {isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Play/Pause Button */}
-        {channels.length > 0 && (
-          <View style={styles.playSection}>
+        {/* Transport — always present. Showing and hiding play/save as the
+            first channel arrived made the whole page jump under the finger. */}
+        <View style={styles.transport}>
+          <View style={styles.transportRow}>
+            {/* A mix is what people actually fall asleep to, and it had no
+                timer at all — it played until the battery died. */}
             <TouchableOpacity
+              onPress={() => setShowTimerModal(true)}
+              disabled={isEmpty}
+              style={styles.timerButton}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isEmpty }}
+              accessibilityLabel={
+                timerRemaining !== null && timerRemaining > 0
+                  ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
+                  : t('player.timer')
+              }
+            >
+              <Ionicons
+                name="timer-outline"
+                size={24}
+                color={
+                  isEmpty
+                    ? colors.tabIconDefault
+                    : timerDuration
+                      ? colors.primary
+                      : colors.textSecondary
+                }
+              />
+              {timerRemaining !== null && timerRemaining > 0 && (
+                <Text
+                  style={[styles.timerBadge, { color: colors.accent }]}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                >
+                  {formatTimerValue(timerRemaining)}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <PressableScale
               onPress={handlePlayPause}
-              activeOpacity={reduceMotion ? 1 : 0.8}
+              disabled={isEmpty}
               style={[styles.playButton, { backgroundColor: colors.primary }]}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isEmpty }}
               accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
             >
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
                 size={32}
-                color="#1A140C"
+                color={onPrimary}
                 style={isPlaying ? undefined : { marginLeft: 4 }}
               />
-            </TouchableOpacity>
-          </View>
-        )}
+            </PressableScale>
 
-        {/* Save Button */}
-        {channels.length > 0 && (
-          <View style={styles.saveSection}>
-            <Button
-              title={t('mixer.savePreset')}
-              onPress={() => setShowSaveDialog(true)}
-              variant="secondary"
-            />
+            {/* Balances the timer slot so play stays centred. */}
+            <View style={styles.timerButton} />
           </View>
-        )}
+
+          <Button
+            title={t('mixer.savePreset')}
+            onPress={() => setShowSaveDialog(true)}
+            disabled={isEmpty}
+            variant="secondary"
+          />
+        </View>
 
         {/* Saved Mixes */}
         {customMixes.length > 0 && (
           <View style={styles.section}>
             <CategoryHeader title={t('mixer.myMixes')} />
-            {customMixes.map(mix => (
-              <TouchableOpacity
-                key={mix.id}
-                onPress={() => handleLoadMix(mix)}
-                activeOpacity={reduceMotion ? 1 : 0.6}
-                style={[styles.mixRow, { borderBottomColor: colors.cardBorder }]}
-              >
-                <View style={styles.mixTextContainer}>
-                  <Text style={[styles.mixName, { color: colors.text }]}>
-                    {mix.name}
-                  </Text>
-                  <Text style={[styles.mixChannels, { color: colors.textSecondary }]}>
-                    {mix.channels.length} {t('mixer.sounds')}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    Alert.alert(
-                      t('common.delete'),
-                      `${t('mixer.deleteMix')} "${mix.name}"?`,
-                      [
-                        { text: t('common.cancel'), style: 'cancel' },
-                        {
-                          text: t('common.delete'),
-                          style: 'destructive',
-                          onPress: () => deleteCustomMix(mix.id),
-                        },
-                      ]
-                    );
-                  }}
-                  style={styles.deleteButton}
+            {customMixes.map(mix => {
+              const isActive = mix.id === activeMixId;
+              return (
+                /* Row and delete are siblings, not nested touchables — the
+                   delete button used to live inside the row's own pressable,
+                   so the two targets overlapped. */
+                <View
+                  key={mix.id}
+                  style={[styles.mixRow, { borderBottomColor: colors.cardBorder }]}
                 >
-                  <Ionicons name="trash-outline" size={20} color={colors.error} />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            ))}
+                  <TouchableOpacity
+                    onPress={() => handleLoadMix(mix)}
+                    activeOpacity={0.6}
+                    style={styles.mixMain}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isActive }}
+                    accessibilityLabel={`${mix.name}, ${mix.channels.length} ${t('mixer.sounds')}`}
+                  >
+                    <View style={styles.mixTextContainer}>
+                      <Text
+                        style={[
+                          styles.mixName,
+                          { color: isActive ? colors.accent : colors.text },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {mix.name}
+                      </Text>
+                      <Text style={[styles.mixChannels, { color: colors.textSecondary }]}>
+                        {isActive
+                          ? t('mixer.loaded')
+                          : `${mix.channels.length} ${t('mixer.sounds')}`}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleRenameMix(mix)}
+                    style={styles.deleteButton}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('mixer.renameMix')} ${mix.name}`}
+                  >
+                    <Ionicons name="pencil-outline" size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteMix(mix.id, mix.name)}
+                    style={styles.deleteButton}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('common.delete')} ${mix.name}`}
+                  >
+                    <Ionicons name="trash-outline" size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
         )}
 
       </ScrollView>
 
+      <TimerModal
+        visible={showTimerModal}
+        onClose={() => setShowTimerModal(false)}
+      />
+
       {/* Preset Picker Modal */}
       <Modal
         visible={showPresetPicker}
         animationType={reduceMotion ? 'none' : 'slide'}
-        onRequestClose={() => setShowPresetPicker(false)}
+        onRequestClose={() => {
+          setPickerQuery('');
+          setShowPresetPicker(false);
+        }}
+        accessibilityViewIsModal
       >
         <View style={[styles.modal, { backgroundColor: colors.background }]}>
           <SafeAreaView style={styles.modalInner}>
@@ -288,14 +479,27 @@ export default function MixerScreen() {
                 {t('mixer.addSound')}
               </Text>
               <TouchableOpacity
-                onPress={() => setShowPresetPicker(false)}
+                onPress={() => {
+                  setPickerQuery('');
+                  setShowPresetPicker(false);
+                }}
                 style={styles.closeButton}
               >
                 <Ionicons name="close" size={28} color={colors.text} />
               </TouchableOpacity>
             </View>
+            <View style={[styles.searchBar, { backgroundColor: colors.backgroundSecondary }]}>
+              <Ionicons name="search" size={18} color={colors.textSecondary} />
+              <TextInput
+                value={pickerQuery}
+                onChangeText={setPickerQuery}
+                placeholder={t('explore.searchPlaceholder')}
+                placeholderTextColor={colors.textSecondary}
+                style={[styles.searchInput, { color: colors.text }]}
+              />
+            </View>
             <ScrollView style={styles.presetList}>
-              {pickerGroups.map(group => (
+              {filteredPickerGroups.map(group => (
                 <View key={group.titleKey}>
                   <Text style={[styles.pickerGroupTitle, { color: colors.textSecondary }]}>
                     {t(group.titleKey)}
@@ -304,13 +508,13 @@ export default function MixerScreen() {
                     <TouchableOpacity
                       key={preset.id}
                       onPress={() => handleAddChannel(preset)}
-                      activeOpacity={reduceMotion ? 1 : 0.6}
+                      activeOpacity={0.6}
                       style={[styles.presetItem, { borderBottomColor: colors.cardBorder }]}
                     >
                       <Text style={[styles.presetItemName, { color: colors.text }]}>
                         {t(preset.nameKey)}
                       </Text>
-                      <Ionicons name="add" size={22} color={colors.primary} />
+                      <Ionicons name="add" size={22} color={colors.accent} />
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -320,26 +524,40 @@ export default function MixerScreen() {
         </View>
       </Modal>
 
-      {/* Save Dialog Modal */}
+      {/* Save / Rename Dialog — a single text field doesn't need a full
+          screen, so it lives in a bottom sheet like the timer picker. */}
       <Modal
         visible={showSaveDialog}
+        transparent
         animationType={reduceMotion ? 'none' : 'slide'}
-        onRequestClose={() => setShowSaveDialog(false)}
+        onRequestClose={closeSaveDialog}
+        accessibilityViewIsModal
       >
-        <View style={[styles.modal, { backgroundColor: colors.background }]}>
-          <SafeAreaView style={styles.modalInner}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                {t('mixer.savePreset')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowSaveDialog(false)}
-                style={styles.closeButton}
-              >
-                <Ionicons name="close" size={28} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.saveForm}>
+        <KeyboardAvoidingView
+          style={styles.sheetOverlayWrap}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <Pressable
+            style={[styles.sheetOverlay, { backgroundColor: colors.overlay }]}
+            onPress={closeSaveDialog}
+          >
+            <Pressable
+              style={[styles.sheet, { backgroundColor: colors.backgroundSecondary }]}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <View style={styles.sheetHeader}>
+                <Text style={[styles.sheetTitle, { color: colors.text }]} accessibilityRole="header">
+                  {editingMixId ? t('mixer.renameMix') : t('mixer.savePreset')}
+                </Text>
+                <TouchableOpacity
+                  onPress={closeSaveDialog}
+                  style={styles.closeButton}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.cancel')}
+                >
+                  <Ionicons name="close" size={24} color={colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('mixer.presetName')}
               </Text>
@@ -348,19 +566,20 @@ export default function MixerScreen() {
                 onChangeText={setMixName}
                 placeholder={t('mixer.namePlaceholder')}
                 placeholderTextColor={colors.textSecondary}
+                autoFocus
                 style={[
                   styles.input,
                   {
                     color: colors.text,
-                    backgroundColor: colors.backgroundSecondary,
+                    backgroundColor: colors.background,
                     borderColor: colors.cardBorder,
                   },
                 ]}
               />
               <Button title={t('common.save')} onPress={handleSaveMix} />
-            </View>
-          </SafeAreaView>
-        </View>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
@@ -385,7 +604,7 @@ const styles = StyleSheet.create({
     ...Typography.largeTitle,
   },
   infoText: {
-    ...Typography.subhead,
+    ...Typography.body,
     lineHeight: 21,
     marginBottom: Spacing.md,
   },
@@ -405,8 +624,19 @@ const styles = StyleSheet.create({
   channelName: {
     ...Typography.headline,
   },
-  removeButton: {
-    padding: Spacing.xs,
+  channelActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  channelActionButton: {
+    width: AccessibilitySize.minTouchTarget,
+    height: AccessibilitySize.minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Muted reads as "still here, just silent" — dimmed, not removed.
+  mutedSlider: {
+    opacity: 0.4,
   },
   addRow: {
     flexDirection: 'row',
@@ -418,10 +648,28 @@ const styles = StyleSheet.create({
   addRowText: {
     ...Typography.headline,
   },
-  playSection: {
+  transport: {
     alignItems: 'center',
+    gap: Spacing.md,
+    marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
-    marginTop: Spacing.md,
+  },
+  transportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xl,
+  },
+  timerButton: {
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timerBadge: {
+    ...Typography.caption,
+    fontVariant: ['tabular-nums'],
+    marginTop: 2,
   },
   playButton: {
     width: 72,
@@ -430,15 +678,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  saveSection: {
-    marginBottom: Spacing.xl,
-  },
   mixRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  mixMain: {
+    flex: 1,
+    paddingVertical: Spacing.md,
+    justifyContent: 'center',
+    minHeight: 56,
   },
   mixTextContainer: {
     flex: 1,
@@ -448,10 +697,13 @@ const styles = StyleSheet.create({
     ...Typography.headline,
   },
   mixChannels: {
-    ...Typography.caption1,
+    ...Typography.caption,
   },
   deleteButton: {
-    padding: Spacing.sm,
+    width: AccessibilitySize.minTouchTarget,
+    height: AccessibilitySize.minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modal: {
     flex: 1,
@@ -468,7 +720,7 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
   },
   modalTitle: {
-    ...Typography.title1,
+    ...Typography.title,
   },
   closeButton: {
     width: AccessibilitySize.minTouchTarget,
@@ -491,7 +743,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   emptyStateText: {
-    ...Typography.subhead,
+    ...Typography.body,
     lineHeight: 21,
   },
   sampleButton: {
@@ -500,7 +752,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sampleButtonText: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
   presetItem: {
@@ -514,16 +766,51 @@ const styles = StyleSheet.create({
   presetItemName: {
     ...Typography.body,
   },
-  saveForm: {
-    gap: Spacing.md,
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.sm,
+    minHeight: 44,
+  },
+  searchInput: {
+    flex: 1,
+    ...Typography.body,
+    paddingVertical: Spacing.sm,
   },
   label: {
     ...Typography.headline,
+    marginBottom: Spacing.sm,
   },
   input: {
     borderWidth: 1,
     borderRadius: 12,
     padding: Spacing.md,
+    marginBottom: Spacing.md,
     ...Typography.body,
+  },
+  sheetOverlayWrap: {
+    flex: 1,
+  },
+  sheetOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: Spacing.lg,
+    paddingBottom: Spacing.xxl,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  sheetTitle: {
+    ...Typography.title,
   },
 });

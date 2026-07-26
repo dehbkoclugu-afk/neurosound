@@ -3,40 +3,43 @@
  * Flat surface, one breathing ring, typographic info, single amber accent.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Modal,
-  Pressable,
-  ActivityIndicator,
+  Animated,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Reanimated, { ZoomIn } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily } from '@/constants/theme';
+import {
+  Spacing,
+  Typography,
+  FontFamily,
+  onPrimary,
+  withAlpha,
+  CategoryColors,
+} from '@/constants/theme';
+import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { WaveVisualizer } from '@/components/player/WaveVisualizer';
 import { Slider } from '@/components/ui/Slider';
+import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
+import { PressableScale } from '@/components/ui/PressableScale';
+import { useToastStore } from '@/stores/toastStore';
+import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
-
-// Timer options
-const TIMER_OPTIONS = [
-  { labelKey: 'player.timerOptions.none', value: null },
-  { labelKey: 'player.timerOptions.15min', value: 15 },
-  { labelKey: 'player.timerOptions.30min', value: 30 },
-  { labelKey: 'player.timerOptions.1hour', value: 60 },
-  { labelKey: 'player.timerOptions.2hours', value: 120 },
-];
 
 // Visual pulse tempo follows the sound: slow breathing for delta,
 // fine shimmer for gamma, slow drift for ambient noise, steady for tones.
@@ -72,6 +75,7 @@ export default function PlayerScreen() {
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
   const [showTimerModal, setShowTimerModal] = useState(false);
+  const showToast = useToastStore((s) => s.show);
 
   // Load preset into the global controller (same preset = keeps playing)
   useEffect(() => {
@@ -90,35 +94,63 @@ export default function PlayerScreen() {
   }, [volume, maxVolume]);
 
   const handlePlayPause = useCallback(async () => {
+    haptics.commit();
     await playerController.toggle();
   }, []);
 
-  const handleSelectTimer = useCallback((value: number | null) => {
-    playerController.startTimer(value);
-    setShowTimerModal(false);
-  }, []);
+  // The most requested action next to a sound is layering it into a mix —
+  // this used to be a decorative empty view "for symmetry".
+  const handleAddToMixer = useCallback(async () => {
+    if (!preset) return;
+    const added = await playerController.mixerAddChannel(preset);
+    if (!added) {
+      Alert.alert(t('mixer.maxChannels'), t('mixer.maxChannelsDesc'));
+      return;
+    }
+    haptics.save();
+    showToast(t('mixer.addedToMixer'));
+  }, [preset, t, showToast]);
 
   const isFavorite = id ? favoriteIds.includes(id) : false;
+
+  // Favouriting is rare and rewarding — the one place a little delight earns
+  // its keep. Removing gets no pop; it is not an achievement.
+  const heartScale = useRef(new Animated.Value(1)).current;
 
   const handleFavoriteToggle = useCallback(() => {
     if (!id) return;
     if (favoriteIds.includes(id)) {
+      haptics.commit();
       removeFavorite(id);
-    } else {
-      addFavorite(id);
+      return;
     }
-  }, [id, favoriteIds, addFavorite, removeFavorite]);
 
-  // Close only dismisses the modal — audio keeps playing, MiniPlayer takes over
+    haptics.save();
+    addFavorite(id);
+
+    if (reduceMotion) return;
+    heartScale.setValue(1);
+    Animated.sequence([
+      Animated.timing(heartScale, { toValue: 1.3, duration: 120, useNativeDriver: true }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        friction: 4,
+        tension: 180,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [id, favoriteIds, addFavorite, removeFavorite, reduceMotion, heartScale]);
+
+  // Close only dismisses the modal — audio keeps playing, MiniPlayer takes over.
+  // Arriving here from a deep link means there is no history to pop, so back
+  // would exit the app instead of returning to it.
   const handleClose = useCallback(() => {
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
   }, [router]);
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   if (!preset) {
     return (
@@ -136,7 +168,11 @@ export default function PlayerScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Atmospheric wash — the sound's colour bleeds softly from the top */}
       <LinearGradient
-        colors={[preset.color + '2E', preset.color + '0D', colors.background]}
+        colors={[
+          withAlpha(colors.primary, 0.16),
+          withAlpha(colors.primary, 0.04),
+          colors.background,
+        ]}
         locations={[0, 0.42, 0.82]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
@@ -151,7 +187,11 @@ export default function PlayerScreen() {
         >
           <Ionicons name="chevron-down" size={26} color={colors.textSecondary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>
+        <Text
+          style={[styles.headerTitle, { color: colors.textSecondary }]}
+          accessibilityLiveRegion="polite"
+          accessibilityRole="text"
+        >
           {isPlaying ? t('player.nowPlaying') : t('player.paused')}
         </Text>
         <TouchableOpacity
@@ -159,151 +199,198 @@ export default function PlayerScreen() {
           style={styles.headerButton}
           accessibilityLabel={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
         >
-          <Ionicons
-            name={isFavorite ? 'heart' : 'heart-outline'}
-            size={22}
-            color={isFavorite ? colors.primary : colors.textSecondary}
-          />
+          <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={22}
+              color={isFavorite ? colors.accent : colors.textSecondary}
+            />
+          </Animated.View>
         </TouchableOpacity>
       </View>
 
       {/* Breathing ring — the centerpiece, over a soft radial glow */}
       <View style={styles.content}>
         <View style={styles.visualWrap}>
-          <View style={[styles.glowOuter, { backgroundColor: preset.color + '0F' }]} />
-          <View style={[styles.glowMid, { backgroundColor: preset.color + '14' }]} />
-          <View style={[styles.glowInner, { backgroundColor: preset.color + '1C' }]} />
+          <View
+            style={[styles.glowOuter, { backgroundColor: withAlpha(colors.primary, 0.05) }]}
+          />
+          <View
+            style={[styles.glowInner, { backgroundColor: withAlpha(colors.primary, 0.09) }]}
+          />
           <WaveVisualizer
             isPlaying={isPlaying}
-            color={preset.color}
+            color={colors.primary}
             intensity={volume}
             tempoMs={getVisualTempoMs(preset)}
           />
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={[styles.presetName, { color: colors.text }]}>
+          <Text
+            style={[styles.presetName, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t(preset.nameKey)}
           </Text>
 
-          {frequencyLine && (
+          <View style={styles.metaRow}>
+            {/* The only place the sound's own colour still appears. */}
+            <View
+              style={[
+                styles.categoryDot,
+                { backgroundColor: CategoryColors[preset.type] },
+              ]}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
             <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
-              {frequencyLine}
+              {frequencyLine ?? t(`explore.categories.${preset.type}`)}
             </Text>
-          )}
+          </View>
 
-          {preset.type !== 'solfeggio' && (
-            <Text style={[styles.presetDescription, { color: colors.textSecondary }]}>
-              {t(preset.descriptionKey)}
-            </Text>
-          )}
+          <Text
+            style={[
+              styles.presetDescription,
+              { color: colors.textSecondary },
+              preset.type === 'solfeggio' && styles.disclaimer,
+            ]}
+          >
+            {t(preset.descriptionKey)}
+          </Text>
 
           {playbackError && (
-            <Text style={[styles.playbackError, { color: colors.error }]}>
-              {t('player.playbackError')}
-            </Text>
+            <View style={styles.playbackError} accessibilityLiveRegion="assertive">
+              <Ionicons
+                name="alert-circle-outline"
+                size={16}
+                color={colors.error}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+              <Text style={[styles.playbackErrorText, { color: colors.error }]}>
+                {t('player.playbackError')}
+              </Text>
+            </View>
           )}
         </View>
       </View>
 
       {/* Controls */}
-      <View style={[styles.controls, { paddingBottom: insets.bottom + Spacing.xl }]}>
-        <View style={styles.volumeContainer}>
-          <Ionicons name="volume-low" size={18} color={colors.textSecondary} />
-          <View style={styles.sliderWrapper}>
-            <Slider
-              value={volume}
-              onValueChange={setVolume}
-              max={1}
-              showValue={false}
-              accessibilityLabel={t('accessibility.volumeSlider')}
+      <View
+        style={[
+          styles.controls,
+          contentColumn,
+          { paddingBottom: insets.bottom + Spacing.xl },
+        ]}
+      >
+        <View style={styles.volumeSection}>
+          <View style={styles.volumeContainer}>
+            <Ionicons
+              name="volume-low"
+              size={18}
+              color={colors.textSecondary}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <View style={styles.sliderWrapper}>
+              <Slider
+                value={volume}
+                onValueChange={setVolume}
+                max={1}
+                showValue={false}
+                accessibilityLabel={t('accessibility.volumeSlider')}
+              />
+            </View>
+            <Ionicons
+              name="volume-high"
+              size={18}
+              color={colors.textSecondary}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
             />
           </View>
-          <Ionicons name="volume-high" size={18} color={colors.textSecondary} />
+
+          {/* The safety cap is invisible otherwise: the slider runs to 100%
+              while the output stops at maxVolume, so full travel sounds
+              quieter than it looks with no explanation anywhere. */}
+          {maxVolume < 1 && (
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/settings')}
+              style={styles.volumeCap}
+              accessibilityRole="button"
+              accessibilityLabel={`${t('player.volumeCapped', {
+                percent: Math.round(maxVolume * 100),
+              })}. ${t('common.settings')}`}
+            >
+              <Text style={[styles.volumeCapText, { color: colors.textSecondary }]}>
+                {t('player.volumeCapped', { percent: Math.round(maxVolume * 100) })}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.mainControls}>
           <TouchableOpacity
             onPress={() => setShowTimerModal(true)}
             style={styles.sideButton}
-            accessibilityLabel={t('player.timer')}
+            accessibilityRole="button"
+            accessibilityLabel={
+              timerRemaining !== null && timerRemaining > 0
+                ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
+                : t('player.timer')
+            }
           >
             <Ionicons
               name="timer-outline"
               size={24}
-              color={timerDuration ? colors.primary : colors.textSecondary}
+              color={timerDuration ? colors.accent : colors.textSecondary}
             />
             {timerRemaining !== null && timerRemaining > 0 && (
-              <Text style={[styles.timerBadge, { color: colors.primary }]}>
-                {formatTime(timerRemaining)}
-              </Text>
+              <Reanimated.Text
+                entering={reduceMotion ? undefined : ZoomIn.duration(200)}
+                style={[styles.timerBadge, { color: colors.accent }]}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
+                {formatTimerValue(timerRemaining)}
+              </Reanimated.Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePlayPause}
             disabled={isLoading}
-            activeOpacity={reduceMotion ? 1 : 0.8}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
             accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
             accessibilityState={{ busy: isLoading }}
           >
-            {isLoading ? (
-              <ActivityIndicator size="large" color="#1A140C" />
-            ) : (
-              <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
-                size={38}
-                color="#1A140C"
-                style={isPlaying ? undefined : { marginLeft: 3 }}
-              />
-            )}
-          </TouchableOpacity>
+            {/* Sound generation isn't a spinner's kind of wait — the ring
+                already sits dim and starts breathing the moment it's ready. */}
+            <Ionicons
+              name={isPlaying ? 'pause' : 'play'}
+              size={38}
+              color={onPrimary}
+              style={isPlaying ? undefined : { marginLeft: 3 }}
+            />
+          </PressableScale>
 
-          {/* Placeholder for symmetry */}
-          <View style={styles.sideButton} />
+          <TouchableOpacity
+            onPress={handleAddToMixer}
+            style={styles.sideButton}
+            accessibilityRole="button"
+            accessibilityLabel={t('mixer.addToMixer')}
+          >
+            <Ionicons name="layers-outline" size={24} color={colors.textSecondary} />
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Timer Modal */}
-      <Modal
+      <TimerModal
         visible={showTimerModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowTimerModal(false)}
-      >
-        <Pressable
-          style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}
-          onPress={() => setShowTimerModal(false)}
-        >
-          <View style={[styles.modalContent, { backgroundColor: colors.backgroundSecondary }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('player.timer')}</Text>
-            {TIMER_OPTIONS.map((option) => {
-              const isSelected = timerDuration === option.value;
-              return (
-                <TouchableOpacity
-                  key={option.labelKey}
-                  onPress={() => handleSelectTimer(option.value)}
-                  style={[styles.timerOption, { borderBottomColor: colors.cardBorder }]}
-                >
-                  <Text
-                    style={[
-                      styles.timerOptionText,
-                      { color: isSelected ? colors.primary : colors.text },
-                      isSelected && styles.timerOptionTextSelected,
-                    ]}
-                  >
-                    {t(option.labelKey)}
-                  </Text>
-                  {isSelected && (
-                    <Ionicons name="checkmark" size={20} color={colors.primary} />
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </Pressable>
-      </Modal>
+        onClose={() => setShowTimerModal(false)}
+      />
     </View>
   );
 }
@@ -346,12 +433,6 @@ const styles = StyleSheet.create({
     height: 340,
     borderRadius: 170,
   },
-  glowMid: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-  },
   glowInner: {
     position: 'absolute',
     width: 210,
@@ -363,32 +444,65 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   presetName: {
-    ...Typography.title1,
+    ...Typography.title,
     textAlign: 'center',
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  categoryDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
   frequencyLine: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontVariant: ['tabular-nums'],
   },
   presetDescription: {
-    ...Typography.subhead,
+    ...Typography.body,
     textAlign: 'center',
     lineHeight: 21,
     maxWidth: 300,
   },
+  // The disclaimer is context, not a claim about the sound — it sits back.
+  disclaimer: {
+    ...Typography.footnote,
+    lineHeight: 18,
+    maxWidth: 280,
+  },
   playbackError: {
-    ...Typography.subhead,
-    textAlign: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
     marginTop: Spacing.sm,
+  },
+  playbackErrorText: {
+    ...Typography.body,
+    textAlign: 'center',
   },
   controls: {
     paddingHorizontal: Spacing.xl,
   },
+  volumeSection: {
+    marginBottom: Spacing.xl,
+  },
   volumeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.xl,
     gap: Spacing.md,
+  },
+  volumeCap: {
+    alignSelf: 'center',
+    paddingTop: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    minHeight: 32,
+  },
+  volumeCapText: {
+    ...Typography.caption,
+    fontVariant: ['tabular-nums'],
   },
   sliderWrapper: {
     flex: 1,
@@ -406,7 +520,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timerBadge: {
-    ...Typography.caption2,
+    ...Typography.caption,
     fontVariant: ['tabular-nums'],
     marginTop: 2,
   },
@@ -421,36 +535,5 @@ const styles = StyleSheet.create({
     ...Typography.body,
     textAlign: 'center',
     marginTop: Spacing.xxl,
-  },
-  // Modal
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: Spacing.xl,
-  },
-  modalContent: {
-    borderRadius: 20,
-    padding: Spacing.lg,
-    width: '100%',
-    maxWidth: 320,
-  },
-  modalTitle: {
-    ...Typography.title3,
-    textAlign: 'center',
-    marginBottom: Spacing.md,
-  },
-  timerOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  timerOptionText: {
-    ...Typography.body,
-  },
-  timerOptionTextSelected: {
-    fontFamily: FontFamily.semibold,
   },
 });

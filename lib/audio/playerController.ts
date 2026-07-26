@@ -6,7 +6,11 @@
  * in audioStore; this module is the only writer for playback actions.
  */
 
-import { useAudioStore } from '@/stores/audioStore';
+import { AppState, Platform } from 'react-native';
+import type { AudioPlayer } from 'expo-audio';
+
+import i18n from '@/i18n';
+import { useAudioStore, MixerChannelState } from '@/stores/audioStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset, getPresetById } from '../frequencies';
 import {
@@ -23,6 +27,45 @@ type Generator = BinauralPlayer | NoisePlayer | TonePlayer;
 let generator: Generator | null = null;
 let currentId: string | null = null;
 let timerInterval: ReturnType<typeof setInterval> | null = null;
+
+// ---------------------------------------------------------------------------
+// Lock screen / now-playing — a background sound app with no lock screen
+// control means unlocking the phone just to pause, which is exactly the
+// interaction someone falling asleep doesn't want. expo-audio exposes this
+// natively; no extra native module or build step needed.
+// ---------------------------------------------------------------------------
+
+let lockScreenPlayer: AudioPlayer | null = null;
+let lockScreenSubscription: { remove: () => void } | null = null;
+
+/** Mirrors a lock-screen-triggered play/pause back into the store, so the
+ *  in-app button reflects reality if the user opens the app again without
+ *  having touched it directly. */
+function watchLockScreenPlayer(player: AudioPlayer): void {
+  if (player === lockScreenPlayer) return;
+  lockScreenSubscription?.remove();
+  lockScreenPlayer = player;
+  lockScreenSubscription = player.addListener('playbackStatusUpdate', (status) => {
+    if (useAudioStore.getState().isMixerPlaying) return; // owned by the mixer path
+    useAudioStore.getState().setIsPlaying(status.playing);
+  });
+}
+
+function setNowPlaying(title: string): void {
+  if (Platform.OS === 'web') return;
+  const player = generator?.getNativePlayer() ?? null;
+  if (!player) return;
+  player.setActiveForLockScreen(true, { title, artist: 'NeuroSound' });
+  watchLockScreenPlayer(player);
+}
+
+function clearNowPlaying(): void {
+  if (Platform.OS === 'web') return;
+  lockScreenSubscription?.remove();
+  lockScreenSubscription = null;
+  lockScreenPlayer = null;
+  generator?.getNativePlayer()?.clearLockScreenControls();
+}
 
 function createGenerator(preset: FrequencyPreset): Generator | null {
   switch (preset.type) {
@@ -119,20 +162,32 @@ let playPending = false;
 
 export async function play(): Promise<void> {
   if (!generator || playPending) return;
+  // Captured locally: unload()/loadPreset() can dispose and null out the
+  // module-level `generator` while this call is still awaiting play() (e.g.
+  // the user taps the MiniPlayer's close button mid-load) — re-reading the
+  // mutable variable afterwards would dereference null instead of finding
+  // out cleanly that this attempt is no longer relevant.
+  const gen = generator;
   playPending = true;
   const store = useAudioStore.getState();
   store.setIsLoading(true);
   store.setPlaybackError(false);
   try {
     setGenVolume(0); // fade in from silence
-    await generator.play();
-    if (!generator || !generator.getIsPlaying()) {
-      // generators swallow their own errors; surface the failure to the UI
-      useAudioStore.getState().setPlaybackError(true);
+    await gen.play();
+    if (generator !== gen || !gen.getIsPlaying()) {
+      // Either superseded (unloaded/switched while awaiting) or the
+      // generator swallowed its own error — either way, this attempt is
+      // done; only surface a failure if it's still the active generator.
+      if (generator === gen) useAudioStore.getState().setPlaybackError(true);
       return;
     }
     ramp(effectiveVolume(), FADE_IN_MS);
     useAudioStore.getState().setIsPlaying(true);
+    const preset = useAudioStore.getState().currentPreset;
+    if (preset) setNowPlaying(i18n.t(preset.nameKey));
+  } catch (e) {
+    if (generator === gen) useAudioStore.getState().setPlaybackError(true);
   } finally {
     useAudioStore.getState().setIsLoading(false);
     playPending = false;
@@ -171,18 +226,24 @@ export function syncVolume(): void {
   const { mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
   mixerChannels.forEach((ch) =>
-    mixerGenerators.get(ch.id)?.setVolume(ch.volume * maxVolume)
+    mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume))
   );
+}
+
+/** Tear down the single-preset generator, leaving the timer alone. */
+function disposePreset(): void {
+  pause(true);
+  clearNowPlaying();
+  generator?.dispose();
+  generator = null;
+  currentId = null;
+  useAudioStore.getState().setCurrentPreset(null);
 }
 
 /** Stop, dispose, and clear everything — MiniPlayer close button. */
 export function unload(): void {
-  pause(true);
-  generator?.dispose();
-  generator = null;
-  currentId = null;
+  disposePreset();
   clearTimer();
-  useAudioStore.getState().setCurrentPreset(null);
 }
 
 function clearTimer(): void {
@@ -191,6 +252,58 @@ function clearTimer(): void {
     timerInterval = null;
   }
   useAudioStore.getState().setTimer(null);
+}
+
+/**
+ * Advance the sleep timer against the wall clock. Called on every tick and
+ * again whenever the app returns to the foreground, so a throttled or fully
+ * suspended JS timer can never let playback run past its deadline — it just
+ * catches up on the next evaluation.
+ */
+/** Scale whatever is currently playing, for the timer's closing fade. */
+function applyTimerFade(ratio: number): void {
+  const { isPlaying, isMixerPlaying, mixerChannels } = useAudioStore.getState();
+  const { maxVolume } = useSettingsStore.getState();
+
+  if (isPlaying) {
+    setGenVolume(effectiveVolume() * ratio);
+  }
+  if (isMixerPlaying) {
+    mixerChannels.forEach((ch) =>
+      mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume) * ratio)
+    );
+  }
+}
+
+/** Stop whichever source the timer was counting down for. */
+function stopForTimer(): void {
+  const { isMixerPlaying } = useAudioStore.getState();
+  if (isMixerPlaying) mixerStop();
+  pause();
+}
+
+function evaluateTimer(): void {
+  const { timerEndsAt, updateTimerRemaining, isPlaying, isMixerPlaying } =
+    useAudioStore.getState();
+  if (timerEndsAt === null) {
+    clearTimer();
+    return;
+  }
+
+  const remaining = Math.max(0, Math.round((timerEndsAt - Date.now()) / 1000));
+
+  if (remaining <= 0) {
+    stopForTimer();
+    clearTimer();
+    return;
+  }
+
+  updateTimerRemaining(remaining);
+
+  // Gentle fade over the final window instead of an abrupt cut
+  if ((isPlaying || isMixerPlaying) && remaining <= TIMER_FADE_WINDOW_S && !rampInterval) {
+    applyTimerFade(remaining / TIMER_FADE_WINDOW_S);
+  }
 }
 
 /** Sleep timer: counts down globally, pauses playback when done. */
@@ -202,25 +315,15 @@ export function startTimer(minutes: number | null): void {
   useAudioStore.getState().setTimer(minutes);
   if (!minutes) return;
 
-  timerInterval = setInterval(() => {
-    const { timerRemaining, updateTimerRemaining, isPlaying } = useAudioStore.getState();
-    if (timerRemaining === null) {
-      clearTimer();
-      return;
-    }
-    if (timerRemaining <= 1) {
-      pause();
-      clearTimer();
-      return;
-    }
-    const next = timerRemaining - 1;
-    updateTimerRemaining(next);
-    // Gentle fade over the final window instead of an abrupt cut
-    if (isPlaying && next <= TIMER_FADE_WINDOW_S && !rampInterval) {
-      setGenVolume(effectiveVolume() * (next / TIMER_FADE_WINDOW_S));
-    }
-  }, 1000);
+  timerInterval = setInterval(evaluateTimer, 1000);
 }
+
+// A suspended JS thread stops ticking; re-evaluating on resume closes the gap.
+AppState.addEventListener('change', (next) => {
+  if (next === 'active' && useAudioStore.getState().timerEndsAt !== null) {
+    evaluateTimer();
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Mixer - up to MAX_MIXER_CHANNELS layered generators, channel list in store
@@ -235,7 +338,8 @@ let mixerStartPending = false;
 /** Start (or resume) all mixer channels. Silences the single-preset player. */
 export async function mixerStart(): Promise<void> {
   if (mixerStartPending) return;
-  unload(); // mutual exclusion: MiniPlayer preset off
+  // Mutual exclusion only — a sleep timer set for this session must survive.
+  disposePreset();
 
   const { mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
@@ -250,7 +354,7 @@ export async function mixerStart(): Promise<void> {
 }
 
 async function startMixerChannels(
-  mixerChannels: { id: string; preset: FrequencyPreset; volume: number }[],
+  mixerChannels: MixerChannelState[],
   maxVolume: number
 ): Promise<void> {
   for (const ch of mixerChannels) {
@@ -261,7 +365,7 @@ async function startMixerChannels(
       gen = created;
       mixerGenerators.set(ch.id, gen);
     }
-    gen.setVolume(ch.volume * maxVolume);
+    gen.setVolume(channelVolume(ch, maxVolume));
     await gen.play();
   }
   useAudioStore.getState().setIsMixerPlaying(true);
@@ -276,6 +380,33 @@ export function mixerStop(): void {
   useAudioStore.getState().setIsMixerPlaying(false);
 }
 
+/** A muted channel outputs nothing but keeps its level, so unmuting restores
+ *  exactly what the user set. */
+function channelVolume(
+  ch: { volume: number; muted: boolean },
+  maxVolume: number
+): number {
+  return ch.muted ? 0 : ch.volume * maxVolume;
+}
+
+export function mixerSetChannelMuted(channelId: string, muted: boolean): void {
+  useAudioStore.getState().setMixerChannelMuted(channelId, muted);
+  const ch = useAudioStore
+    .getState()
+    .mixerChannels.find((c) => c.id === channelId);
+  if (!ch) return;
+  mixerGenerators
+    .get(channelId)
+    ?.setVolume(channelVolume(ch, useSettingsStore.getState().maxVolume));
+}
+
+/** Stop the mixer and discard its channels — the MiniPlayer close button.
+ *  Mirrors `unload()` for the single-preset player. */
+export function mixerClear(): void {
+  mixerStop();
+  useAudioStore.getState().clearMixerChannels();
+}
+
 /** Add a channel. Returns false when the channel limit is reached.
  *  If the mixer is playing, the new channel starts immediately. */
 export async function mixerAddChannel(preset: FrequencyPreset): Promise<boolean> {
@@ -283,7 +414,8 @@ export async function mixerAddChannel(preset: FrequencyPreset): Promise<boolean>
   if (store.mixerChannels.length >= MAX_MIXER_CHANNELS) return false;
 
   const id = `channel-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-  store.addMixerChannel({ id, preset, volume: 0.5 });
+  store.addMixerChannel({ id, preset, volume: 0.5, muted: false });
+  store.setActiveMixId(null);
 
   if (store.isMixerPlaying) {
     const gen = createGenerator(preset);
@@ -304,22 +436,34 @@ export function mixerRemoveChannel(channelId: string): void {
     mixerGenerators.delete(channelId);
   }
   useAudioStore.getState().removeMixerChannel(channelId);
+  useAudioStore.getState().setActiveMixId(null);
   if (useAudioStore.getState().mixerChannels.length === 0) {
     useAudioStore.getState().setIsMixerPlaying(false);
   }
 }
 
 export function mixerSetChannelVolume(channelId: string, volume: number): void {
-  useAudioStore.getState().updateMixerChannelVolume(channelId, volume);
+  const store = useAudioStore.getState();
+  store.updateMixerChannelVolume(channelId, volume);
+  // Moving a muted channel's level unmutes it — otherwise the slider moves and
+  // nothing happens, which reads as broken.
+  store.setMixerChannelMuted(channelId, false);
   mixerGenerators
     .get(channelId)
     ?.setVolume(volume * useSettingsStore.getState().maxVolume);
 }
 
-/** Replace all channels from a saved mix (stops current mixer playback). */
-export function mixerLoadChannels(
-  channels: { presetId: string; volume: number }[]
-): void {
+/**
+ * Replace all channels from a saved mix and start playing.
+ *
+ * Loading used to swap the channels silently: no sound, no scroll, no
+ * confirmation — the change happened off-screen above the list the user had
+ * just tapped, so tapping a saved mix appeared to do nothing at all.
+ */
+export async function mixerLoadChannels(
+  channels: { presetId: string; volume: number }[],
+  mixId?: string
+): Promise<void> {
   mixerStop();
   const store = useAudioStore.getState();
   store.clearMixerChannels();
@@ -330,7 +474,10 @@ export function mixerLoadChannels(
         id: `channel-${Date.now()}-${index}`,
         preset,
         volume: ch.volume,
+        muted: false,
       });
     }
   });
+  store.setActiveMixId(mixId ?? null);
+  await mixerStart();
 }

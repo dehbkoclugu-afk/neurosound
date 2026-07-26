@@ -14,10 +14,11 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { Spacing, Typography, onPrimary } from '@/constants/theme';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
+import * as haptics from '@/lib/haptics';
+import { PressableScale } from './PressableScale';
 import { useTranslation } from 'react-i18next';
 
 interface MiniPlayerProps {
@@ -27,42 +28,63 @@ interface MiniPlayerProps {
 export function MiniPlayer({ onPress }: MiniPlayerProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { reduceMotion } = useSettingsStore();
-  const { currentPreset, isPlaying, isLoading } = useAudioStore();
+  const { currentPreset, isPlaying, isLoading, isMixerPlaying, mixerChannels } =
+    useAudioStore();
 
   const colors = useThemeColors();
 
-  if (!currentPreset) {
+  // The mixer is a second, independent source of playback. Without this branch
+  // it had no global control at all: leaving the Mixer tab mid-playback left
+  // the user with no way to pause and no sign that anything was playing.
+  const isMixerSession = !currentPreset && mixerChannels.length > 0;
+
+  if (!currentPreset && !isMixerSession) {
     return null;
   }
+
+  const title = currentPreset ? t(currentPreset.nameKey) : t('mixer.title');
+
+  const subline = currentPreset
+    ? currentPreset.type === 'binaural'
+      ? `${currentPreset.beatFrequency} Hz`
+      : currentPreset.type === 'solfeggio'
+        ? `${currentPreset.frequency} Hz`
+        : t('explore.categories.noise')
+    : `${mixerChannels.length} ${t('mixer.sounds')}`;
+
+  const playing = currentPreset ? isPlaying : isMixerPlaying;
 
   const handlePress = () => {
     if (onPress) {
       onPress();
-    } else {
+    } else if (currentPreset) {
       router.push(`/player/${currentPreset.id}`);
+    } else {
+      router.push('/(tabs)/mixer');
     }
   };
 
   const handlePlayPause = () => {
-    playerController.toggle();
+    haptics.commit();
+    if (currentPreset) {
+      playerController.toggle();
+    } else if (isMixerPlaying) {
+      playerController.mixerStop();
+    } else {
+      playerController.mixerStart();
+    }
   };
 
   const handleStop = () => {
-    playerController.unload();
+    if (currentPreset) {
+      playerController.unload();
+    } else {
+      playerController.mixerClear();
+    }
   };
 
-  const subline =
-    currentPreset.type === 'binaural'
-      ? `${currentPreset.beatFrequency} Hz`
-      : currentPreset.type === 'solfeggio'
-        ? `${currentPreset.frequency} Hz`
-        : t('explore.categories.noise');
-
   return (
-    <TouchableOpacity
-      onPress={handlePress}
-      activeOpacity={reduceMotion ? 1 : 0.9}
+    <View
       style={[
         styles.container,
         {
@@ -70,14 +92,24 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           borderTopColor: colors.cardBorder,
         },
       ]}
-      accessibilityRole="button"
-      accessibilityLabel={`${t('player.nowPlaying')}: ${t(currentPreset.nameKey)}`}
-      accessibilityHint={t('accessibility.expandPlayer')}
     >
       <View style={styles.content}>
-        <View style={styles.infoContainer}>
+        {/* A pressable row wrapping the play/stop buttons would nest
+            interactive elements inside one another — invalid HTML on web
+            (React logs a hydration-error warning for it) and an ambiguous
+            touch target on native. The expand action is scoped to just the
+            info column instead, as a sibling of the buttons, not their
+            ancestor. */}
+        <TouchableOpacity
+          onPress={handlePress}
+          activeOpacity={0.7}
+          style={styles.infoContainer}
+          accessibilityRole="button"
+          accessibilityLabel={`${t('player.nowPlaying')}: ${title}`}
+          accessibilityHint={t('accessibility.expandPlayer')}
+        >
           <Text style={[styles.presetName, { color: colors.text }]} numberOfLines={1}>
-            {t(currentPreset.nameKey)}
+            {title}
           </Text>
           <Text
             style={[styles.presetType, { color: colors.textSecondary }]}
@@ -85,33 +117,32 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           >
             {subline}
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.rightSection}>
-          <TouchableOpacity
+          <PressableScale
             onPress={handlePlayPause}
             disabled={isLoading}
-            activeOpacity={reduceMotion ? 1 : 0.7}
             style={[styles.playButton, { backgroundColor: colors.primary }]}
             accessibilityRole="button"
-            accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
+            accessibilityLabel={playing ? t('accessibility.pauseButton') : t('accessibility.playButton')}
             accessibilityState={{ busy: isLoading }}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="#1A140C" />
+              <ActivityIndicator size="small" color={onPrimary} />
             ) : (
               <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
+                name={playing ? 'pause' : 'play'}
                 size={18}
-                color="#1A140C"
-                style={isPlaying ? undefined : { marginLeft: 2 }}
+                color={onPrimary}
+                style={playing ? undefined : { marginLeft: 2 }}
               />
             )}
-          </TouchableOpacity>
+          </PressableScale>
           <TouchableOpacity
             onPress={handleStop}
-            activeOpacity={reduceMotion ? 1 : 0.7}
+            activeOpacity={0.7}
             style={styles.stopButton}
             accessibilityRole="button"
             accessibilityLabel={t('common.stop')}
@@ -121,7 +152,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -147,10 +178,10 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   presetName: {
-    ...Typography.subhead,
+    ...Typography.body,
   },
   presetType: {
-    ...Typography.caption1,
+    ...Typography.caption,
     fontVariant: ['tabular-nums'],
   },
   rightSection: {

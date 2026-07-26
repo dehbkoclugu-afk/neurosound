@@ -15,8 +15,9 @@ import {
   ViewStyle,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, Spacing } from '@/constants/theme';
+import { AccessibilitySize, Spacing, Typography } from '@/constants/theme';
 
 interface SliderProps {
   value: number;
@@ -44,6 +45,7 @@ export function Slider({
   style,
 }: SliderProps) {
   const [sliderWidth, setSliderWidth] = useState(0);
+  const { t } = useTranslation();
 
   const colors = useThemeColors();
 
@@ -69,17 +71,29 @@ export function Slider({
   // child-relative coordinates when the finger lands on the thumb.
   const startXRef = useRef(0);
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderGrant: (evt) => {
-      startXRef.current = evt.nativeEvent.locationX;
-      handleValueFromPosition(startXRef.current);
-    },
-    onPanResponderMove: (_evt, gestureState) => {
-      handleValueFromPosition(startXRef.current + gestureState.dx);
-    },
-  });
+  // handleValueFromPosition changes identity on every value/width update, and
+  // calling it is exactly what drives that update — so the PanResponder itself
+  // must be created once and read the latest callback through a ref. Rebuilding
+  // it on every render (the previous shape) swapped the live responder for a
+  // fresh, never-granted one the instant the first onPanResponderGrant fired,
+  // so onPanResponderMove never ran again for the rest of that gesture: the
+  // slider looked like it only supported tap-to-set, never drag.
+  const handleValueFromPositionRef = useRef(handleValueFromPosition);
+  handleValueFromPositionRef.current = handleValueFromPosition;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        startXRef.current = evt.nativeEvent.locationX;
+        handleValueFromPositionRef.current(startXRef.current);
+      },
+      onPanResponderMove: (_evt, gestureState) => {
+        handleValueFromPositionRef.current(startXRef.current + gestureState.dx);
+      },
+    })
+  ).current;
 
   const handleAccessibilityAction = (direction: 'increment' | 'decrement') => {
     const newValue = direction === 'increment' ? value + step * 10 : value - step * 10;
@@ -115,8 +129,8 @@ export function Slider({
           text: formatValue(value),
         }}
         accessibilityActions={[
-          { name: 'increment', label: 'Artır' },
-          { name: 'decrement', label: 'Azalt' },
+          { name: 'increment', label: t('accessibility.increase') },
+          { name: 'decrement', label: t('accessibility.decrease') },
         ]}
         onAccessibilityAction={(event) => {
           switch (event.nativeEvent.actionName) {
@@ -129,12 +143,17 @@ export function Slider({
           }
         }}
       >
-        {/* Track fill */}
+        {/* Track fill — pointerEvents="none" so a tap here is always reported
+            relative to the full track. Without it, a touch landing on this
+            (partial-width) view or the thumb below gets a locationX relative
+            to that child's own bounds instead of the track, and the slider
+            jumps to the wrong value on touch-down. */}
         <View
+          pointerEvents="none"
           style={[
             styles.trackFill,
             {
-              backgroundColor: colors.primary,
+              backgroundColor: colors.accent,
               width: `${normalizedValue * 100}%`,
             },
           ]}
@@ -142,6 +161,7 @@ export function Slider({
 
         {/* Thumb */}
         <View
+          pointerEvents="none"
           style={[
             styles.thumb,
             {
@@ -166,11 +186,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
+    ...Typography.body,
+    fontFamily: Typography.headline.fontFamily,
   },
   value: {
-    fontSize: 14,
+    ...Typography.body,
+    fontVariant: ['tabular-nums'],
   },
   sliderContainer: {
     height: AccessibilitySize.minTouchTarget,

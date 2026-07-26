@@ -13,9 +13,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Spacing, Typography, FontFamily } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, CategoryColors } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
 
@@ -48,6 +47,14 @@ function getSubline(preset: FrequencyPreset, t: (k: string) => string): string {
   return t('explore.categories.noise');
 }
 
+// Chip already carries category through its icon and colour, so it only
+// needs the frequency — repeating "Binaural Beats · 6 Hz" would overflow.
+function getFrequencyOnly(preset: FrequencyPreset): string | null {
+  if (preset.type === 'binaural' && preset.beatFrequency) return `${preset.beatFrequency} Hz`;
+  if (preset.type === 'solfeggio' && preset.frequency) return `${preset.frequency} Hz`;
+  return null;
+}
+
 export function PresetCard({
   preset,
   onPress,
@@ -55,19 +62,27 @@ export function PresetCard({
   style,
 }: PresetCardProps) {
   const { t } = useTranslation();
-  const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.6}
+      activeOpacity={0.6}
       style={[styles.row, { borderBottomColor: colors.cardBorder }, style]}
       accessibilityRole="button"
-      accessibilityLabel={t(preset.nameKey)}
+      // The subline carries the category and the frequency, and the heart
+      // carries favourite state. Announcing the name alone dropped both, so a
+      // screen reader user could not tell 6 Hz from 40 Hz.
+      accessibilityLabel={[
+        t(preset.nameKey),
+        getSubline(preset, t),
+        isFavorite ? t('common.addedToFavorites') : null,
+      ]
+        .filter(Boolean)
+        .join(', ')}
     >
       {/* Naked icon — no tinted box */}
-      <Icon icon={presetIcon(preset)} size={20} color={colors.textSecondary} />
+      <Icon icon={presetIcon(preset)} size={20} color={CategoryColors[preset.type]} />
       <View style={styles.rowText}>
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
           {t(preset.nameKey)}
@@ -77,7 +92,13 @@ export function PresetCard({
         </Text>
       </View>
       {isFavorite && (
-        <Ionicons name="heart" size={16} color={colors.primary} />
+        <Ionicons
+          name="heart"
+          size={16}
+          color={colors.accent}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
       )}
     </TouchableOpacity>
   );
@@ -97,21 +118,31 @@ export function PresetCardSmall({
   onPress,
   style,
 }: PresetCardSmallProps) {
-  const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
+  const frequency = getFrequencyOnly(preset);
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reduceMotion ? 1 : 0.6}
+      activeOpacity={0.6}
       style={[styles.chip, { borderColor: colors.cardBorder }, style]}
       accessibilityRole="button"
-      accessibilityLabel={name}
+      accessibilityLabel={frequency ? `${name}, ${frequency}` : name}
     >
-      <Icon icon={presetIcon(preset)} size={15} color={colors.textSecondary} />
+      <Icon icon={presetIcon(preset)} size={15} color={CategoryColors[preset.type]} />
       <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
         {name}
       </Text>
+      {frequency && (
+        <Text
+          style={[styles.chipFrequency, { color: colors.textSecondary }]}
+          numberOfLines={1}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {frequency}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 }
@@ -149,7 +180,11 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   chipText: {
-    ...Typography.subhead,
+    ...Typography.body,
     fontFamily: FontFamily.semibold,
+  },
+  chipFrequency: {
+    ...Typography.caption,
+    fontVariant: ['tabular-nums'],
   },
 });

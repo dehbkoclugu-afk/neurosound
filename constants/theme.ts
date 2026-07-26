@@ -10,19 +10,40 @@
  * a muted amber so selected states remain readable, never gray).
  */
 
-import { Platform } from 'react-native';
-
 // Primary brand colors — calm amber
 const primary = '#D99A4E';
 const primaryLight = '#E8B573';
 const primaryDark = '#B57C35';
 
-// Category icons for UI (rendered via components/ui/Icon)
-export const CategoryIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
-  binaural: { name: 'pulse', library: 'ionicon' },
-  solfeggio: { name: 'musical-notes', library: 'ionicon' },
-  noise: { name: 'volume-medium', library: 'ionicon' },
-};
+/**
+ * Text/icon colour for anything sitting ON a filled primary surface.
+ * White on amber is 2.4:1 — well below WCAG AA. This warm near-black is
+ * 7.6:1 on #D99A4E and 5.9:1 on the dimmed night amber.
+ */
+export const onPrimary = '#1A140C';
+
+/**
+ * Overlay a colour at a given alpha.
+ *
+ * Call sites were building `preset.color + '2E'` by hand, which silently
+ * produces garbage for a 3-digit hex or an rgb() string and gives no hint
+ * about what "2E" means. Takes 0-1 and expands shorthand.
+ */
+export function withAlpha(color: string, alpha: number): string {
+  const hex = color.replace('#', '');
+  const full =
+    hex.length === 3
+      ? hex
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : hex;
+  if (full.length !== 6) return color; // not a hex we can extend — leave it alone
+  const a = Math.round(Math.max(0, Math.min(1, alpha)) * 255)
+    .toString(16)
+    .padStart(2, '0');
+  return `#${full}${a}`;
+}
 
 // Binaural type icons — each unique
 export const BinauralIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
@@ -53,66 +74,32 @@ export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'ma
 // Solfeggio icon
 export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const };
 
-// Frequency category colors (preset identity coding — not the brand accent)
-export const FrequencyColors = {
-  binaural: {
-    delta: '#3B82F6', // Blue - sleep
-    theta: '#8B5CF6', // Purple - meditation
-    alpha: '#10B981', // Green - relaxation
-    beta: '#F59E0B', // Amber - focus
-    gamma: '#EF4444', // Red - cognitive
-  },
-  solfeggio: '#EC4899', // Pink
-  noise: {
-    white: '#94A3B8',
-    pink: '#F472B6',
-    brown: '#A78BFA',
-  },
+/**
+ * Category markers — the one place a sound's own colour still shows.
+ *
+ * The app used to carry 22 distinct preset colours and paint whole screens
+ * with them, which fought the single-amber identity this file declares. Colour
+ * now identifies the *kind* of sound and nothing more: a tinted row icon, a dot
+ * beside the frequency. Everything structural is amber.
+ *
+ * Each clears 3:1 against all nine surfaces across the five palettes, so one
+ * value works everywhere rather than five sets of three.
+ */
+export const CategoryColors: Record<'binaural' | 'solfeggio' | 'noise', string> = {
+  binaural: '#6578AD',
+  solfeggio: '#AA6482',
+  noise: '#4E8474',
 };
 
-// Gradient backgrounds for presets (player screen identity per sound)
-export const GradientColors: Record<string, string[]> = {
-  // Binaural
-  delta: ['#1e3a5f', '#3B82F6'],
-  theta: ['#4c1d95', '#8B5CF6'],
-  alpha: ['#065f46', '#10B981'],
-  beta: ['#92400e', '#F59E0B'],
-  gamma: ['#991b1b', '#EF4444'],
-  // Solfeggio - each frequency has unique color
-  solfeggio: ['#831843', '#EC4899'], // Default fallback
-  'solfeggio-40': ['#78350f', '#F59E0B'],    // Amber
-  'solfeggio-111': ['#064e3b', '#10B981'],   // Emerald
-  'solfeggio-174': ['#7f1d1d', '#EF4444'],   // Red
-  'solfeggio-285': ['#7c2d12', '#F97316'],   // Orange
-  'solfeggio-396': ['#4c1d95', '#8B5CF6'],   // Violet
-  'solfeggio-417': ['#831843', '#F472B6'],   // Pink
-  'solfeggio-432': ['#14532d', '#22C55E'],   // Green
-  'solfeggio-440': ['#1e3a8a', '#3B82F6'],   // Blue
-  'solfeggio-528': ['#831843', '#EC4899'],   // Pink (Love)
-  'solfeggio-639': ['#164e63', '#06B6D4'],   // Cyan
-  'solfeggio-741': ['#0c4a6e', '#0EA5E9'],   // Sky blue
-  'solfeggio-777': ['#78350f', '#FBBF24'],   // Gold
-  'solfeggio-852': ['#312e81', '#6366F1'],   // Indigo
-  'solfeggio-888': ['#581c87', '#A855F7'],   // Purple
-  'solfeggio-963': ['#701a75', '#D946EF'],   // Fuchsia
-  // Noise - Classic
-  white: ['#475569', '#94A3B8'],
-  pink: ['#9d174d', '#F472B6'],
-  brown: ['#5b21b6', '#A78BFA'],
-  // Noise - Nature
-  rain: ['#1e3a5f', '#60A5FA'],
-  thunder: ['#312e81', '#6366F1'],
-  ocean: ['#164e63', '#06B6D4'],
-  wind: ['#4c1d95', '#8B5CF6'],
-  fire: ['#7c2d12', '#F97316'],
-  forest: ['#14532d', '#22C55E'],
-  stream: ['#134e4a', '#14B8A6'],
-  // Noise - Machines
-  fan: ['#334155', '#64748B'],
-  airplane: ['#1e293b', '#475569'],
-  train: ['#44403c', '#78716C'],
-};
-
+/**
+ * Accent colour for text and standalone glyphs — links, "See all", the timer
+ * badge, secondary button labels.
+ *
+ * `primary` is a fill colour: it works under `onPrimary` text and as a slider
+ * track, but as text on a light background it is 2.3:1. This is the same amber
+ * pushed until it clears AA on each palette's background. Fills keep `primary`;
+ * anything the user has to read uses this.
+ */
 export const Colors = {
   light: {
     text: '#201B15',
@@ -125,12 +112,13 @@ export const Colors = {
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
+    accent: '#925E1F', // AA on both surface levels
     icon: '#6E655A',
     tabIconDefault: '#A99F91',
     tabIconSelected: primaryDark,
     success: '#4C9A57',
-    warning: '#C77F2C',
-    error: '#C4553B',
+    warning: '#935E20', // AA on both surface levels
+    error: '#AE4B34', // AA on both surface levels
     slider: '#E5DFD3',
     sliderThumb: primaryDark,
     overlay: 'rgba(0, 0, 0, 0.5)',
@@ -147,6 +135,7 @@ export const Colors = {
     tint: primary,
     primary: primary,
     primaryLight: primaryLight,
+    accent: primary, // AA on both surface levels
     icon: '#A69B8C',
     tabIconDefault: '#5C544A',
     tabIconSelected: primary,
@@ -162,7 +151,9 @@ export const Colors = {
   // bedtime use. Low-contrast setting is intentionally ignored here.
   night: {
     text: '#CDBFA9',
-    textSecondary: '#7A6F5F',
+    // AA on both surface levels
+    // as dim as compliance allows; footnotes were unreadable at 4.15:1.
+    textSecondary: '#877C68',
     background: '#050403',
     backgroundSecondary: '#12100D',
     card: '#12100D',
@@ -171,6 +162,7 @@ export const Colors = {
     tint: '#A87C3F',
     primary: '#A87C3F',
     primaryLight: '#C1954F',
+    accent: '#A87C3F', // AA on both surface levels
     icon: '#7A6F5F',
     tabIconDefault: '#453E35',
     tabIconSelected: '#A87C3F',
@@ -184,9 +176,11 @@ export const Colors = {
   },
   // Low contrast mode for visual sensitivity — primary stays a muted amber
   // so selected/active states remain distinguishable (never plain gray).
+  // "Low contrast" softens the *ceiling* (no near-black on near-white); it
+  // must never push text under AA. Secondary text stays at or above 4.5:1.
   lowContrastLight: {
     text: '#4E463C',
-    textSecondary: '#948A7C',
+    textSecondary: '#72685B', // AA on both surface levels
     background: '#F8F5F0',
     backgroundSecondary: '#F1ECE3',
     card: '#F8F5F0',
@@ -195,12 +189,13 @@ export const Colors = {
     tint: '#B59B72',
     primary: '#B59B72',
     primaryLight: '#CBB699',
+    accent: '#7E6642', // AA on both surface levels
     icon: '#948A7C',
     tabIconDefault: '#C9C0B2',
     tabIconSelected: '#94794F',
     success: '#8FB894',
-    warning: '#D6B27C',
-    error: '#D19582',
+    warning: '#88632A', // AA on both surface levels
+    error: '#A2543C', // AA on both surface levels
     slider: '#E5DFD3',
     sliderThumb: '#B59B72',
     overlay: 'rgba(0, 0, 0, 0.3)',
@@ -208,7 +203,7 @@ export const Colors = {
   },
   lowContrastDark: {
     text: '#C9C0B2',
-    textSecondary: '#7D746A',
+    textSecondary: '#928A7E', // AA on both surface levels
     background: '#1B1815',
     backgroundSecondary: '#26221E',
     card: '#26221E',
@@ -217,6 +212,7 @@ export const Colors = {
     tint: '#8F7A5C',
     primary: '#8F7A5C',
     primaryLight: '#A69072',
+    accent: '#9E8868', // AA on both surface levels
     icon: '#7D746A',
     tabIconDefault: '#4A443C',
     tabIconSelected: '#A69072',
@@ -233,11 +229,7 @@ export const Colors = {
 // Minimum touch target size for accessibility (48x48 dp)
 export const AccessibilitySize = {
   minTouchTarget: 48,
-  iconSize: 24,
-  iconSizeLarge: 32,
   borderRadius: 12,
-  borderRadiusLarge: 16,
-  borderRadiusXL: 24,
 };
 
 // Spacing constants - Modern generous spacing
@@ -251,40 +243,6 @@ export const Spacing = {
   xxxl: 64,
 };
 
-// Shadow styles for elevation
-export const Shadows = {
-  small: Platform.select({
-    web: { boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)' },
-    default: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
-      elevation: 2,
-    },
-  }),
-  medium: Platform.select({
-    web: { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)' },
-    default: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-  }),
-  large: Platform.select({
-    web: { boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)' },
-    default: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 16,
-      elevation: 8,
-    },
-  }),
-};
-
 // Font families — Nunito Sans, loaded in app/_layout.tsx via expo-font
 export const FontFamily = {
   regular: 'NunitoSans_400Regular',
@@ -292,27 +250,26 @@ export const FontFamily = {
   bold: 'NunitoSans_700Bold',
 };
 
-// Typography scale (product register: tight ratio, hierarchy via weight)
+// Typography scale (product register: tight ratio, hierarchy via weight).
+// Tracking is size-specific: negative as type grows, slightly open as it
+// shrinks. One value for every size is wrong somewhere.
+// Six levels, not eleven: title1/2/3 were three sizes for one job (a
+// prominent-but-not-largeTitle heading) and callout/subhead sat 1-2px from
+// body and each other — distinctions that don't survive contact with a real
+// screen. headline and body both stay at 17 and lean on weight, not size, to
+// separate — the same trick Apple's own type scale uses at this step.
 export const Typography = {
   largeTitle: {
     fontSize: 32,
     fontFamily: FontFamily.bold,
     lineHeight: 39,
+    letterSpacing: -0.5,
   },
-  title1: {
-    fontSize: 27,
-    fontFamily: FontFamily.bold,
-    lineHeight: 33,
-  },
-  title2: {
+  title: {
     fontSize: 22,
     fontFamily: FontFamily.semibold,
     lineHeight: 28,
-  },
-  title3: {
-    fontSize: 20,
-    fontFamily: FontFamily.semibold,
-    lineHeight: 25,
+    letterSpacing: -0.3,
   },
   headline: {
     fontSize: 17,
@@ -324,57 +281,17 @@ export const Typography = {
     fontFamily: FontFamily.regular,
     lineHeight: 23,
   },
-  callout: {
-    fontSize: 16,
-    fontFamily: FontFamily.regular,
-    lineHeight: 21,
-  },
-  subhead: {
-    fontSize: 15,
-    fontFamily: FontFamily.regular,
-    lineHeight: 20,
-  },
   footnote: {
     fontSize: 13,
     fontFamily: FontFamily.regular,
     lineHeight: 18,
+    letterSpacing: 0.1,
   },
-  caption1: {
+  caption: {
     fontSize: 12,
     fontFamily: FontFamily.regular,
     lineHeight: 16,
-  },
-  caption2: {
-    fontSize: 11,
-    fontFamily: FontFamily.regular,
-    lineHeight: 13,
-  },
-  // For Hz values, timers, counters — tabular figures
-  mono: {
-    fontSize: 15,
-    fontFamily: FontFamily.semibold,
-    lineHeight: 20,
-    fontVariant: ['tabular-nums'] as const,
+    letterSpacing: 0.15,
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    sans: 'system-ui',
-    serif: 'ui-serif',
-    rounded: 'ui-rounded',
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});

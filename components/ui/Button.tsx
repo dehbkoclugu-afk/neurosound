@@ -6,15 +6,11 @@
  */
 
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { Text, ViewStyle, TextStyle } from 'react-native';
+
+import { PressableScale } from './PressableScale';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, Spacing } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { AccessibilitySize, Spacing, Typography, onPrimary } from '@/constants/theme';
 
 interface ButtonProps {
   title: string;
@@ -43,8 +39,6 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
-  const { reduceMotion } = useSettingsStore();
-
   const colors = useThemeColors();
 
   const getButtonStyle = (): ViewStyle => {
@@ -56,7 +50,8 @@ export function Button({
       justifyContent: 'center',
       flexDirection: iconPosition === 'right' ? 'row-reverse' : 'row',
       gap: Spacing.sm,
-      opacity: disabled ? 0.5 : 1,
+      // Disabled opacity is owned by PressableScale — it composes press
+      // feedback on top of the resting value.
     };
 
     // Size variants
@@ -89,8 +84,11 @@ export function Button({
   };
 
   const getTextStyle = (): TextStyle => {
+    // fontWeight does nothing for the loaded Nunito Sans faces — React Native
+    // does not synthesize weights for custom fonts, it silently falls back to
+    // the system font. Weight has to come from fontFamily.
     const baseStyle: TextStyle = {
-      fontWeight: '600',
+      fontFamily: Typography.headline.fontFamily,
     };
 
     const sizeStyles: Record<string, TextStyle> = {
@@ -100,9 +98,9 @@ export function Button({
     };
 
     const variantStyles: Record<string, TextStyle> = {
-      primary: { color: '#FFFFFF' },
-      secondary: { color: colors.primary },
-      ghost: { color: colors.primary },
+      primary: { color: onPrimary },
+      secondary: { color: colors.accent },
+      ghost: { color: colors.accent },
     };
 
     return {
@@ -113,11 +111,10 @@ export function Button({
   };
 
   return (
-    <TouchableOpacity
+    <PressableScale
       onPress={onPress}
       disabled={disabled}
       style={[getButtonStyle(), style]}
-      activeOpacity={reduceMotion ? 1 : 0.7}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
       accessibilityHint={accessibilityHint}
@@ -125,6 +122,6 @@ export function Button({
     >
       {icon}
       <Text style={[getTextStyle(), textStyle]}>{title}</Text>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

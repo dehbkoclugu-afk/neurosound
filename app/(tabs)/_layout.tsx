@@ -10,15 +10,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { MiniPlayer } from '@/components/ui/MiniPlayer';
-import { Spacing, Shadows } from '@/constants/theme';
+import { MiniPlayerHost } from '@/components/ui/MiniPlayerHost';
+import { Spacing } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { useAudioStore } from '@/stores/audioStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { useMiniPlayerVisible, MINI_PLAYER_HEIGHT } from '@/hooks/use-mini-player';
 
 export default function TabLayout() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const { currentPreset } = useAudioStore();
+  const miniPlayerVisible = useMiniPlayerVisible();
+  const { theme } = useSettingsStore();
+  // Night mode exists to emit as little as possible before sleep — the tab
+  // bar is the one piece of chrome always on screen, so it drops its labels
+  // and sits at lower contrast instead of competing with the player.
+  const isNight = theme === 'night';
 
   const colors = useThemeColors();
 
@@ -28,14 +34,14 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: colors.tabIconSelected,
           tabBarInactiveTintColor: colors.tabIconDefault,
+          tabBarShowLabel: !isNight,
           tabBarStyle: {
             backgroundColor: colors.background,
             borderTopColor: colors.cardBorder,
             borderTopWidth: StyleSheet.hairlineWidth,
-            height: 56 + insets.bottom,
+            height: (isNight ? MINI_PLAYER_HEIGHT - 14 : MINI_PLAYER_HEIGHT) + insets.bottom,
             paddingBottom: insets.bottom,
             paddingTop: Spacing.xs,
-            ...Shadows.small,
           },
           tabBarLabelStyle: {
             fontSize: 11,
@@ -43,7 +49,7 @@ export default function TabLayout() {
             marginTop: 2,
           },
           tabBarIconStyle: {
-            marginBottom: -2,
+            marginBottom: isNight ? 0 : -2,
           },
           headerShown: false,
           tabBarButton: HapticTab,
@@ -104,11 +110,10 @@ export default function TabLayout() {
       </Tabs>
 
       {/* MiniPlayer overlay above tab bar */}
-      {currentPreset && (
-        <View style={[styles.miniPlayerContainer, { bottom: 56 + insets.bottom }]}>
-          <MiniPlayer />
-        </View>
-      )}
+      <MiniPlayerHost
+        visible={miniPlayerVisible}
+        bottom={MINI_PLAYER_HEIGHT + insets.bottom}
+      />
     </View>
   );
 }
@@ -116,11 +121,5 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  miniPlayerContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: 100,
   },
 });

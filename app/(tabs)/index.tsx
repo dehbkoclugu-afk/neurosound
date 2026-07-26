@@ -1,9 +1,10 @@
 /**
- * Home Screen - Intent-first entry ("what do you need?"), then history,
- * favorites, and the technical categories for power users.
+ * Home Screen — intent-first entry ("what do you need?"), then history
+ * and favourites. The technical taxonomy lives in Explore; duplicating it
+ * here gave two paths to one destination.
  */
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,47 +12,29 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
-  FlatList,
-  TouchableOpacity,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
-import { CategoryHeader, CategoryCard } from '@/components/ui/CategoryHeader';
+import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
 import { Icon } from '@/components/ui/Icon';
+import { PressableScale } from '@/components/ui/PressableScale';
 import { intents } from '@/lib/intents';
+import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
 
 // Category data for grid cards
-const categories = [
-  {
-    key: 'binaural',
-    titleKey: 'explore.categories.binaural',
-    iconName: 'pulse',
-    color: '#8B5CF6',
-  },
-  {
-    key: 'solfeggio',
-    titleKey: 'explore.categories.solfeggio',
-    iconName: 'musical-notes',
-    color: '#EC4899',
-  },
-  {
-    key: 'noise',
-    titleKey: 'explore.categories.noise',
-    iconName: 'volume-medium',
-    color: '#3B82F6',
-  },
-];
+// How many favourites the home screen previews before offering the rest.
+const FAVORITES_PREVIEW = 4;
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -60,13 +43,15 @@ export default function HomeScreen() {
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
+  const miniPlayerInset = useMiniPlayerInset();
+  const [showAllFavorites, setShowAllFavorites] = useState(false);
 
-  // First run: route into onboarding once
-  useEffect(() => {
-    if (!hasSeenOnboarding) {
-      router.push('/onboarding');
-    }
-  }, [hasSeenOnboarding, router]);
+  // Route guard, not a post-render push: rendering Home for a frame and then
+  // navigating away read as a flash, and left onboarding with no history to
+  // pop back into if it were ever reached directly.
+  if (!hasSeenOnboarding) {
+    return <Redirect href="/onboarding" />;
+  }
 
   const handlePresetPress = (presetId: string) => {
     const preset = getPresetById(presetId);
@@ -89,13 +74,6 @@ export default function HomeScreen() {
     }
   };
 
-  const handleCategoryPress = (categoryKey: string) => {
-    router.push({
-      pathname: '/(tabs)/explore',
-      params: { category: categoryKey },
-    });
-  };
-
   const favoritePresets = favoriteIds
     .map(id => getPresetById(id))
     .filter((p): p is FrequencyPreset => p !== undefined);
@@ -109,100 +87,131 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Soft warm atmosphere at the top, fading into the background */}
       <LinearGradient
-        colors={[colors.primary + '1A', colors.background]}
+        colors={[withAlpha(colors.primary, 0.1), colors.background]}
         locations={[0, 0.4]}
         style={styles.atmosphere}
         pointerEvents="none"
       />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          contentColumn,
+          { paddingBottom: miniPlayerInset + Spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header with proper spacing */}
+        {/* Brand presence without a second settings entry point — the tab
+            already gives access, so this row only carries the wordmark. */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text style={[styles.wordmark, { color: colors.textSecondary }]}>
             NeuroSound
           </Text>
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/settings')}
-            style={styles.headerButton}
-            accessibilityLabel={t('common.settings')}
-          >
-            <Ionicons name="settings-outline" size={24} color={colors.text} />
-          </TouchableOpacity>
         </View>
 
         {/* Intent Section — primary entry, typographic */}
         <View style={styles.section}>
-          <Text style={[styles.intentsTitle, { color: colors.text }]}>
+          <Text
+            style={[styles.intentsTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             {t('home.intentsTitle')}
           </Text>
           <View style={styles.intentStack}>
             {intents.map((intent) => (
-              <TouchableOpacity
+              <PressableScale
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
-                activeOpacity={0.85}
+                // Large surfaces need less travel than buttons to read as
+                // pressed rather than shrinking.
+                scaleTo={0.985}
+                pressedOpacity={0.9}
                 style={styles.intentBlock}
                 accessibilityRole="button"
-                accessibilityLabel={t(intent.nameKey)}
+                accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
                 <Image
-                  source={{ uri: intent.image }}
+                  source={intent.image}
                   style={StyleSheet.absoluteFill}
                   contentFit="cover"
                   transition={300}
                 />
-                {/* Scrim: tint toward the intent colour, darken for text contrast */}
+                {/* Tint: decorative, diagonal, carries the intent's colour. */}
                 <LinearGradient
-                  colors={[intent.color + '66', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.72)']}
-                  locations={[0, 0.45, 1]}
+                  colors={[withAlpha(intent.color, 0.4), 'transparent']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                {/* Legibility: vertical and separate, so the whole text band
+                    darkens evenly. A diagonal scrim left the bottom-LEFT — where
+                    the title actually sits — in its lightest stop, which is
+                    2.4:1 over a bright photo. Placeholder images are random, so
+                    the floor has to be guaranteed, not hoped for. */}
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.62)']}
+                  locations={[0.35, 0.7, 1]}
                   style={StyleSheet.absoluteFill}
                 />
                 <View style={styles.intentRow}>
                   <View style={styles.intentText}>
                     <Text style={styles.intentName}>{t(intent.nameKey)}</Text>
-                    <Text style={styles.intentDesc} numberOfLines={1}>
+                    <Text style={styles.intentDesc} numberOfLines={2}>
                       {t(intent.descKey)}
                     </Text>
                   </View>
                   <Icon icon={intent.icon} size={26} color="rgba(255,255,255,0.95)" />
                 </View>
-              </TouchableOpacity>
+              </PressableScale>
             ))}
           </View>
         </View>
 
         {/* Recently Played Section */}
-        {recentPresets.length > 0 && (
-          <View style={styles.section}>
-            <CategoryHeader title={t('home.recentlyPlayed')} />
-            <FlatList
-              data={recentPresets}
+        <View style={styles.section}>
+          <CategoryHeader title={t('home.recentlyPlayed')} />
+          {recentPresets.length > 0 ? (
+            /* A horizontal FlatList nested in a ScrollView cancels its own
+               virtualisation; ten chips do not need it. */
+            <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.horizontalList}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
+            >
+              {recentPresets.map((item) => (
                 <PresetCardSmall
+                  key={item.id}
                   preset={item}
                   name={t(item.nameKey)}
                   onPress={() => handlePresetPress(item.id)}
                 />
-              )}
-            />
-          </View>
-        )}
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+              {t('home.recentlyPlayedEmpty')}
+            </Text>
+          )}
+        </View>
 
         {/* Favorites Section — teaches the heart affordance when empty */}
         <View style={styles.section}>
-          <CategoryHeader title={t('home.favorites')} iconName="heart" />
+          <CategoryHeader
+            title={t('home.favorites')}
+            iconName="heart"
+            onSeeAll={
+              favoritePresets.length > FAVORITES_PREVIEW
+                ? () => setShowAllFavorites((v) => !v)
+                : undefined
+            }
+            seeAllText={showAllFavorites ? t('common.showLess') : t('common.seeAll')}
+          />
           {favoritePresets.length > 0 ? (
             <View>
-              {favoritePresets.slice(0, 4).map((preset) => (
+              {(showAllFavorites
+                ? favoritePresets
+                : favoritePresets.slice(0, FAVORITES_PREVIEW)
+              ).map((preset) => (
                 <PresetCard
                   key={preset.id}
                   preset={preset}
@@ -218,23 +227,9 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Categories Section — technical taxonomy for power users */}
-        <View style={styles.section}>
-          <CategoryHeader title={t('home.categories')} />
-          <View>
-            {categories.map((category) => (
-              <CategoryCard
-                key={category.key}
-                title={t(category.titleKey)}
-                onPress={() => handleCategoryPress(category.key)}
-              />
-            ))}
-          </View>
-        </View>
-
         {/* Quiet headphone note */}
-        <Text style={[styles.headphoneNote, { color: colors.textSecondary }]}>
-          {t('home.headphoneWarning')}
+        <Text style={[styles.headphoneNote, { color: colors.warning }]}>
+          {t('home.headphoneNote')}
         </Text>
 
       </ScrollView>
@@ -262,33 +257,29 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
   },
-  title: {
-    ...Typography.largeTitle,
-  },
-  headerButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+  // Brand presence without spending the H1 on it.
+  wordmark: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+    letterSpacing: 0.4,
   },
   section: {
     marginBottom: Spacing.xl,
   },
   intentsTitle: {
-    ...Typography.title1,
+    ...Typography.largeTitle,
     marginBottom: Spacing.lg,
   },
   intentStack: {
     gap: Spacing.sm,
   },
   intentBlock: {
-    height: 108,
+    // minHeight, not height: the block holds a 22pt title over a 13pt line,
+    // and a fixed box clips both once the system text size grows.
+    minHeight: 108,
     borderRadius: 20,
     overflow: 'hidden',
     justifyContent: 'flex-end',
@@ -305,7 +296,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   intentName: {
-    ...Typography.title2,
+    ...Typography.title,
     color: '#FFFFFF',
   },
   intentDesc: {
@@ -313,7 +304,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
   },
   emptyStateText: {
-    ...Typography.subhead,
+    ...Typography.body,
     lineHeight: 21,
     paddingVertical: Spacing.sm,
   },
