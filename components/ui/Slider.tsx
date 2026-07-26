@@ -131,8 +131,13 @@ export function Slider({
           }
         }}
       >
-        {/* Track fill */}
+        {/* Track fill — pointerEvents="none" so a tap here is always reported
+            relative to the full track. Without it, a touch landing on this
+            (partial-width) view or the thumb below gets a locationX relative
+            to that child's own bounds instead of the track, and the slider
+            jumps to the wrong value on touch-down. */}
         <View
+          pointerEvents="none"
           style={[
             styles.trackFill,
             {
@@ -144,6 +149,7 @@ export function Slider({
 
         {/* Thumb */}
         <View
+          pointerEvents="none"
           style={[
             styles.thumb,
             {

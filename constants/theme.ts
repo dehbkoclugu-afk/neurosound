@@ -45,13 +45,6 @@ export function withAlpha(color: string, alpha: number): string {
   return `#${full}${a}`;
 }
 
-// Category icons for UI (rendered via components/ui/Icon)
-export const CategoryIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
-  binaural: { name: 'pulse', library: 'ionicon' },
-  solfeggio: { name: 'musical-notes', library: 'ionicon' },
-  noise: { name: 'volume-medium', library: 'ionicon' },
-};
-
 // Binaural type icons — each unique
 export const BinauralIcons: Record<string, { name: string; library: 'ionicon' | 'material' }> = {
   delta: { name: 'moon', library: 'ionicon' },

@@ -25,6 +25,7 @@ import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import i18n from '@/i18n';
+import * as playerController from '@/lib/audio/playerController';
 
 const THEME_OPTIONS: { value: ThemeMode; labelKey: string }[] = [
   { value: 'light', labelKey: 'settings.themes.light' },
@@ -81,6 +82,14 @@ export default function SettingsScreen() {
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);
     i18n.changeLanguage(newLanguage);
+  };
+
+  // The cap is a hearing-safety control — it has to apply to audio that's
+  // already playing, not just the next time a player screen happens to
+  // mount and re-run its own volume sync.
+  const handleMaxVolumeChange = (value: number) => {
+    setMaxVolume(value);
+    playerController.syncVolume();
   };
 
   return (
@@ -305,7 +314,7 @@ export default function SettingsScreen() {
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <Slider
               value={maxVolume}
-              onValueChange={setMaxVolume}
+              onValueChange={handleMaxVolumeChange}
               min={0.1}
               max={1}
               step={0.1}

@@ -501,7 +501,7 @@ export class NoisePlayer {
   private gainNode: GainNode | null = null;
   private filterNode: BiquadFilterNode | null = null;
 
-  setNoiseType(type: string) {
+  async setNoiseType(type: string): Promise<void> {
     const wasPlaying = this.isPlaying;
     if (wasPlaying) {
       this.stop();
@@ -509,13 +509,15 @@ export class NoisePlayer {
     this.noiseType = type;
     this.isLoaded = false;
 
-    // Preload real audio file for faster playback
+    // Preload real audio file for faster playback. Awaited before replaying
+    // below — firing it and moving on left play() racing the preload, which
+    // would find isLoaded still false and create a second, orphaned player.
     if (hasRealSound(type) && !isWeb) {
-      this.preloadAudio();
+      await this.preloadAudio();
     }
 
     if (wasPlaying) {
-      this.play();
+      await this.play();
     }
   }
 
@@ -525,17 +527,23 @@ export class NoisePlayer {
     if (!soundAsset) return;
 
     try {
-      // Release previous player if exists
-      if (this.player) {
-        this.player.remove();
-        this.player = null;
-      }
-
       // Create without playing — loads so playback can start instantly later
       const player = createAudioPlayer(soundAsset);
       player.loop = true;
       player.volume = this.volume;
 
+      // A tap fast enough to land before this resolves takes play()'s own
+      // "create and play directly" fallback path. If that's already making
+      // sound, swapping in this (unplayed) player would silently kill it
+      // while isPlaying kept reporting true.
+      if (this.isPlaying) {
+        player.remove();
+        return;
+      }
+
+      if (this.player) {
+        this.player.remove();
+      }
       this.player = player;
       this.isLoaded = true;
     } catch (e) {
@@ -594,144 +602,17 @@ export class NoisePlayer {
     return output;
   }
 
-  private generateNoiseData(type: string, bufferSize: number, sampleRate: number): Float32Array {
+  // Only white/pink/brown ever reach here — play() routes anything with a
+  // bundled real recording (ambientSounds.ts's ten themed types) through
+  // playRealAudioWeb/Native instead. This used to also carry a per-type
+  // synthesis branch (rain, thunder, ocean, wind, fire, forest, stream, fan,
+  // airplane, train) that could never execute for exactly that reason.
+  private generateNoiseData(type: string, bufferSize: number): Float32Array {
     switch (type) {
       case 'pink':
         return this.generatePinkNoise(bufferSize);
       case 'brown':
         return this.generateBrownNoise(bufferSize);
-      case 'rain': {
-        const output = new Float32Array(bufferSize);
-        const pink = this.generatePinkNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = pink[i] * 0.6;
-          if (Math.random() < 0.001) {
-            const dropLength = Math.floor(Math.random() * 500) + 100;
-            for (let j = 0; j < dropLength && i + j < bufferSize; j++) {
-              const envelope = Math.exp(-j / 100);
-              output[i + j] += (Math.random() * 2 - 1) * envelope * 0.3;
-            }
-          }
-        }
-        return output;
-      }
-      case 'thunder': {
-        const output = new Float32Array(bufferSize);
-        const brown = this.generateBrownNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = brown[i] * 0.5;
-          if (Math.random() < 0.00005) {
-            const rumbleLength = Math.floor(Math.random() * 10000) + 5000;
-            for (let j = 0; j < rumbleLength && i + j < bufferSize; j++) {
-              const envelope = Math.sin(Math.PI * j / rumbleLength);
-              output[i + j] += (Math.random() * 2 - 1) * envelope * 0.5;
-            }
-          }
-        }
-        return output;
-      }
-      case 'ocean': {
-        const output = new Float32Array(bufferSize);
-        const brown = this.generateBrownNoise(bufferSize);
-        const waveFreq = 0.08;
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          const wave = (Math.sin(2 * Math.PI * waveFreq * t) + 1) * 0.5;
-          const wave2 = (Math.sin(2 * Math.PI * waveFreq * 1.3 * t) + 1) * 0.25;
-          output[i] = brown[i] * (0.3 + wave * 0.5 + wave2 * 0.2);
-        }
-        return output;
-      }
-      case 'wind': {
-        const output = new Float32Array(bufferSize);
-        const pink = this.generatePinkNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          const gust1 = (Math.sin(2 * Math.PI * 0.1 * t) + 1) * 0.3;
-          const gust2 = (Math.sin(2 * Math.PI * 0.23 * t) + 1) * 0.2;
-          output[i] = pink[i] * (0.3 + gust1 + gust2);
-        }
-        return output;
-      }
-      case 'fire': {
-        const output = new Float32Array(bufferSize);
-        const brown = this.generateBrownNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = brown[i] * 0.4;
-          if (Math.random() < 0.002) {
-            const crackleLength = Math.floor(Math.random() * 300) + 50;
-            for (let j = 0; j < crackleLength && i + j < bufferSize; j++) {
-              const envelope = Math.exp(-j / 50);
-              output[i + j] += (Math.random() * 2 - 1) * envelope * 0.6;
-            }
-          }
-        }
-        return output;
-      }
-      case 'forest': {
-        const output = new Float32Array(bufferSize);
-        const pink = this.generatePinkNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          const gust = (Math.sin(2 * Math.PI * 0.1 * t) + 1) * 0.2;
-          output[i] = pink[i] * (0.2 + gust);
-          if (Math.random() < 0.0001) {
-            const chirpLength = Math.floor(Math.random() * 2000) + 500;
-            const chirpFreq = Math.random() * 2000 + 1500;
-            for (let j = 0; j < chirpLength && i + j < bufferSize; j++) {
-              const envelope = Math.sin(Math.PI * j / chirpLength);
-              output[i + j] += Math.sin(2 * Math.PI * chirpFreq * j / sampleRate) * envelope * 0.15;
-            }
-          }
-        }
-        return output;
-      }
-      case 'stream': {
-        const output = new Float32Array(bufferSize);
-        const pink = this.generatePinkNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          const mod1 = (Math.sin(2 * Math.PI * 2.3 * t) + 1) * 0.2;
-          const mod2 = (Math.sin(2 * Math.PI * 3.7 * t) + 1) * 0.15;
-          output[i] = pink[i] * (0.4 + mod1 + mod2);
-        }
-        return output;
-      }
-      case 'fan': {
-        const output = new Float32Array(bufferSize);
-        const pink = this.generatePinkNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          const wobble = 1 + Math.sin(2 * Math.PI * 0.5 * t) * 0.05;
-          output[i] = pink[i] * 0.7 * wobble;
-        }
-        return output;
-      }
-      case 'airplane': {
-        const output = new Float32Array(bufferSize);
-        const brown = this.generateBrownNoise(bufferSize);
-        const pink = this.generatePinkNoise(bufferSize);
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          const variation = 1 + Math.sin(2 * Math.PI * 0.02 * t) * 0.1;
-          output[i] = (brown[i] * 0.7 + pink[i] * 0.3) * variation;
-        }
-        return output;
-      }
-      case 'train': {
-        const output = new Float32Array(bufferSize);
-        const brown = this.generateBrownNoise(bufferSize);
-        const rhythm = 1.5;
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          output[i] = brown[i] * 0.5;
-          const phase = (t * rhythm) % 1;
-          if (phase < 0.1) {
-            output[i] += brown[i] * 0.4;
-          }
-        }
-        return output;
-      }
       case 'white':
       default:
         return this.generateWhiteNoise(bufferSize);
@@ -813,19 +694,11 @@ export class NoisePlayer {
     }
   }
 
-  // Get filter settings for ambient sounds
+  // Only white/pink/brown ever reach playProceduralWeb (see
+  // generateNoiseData) — the themed types' filter settings this used to
+  // carry alongside them were equally unreachable.
   private getFilterSettings(type: string): { frequency: number; Q: number; type: BiquadFilterType } | null {
     switch (type) {
-      case 'rain': return { frequency: 4000, Q: 0.5, type: 'lowpass' };
-      case 'thunder': return { frequency: 300, Q: 0.8, type: 'lowpass' };
-      case 'ocean': return { frequency: 600, Q: 0.6, type: 'lowpass' };
-      case 'wind': return { frequency: 1500, Q: 1.2, type: 'bandpass' };
-      case 'fire': return { frequency: 3000, Q: 0.7, type: 'lowpass' };
-      case 'forest': return { frequency: 5000, Q: 0.5, type: 'lowpass' };
-      case 'stream': return { frequency: 3500, Q: 0.8, type: 'lowpass' };
-      case 'fan': return { frequency: 800, Q: 0.6, type: 'lowpass' };
-      case 'airplane': return { frequency: 250, Q: 0.9, type: 'lowpass' };
-      case 'train': return { frequency: 400, Q: 0.7, type: 'lowpass' };
       case 'brown': return { frequency: 500, Q: 0.5, type: 'lowpass' };
       default: return null;
     }
@@ -847,7 +720,7 @@ export class NoisePlayer {
     const buffer = this.audioContext.createBuffer(2, bufferSize, sampleRate);
 
     // Generate appropriate noise for the type
-    const noiseData = this.generateNoiseData(this.noiseType, bufferSize, sampleRate);
+    const noiseData = this.generateNoiseData(this.noiseType, bufferSize);
     buffer.copyToChannel(noiseData as Float32Array<ArrayBuffer>, 0);
     buffer.copyToChannel(noiseData as Float32Array<ArrayBuffer>, 1);
 

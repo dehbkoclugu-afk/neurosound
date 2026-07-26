@@ -1,6 +1,5 @@
 /**
  * Section header — quiet, typographic. Small secondary label, no icons.
- * CategoryCard is a plain text row with a chevron (no icon tiles).
  */
 
 import React from 'react';
@@ -11,7 +10,6 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, FontFamily } from '@/constants/theme';
 
@@ -65,41 +63,6 @@ export function CategoryHeader({
   );
 }
 
-// Plain text row for category navigation
-interface CategoryCardProps {
-  title: string;
-  iconName?: string; // kept for API compat, unused
-  color?: string; // kept for API compat, unused
-  onPress: () => void;
-  style?: ViewStyle;
-}
-
-export function CategoryCard({
-  title,
-  onPress,
-  style,
-}: CategoryCardProps) {
-  const colors = useThemeColors();
-
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.6}
-      style={[styles.categoryRow, { borderBottomColor: colors.cardBorder }, style]}
-      accessibilityRole="button"
-      accessibilityLabel={title}
-    >
-      <Text style={[styles.categoryTitle, { color: colors.text }]}>{title}</Text>
-      <Ionicons
-        name="chevron-forward"
-        size={18}
-        color={colors.textSecondary}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      />
-    </TouchableOpacity>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -127,16 +90,5 @@ const styles = StyleSheet.create({
   seeAllText: {
     ...Typography.body,
     fontFamily: FontFamily.semibold,
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    minHeight: 52,
-  },
-  categoryTitle: {
-    ...Typography.headline,
   },
 });

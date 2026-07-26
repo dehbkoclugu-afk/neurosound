@@ -73,7 +73,7 @@ export default function ExploreScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
-  const { isFavorite } = usePresetsStore();
+  const { isFavorite, favoriteIds } = usePresetsStore();
   const { seenCategoryDescriptions, markCategoryDescriptionSeen } = useSettingsStore();
 
   // Initialize with params or default
@@ -109,11 +109,16 @@ export default function ExploreScreen() {
 
   // A category's blurb is shown the first time it's opened, then it gets out
   // of the way — repeating a 3-line paragraph on every visit pushed the list
-  // down for no new information.
+  // down for no new information. Marking it seen has to happen when the user
+  // *leaves* the category, not the moment it arrives: doing it on arrival
+  // collapsed the paragraph out from under the user almost as soon as it
+  // rendered, on the very next effect tick.
   useEffect(() => {
-    if (!seenCategoryDescriptions[activeCategory]) {
-      markCategoryDescriptionSeen(activeCategory);
-    }
+    return () => {
+      if (!useSettingsStore.getState().seenCategoryDescriptions[activeCategory]) {
+        markCategoryDescriptionSeen(activeCategory);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory]);
 
@@ -161,8 +166,11 @@ export default function ExploreScreen() {
       });
     });
     return map;
+    // isFavorite is a stable function reference (it reads favoriteIds via
+    // get() internally), so it never changes and never invalidates this
+    // memo on its own — favoriteIds is the dependency that actually moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [normalizedQuery, favoritesOnly, isFavorite]);
+  }, [normalizedQuery, favoritesOnly, favoriteIds]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>

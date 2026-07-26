@@ -162,22 +162,32 @@ let playPending = false;
 
 export async function play(): Promise<void> {
   if (!generator || playPending) return;
+  // Captured locally: unload()/loadPreset() can dispose and null out the
+  // module-level `generator` while this call is still awaiting play() (e.g.
+  // the user taps the MiniPlayer's close button mid-load) — re-reading the
+  // mutable variable afterwards would dereference null instead of finding
+  // out cleanly that this attempt is no longer relevant.
+  const gen = generator;
   playPending = true;
   const store = useAudioStore.getState();
   store.setIsLoading(true);
   store.setPlaybackError(false);
   try {
     setGenVolume(0); // fade in from silence
-    await generator.play();
-    if (!generator || !generator.getIsPlaying()) {
-      // generators swallow their own errors; surface the failure to the UI
-      useAudioStore.getState().setPlaybackError(true);
+    await gen.play();
+    if (generator !== gen || !gen.getIsPlaying()) {
+      // Either superseded (unloaded/switched while awaiting) or the
+      // generator swallowed its own error — either way, this attempt is
+      // done; only surface a failure if it's still the active generator.
+      if (generator === gen) useAudioStore.getState().setPlaybackError(true);
       return;
     }
     ramp(effectiveVolume(), FADE_IN_MS);
     useAudioStore.getState().setIsPlaying(true);
     const preset = useAudioStore.getState().currentPreset;
     if (preset) setNowPlaying(i18n.t(preset.nameKey));
+  } catch (e) {
+    if (generator === gen) useAudioStore.getState().setPlaybackError(true);
   } finally {
     useAudioStore.getState().setIsLoading(false);
     playPending = false;

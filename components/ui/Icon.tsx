@@ -6,7 +6,7 @@
 import React from 'react';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleProp, TextStyle } from 'react-native';
-import { BinauralIcons, NoiseIcons, CategoryIcons, SolfeggioIcon } from '@/constants/theme';
+import { BinauralIcons, NoiseIcons, SolfeggioIcon } from '@/constants/theme';
 
 export type IconLibrary = 'ionicon' | 'material';
 
@@ -84,9 +84,4 @@ export function getPresetIcon(
   }
 
   return { name: 'headset', library: 'ionicon' };
-}
-
-// Category icons
-export function getCategoryIcon(category: string): IconConfig {
-  return (CategoryIcons[category] as IconConfig) || { name: 'apps', library: 'ionicon' };
 }
