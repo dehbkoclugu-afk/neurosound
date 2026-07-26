@@ -10,15 +10,13 @@
  * turn motion down still need to know the interface heard them.
  */
 
-import React, { useRef } from 'react';
-import {
-  Animated,
-  Pressable,
-  PressableProps,
-  StyleProp,
-  ViewStyle,
-  GestureResponderEvent,
-} from 'react-native';
+import React from 'react';
+import { Pressable, PressableProps, StyleProp, ViewStyle, GestureResponderEvent } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { useSettingsStore } from '@/stores/settingsStore';
 
@@ -55,36 +53,23 @@ export function PressableScale({
   ...rest
 }: PressableScaleProps) {
   const { reduceMotion } = useSettingsStore();
-  const progress = useRef(new Animated.Value(0)).current;
-
-  const animateTo = (toValue: number, duration: number) => {
-    Animated.timing(progress, {
-      toValue,
-      duration,
-      useNativeDriver: true,
-    }).start();
-  };
+  const progress = useSharedValue(0);
+  const restingOpacity = disabled ? disabledOpacity : 1;
 
   const handlePressIn = (e: GestureResponderEvent) => {
-    animateTo(1, PRESS_IN_MS);
+    progress.value = withTiming(1, { duration: PRESS_IN_MS });
     onPressIn?.(e);
   };
 
   const handlePressOut = (e: GestureResponderEvent) => {
-    animateTo(0, PRESS_OUT_MS);
+    progress.value = withTiming(0, { duration: PRESS_OUT_MS });
     onPressOut?.(e);
   };
 
-  const scale = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, scaleTo],
-  });
-
-  const restingOpacity = disabled ? disabledOpacity : 1;
-  const opacity = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [restingOpacity, restingOpacity * pressedOpacity],
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: restingOpacity - progress.value * restingOpacity * (1 - pressedOpacity),
+    transform: reduceMotion ? [] : [{ scale: 1 - progress.value * (1 - scaleTo) }],
+  }));
 
   return (
     <AnimatedPressable
@@ -92,7 +77,7 @@ export function PressableScale({
       disabled={disabled}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      style={[style, { opacity, transform: reduceMotion ? [] : [{ scale }] }]}
+      style={[style, animatedStyle]}
     >
       {children}
     </AnimatedPressable>

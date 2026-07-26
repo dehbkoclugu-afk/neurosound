@@ -3,7 +3,7 @@
  * Modern card-based design with clean UI
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,9 @@ import {
   Alert,
   TextInput,
   Modal,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,6 +30,7 @@ import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Button } from '@/components/ui/Button';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
+import { Toast } from '@/components/ui/Toast';
 import * as haptics from '@/lib/haptics';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
@@ -56,7 +60,7 @@ const SAMPLE_MIX = [
 export default function MixerScreen() {
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
-  const { addCustomMix, customMixes, deleteCustomMix } = usePresetsStore();
+  const { addCustomMix, updateCustomMix, customMixes, deleteCustomMix } = usePresetsStore();
   const {
     mixerChannels: channels,
     isMixerPlaying: isPlaying,
@@ -69,12 +73,36 @@ export default function MixerScreen() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [mixName, setMixName] = useState('');
+  const [editingMixId, setEditingMixId] = useState<string | null>(null);
+  const [pickerQuery, setPickerQuery] = useState('');
+  const [toast, setToast] = useState<{ visible: boolean; message: string }>({
+    visible: false,
+    message: '',
+  });
 
   const colors = useThemeColors();
   const miniPlayerInset = useMiniPlayerInset();
 
   const isEmpty = channels.length === 0;
   const isFull = channels.length >= playerController.MAX_MIXER_CHANNELS;
+
+  const showToast = useCallback((message: string) => {
+    setToast({ visible: true, message });
+  }, []);
+
+  // 33 presets in a flat scroll is unusable without a filter.
+  const filteredPickerGroups = useMemo(() => {
+    const query = pickerQuery.trim().toLowerCase();
+    if (!query) return pickerGroups;
+    return pickerGroups
+      .map((group) => ({
+        ...group,
+        presets: group.presets.filter((preset) =>
+          t(preset.nameKey).toLowerCase().includes(query)
+        ),
+      }))
+      .filter((group) => group.presets.length > 0);
+  }, [pickerQuery, t]);
 
   const handlePlayPause = useCallback(async () => {
     haptics.commit();
@@ -91,6 +119,7 @@ export default function MixerScreen() {
       Alert.alert(t('mixer.maxChannels'), t('mixer.maxChannelsDesc'));
       return;
     }
+    setPickerQuery('');
     setShowPresetPicker(false);
   }, [t]);
 
@@ -111,12 +140,29 @@ export default function MixerScreen() {
     // Clear the draft on dismiss too, not only on a successful save — stale
     // text reappearing next time reads as a bug.
     setMixName('');
+    setEditingMixId(null);
     setShowSaveDialog(false);
+  }, []);
+
+  const handleRenameMix = useCallback((mix: typeof customMixes[0]) => {
+    setEditingMixId(mix.id);
+    setMixName(mix.name);
+    setShowSaveDialog(true);
   }, []);
 
   const handleSaveMix = useCallback(() => {
     if (!mixName.trim()) {
       Alert.alert(t('common.error'), t('mixer.enterName'));
+      return;
+    }
+
+    if (editingMixId) {
+      updateCustomMix(editingMixId, { name: mixName.trim() });
+      haptics.save();
+      setMixName('');
+      setEditingMixId(null);
+      setShowSaveDialog(false);
+      showToast(t('mixer.mixRenamed'));
       return;
     }
 
@@ -136,8 +182,8 @@ export default function MixerScreen() {
     haptics.save();
     setMixName('');
     setShowSaveDialog(false);
-    Alert.alert(t('common.saved'), t('mixer.mixSaved'));
-  }, [mixName, channels, addCustomMix, t]);
+    showToast(t('mixer.mixSaved'));
+  }, [mixName, channels, addCustomMix, updateCustomMix, editingMixId, showToast, t]);
 
   const handleLoadMix = useCallback(async (mix: typeof customMixes[0]) => {
     haptics.commit();
@@ -395,6 +441,14 @@ export default function MixerScreen() {
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity
+                    onPress={() => handleRenameMix(mix)}
+                    style={styles.deleteButton}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('mixer.renameMix')} ${mix.name}`}
+                  >
+                    <Ionicons name="pencil-outline" size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
                     onPress={() => handleDeleteMix(mix.id, mix.name)}
                     style={styles.deleteButton}
                     accessibilityRole="button"
@@ -419,7 +473,10 @@ export default function MixerScreen() {
       <Modal
         visible={showPresetPicker}
         animationType={reduceMotion ? 'none' : 'slide'}
-        onRequestClose={() => setShowPresetPicker(false)}
+        onRequestClose={() => {
+          setPickerQuery('');
+          setShowPresetPicker(false);
+        }}
         accessibilityViewIsModal
       >
         <View style={[styles.modal, { backgroundColor: colors.background }]}>
@@ -429,14 +486,27 @@ export default function MixerScreen() {
                 {t('mixer.addSound')}
               </Text>
               <TouchableOpacity
-                onPress={() => setShowPresetPicker(false)}
+                onPress={() => {
+                  setPickerQuery('');
+                  setShowPresetPicker(false);
+                }}
                 style={styles.closeButton}
               >
                 <Ionicons name="close" size={28} color={colors.text} />
               </TouchableOpacity>
             </View>
+            <View style={[styles.searchBar, { backgroundColor: colors.backgroundSecondary }]}>
+              <Ionicons name="search" size={18} color={colors.textSecondary} />
+              <TextInput
+                value={pickerQuery}
+                onChangeText={setPickerQuery}
+                placeholder={t('explore.searchPlaceholder')}
+                placeholderTextColor={colors.textSecondary}
+                style={[styles.searchInput, { color: colors.text }]}
+              />
+            </View>
             <ScrollView style={styles.presetList}>
-              {pickerGroups.map(group => (
+              {filteredPickerGroups.map(group => (
                 <View key={group.titleKey}>
                   <Text style={[styles.pickerGroupTitle, { color: colors.textSecondary }]}>
                     {t(group.titleKey)}
@@ -461,29 +531,40 @@ export default function MixerScreen() {
         </View>
       </Modal>
 
-      {/* Save Dialog Modal */}
+      {/* Save / Rename Dialog — a single text field doesn't need a full
+          screen, so it lives in a bottom sheet like the timer picker. */}
       <Modal
         visible={showSaveDialog}
+        transparent
         animationType={reduceMotion ? 'none' : 'slide'}
         onRequestClose={closeSaveDialog}
         accessibilityViewIsModal
       >
-        <View style={[styles.modal, { backgroundColor: colors.background }]}>
-          <SafeAreaView style={styles.modalInner}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                {t('mixer.savePreset')}
-              </Text>
-              <TouchableOpacity
-                onPress={closeSaveDialog}
-                style={styles.closeButton}
-                accessibilityRole="button"
-                accessibilityLabel={t('common.cancel')}
-              >
-                <Ionicons name="close" size={28} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.saveForm}>
+        <KeyboardAvoidingView
+          style={styles.sheetOverlayWrap}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <Pressable
+            style={[styles.sheetOverlay, { backgroundColor: colors.overlay }]}
+            onPress={closeSaveDialog}
+          >
+            <Pressable
+              style={[styles.sheet, { backgroundColor: colors.backgroundSecondary }]}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <View style={styles.sheetHeader}>
+                <Text style={[styles.sheetTitle, { color: colors.text }]} accessibilityRole="header">
+                  {editingMixId ? t('mixer.renameMix') : t('mixer.savePreset')}
+                </Text>
+                <TouchableOpacity
+                  onPress={closeSaveDialog}
+                  style={styles.closeButton}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.cancel')}
+                >
+                  <Ionicons name="close" size={24} color={colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('mixer.presetName')}
               </Text>
@@ -492,20 +573,27 @@ export default function MixerScreen() {
                 onChangeText={setMixName}
                 placeholder={t('mixer.namePlaceholder')}
                 placeholderTextColor={colors.textSecondary}
+                autoFocus
                 style={[
                   styles.input,
                   {
                     color: colors.text,
-                    backgroundColor: colors.backgroundSecondary,
+                    backgroundColor: colors.background,
                     borderColor: colors.cardBorder,
                   },
                 ]}
               />
               <Button title={t('common.save')} onPress={handleSaveMix} />
-            </View>
-          </SafeAreaView>
-        </View>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
+
+      <Toast
+        message={toast.message}
+        visible={toast.visible}
+        onHide={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
     </SafeAreaView>
   );
 }
@@ -691,16 +779,51 @@ const styles = StyleSheet.create({
   presetItemName: {
     ...Typography.body,
   },
-  saveForm: {
-    gap: Spacing.md,
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.sm,
+    minHeight: 44,
+  },
+  searchInput: {
+    flex: 1,
+    ...Typography.body,
+    paddingVertical: Spacing.sm,
   },
   label: {
     ...Typography.headline,
+    marginBottom: Spacing.sm,
   },
   input: {
     borderWidth: 1,
     borderRadius: 12,
     padding: Spacing.md,
+    marginBottom: Spacing.md,
     ...Typography.body,
+  },
+  sheetOverlayWrap: {
+    flex: 1,
+  },
+  sheetOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: Spacing.lg,
+    paddingBottom: Spacing.xxl,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  sheetTitle: {
+    ...Typography.title3,
   },
 });

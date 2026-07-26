@@ -60,6 +60,8 @@ interface SettingsState {
   hasSeenOnboarding: boolean;
   hasSeenHeadphoneWarning: boolean;
   hasSeenEpilepsyWarning: boolean;
+  /** Explore's category blurb shown once per category, not on every visit. */
+  seenCategoryDescriptions: Record<string, boolean>;
 
   // Actions
   setTheme: (theme: ThemeMode) => void;
@@ -72,6 +74,7 @@ interface SettingsState {
   setHasSeenOnboarding: (seen: boolean) => void;
   setHasSeenHeadphoneWarning: (seen: boolean) => void;
   setHasSeenEpilepsyWarning: (seen: boolean) => void;
+  markCategoryDescriptionSeen: (category: string) => void;
   resetSettings: () => void;
 }
 
@@ -88,6 +91,7 @@ const initialState = {
   hasSeenOnboarding: false,
   hasSeenHeadphoneWarning: false,
   hasSeenEpilepsyWarning: false,
+  seenCategoryDescriptions: {},
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -105,6 +109,10 @@ export const useSettingsStore = create<SettingsState>()(
       setHasSeenOnboarding: (hasSeenOnboarding) => set({ hasSeenOnboarding }),
       setHasSeenHeadphoneWarning: (hasSeenHeadphoneWarning) => set({ hasSeenHeadphoneWarning }),
       setHasSeenEpilepsyWarning: (hasSeenEpilepsyWarning) => set({ hasSeenEpilepsyWarning }),
+      markCategoryDescriptionSeen: (category) =>
+        set((state) => ({
+          seenCategoryDescriptions: { ...state.seenCategoryDescriptions, [category]: true },
+        })),
       resetSettings: () => set(initialState),
     }),
     {

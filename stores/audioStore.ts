@@ -3,7 +3,39 @@
  */
 
 import { create } from 'zustand';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FrequencyPreset } from '../lib/frequencies';
+
+const isClient = typeof window !== 'undefined';
+
+const safeStorage: StateStorage = {
+  getItem: async (name: string) => {
+    if (!isClient) return null;
+    try {
+      return await AsyncStorage.getItem(name);
+    } catch (e) {
+      console.log('Storage getItem error:', e);
+      return null;
+    }
+  },
+  setItem: async (name: string, value: string) => {
+    if (!isClient) return;
+    try {
+      await AsyncStorage.setItem(name, value);
+    } catch (e) {
+      console.log('Storage setItem error:', e);
+    }
+  },
+  removeItem: async (name: string) => {
+    if (!isClient) return;
+    try {
+      await AsyncStorage.removeItem(name);
+    } catch (e) {
+      console.log('Storage removeItem error:', e);
+    }
+  },
+};
 
 export interface PlaybackState {
   // Current playback
@@ -72,57 +104,68 @@ const initialState = {
   activeMixId: null,
 };
 
-export const useAudioStore = create<PlaybackState>((set) => ({
-  ...initialState,
+export const useAudioStore = create<PlaybackState>()(
+  persist(
+    (set) => ({
+      ...initialState,
 
-  setCurrentPreset: (preset) => set({ currentPreset: preset }),
+      setCurrentPreset: (preset) => set({ currentPreset: preset }),
 
-  setIsPlaying: (isPlaying) => set({ isPlaying }),
+      setIsPlaying: (isPlaying) => set({ isPlaying }),
 
-  setIsLoading: (isLoading) => set({ isLoading }),
+      setIsLoading: (isLoading) => set({ isLoading }),
 
-  setPlaybackError: (playbackError) => set({ playbackError }),
+      setPlaybackError: (playbackError) => set({ playbackError }),
 
-  setVolume: (volume) => set({ volume: Math.max(0, Math.min(1, volume)) }),
+      setVolume: (volume) => set({ volume: Math.max(0, Math.min(1, volume)) }),
 
-  setTimer: (duration) =>
-    set({
-      timerDuration: duration,
-      timerRemaining: duration ? duration * 60 : null,
-      timerEndsAt: duration ? Date.now() + duration * 60_000 : null,
+      setTimer: (duration) =>
+        set({
+          timerDuration: duration,
+          timerRemaining: duration ? duration * 60 : null,
+          timerEndsAt: duration ? Date.now() + duration * 60_000 : null,
+        }),
+
+      updateTimerRemaining: (remaining) => set({ timerRemaining: remaining }),
+
+      setIsMixerPlaying: (isMixerPlaying) => set({ isMixerPlaying }),
+
+      addMixerChannel: (channel) =>
+        set((state) => ({
+          mixerChannels: [...state.mixerChannels, channel],
+        })),
+
+      removeMixerChannel: (channelId) =>
+        set((state) => ({
+          mixerChannels: state.mixerChannels.filter((c) => c.id !== channelId),
+        })),
+
+      updateMixerChannelVolume: (channelId, volume) =>
+        set((state) => ({
+          mixerChannels: state.mixerChannels.map((c) =>
+            c.id === channelId ? { ...c, volume: Math.max(0, Math.min(1, volume)) } : c
+          ),
+        })),
+
+      setMixerChannelMuted: (channelId, muted) =>
+        set((state) => ({
+          mixerChannels: state.mixerChannels.map((c) =>
+            c.id === channelId ? { ...c, muted } : c
+          ),
+        })),
+
+      clearMixerChannels: () => set({ mixerChannels: [], activeMixId: null }),
+
+      setActiveMixId: (activeMixId) => set({ activeMixId }),
+
+      reset: () => set(initialState),
     }),
-
-  updateTimerRemaining: (remaining) => set({ timerRemaining: remaining }),
-
-  setIsMixerPlaying: (isMixerPlaying) => set({ isMixerPlaying }),
-
-  addMixerChannel: (channel) =>
-    set((state) => ({
-      mixerChannels: [...state.mixerChannels, channel],
-    })),
-
-  removeMixerChannel: (channelId) =>
-    set((state) => ({
-      mixerChannels: state.mixerChannels.filter((c) => c.id !== channelId),
-    })),
-
-  updateMixerChannelVolume: (channelId, volume) =>
-    set((state) => ({
-      mixerChannels: state.mixerChannels.map((c) =>
-        c.id === channelId ? { ...c, volume: Math.max(0, Math.min(1, volume)) } : c
-      ),
-    })),
-
-  setMixerChannelMuted: (channelId, muted) =>
-    set((state) => ({
-      mixerChannels: state.mixerChannels.map((c) =>
-        c.id === channelId ? { ...c, muted } : c
-      ),
-    })),
-
-  clearMixerChannels: () => set({ mixerChannels: [], activeMixId: null }),
-
-  setActiveMixId: (activeMixId) => set({ activeMixId }),
-
-  reset: () => set(initialState),
-}));
+    {
+      name: 'neurosound-audio',
+      storage: createJSONStorage(() => safeStorage),
+      // Only the volume level survives a restart — playback, timers and mixer
+      // sessions die with the process and should not resume from stale state.
+      partialize: (state) => ({ volume: state.volume }),
+    }
+  )
+);

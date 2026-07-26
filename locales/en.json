@@ -16,7 +16,8 @@
     "removeFromFavorites": "Remove from favorites",
     "addedToFavorites": "favourited",
     "seeAll": "See all",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "rename": "Rename"
   },
   "tabs": {
     "home": "Home",
@@ -105,7 +106,10 @@
       "train": "Train",
       "trainDesc": "Rhythmic train on tracks"
     },
-    "solfeggioDisclaimer": "A traditional tone. Effects are personal; no medical benefit is claimed."
+    "solfeggioDisclaimer": "A traditional tone. Effects are personal; no medical benefit is claimed.",
+    "searchPlaceholder": "Search sounds",
+    "favoritesOnly": "Favourites only",
+    "aboutCategory": "About this category"
   },
   "mixer": {
     "title": "Sound Mixer",
@@ -128,7 +132,11 @@
     "trySample": "Try a sample mix",
     "mute": "Mute",
     "channelsFull": "4 of 4 — remove one to add another",
-    "loaded": "Loaded"
+    "loaded": "Loaded",
+    "renameMix": "Rename mix",
+    "mixRenamed": "Mix renamed",
+    "addToMixer": "Add to mixer",
+    "addedToMixer": "Added to mixer"
   },
   "player": {
     "nowPlaying": "Now Playing",

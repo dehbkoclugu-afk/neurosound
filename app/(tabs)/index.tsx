@@ -4,7 +4,7 @@
  * here gave two paths to one destination.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,9 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
-  TouchableOpacity,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 
@@ -48,12 +46,12 @@ export default function HomeScreen() {
   const miniPlayerInset = useMiniPlayerInset();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
 
-  // First run: route into onboarding once
-  useEffect(() => {
-    if (!hasSeenOnboarding) {
-      router.push('/onboarding');
-    }
-  }, [hasSeenOnboarding, router]);
+  // Route guard, not a post-render push: rendering Home for a frame and then
+  // navigating away read as a flash, and left onboarding with no history to
+  // pop back into if it were ever reached directly.
+  if (!hasSeenOnboarding) {
+    return <Redirect href="/onboarding" />;
+  }
 
   const handlePresetPress = (presetId: string) => {
     const preset = getPresetById(presetId);
@@ -103,18 +101,12 @@ export default function HomeScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header with proper spacing */}
+        {/* Brand presence without a second settings entry point — the tab
+            already gives access, so this row only carries the wordmark. */}
         <View style={styles.header}>
           <Text style={[styles.wordmark, { color: colors.textSecondary }]}>
             NeuroSound
           </Text>
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/settings')}
-            style={styles.headerButton}
-            accessibilityLabel={t('common.settings')}
-          >
-            <Ionicons name="settings-outline" size={24} color={colors.text} />
-          </TouchableOpacity>
         </View>
 
         {/* Intent Section — primary entry, typographic */}
@@ -265,9 +257,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
   },
@@ -276,12 +265,6 @@ const styles = StyleSheet.create({
     ...Typography.footnote,
     fontFamily: FontFamily.semibold,
     letterSpacing: 0.4,
-  },
-  headerButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   section: {
     marginBottom: Spacing.xl,

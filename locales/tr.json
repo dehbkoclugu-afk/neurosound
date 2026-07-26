@@ -16,7 +16,8 @@
     "removeFromFavorites": "Favorilerden çıkar",
     "addedToFavorites": "favorilerde",
     "seeAll": "Tümü",
-    "showLess": "Daha az"
+    "showLess": "Daha az",
+    "rename": "Yeniden adlandır"
   },
   "tabs": {
     "home": "Ana Sayfa",
@@ -105,7 +106,10 @@
       "train": "Tren",
       "trainDesc": "Raylarda ritmik tren sesi"
     },
-    "solfeggioDisclaimer": "Geleneksel bir ton. Etkisi kişiseldir; tıbbi bir fayda iddia edilmez."
+    "solfeggioDisclaimer": "Geleneksel bir ton. Etkisi kişiseldir; tıbbi bir fayda iddia edilmez.",
+    "searchPlaceholder": "Ses ara",
+    "favoritesOnly": "Sadece favoriler",
+    "aboutCategory": "Bu kategori hakkında"
   },
   "mixer": {
     "title": "Ses Karıştırıcı",
@@ -128,7 +132,11 @@
     "trySample": "Örnek karışımı dene",
     "mute": "Sustur",
     "channelsFull": "4/4 dolu — eklemek için birini çıkar",
-    "loaded": "Yüklü"
+    "loaded": "Yüklü",
+    "renameMix": "Karışımı yeniden adlandır",
+    "mixRenamed": "Karışım yeniden adlandırıldı",
+    "addToMixer": "Karıştırıcıya ekle",
+    "addedToMixer": "Karıştırıcıya eklendi"
   },
   "player": {
     "nowPlaying": "Şu an çalıyor",

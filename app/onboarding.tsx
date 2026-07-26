@@ -94,13 +94,24 @@ export default function OnboardingScreen() {
     return () => content.stop();
   }, [step, reduceMotion, stepAnim, contentAnim]);
 
+  // Arriving here from a deep link (or a future "replay onboarding" entry
+  // point) means there may be no history to pop — back() would exit the app
+  // instead of landing on Home.
+  const closeOnboarding = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
+  };
+
   // Skipping still records the flags: the alternative is re-showing all three
   // screens on every launch to someone who has already said no.
   const finish = () => {
     setHasSeenOnboarding(true);
     setHasSeenEpilepsyWarning(true);
     setHasSeenHeadphoneWarning(true);
-    router.back();
+    closeOnboarding();
   };
 
   const handleLanguage = (next: Language) => {
@@ -115,7 +126,7 @@ export default function OnboardingScreen() {
       // Step 2 already covered headphones; repeating it in an alert on the
       // first binaural tap is the same sentence three times in two minutes.
       setHasSeenHeadphoneWarning(true);
-      router.back();
+      closeOnboarding();
     } else {
       setStep(step + 1);
     }

@@ -47,6 +47,14 @@ function getSubline(preset: FrequencyPreset, t: (k: string) => string): string {
   return t('explore.categories.noise');
 }
 
+// Chip already carries category through its icon and colour, so it only
+// needs the frequency — repeating "Binaural Beats · 6 Hz" would overflow.
+function getFrequencyOnly(preset: FrequencyPreset): string | null {
+  if (preset.type === 'binaural' && preset.beatFrequency) return `${preset.beatFrequency} Hz`;
+  if (preset.type === 'solfeggio' && preset.frequency) return `${preset.frequency} Hz`;
+  return null;
+}
+
 export function PresetCard({
   preset,
   onPress,
@@ -111,6 +119,7 @@ export function PresetCardSmall({
   style,
 }: PresetCardSmallProps) {
   const colors = useThemeColors();
+  const frequency = getFrequencyOnly(preset);
 
   return (
     <TouchableOpacity
@@ -118,12 +127,22 @@ export function PresetCardSmall({
       activeOpacity={0.6}
       style={[styles.chip, { borderColor: colors.cardBorder }, style]}
       accessibilityRole="button"
-      accessibilityLabel={name}
+      accessibilityLabel={frequency ? `${name}, ${frequency}` : name}
     >
       <Icon icon={presetIcon(preset)} size={15} color={CategoryColors[preset.type]} />
       <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
         {name}
       </Text>
+      {frequency && (
+        <Text
+          style={[styles.chipFrequency, { color: colors.textSecondary }]}
+          numberOfLines={1}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {frequency}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 }
@@ -163,5 +182,9 @@ const styles = StyleSheet.create({
   chipText: {
     ...Typography.subhead,
     fontFamily: FontFamily.semibold,
+  },
+  chipFrequency: {
+    ...Typography.caption2,
+    fontVariant: ['tabular-nums'],
   },
 });

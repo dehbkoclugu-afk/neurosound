@@ -9,14 +9,15 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   Animated,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Reanimated, { ZoomIn } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import {
@@ -35,6 +36,7 @@ import { WaveVisualizer } from '@/components/player/WaveVisualizer';
 import { Slider } from '@/components/ui/Slider';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
 import { PressableScale } from '@/components/ui/PressableScale';
+import { Toast } from '@/components/ui/Toast';
 import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
@@ -73,6 +75,10 @@ export default function PlayerScreen() {
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
   const [showTimerModal, setShowTimerModal] = useState(false);
+  const [toast, setToast] = useState<{ visible: boolean; message: string }>({
+    visible: false,
+    message: '',
+  });
 
   // Load preset into the global controller (same preset = keeps playing)
   useEffect(() => {
@@ -94,6 +100,19 @@ export default function PlayerScreen() {
     haptics.commit();
     await playerController.toggle();
   }, []);
+
+  // The most requested action next to a sound is layering it into a mix —
+  // this used to be a decorative empty view "for symmetry".
+  const handleAddToMixer = useCallback(async () => {
+    if (!preset) return;
+    const added = await playerController.mixerAddChannel(preset);
+    if (!added) {
+      Alert.alert(t('mixer.maxChannels'), t('mixer.maxChannelsDesc'));
+      return;
+    }
+    haptics.save();
+    setToast({ visible: true, message: t('mixer.addedToMixer') });
+  }, [preset, t]);
 
   const isFavorite = id ? favoriteIds.includes(id) : false;
 
@@ -331,13 +350,14 @@ export default function PlayerScreen() {
               color={timerDuration ? colors.accent : colors.textSecondary}
             />
             {timerRemaining !== null && timerRemaining > 0 && (
-              <Text
+              <Reanimated.Text
+                entering={reduceMotion ? undefined : ZoomIn.duration(200)}
                 style={[styles.timerBadge, { color: colors.accent }]}
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               >
                 {formatTimerValue(timerRemaining)}
-              </Text>
+              </Reanimated.Text>
             )}
           </TouchableOpacity>
 
@@ -349,26 +369,36 @@ export default function PlayerScreen() {
             accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
             accessibilityState={{ busy: isLoading }}
           >
-            {isLoading ? (
-              <ActivityIndicator size="large" color={onPrimary} />
-            ) : (
-              <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
-                size={38}
-                color={onPrimary}
-                style={isPlaying ? undefined : { marginLeft: 3 }}
-              />
-            )}
+            {/* Sound generation isn't a spinner's kind of wait — the ring
+                already sits dim and starts breathing the moment it's ready. */}
+            <Ionicons
+              name={isPlaying ? 'pause' : 'play'}
+              size={38}
+              color={onPrimary}
+              style={isPlaying ? undefined : { marginLeft: 3 }}
+            />
           </PressableScale>
 
-          {/* Placeholder for symmetry */}
-          <View style={styles.sideButton} />
+          <TouchableOpacity
+            onPress={handleAddToMixer}
+            style={styles.sideButton}
+            accessibilityRole="button"
+            accessibilityLabel={t('mixer.addToMixer')}
+          >
+            <Ionicons name="layers-outline" size={24} color={colors.textSecondary} />
+          </TouchableOpacity>
         </View>
       </View>
 
       <TimerModal
         visible={showTimerModal}
         onClose={() => setShowTimerModal(false)}
+      />
+
+      <Toast
+        message={toast.message}
+        visible={toast.visible}
+        onHide={() => setToast((prev) => ({ ...prev, visible: false }))}
       />
     </View>
   );
