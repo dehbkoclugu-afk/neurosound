@@ -8,11 +8,11 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Switch,
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
