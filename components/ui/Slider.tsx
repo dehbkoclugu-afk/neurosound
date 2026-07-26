@@ -71,17 +71,29 @@ export function Slider({
   // child-relative coordinates when the finger lands on the thumb.
   const startXRef = useRef(0);
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderGrant: (evt) => {
-      startXRef.current = evt.nativeEvent.locationX;
-      handleValueFromPosition(startXRef.current);
-    },
-    onPanResponderMove: (_evt, gestureState) => {
-      handleValueFromPosition(startXRef.current + gestureState.dx);
-    },
-  });
+  // handleValueFromPosition changes identity on every value/width update, and
+  // calling it is exactly what drives that update — so the PanResponder itself
+  // must be created once and read the latest callback through a ref. Rebuilding
+  // it on every render (the previous shape) swapped the live responder for a
+  // fresh, never-granted one the instant the first onPanResponderGrant fired,
+  // so onPanResponderMove never ran again for the rest of that gesture: the
+  // slider looked like it only supported tap-to-set, never drag.
+  const handleValueFromPositionRef = useRef(handleValueFromPosition);
+  handleValueFromPositionRef.current = handleValueFromPosition;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        startXRef.current = evt.nativeEvent.locationX;
+        handleValueFromPositionRef.current(startXRef.current);
+      },
+      onPanResponderMove: (_evt, gestureState) => {
+        handleValueFromPositionRef.current(startXRef.current + gestureState.dx);
+      },
+    })
+  ).current;
 
   const handleAccessibilityAction = (direction: 'increment' | 'decrement') => {
     const newValue = direction === 'increment' ? value + step * 10 : value - step * 10;

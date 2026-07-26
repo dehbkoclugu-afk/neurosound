@@ -84,9 +84,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
   };
 
   return (
-    <TouchableOpacity
-      onPress={handlePress}
-      activeOpacity={0.9}
+    <View
       style={[
         styles.container,
         {
@@ -94,12 +92,22 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           borderTopColor: colors.cardBorder,
         },
       ]}
-      accessibilityRole="button"
-      accessibilityLabel={`${t('player.nowPlaying')}: ${title}`}
-      accessibilityHint={t('accessibility.expandPlayer')}
     >
       <View style={styles.content}>
-        <View style={styles.infoContainer}>
+        {/* A pressable row wrapping the play/stop buttons would nest
+            interactive elements inside one another — invalid HTML on web
+            (React logs a hydration-error warning for it) and an ambiguous
+            touch target on native. The expand action is scoped to just the
+            info column instead, as a sibling of the buttons, not their
+            ancestor. */}
+        <TouchableOpacity
+          onPress={handlePress}
+          activeOpacity={0.7}
+          style={styles.infoContainer}
+          accessibilityRole="button"
+          accessibilityLabel={`${t('player.nowPlaying')}: ${title}`}
+          accessibilityHint={t('accessibility.expandPlayer')}
+        >
           <Text style={[styles.presetName, { color: colors.text }]} numberOfLines={1}>
             {title}
           </Text>
@@ -109,7 +117,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           >
             {subline}
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.rightSection}>
           <PressableScale
@@ -144,7 +152,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
