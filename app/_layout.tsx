@@ -13,6 +13,7 @@ import {
 } from '@expo-google-fonts/nunito-sans';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ToastHost } from '@/components/ui/ToastHost';
 import i18n from '@/i18n';
 
 export const unstable_settings = {
@@ -67,6 +68,7 @@ export default function RootLayout() {
             options={{ headerShown: false, gestureEnabled: false }}
           />
         </Stack>
+        <ToastHost />
         <StatusBar style="auto" />
       </ThemeProvider>
     </I18nextProvider>

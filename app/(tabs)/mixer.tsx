@@ -30,7 +30,7 @@ import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Button } from '@/components/ui/Button';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
-import { Toast } from '@/components/ui/Toast';
+import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
@@ -75,20 +75,13 @@ export default function MixerScreen() {
   const [mixName, setMixName] = useState('');
   const [editingMixId, setEditingMixId] = useState<string | null>(null);
   const [pickerQuery, setPickerQuery] = useState('');
-  const [toast, setToast] = useState<{ visible: boolean; message: string }>({
-    visible: false,
-    message: '',
-  });
+  const showToast = useToastStore((s) => s.show);
 
   const colors = useThemeColors();
   const miniPlayerInset = useMiniPlayerInset();
 
   const isEmpty = channels.length === 0;
   const isFull = channels.length >= playerController.MAX_MIXER_CHANNELS;
-
-  const showToast = useCallback((message: string) => {
-    setToast({ visible: true, message });
-  }, []);
 
   // 33 presets in a flat scroll is unusable without a filter.
   const filteredPickerGroups = useMemo(() => {
@@ -588,12 +581,6 @@ export default function MixerScreen() {
           </Pressable>
         </KeyboardAvoidingView>
       </Modal>
-
-      <Toast
-        message={toast.message}
-        visible={toast.visible}
-        onHide={() => setToast((prev) => ({ ...prev, visible: false }))}
-      />
     </SafeAreaView>
   );
 }

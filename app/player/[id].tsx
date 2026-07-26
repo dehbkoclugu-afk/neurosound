@@ -36,7 +36,7 @@ import { WaveVisualizer } from '@/components/player/WaveVisualizer';
 import { Slider } from '@/components/ui/Slider';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
 import { PressableScale } from '@/components/ui/PressableScale';
-import { Toast } from '@/components/ui/Toast';
+import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
@@ -75,10 +75,7 @@ export default function PlayerScreen() {
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
   const [showTimerModal, setShowTimerModal] = useState(false);
-  const [toast, setToast] = useState<{ visible: boolean; message: string }>({
-    visible: false,
-    message: '',
-  });
+  const showToast = useToastStore((s) => s.show);
 
   // Load preset into the global controller (same preset = keeps playing)
   useEffect(() => {
@@ -111,8 +108,8 @@ export default function PlayerScreen() {
       return;
     }
     haptics.save();
-    setToast({ visible: true, message: t('mixer.addedToMixer') });
-  }, [preset, t]);
+    showToast(t('mixer.addedToMixer'));
+  }, [preset, t, showToast]);
 
   const isFavorite = id ? favoriteIds.includes(id) : false;
 
@@ -393,12 +390,6 @@ export default function PlayerScreen() {
       <TimerModal
         visible={showTimerModal}
         onClose={() => setShowTimerModal(false)}
-      />
-
-      <Toast
-        message={toast.message}
-        visible={toast.visible}
-        onHide={() => setToast((prev) => ({ ...prev, visible: false }))}
       />
     </View>
   );
