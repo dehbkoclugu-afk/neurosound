@@ -37,6 +37,7 @@ import {
   binauralPresets,
   solfeggioPresets,
   noisePresets,
+  getPresetById,
   FrequencyPreset,
 } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
@@ -54,6 +55,15 @@ const EMPTY_SLOTS = Array.from(
   { length: playerController.MAX_MIXER_CHANNELS },
   (_, i) => i
 );
+
+// A saved mix stores preset ids; the row needs the presets themselves to show
+// what it is made of. An id that no longer resolves — a preset removed in a
+// later version — is dropped rather than drawn as an empty badge.
+function mixPresets(mix: { channels: { presetId: string }[] }): FrequencyPreset[] {
+  return mix.channels
+    .map((c) => getPresetById(c.presetId))
+    .filter((p): p is FrequencyPreset => p !== undefined);
+}
 
 // One-tap sample mix for the empty state
 const SAMPLE_MIX = [
@@ -234,7 +244,7 @@ export default function MixerScreen() {
         <View style={styles.section}>
           <CategoryHeader
             title={t('mixer.activeChannels')}
-            subtitle={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
+            counter={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
           />
 
           {/* Empty state is the mixer itself, not a poster about the mixer:
@@ -500,40 +510,76 @@ export default function MixerScreen() {
                     style={styles.mixMain}
                     accessibilityRole="button"
                     accessibilityState={{ selected: isActive }}
-                    accessibilityLabel={`${mix.name}, ${mix.channels.length} ${t('mixer.sounds')}`}
+                    accessibilityLabel={[
+                      mix.name,
+                      mixPresets(mix).map((p) => t(p.nameKey)).join(', '),
+                      isActive ? t('mixer.loaded') : null,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')}
                   >
                     <View style={styles.mixTextContainer}>
-                      <Text
-                        style={[
-                          styles.mixName,
-                          { color: isActive ? colors.accent : colors.text },
-                        ]}
-                        numberOfLines={1}
-                      >
-                        {mix.name}
-                      </Text>
-                      <Text style={[styles.mixChannels, { color: colors.textSecondary }]}>
-                        {isActive
-                          ? t('mixer.loaded')
-                          : `${mix.channels.length} ${t('mixer.sounds')}`}
-                      </Text>
+                      <View style={styles.mixNameRow}>
+                        <Text
+                          style={[
+                            styles.mixName,
+                            { color: isActive ? colors.accent : colors.text },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {mix.name}
+                        </Text>
+                        {/* A rubber stamp, not another line of prose — the
+                            loaded mix was marked only by a colour shift and
+                            the word "Loaded" in caption grey. */}
+                        {isActive && (
+                          <View style={[styles.mixStamp, { borderColor: colors.accent }]}>
+                            <Text style={[styles.mixStampText, { color: colors.accent }]}>
+                              {t('mixer.loaded')}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      {/* "3 sounds" told you how many, never which. The
+                          category badges do both, in the same alphabet the
+                          channel rows above use. */}
+                      <View style={styles.mixIcons}>
+                        {mixPresets(mix).map((preset, i) => (
+                          <View
+                            key={`${preset.id}-${i}`}
+                            style={[
+                              styles.mixIcon,
+                              { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
+                            ]}
+                          >
+                            <Icon
+                              icon={presetIcon(preset)}
+                              size={13}
+                              color={categoryColors[preset.type]}
+                            />
+                          </View>
+                        ))}
+                      </View>
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => handleRenameMix(mix)}
-                    style={styles.deleteButton}
+                    style={styles.mixAction}
                     accessibilityRole="button"
                     accessibilityLabel={`${t('mixer.renameMix')} ${mix.name}`}
                   >
                     <Ionicons name="pencil-outline" size={20} color={colors.textSecondary} />
                   </TouchableOpacity>
+                  {/* Deleting a mix is the only irreversible thing on this
+                      screen, and it looked exactly like renaming it: same
+                      size, same grey. It now carries the error colour. */}
                   <TouchableOpacity
                     onPress={() => handleDeleteMix(mix.id, mix.name)}
-                    style={styles.deleteButton}
+                    style={styles.mixAction}
                     accessibilityRole="button"
                     accessibilityLabel={`${t('common.delete')} ${mix.name}`}
                   >
-                    <Ionicons name="trash-outline" size={20} color={colors.textSecondary} />
+                    <Ionicons name="trash-outline" size={20} color={colors.error} />
                   </TouchableOpacity>
                 </View>
               );
@@ -737,15 +783,39 @@ const styles = StyleSheet.create({
   },
   mixTextContainer: {
     flex: 1,
-    gap: 2,
+    gap: Spacing.xs,
+  },
+  mixNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   mixName: {
     ...Typography.headline,
+    flexShrink: 1,
   },
-  mixChannels: {
-    ...Typography.caption,
+  mixStamp: {
+    borderWidth: 1,
+    borderRadius: Radius.tag,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
   },
-  deleteButton: {
+  mixStampText: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+  },
+  mixIcons: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  mixIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mixAction: {
     width: AccessibilitySize.minTouchTarget,
     height: AccessibilitySize.minTouchTarget,
     alignItems: 'center',

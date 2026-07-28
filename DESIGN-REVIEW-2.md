@@ -130,9 +130,13 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     listesi de `PresetCard` satırı. `PresetCardSmall` başka hiçbir yerde
     kullanılmıyordu, silindi (`getFrequencyOnly` ve chip stilleriyle birlikte).
 
-23. **[P3] Kulaklık notu sayfanın dibinde, ortalanmış, warning renginde** — hiçbir
-    eyleme bağlı değil, her zaman orada. Öneri: sadece binaural bir preset
-    görünürken göster.
+23. **[P3 — ÇÖZÜLDÜ] Kulaklık notu sayfanın dibinde, ortalanmış, warning
+    renginde.** Artık yalnızca ekranda gerçekten binaural bir preset varken
+    çiziliyor (geçmiş ya da görünen favoriler listesinde). Her ziyarette orada
+    duran bir uyarı, uyarı okumamayı öğretmenin en hızlı yolu; üstelik ilk
+    binaural çalışta zaten bir diyalog çıkıyor. Tarayıcıda üç durumda
+    doğrulandı: geçmişsiz → yok, yalnız gürültü geçmişi → yok, binaural
+    geçmişi → var.
 
 24. **[P3] Intent kartlarında basılı tutma önizlemesi yok.** Long-press → o
     intent'in önerilen sesini 3 sn çal.
@@ -288,20 +292,26 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     üst üste dizili kanallar tek kontrolün tekrarı gibi değil, üç ayrı ses gibi
     okunuyor.
 
-61. **[P2] Sil ve yeniden adlandır ikonları aynı boy, aynı renk.** Yıkıcı eylem
-    ayrışmıyor.
+61. **[P2 — ÇÖZÜLDÜ] Sil ve yeniden adlandır ikonları aynı boy, aynı renk.**
+    Sil artık `colors.error` taşıyor, yeniden adlandır grinin içinde kalıyor.
+    Renk beş paletin ikisinde de yüzeyde ölçüldü (en düşük 4.65:1, ikonun
+    ihtiyacı olan 3:1'in epey üstünde) ve `contrast.test.ts`'e sabitlendi.
 
-62. **[P2] Stil adı yanlış:** yeniden adlandırma butonu `styles.deleteButton`
-    kullanıyor (`mixer.tsx:438`). Kozmetik değil, bakım tuzağı.
+62. **[P2 — ÇÖZÜLDÜ] Stil adı yanlış.** İki buton da `styles.mixAction`
+    kullanıyor; `deleteButton` adı kalktı.
 
-63. **[P2] "0/4" sayacı caption boyutunda, çok silik.** Mono + bir adım büyük olsa
-    gerçek bir sayaç gibi okunur.
+63. **[P2 — ÇÖZÜLDÜ] "0/4" sayacı caption boyutunda, çok silik.**
+    `CategoryHeader`'a `counter` prop'u eklendi: sağa hizalı, teyp sayacı
+    yüzünde, footnote boyunda. `subtitle` düz metin için kaldı.
 
-64. **[P2] Kaydedilmiş karışım satırında kanal ikonları yok** — hangi seslerden
-    oluştuğu görünmüyor, sadece "3 sounds".
+64. **[P2 — ÇÖZÜLDÜ] Kaydedilmiş karışım satırında kanal ikonları yok.**
+    "3 sounds" kaçını söylüyordu, hangilerini değil. Yerine kanalların
+    kategori rozetleri geliyor — kanal satırlarının kullandığı alfabenin
+    aynısı. Çözülmeyen preset id'leri boş rozet olarak çizilmiyor, atılıyor.
 
-65. **[P2] Yüklü karışım göstergesi sadece renk + "Loaded" metni.** Katalog
-    dilinde bir "çalıyor" damgası daha güçlü olur.
+65. **[P2 — ÇÖZÜLDÜ] Yüklü karışım göstergesi sadece renk + "Loaded" metni.**
+    Adın yanında kenarlıklı bir "LOADED" damgası var artık; caption grisinde
+    bir satır daha değil.
 
 66. **[P2 — ÇÖZÜLDÜ] Ses seçici tam ekran modal, kaydetme alt sayfa.** Seçici
     artık `Sheet tall` (%85 yükseklik): 33 öğe için gereken boy var ama arkada
@@ -461,14 +471,18 @@ artık kullanılmıyordu, silindi; `mixer.emptyDesc`, `mixer.emptyHint` ve
 `Sheet`'e geçince `mixer.tsx`'te `Modal`/`Pressable`/`KeyboardAvoidingView` ve
 on kadar ölü stil kaldı, onlar da gitti.
 
+Dördüncü turda **#61/#62** (yıkıcı eylemin ayrışması ve stil adı), **#63/#64/
+#65** (sayaç, karışımın içeriği, yüklü damgası) ve **#23** (koşullu kulaklık
+notu) kapatıldı.
+
 Kalanlar için sıra önerisi:
 
 ## Önce şunlar
 
-1. **#61/#62** — Mixer'da sil ve yeniden adlandır aynı boy/aynı renk (yıkıcı
-   eylem ayrışmıyor), üstelik yeniden adlandırma butonu `styles.deleteButton`
-   kullanıyor: kozmetik değil, bakım tuzağı.
-2. **#63/#64/#65** — kaydedilmiş karışım satırı hangi seslerden oluştuğunu
-   göstermiyor ve "0/4" sayacı okunamayacak kadar silik.
-3. **#23** — kulaklık notu her zaman sayfanın dibinde, hiçbir eyleme bağlı
-   değil; yalnızca binaural bir preset görünürken gösterilmeli.
+1. **#19/#20** — wordmark yalnızca Home'da ve katalog kodları (ND-01…04) hâlâ
+   hiçbir bilgi taşımıyor; ikisi de ya sistemleşmeli ya kalkmalı.
+2. **#10/#13** — kart kenarlık dili tutarsız (kutu / yalnız alt çizgi) ve
+   `AccessibilitySize.minTouchTarget` hem dokunma hedefi hem düzen ölçüsü
+   olarak kullanılıyor.
+3. **#67/#68** — Mixer'da kanal sırası değiştirilemiyor ve master ses seviyesi
+   yok; ikisi de "gerçek mikser" iddiasının hâlâ eksik yarısı.

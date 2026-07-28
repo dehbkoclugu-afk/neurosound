@@ -99,6 +99,18 @@ export default function HomeScreen() {
     .filter((p): p is FrequencyPreset => p !== undefined)
     .slice(0, RECENT_PREVIEW);
 
+  const visibleFavorites = showAllFavorites
+    ? favoritePresets
+    : favoritePresets.slice(0, FAVORITES_PREVIEW);
+
+  // The note only earns its place when a binaural preset is actually on the
+  // page. Parked at the foot of every visit it was a permanent warning about
+  // nothing in particular, which is the fastest way to teach someone not to
+  // read warnings — and the first binaural play already raises a dialog.
+  const showsBinaural = [...recentPresets, ...visibleFavorites].some(
+    (preset) => preset.type === 'binaural'
+  );
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
@@ -271,10 +283,7 @@ export default function HomeScreen() {
           />
           {favoritePresets.length > 0 ? (
             <View>
-              {(showAllFavorites
-                ? favoritePresets
-                : favoritePresets.slice(0, FAVORITES_PREVIEW)
-              ).map((preset) => (
+              {visibleFavorites.map((preset) => (
                 <PresetCard
                   key={preset.id}
                   preset={preset}
@@ -290,10 +299,11 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Quiet headphone note */}
-        <Text style={[styles.headphoneNote, { color: colors.warning }]}>
-          {t('home.headphoneNote')}
-        </Text>
+        {showsBinaural && (
+          <Text style={[styles.headphoneNote, { color: colors.warning }]}>
+            {t('home.headphoneNote')}
+          </Text>
+        )}
 
       </ScrollView>
     </SafeAreaView>

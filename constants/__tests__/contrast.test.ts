@@ -127,3 +127,25 @@ describe('core palette contrast', () => {
     expect(failures).toEqual([]);
   });
 });
+
+/**
+ * The mixer's delete button is the only destructive control in the app and it
+ * is drawn as a bare icon in `error`. An icon carries no text, so 3:1 is the
+ * floor — but a warning colour that only just clears it is a warning nobody
+ * reads, so this pins the stricter text threshold it currently satisfies in
+ * every palette.
+ */
+describe('destructive colour', () => {
+  it('error reads clearly on both surface levels in every palette', () => {
+    const failures: string[] = [];
+    for (const [name, c] of Object.entries(Colors)) {
+      for (const surface of [c.background, c.backgroundSecondary]) {
+        const ratio = contrast(c.error, surface);
+        if (ratio < AA_TEXT) {
+          failures.push(`${name}.error on ${surface}: ${ratio.toFixed(2)}:1`);
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+});
