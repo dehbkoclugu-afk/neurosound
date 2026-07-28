@@ -138,6 +138,36 @@ function ramp(to: number, ms: number, onDone?: () => void): void {
   }, 30);
 }
 
+/**
+ * Fade a generator we are done with down to silence on its own timer, then
+ * stop it — the module-level `ramp` only ever drives the *current* generator,
+ * and by the time we retire one it is no longer that.
+ *
+ * Switching presets used to cut the outgoing sound dead. Letting it fall
+ * away while the incoming one fades up (play() already ramps in over
+ * FADE_IN_MS) turns the switch into a crossfade, which matters most in the
+ * one situation this app is for: someone half-asleep changing their mind.
+ *
+ * This is only safe because `getBinauralPlayer()` and friends hand back a
+ * fresh instance each call. If they ever become singletons, retiring the
+ * outgoing one would silence the incoming one 250ms after it started.
+ */
+function retireGenerator(gen: Generator, fromVolume: number): void {
+  const steps = 12;
+  const stepMs = FADE_OUT_MS / steps;
+  let i = 0;
+  const timer = setInterval(() => {
+    i += 1;
+    if (i >= steps) {
+      clearInterval(timer);
+      gen.stop();
+      gen.dispose();
+      return;
+    }
+    gen.setVolume(fromVolume * (1 - i / steps));
+  }, stepMs);
+}
+
 /** Load a preset. Same preset = no-op so playback continues untouched. */
 export function loadPreset(preset: FrequencyPreset): void {
   if (currentId === preset.id && generator) return;
@@ -145,10 +175,17 @@ export function loadPreset(preset: FrequencyPreset): void {
   mixerStop(); // single preset and mixer are mutually exclusive
 
   if (generator) {
+    const outgoing = generator;
+    const outgoingVolume = lastVolume;
+    const wasPlaying = useAudioStore.getState().isPlaying;
     cancelRamp();
-    generator.stop();
-    generator.dispose();
     generator = null;
+    if (wasPlaying && outgoingVolume > 0) {
+      retireGenerator(outgoing, outgoingVolume);
+    } else {
+      outgoing.stop();
+      outgoing.dispose();
+    }
   }
   useAudioStore.getState().setIsPlaying(false);
   useAudioStore.getState().setPlaybackError(false);

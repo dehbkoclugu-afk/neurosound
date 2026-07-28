@@ -260,38 +260,38 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     sabit; `volume` bilgisi Dial'a hiç gitmiyor. (Eski `WaveVisualizer`
     `intensity={volume}` alıyordu — bu bağ koptu.)
 
-45. **[P1] Zamanlayıcı geri sayımı kadranda görünmüyor.** Uykuya dalan kullanıcının
+45. **[P1 — ÇÖZÜLDÜ] Zamanlayıcı geri sayımı kadranda görünmüyor.** Uykuya dalan kullanıcının
     en çok merak ettiği bilgi; şu an sadece alttaki küçük rozette.
 
-46. **[P2] Kadranın tıklanabilirliği zayıf işaretli.** Altındaki 13px "Play"
+46. **[P2 — ÇÖZÜLDÜ] Kadranın tıklanabilirliği zayıf işaretli.** Altındaki 13px "Play"
     etiketi dışında affordance yok.
 
 47. **[P2 — ÇÖZÜLDÜ] Gece temasında minör tikler kaybolacak.** `withAlpha(color, 0.28)`,
     1.5px genişlik, `#050403` zemin — OLED'de neredeyse görünmez.
 
-48. **[P2] Alt kontrol satırı seyrek.** Zamanlayıcı ve mixer ikonları
+48. **[P2 — ÇÖZÜLDÜ] Alt kontrol satırı seyrek.** Zamanlayıcı ve mixer ikonları
     `gap: Spacing.xxl` ile ortada; eskiden aralarında play butonu vardı, şimdi
     boşluk var.
 
-49. **[P2] Ses yüzdesi hiç yazmıyor.** `showValue={false}` (`player:299`).
+49. **[P2 — ÇÖZÜLDÜ] Ses yüzdesi hiç yazmıyor.** `showValue={false}` (`player:299`).
     "Volume capped at 80%" yazıyor ama mevcut seviye yazmıyor.
 
-50. **[P2] Kategori noktası 6px.** `CategoryColors` bu ekranda sadece burada
+50. **[P2 — ÇÖZÜLDÜ] Kategori noktası 6px.** `CategoryColors` bu ekranda sadece burada
     görünüyor ve çok küçük.
 
-51. **[P2] Favori kalbi başlıkta 22px, Explore'da 16px** — aynı anlam, iki boy.
+51. **[P2 — ÇÖZÜLDÜ] Favori kalbi başlıkta 22px, Explore'da 16px** — aynı anlam, iki boy.
 
-52. **[P3] Preset açıklaması tek satır, bağlamsız.** Binaural'in nasıl çalıştığı
+52. **[P3 — ÇÖZÜLDÜ] Preset açıklaması tek satır, bağlamsız.** Binaural'in nasıl çalıştığı
     Explore'da anlatılıyor, kullanıcının onu dinlediği yerde değil.
 
-53. **[P3] Kadran çevresinde zamanlayıcı ilerleme yayı** — kalan süreyi kadranın
+53. **[P3 — ÇÖZÜLDÜ] Kadran çevresinde zamanlayıcı ilerleme yayı** — kalan süreyi kadranın
     kenarına çiz.
 
-54. **[P3] Kadran detent'lerinde haptik tık** (ses ayarlanırken her %10'da).
+54. **[P3 — ÇÖZÜLDÜ] Kadran detent'lerinde haptik tık** (ses ayarlanırken her %10'da).
 
-55. **[P3] Preset geçişinde çapraz geçiş (crossfade) yok** — sert kesme.
+55. **[P3 — ÇÖZÜLDÜ] Preset geçişinde çapraz geçiş (crossfade) yok** — sert kesme.
 
-56. **[P3] Yatay mod desteklenmiyor.** Uyku uygulaması yan yatan telefonda
+56. **[P3 — YAPILMADI, gerekçeli] Yatay mod desteklenmiyor.** Uyku uygulaması yan yatan telefonda
     kullanılır; kadran yatayda doğal olarak sola, bilgi sağa gidebilir.
 
 ---
@@ -487,6 +487,24 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
      göstermiyor; katalog/teyp dilinde "çalma sayacı" zaten hazır bir metafor.
 
 ---
+
+## D bölümü notu (Player + Dial)
+
+- **#45/#53 birlikte çözüldü.** Geri sayım artık kadranın *içinde*, teyp
+  sayacı yüzünde 20px; yanında yüzün iç kenarına çizilen 25 tikli tükenen bir
+  halka var. İki ölçek çakışmıyor: kazanç tikleri yüzün *dışında*, zamanlayıcı
+  tikleri *içinde*, ama aynı 270°'lik yayı paylaşıyorlar.
+- **#55 (crossfade)** gerçek bir ses değişikliği. `loadPreset` giden
+  generator'ı sert kesmek yerine kendi zamanlayıcısıyla söndürüyor; gelen
+  zaten `FADE_IN_MS` ile açılıyor, yani geçiş bir crossfade oluyor. Bunun
+  güvenli olmasının tek sebebi `getBinauralPlayer()` ve kardeşlerinin her
+  çağrıda yeni örnek döndürmesi — singleton olsalardı giden'i emekliye
+  ayırmak geleni 250ms sonra susturacaktı. Kodda not düşüldü.
+- **#56 (yatay mod) yapılmadı, gerekçesi `app.json`'a yazıldı:** uyku
+  uygulaması yatarak kullanılıyor, ivmeölçer her dönüşte ekranı çeviriyor;
+  kadran ve transport tek elle dik tutulan telefona göre yerleşmiş. Yatay
+  destek, önemli olan tek ekran için ikinci bir düzen gerektirir ve yine de
+  kimse kıpırdamadan dururken dönerdi.
 
 ## C bölümü notu (Explore)
 

@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, { ZoomIn } from 'react-native-reanimated';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, withAlpha, BADGE_ALPHA } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, withAlpha, BADGE_ALPHA, Radius, ControlSize } from '@/constants/theme';
 import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -184,9 +184,12 @@ export default function PlayerScreen() {
           accessibilityLabel={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
         >
           <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+            {/* 20 for the heart as a *control*, 14 for the heart as a
+                *marker* on a list row. One meaning, two jobs, two sizes —
+                stated here so the next person does not average them. */}
             <Ionicons
               name={isFavorite ? 'heart' : 'heart-outline'}
-              size={22}
+              size={20}
               color={isFavorite ? colors.accent : colors.textSecondary}
             />
           </Animated.View>
@@ -206,11 +209,24 @@ export default function PlayerScreen() {
             reduceMotion={reduceMotion}
             onPress={handlePlayPause}
             accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
+            timerRemaining={timerRemaining}
+            timerDuration={timerDuration}
+            timerLabel={
+              timerRemaining !== null && timerRemaining > 0
+                ? formatTimerValue(timerRemaining)
+                : null
+            }
           />
-          <View style={styles.dialIconRow} pointerEvents="none">
+          {/* A 13pt caption under a 216pt circle was the only thing saying
+              the circle was pressable. A bordered legend reads as a control,
+              not as a description of one. */}
+          <View
+            style={[styles.dialLegend, { borderColor: colors.cardBorder }]}
+            pointerEvents="none"
+          >
             <Ionicons
               name={isPlaying ? 'pause' : 'play'}
-              size={16}
+              size={13}
               color={colors.textSecondary}
               style={isPlaying ? undefined : { marginLeft: 2 }}
             />
@@ -229,15 +245,20 @@ export default function PlayerScreen() {
           </Text>
 
           <View style={styles.metaRow}>
-            {/* The only place the sound's own colour still appears. */}
+            {/* A 6px dot was carrying the category on the one screen devoted
+                to a single sound — the colour was there and said nothing.
+                The same tinted-tag language the lists use, with the name in
+                it. */}
             <View
               style={[
-                styles.categoryDot,
-                { backgroundColor: categoryColors[preset.type] },
+                styles.categoryTag,
+                { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
               ]}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
+            >
+              <Text style={[styles.categoryTagText, { color: categoryColors[preset.type] }]}>
+                {t(`explore.categories.${preset.type}`)}
+              </Text>
+            </View>
             <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
               {frequencyParts ? (
                 frequencyParts.map((value, i) => (
@@ -261,6 +282,16 @@ export default function PlayerScreen() {
           >
             {t(preset.descriptionKey)}
           </Text>
+
+          {/* One sentence of description and no explanation of the mechanism
+              anywhere on the screen that plays it. Binaural is the only type
+              whose effect depends on the listener doing something (wearing
+              headphones), so it is the only one that gets the extra line. */}
+          {preset.type === 'binaural' && (
+            <Text style={[styles.mechanism, { color: colors.textSecondary }]}>
+              {t('explore.binauralDescription')}
+            </Text>
+          )}
 
           {playbackError && (
             <View style={styles.playbackError} accessibilityLiveRegion="assertive">
@@ -288,31 +319,16 @@ export default function PlayerScreen() {
         ]}
       >
         <View style={styles.volumeSection}>
-          <View style={styles.volumeContainer}>
-            <Ionicons
-              name="volume-low"
-              size={18}
-              color={colors.textSecondary}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
-            <View style={styles.sliderWrapper}>
-              <Slider
-                value={volume}
-                onValueChange={setVolume}
-                max={1}
-                showValue={false}
-                accessibilityLabel={t('accessibility.volumeSlider')}
-              />
-            </View>
-            <Ionicons
-              name="volume-high"
-              size={18}
-              color={colors.textSecondary}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
-          </View>
+          {/* The two flanking speaker icons said which way is louder; the
+              printed percentage says it better and exactly, so they go and
+              the track gets the full width back. */}
+          <Slider
+            value={volume}
+            onValueChange={setVolume}
+            max={1}
+            label={t('mixer.volume')}
+            accessibilityLabel={t('accessibility.volumeSlider')}
+          />
 
           {/* The safety cap is invisible otherwise: the slider runs to 100%
               while the output stops at maxVolume, so full travel sounds
@@ -344,21 +360,24 @@ export default function PlayerScreen() {
                 : t('player.timer')
             }
           >
-            <Ionicons
-              name="timer-outline"
-              size={24}
-              color={timerDuration ? colors.accent : colors.textSecondary}
-            />
-            {timerRemaining !== null && timerRemaining > 0 && (
-              <Reanimated.Text
-                entering={reduceMotion ? undefined : ZoomIn.duration(200)}
-                style={[styles.timerBadge, { color: colors.accent }]}
-                accessibilityElementsHidden
-                importantForAccessibility="no-hide-descendants"
-              >
-                {formatTimerValue(timerRemaining)}
-              </Reanimated.Text>
-            )}
+            <Reanimated.View entering={reduceMotion ? undefined : ZoomIn.duration(200)}>
+              <Ionicons
+                name="timer-outline"
+                size={22}
+                color={timerDuration ? colors.accent : colors.textSecondary}
+              />
+            </Reanimated.View>
+            {/* Two unlabelled icons with 48pt of nothing between them read as
+                leftovers. The countdown itself has moved onto the dial, so
+                this row can say what it is instead of repeating it. */}
+            <Text
+              style={[
+                styles.sideButtonLabel,
+                { color: timerDuration ? colors.accent : colors.textSecondary },
+              ]}
+            >
+              {t('player.timer')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -367,7 +386,10 @@ export default function PlayerScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('mixer.addToMixer')}
           >
-            <Ionicons name="layers-outline" size={24} color={colors.textSecondary} />
+            <Ionicons name="layers-outline" size={22} color={colors.textSecondary} />
+            <Text style={[styles.sideButtonLabel, { color: colors.textSecondary }]}>
+              {t('mixer.addToMixer')}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -413,10 +435,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.sm,
   },
-  dialIconRow: {
+  dialLegend: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: Radius.pill,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 5,
   },
   dialIconLabel: {
     ...Typography.footnote,
@@ -434,10 +460,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
   },
-  categoryDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  categoryTag: {
+    borderRadius: Radius.tag,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+  },
+  categoryTagText: {
+    ...Typography.label,
+    textTransform: 'uppercase',
   },
   frequencyLine: {
     ...Typography.body,
@@ -457,6 +487,13 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     maxWidth: 280,
   },
+  mechanism: {
+    ...Typography.footnote,
+    textAlign: 'center',
+    lineHeight: 18,
+    maxWidth: 300,
+    marginTop: Spacing.xs,
+  },
   playbackError: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -473,11 +510,7 @@ const styles = StyleSheet.create({
   volumeSection: {
     marginBottom: Spacing.xl,
   },
-  volumeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
+
   volumeCap: {
     alignSelf: 'center',
     paddingTop: Spacing.sm,
@@ -487,25 +520,21 @@ const styles = StyleSheet.create({
   volumeCapText: {
     ...Typography.caption,
   },
-  sliderWrapper: {
-    flex: 1,
-  },
   mainControls: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
-    gap: Spacing.xxl,
+    gap: Spacing.lg,
   },
   sideButton: {
-    width: 60,
-    height: 60,
+    minWidth: 96,
+    minHeight: ControlSize.row,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 4,
   },
-  timerBadge: {
+  sideButtonLabel: {
     ...Typography.caption,
-    ...Typography.numeral,
-    marginTop: 2,
   },
   errorText: {
     ...Typography.body,

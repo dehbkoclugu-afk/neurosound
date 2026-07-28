@@ -20,7 +20,7 @@
  */
 
 import React, { useCallback, useEffect, useRef } from 'react';
-import { View, StyleSheet, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, PanResponder } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
@@ -32,7 +32,8 @@ import Animated, {
   cancelAnimation,
 } from 'react-native-reanimated';
 
-import { withAlpha } from '@/constants/theme';
+import { withAlpha, Typography } from '@/constants/theme';
+import * as haptics from '@/lib/haptics';
 
 const DIAL_SIZE = 216;
 const FACE_SIZE = 176;
@@ -56,6 +57,15 @@ const LOADING_DIM = 0.45;
 const TREMBLE_DEG = 2.2;
 const TREMBLE_MS = 1400;
 
+/** The sleep timer's own scale, drawn just inside the face so it never
+ *  collides with the gain ticks outside it. Same 270° sweep, so the two
+ *  readings share one geometry. */
+const TIMER_TICKS = 25;
+
+/** Volume detents. A hardware knob clicks; this is the software equivalent,
+ *  and it also lets you set a level in the dark without looking. */
+const DETENT_STEPS = 10;
+
 /** Full-scale travel distance for a drag, in points. Roughly the dial's own
  *  height, so a gesture across the control spans the whole range. */
 const DRAG_RANGE_PX = 200;
@@ -74,6 +84,13 @@ interface DialProps {
   reduceMotion?: boolean;
   onPress: () => void;
   accessibilityLabel: string;
+  /** Seconds left on the sleep timer, or null when none is running. */
+  timerRemaining?: number | null;
+  /** Minutes the timer was set to, for the depleting ring's scale. */
+  timerDuration?: number | null;
+  /** Pre-formatted countdown. Passed in rather than formatted here so the
+   *  dial and the transport badge can never disagree. */
+  timerLabel?: string | null;
 }
 
 export function Dial({
@@ -85,6 +102,9 @@ export function Dial({
   reduceMotion = false,
   onPress,
   accessibilityLabel,
+  timerRemaining = null,
+  timerDuration = null,
+  timerLabel = null,
 }: DialProps) {
   const needle = useSharedValue(angleForVolume(volume));
   const tremble = useSharedValue(0);
@@ -161,9 +181,18 @@ export function Dial({
 
   const startVolume = useRef(volume);
 
+  // Last detent crossed during the current drag, so a click fires once per
+  // step rather than on every frame inside the same step.
+  const lastDetent = useRef(-1);
+
   const applyDrag = useCallback((dy: number) => {
     // Up increases, the way every hardware fader and software knob behaves.
     const next = Math.max(0, Math.min(1, startVolume.current - dy / DRAG_RANGE_PX));
+    const detent = Math.round(next * DETENT_STEPS);
+    if (detent !== lastDetent.current) {
+      lastDetent.current = detent;
+      haptics.select();
+    }
     needle.value = angleForVolume(next);
     onVolumeChangeRef.current(next);
   }, [needle]);
@@ -180,6 +209,7 @@ export function Dial({
       onPanResponderGrant: () => {
         dragging.current = true;
         startVolume.current = volumeRef.current;
+        lastDetent.current = Math.round(volumeRef.current * DETENT_STEPS);
       },
       onPanResponderMove: (_e, g) => {
         if (isLoadingRef.current) return;
@@ -218,6 +248,13 @@ export function Dial({
   }));
 
   const ticks = Array.from({ length: TICK_COUNT });
+
+  // Fraction of the timer still to run. `timerDuration` is in minutes.
+  const timerFraction =
+    timerRemaining !== null && timerDuration
+      ? Math.max(0, Math.min(1, timerRemaining / (timerDuration * 60)))
+      : null;
+  const timerTicks = timerFraction === null ? [] : Array.from({ length: TIMER_TICKS });
 
   return (
     <View
@@ -288,6 +325,32 @@ export function Dial({
             faceStyle,
           ]}
         >
+          {/* The sleep timer as a depleting scale, drawn just inside the
+              face so it reads as a second instrument on the same dial
+              rather than competing with the gain ticks outside it. */}
+          {timerTicks.map((_, i) => {
+            const spent = i / (TIMER_TICKS - 1) > (timerFraction as number);
+            const angle = ANGLE_MIN + ((ANGLE_MAX - ANGLE_MIN) / (TIMER_TICKS - 1)) * i;
+            return (
+              <View
+                key={`timer-${i}`}
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  styles.tickPivot,
+                  { transform: [{ rotate: `${angle}deg` }] },
+                ]}
+                pointerEvents="none"
+              >
+                <View
+                  style={[
+                    styles.timerTick,
+                    { backgroundColor: withAlpha(color, spent ? 0.12 : 0.85) },
+                  ]}
+                />
+              </View>
+            );
+          })}
+
           <LinearGradient
             colors={[withAlpha(color, 0.1), withAlpha(color, 0.02)]}
             style={[StyleSheet.absoluteFill, { borderRadius: FACE_SIZE / 2 }]}
@@ -296,6 +359,20 @@ export function Dial({
             <View style={[styles.needle, { backgroundColor: color }]} />
           </Animated.View>
           <View style={[styles.hub, { backgroundColor: color }]} />
+
+          {/* Someone falling asleep should be able to read the countdown
+              from the pillow. It used to live in an 11pt badge under an icon
+              at the bottom of the screen. The needle only ever occupies the
+              upper half, so the lower half is free for it. */}
+          {timerLabel && (
+            <Text
+              style={[styles.countdown, { color }]}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              {timerLabel}
+            </Text>
+          )}
         </Animated.View>
       </View>
     </View>
@@ -338,6 +415,19 @@ const styles = StyleSheet.create({
     width: 2.5,
     marginLeft: -1.25,
     borderRadius: 1.5,
+  },
+  timerTick: {
+    width: 2,
+    height: 4,
+    marginTop: 5,
+    borderRadius: 1,
+  },
+  countdown: {
+    position: 'absolute',
+    top: '58%',
+    ...Typography.title,
+    ...Typography.numeral,
+    fontSize: 20,
   },
   hub: {
     position: 'absolute',

@@ -3,6 +3,7 @@
     "name": "NeuroSound",
     "slug": "neurosound",
     "version": "1.0.0",
+    "_orientationNote": "Portrait-locked on purpose (design review #56). A sleep app is used lying down, where the accelerometer flips the screen on every roll; and the dial plus transport are laid out for one-handed reach on a phone held upright in the dark. Landscape would need a second layout for the one screen that matters and would still rotate under someone who is not moving.",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "neurosound",
