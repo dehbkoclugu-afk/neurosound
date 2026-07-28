@@ -74,6 +74,14 @@ interface PresetsState {
   // Recently played
   recentlyPlayed: RecentlyPlayed[];
 
+  /** Total seconds of playback, ever. A tape counter for the whole deck —
+   *  the app kept a ten-item history and otherwise had no idea how much it
+   *  had been used, which in a catalogue/tape world is the one number the
+   *  metaphor was already promising. */
+  listenedSeconds: number;
+  /** How many times playback has been started. */
+  sessionCount: number;
+
   // Actions
   addFavorite: (presetId: string) => void;
   removeFavorite: (presetId: string) => void;
@@ -85,6 +93,8 @@ interface PresetsState {
 
   addRecentlyPlayed: (presetId: string) => void;
   clearRecentlyPlayed: () => void;
+  recordListening: (seconds: number) => void;
+  recordSessionStart: () => void;
 
   reset: () => void;
 }
@@ -94,6 +104,8 @@ const MAX_RECENTLY_PLAYED = 10;
 const initialState = {
   favoriteIds: [],
   customMixes: [],
+  listenedSeconds: 0,
+  sessionCount: 0,
   recentlyPlayed: [],
 };
 
@@ -163,6 +175,12 @@ export const usePresetsStore = create<PresetsState>()(
         }),
 
       clearRecentlyPlayed: () => set({ recentlyPlayed: [] }),
+
+      recordListening: (seconds) =>
+        set((state) => ({ listenedSeconds: state.listenedSeconds + Math.max(0, seconds) })),
+
+      recordSessionStart: () =>
+        set((state) => ({ sessionCount: state.sessionCount + 1 })),
 
       reset: () => set(initialState),
     }),

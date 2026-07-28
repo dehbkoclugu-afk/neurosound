@@ -92,7 +92,7 @@ export default function PlayerScreen() {
       return;
     }
     haptics.save();
-    showToast(t('mixer.addedToMixer'));
+    showToast(t('mixer.addedToMixer'), 'success');
   }, [preset, t, showToast]);
 
   const isFavorite = id ? favoriteIds.includes(id) : false;
@@ -259,18 +259,19 @@ export default function PlayerScreen() {
                 {t(`explore.categories.${preset.type}`)}
               </Text>
             </View>
-            <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
-              {frequencyParts ? (
-                frequencyParts.map((value, i) => (
+            {/* Noise presets have no frequency to print, and the fallback
+                used to be the category name — which the tag beside it now
+                already says, so the row read "AMBIENT SOUNDS Ambient Sounds". */}
+            {frequencyParts && (
+              <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
+                {frequencyParts.map((value, i) => (
                   <Text key={value}>
                     {i > 0 ? ' · ' : ''}
                     <Text style={styles.frequencyNumeral}>{value}</Text> Hz
                   </Text>
-                ))
-              ) : (
-                t(`explore.categories.${preset.type}`)
-              )}
-            </Text>
+                ))}
+              </Text>
+            )}
           </View>
 
           <Text

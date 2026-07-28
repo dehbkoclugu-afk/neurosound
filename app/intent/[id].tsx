@@ -190,13 +190,14 @@ export default function IntentScreen() {
         </View>
 
         <View style={[styles.list, contentColumn]}>
-          {presets.map((preset) => (
+          {presets.map((preset, i) => (
             <PresetRow
               key={preset.id}
               preset={preset}
               onPress={() => handlePresetPress(preset.id)}
               isFavorite={isFavorite(preset.id)}
               isPlaying={isPresetPlaying(preset.id)}
+              index={i}
             />
           ))}
         </View>

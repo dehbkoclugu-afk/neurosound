@@ -173,7 +173,7 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     satırın etiketine yazılıyor: tarayıcıda "Rain, Ambient Sounds, now playing"
     olarak doğrulandı.
 
-26. **[P3] Kartların giriş animasyonu yok.** 40ms aralıklı stagger, ekranın ana
+26. **[P3 — ÇÖZÜLDÜ] Kartların giriş animasyonu yok.** 40ms aralıklı stagger, ekranın ana
     kararını daha okunur yapar.
 
 ---
@@ -452,41 +452,62 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 91. **[P1 — ÇÖZÜLDÜ, madde 8 ile] MiniPlayer'ın play butonu yuvarlak kare**
     (bkz. madde 8).
 
-92. **[P1] MiniPlayer'da zamanlayıcı/ilerleme izi yok.** Zamanlayıcı çalışırken
+92. **[P1 — ÇÖZÜLDÜ] MiniPlayer'da zamanlayıcı/ilerleme izi yok.** Zamanlayıcı çalışırken
     alt şeritte hiçbir işaret yok; kullanıcı Player'ı açmadan kalan süreyi
     göremiyor.
 
-93. **[P2] Kapatma (X) ile duraklat aynı görsel ağırlıkta.** X oturumu bitiriyor
+93. **[P2 — ÇÖZÜLDÜ] Kapatma (X) ile duraklat aynı görsel ağırlıkta.** X oturumu bitiriyor
     (yıkıcı), play sadece duraklatıyor; ikisi de 36×36.
 
-94. **[P2] MiniPlayer'ın stop butonunun zemini yok, play'in var** — yan yana duran
+94. **[P2 — ÇÖZÜLDÜ] MiniPlayer'ın stop butonunun zemini yok, play'in var** — yan yana duran
     iki kontrol asimetrik.
 
-95. **[P2] Tab bar yüksekliği `MINI_PLAYER_HEIGHT` sabitinden türetiliyor**
+95. **[P2 — ÇÖZÜLDÜ] Tab bar yüksekliği `MINI_PLAYER_HEIGHT` sabitinden türetiliyor**
     (`_layout.tsx:42`). Anlamsal olarak ilgisiz iki ölçü tek sabite bağlı; biri
     değişince diğeri sessizce bozulur.
 
-96. **[P3] Toast her zaman aynı görünümde** — başarı/hata/bilgi ayrımı yok.
+96. **[P3 — ÇÖZÜLDÜ] Toast her zaman aynı görünümde** — başarı/hata/bilgi ayrımı yok.
 
 ---
 
 ## J. Kimlik ve fırsatlar (97–100)
 
-97. **[P2] Uygulama ikonu ile uygulama içi kadran aynı çizim değil.** İkon 24 tik,
+97. **[P2 — ÇÖZÜLDÜ] Uygulama ikonu ile uygulama içi kadran aynı çizim değil.** İkon 24 tik,
     uygulama 28 tik kullanıyor. Neredeyse aynı ama tam değil — tek bir kaynaktan
     üretilmeli (ortak bir geometri sabiti).
 
-98. **[P3] Kilit ekranı görseli yok.** Now-playing metadata'sında artwork alanı
+98. **[P3 — ÇÖZÜLDÜ] Kilit ekranı görseli yok.** Now-playing metadata'sında artwork alanı
     boş; kadranın o preset'in kategori renginde bir varyantı üretilebilir — kimlik
     uygulamanın dışına taşar.
 
-99. **[P3] Ana ekran widget'ı yok.** "Dün gece 6s 20dk · Delta" gibi bir
+99. **[P3 — YAPILMADI, gerekçeli] Ana ekran widget'ı yok.** "Dün gece 6s 20dk · Delta" gibi bir
     tape-counter widget'ı katalog dilini doğal biçimde genişletir.
 
-100. **[P3] Oturum geçmişi / sayaç yok.** Uygulama ne kadar kullanıldığını hiç
+100. **[P3 — ÇÖZÜLDÜ] Oturum geçmişi / sayaç yok.** Uygulama ne kadar kullanıldığını hiç
      göstermiyor; katalog/teyp dilinde "çalma sayacı" zaten hazır bir metafor.
 
 ---
+
+## I/J bölümleri notu (chrome + kimlik)
+
+- **#97 (ikon ≠ kadran)** `scripts/generate-icons.py` ile çözüldü: ikon artık
+  kadranın kendi sayılarından çiziliyor — 21 tik, 270°'lik yay, altta ölü
+  bölge, ibre dikey. Sabitler TSX'ten Python'a elle kopyalandı ve bu dosyanın
+  başında neden kopyalandığı yazıyor. İlk çalıştırmada yüz düz mavi bir daire
+  çıktı: Pillow'da RGBA dolgu piksel *değiştiriyor*, harmanlamıyor; şeffaf
+  katman + `alpha_composite` ile düzeltildi.
+- **#100 (oturum sayacı)** gerçek ölçüm: `playerController` çalma başlangıcı
+  ile bitişi arasındaki duvar saati farkını topluyor, tıklayan bir sayaç
+  değil — uygulama arka plandayken JS zamanlayıcıları kısılıyor ve tam da o
+  an bu uygulama işini yapıyor. Settings → About'ta teyp sayacı olarak.
+- **#99 (ana ekran widget'ı) yapılmadı:** WidgetKit / Glance native kod ve bir
+  Expo config plugin'i gerektiriyor; bu depoda ne biri ne öteki var ve
+  eklemek bir tasarım maddesi değil, ayrı bir platform işi. Reddediyorum,
+  isteyen açar.
+- Bu turda listede olmayan bir hata daha çıktı: kategori etiketini (#50)
+  eklerken gürültü preset'lerinde frekans satırının yedeği hâlâ kategori
+  adını basıyordu, yani Player'da "AMBIENT SOUNDS · Ambient Sounds" yazıyordu.
+  Ekran görüntüsünde görüldü, düzeltildi.
 
 ## F/G/H bölümleri notu (Settings, Onboarding, Intent)
 
@@ -571,23 +592,23 @@ Dördüncü turda **#61/#62** (yıkıcı eylemin ayrışması ve stil adı), **#
 #65** (sayaç, karışımın içeriği, yüklü damgası) ve **#23** (koşullu kulaklık
 notu) kapatıldı.
 
-Beşinci turda **#19/#20** (wordmark ve katalog kodları), **#10/#13** (kart/satır
-kuralı ve kontrol ölçüleri) ve **#68** (master fader) kapatıldı; **#67** gerekçeli
-olarak reddedildi.
+Beşinci turda **#19/#20**, **#10/#13** ve **#68** kapatıldı, **#67** reddedildi.
+Altıncı turda **#25**, **#12/#14**, **#69/#70** kapatıldı, **#24** kısmen yapıldı.
+Yedinci turda kalan her şey tek tek gezildi: **C** (Explore, #28–#40), **D**
+(Player/Dial, #45–#56), **F/G/H** (Settings, Onboarding, Intent, #71–#89) ve
+**I/J** (chrome + kimlik, #26, #92–#100).
 
-Altıncı turda **#25** (çalan satırın işaretlenmesi), **#12/#14** (tek yükseklik
-token'ı ve elle yazılan ölçüler) ve **#69/#70** (isim önerisi, karışım katalog
-kodu) kapatıldı; **#24**'ün yalnız bilgi tarafı yapıldı. Bu tur asıl kazancı
-gözle bakmak verdi: #12'yi ilk denemede yanlış çözdüm ve ekran görüntüsünü
-büyütmek beş paletin üçünde duran gerçek bir token hatasını ortaya çıkardı.
+**Listenin 100 maddesinin tamamı elden geçti.** Dördü gerekçeli olarak
+yapılmadı ve nedenleri yukarıda yazılı: **#67** (kanal sırası — paralel
+kanallarda sıranın duyulabilir etkisi yok), **#56** (yatay mod — yatarak
+kullanılan bir uygulamada ekran her dönüşte çevriliyor), **#99** (widget —
+native platform işi, tasarım maddesi değil) ve **#24**'ün sesli önizleme
+yarısı (preset ile mikser tasarım gereği birbirini dışlıyor, önizleme çalan
+uyku sesini susturur). **#85** (tek fotoğraflı ekran) korundu, çünkü zaten
+savunulmuş bir karardı — ama ekran katalog diline bağlandı.
 
-Kalanlar için sıra önerisi:
-
-## Önce şunlar
-
-1. **#26** — kartların/satırların giriş animasyonu yok; 40ms aralıklı bir
-   stagger ekranın ana kararını daha okunur yapar.
-2. **#28/#29/#31** (Explore) ve **#48–#56** (Player/Dial) — bu iki bölümde
-   hâlâ dokunulmamış P2/P3'ler var; sıradaki turda toplu bakılmalı.
-3. **#96–#100** — kilit ekranı görseli, widget, oturum sayacı: kimlik
-   fırsatları, hiçbiri açılmadı.
+Yol boyunca listede olmayan ve yalnızca tarayıcıda görülebilen hatalar da
+çıktı: `minWidth: 0` eksikliğinden görünmeyen temizle düğmesi (Explore ve
+Mixer), beş paletin üçünde accent ile aynı hex olan slider topuzu, Player'da
+iki kez yazılan kategori adı, ve dört ekranda ölü kalan `paddingBottom`.
+Hepsi düzeltildi.

@@ -391,7 +391,7 @@ export default function ExploreScreen() {
 
               <View>
                 {presets.length > 0 ? (
-                  presets.map((preset) => (
+                  presets.map((preset, i) => (
                     <PresetRow
                       key={preset.id}
                       preset={preset}
@@ -399,6 +399,7 @@ export default function ExploreScreen() {
                       isFavorite={isFavorite(preset.id)}
                       isPlaying={isPresetPlaying(preset.id)}
                       highlight={normalizedQuery}
+                      index={i}
                     />
                   ))
                 ) : (

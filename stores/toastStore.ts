@@ -9,16 +9,23 @@
 
 import { create } from 'zustand';
 
+/** Every toast looked identical, so "Mix saved" and a failure would have
+ *  arrived in the same grey slab. `info` stays the default because most of
+ *  them are neither good news nor bad. */
+export type ToastVariant = 'success' | 'error' | 'info';
+
 interface ToastState {
   visible: boolean;
   message: string;
-  show: (message: string) => void;
+  variant: ToastVariant;
+  show: (message: string, variant?: ToastVariant) => void;
   hide: () => void;
 }
 
 export const useToastStore = create<ToastState>((set) => ({
   visible: false,
   message: '',
-  show: (message) => set({ visible: true, message }),
+  variant: 'info',
+  show: (message, variant = 'info') => set({ visible: true, message, variant }),
   hide: () => set({ visible: false }),
 }));

@@ -14,7 +14,12 @@ import { MiniPlayerHost } from '@/components/ui/MiniPlayerHost';
 import { FontFamily, Spacing } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { useMiniPlayerVisible, MINI_PLAYER_HEIGHT } from '@/hooks/use-mini-player';
+import {
+  useMiniPlayerVisible,
+  MINI_PLAYER_HEIGHT,
+  TAB_BAR_HEIGHT,
+  TAB_BAR_HEIGHT_NIGHT,
+} from '@/hooks/use-mini-player';
 
 export default function TabLayout() {
   const { t } = useTranslation();
@@ -39,7 +44,7 @@ export default function TabLayout() {
             backgroundColor: colors.background,
             borderTopColor: colors.cardBorder,
             borderTopWidth: StyleSheet.hairlineWidth,
-            height: (isNight ? MINI_PLAYER_HEIGHT - 14 : MINI_PLAYER_HEIGHT) + insets.bottom,
+            height: (isNight ? TAB_BAR_HEIGHT_NIGHT : TAB_BAR_HEIGHT) + insets.bottom,
             paddingBottom: insets.bottom,
             paddingTop: Spacing.xs,
           },

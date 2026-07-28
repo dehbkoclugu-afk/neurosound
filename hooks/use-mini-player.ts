@@ -13,6 +13,15 @@ import { useAudioStore } from '@/stores/audioStore';
 
 export const MINI_PLAYER_HEIGHT = 56;
 
+/**
+ * Tab bar height. It used to be `MINI_PLAYER_HEIGHT` with `- 14` subtracted
+ * in night mode, which made two unrelated pieces of chrome move together and
+ * turned a design decision ("the night tab bar is shorter because it drops
+ * its labels") into arithmetic on someone else's constant.
+ */
+export const TAB_BAR_HEIGHT = 56;
+export const TAB_BAR_HEIGHT_NIGHT = 42;
+
 /** True when the MiniPlayer has something to show — a loaded preset or a
  *  mixer session.
  *

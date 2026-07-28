@@ -8,9 +8,11 @@
 
 import { AppState, Platform } from 'react-native';
 import type { AudioPlayer } from 'expo-audio';
+import { Asset } from 'expo-asset';
 
 import i18n from '@/i18n';
 import { useAudioStore, MixerChannelState } from '@/stores/audioStore';
+import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset, getPresetById } from '../frequencies';
 import {
@@ -51,11 +53,37 @@ function watchLockScreenPlayer(player: AudioPlayer): void {
   });
 }
 
+/**
+ * The lock screen's artwork slot was left empty, so the one place the app
+ * appears while the phone is face-down showed a blank square.
+ *
+ * Resolved once and cached: `Asset.fromModule` is synchronous for a bundled
+ * image but its `localUri` only exists after a download on Android, so the
+ * first call kicks that off and later calls get the real path. A missing
+ * artwork is not worth failing playback over, hence the catch.
+ */
+let artworkUri: string | null = null;
+function ensureArtwork(): string | undefined {
+  if (artworkUri) return artworkUri;
+  try {
+    const asset = Asset.fromModule(require('@/assets/images/icon.png'));
+    artworkUri = asset.localUri ?? asset.uri ?? null;
+    if (!asset.localUri) void asset.downloadAsync().catch(() => {});
+  } catch {
+    return undefined;
+  }
+  return artworkUri ?? undefined;
+}
+
 function setNowPlaying(title: string): void {
   if (Platform.OS === 'web') return;
   const player = generator?.getNativePlayer() ?? null;
   if (!player) return;
-  player.setActiveForLockScreen(true, { title, artist: 'NeuroSound' });
+  player.setActiveForLockScreen(true, {
+    title,
+    artist: 'NeuroSound',
+    artworkUrl: ensureArtwork(),
+  });
   watchLockScreenPlayer(player);
 }
 
@@ -195,6 +223,29 @@ export function loadPreset(preset: FrequencyPreset): void {
   useAudioStore.getState().setCurrentPreset(preset);
 }
 
+/**
+ * Listening time, measured rather than guessed.
+ *
+ * Wall-clock deltas between "started" and "stopped", not a ticking counter:
+ * JS timers are throttled while the app is backgrounded, which is precisely
+ * when this app is doing its job, so a counter would undercount every night.
+ * Both playback paths — single preset and mixer — funnel through here.
+ */
+let listeningStartedAt: number | null = null;
+
+function beginListening(): void {
+  if (listeningStartedAt !== null) return;
+  listeningStartedAt = Date.now();
+  usePresetsStore.getState().recordSessionStart();
+}
+
+function endListening(): void {
+  if (listeningStartedAt === null) return;
+  const seconds = (Date.now() - listeningStartedAt) / 1000;
+  listeningStartedAt = null;
+  if (seconds >= 1) usePresetsStore.getState().recordListening(Math.round(seconds));
+}
+
 let playPending = false;
 
 export async function play(): Promise<void> {
@@ -221,6 +272,7 @@ export async function play(): Promise<void> {
     }
     ramp(effectiveVolume(), FADE_IN_MS);
     useAudioStore.getState().setIsPlaying(true);
+    beginListening();
     const preset = useAudioStore.getState().currentPreset;
     if (preset) setNowPlaying(i18n.t(preset.nameKey));
   } catch (e) {
@@ -235,6 +287,7 @@ export async function play(): Promise<void> {
 export function pause(immediate: boolean = false): void {
   const gen = generator;
   useAudioStore.getState().setIsPlaying(false);
+  endListening();
   if (!gen) return;
   if (immediate) {
     cancelRamp();
@@ -406,6 +459,7 @@ async function startMixerChannels(
     await gen.play();
   }
   useAudioStore.getState().setIsMixerPlaying(true);
+  beginListening();
 }
 
 export function mixerStop(): void {
@@ -415,6 +469,7 @@ export function mixerStop(): void {
   });
   mixerGenerators.clear();
   useAudioStore.getState().setIsMixerPlaying(false);
+  endListening();
 }
 
 /**

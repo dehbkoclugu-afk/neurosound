@@ -8,7 +8,8 @@
  */
 
 import React, { useEffect } from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, View, Text, ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -21,6 +22,15 @@ import Animated, {
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Radius, Spacing, Typography } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { ToastVariant } from '@/stores/toastStore';
+
+/** Icon per variant. The colour comes from the palette at render time so the
+ *  same map works in all five themes. */
+const VARIANT_ICON: Record<ToastVariant, keyof typeof Ionicons.glyphMap> = {
+  success: 'checkmark-circle',
+  error: 'alert-circle',
+  info: 'information-circle',
+};
 
 const VISIBLE_MS = 1800;
 const FADE_MS = 200;
@@ -29,10 +39,11 @@ interface ToastProps {
   message: string;
   visible: boolean;
   onHide: () => void;
+  variant?: ToastVariant;
   style?: ViewStyle;
 }
 
-export function Toast({ message, visible, onHide, style }: ToastProps) {
+export function Toast({ message, visible, onHide, variant = 'info', style }: ToastProps) {
   const colors = useThemeColors();
   const { reduceMotion } = useSettingsStore();
   const progress = useSharedValue(0);
@@ -70,12 +81,23 @@ export function Toast({ message, visible, onHide, style }: ToastProps) {
         animatedStyle,
         style,
       ]}
-      accessibilityLiveRegion="polite"
+      accessibilityLiveRegion={variant === 'error' ? 'assertive' : 'polite'}
       accessibilityRole="text"
     >
-      <Animated.Text style={[styles.text, { color: colors.background }]}>
-        {message}
-      </Animated.Text>
+      <View style={styles.row}>
+        <Ionicons
+          name={VARIANT_ICON[variant]}
+          size={17}
+          color={
+            variant === 'success'
+              ? colors.success
+              : variant === 'error'
+                ? colors.error
+                : colors.background
+          }
+        />
+        <Text style={[styles.text, { color: colors.background }]}>{message}</Text>
+      </View>
     </Animated.View>
   );
 }
@@ -90,8 +112,13 @@ const styles = StyleSheet.create({
     borderRadius: Radius.card,
     maxWidth: '85%',
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
   text: {
     ...Typography.body,
-    textAlign: 'center',
+    flexShrink: 1,
   },
 });

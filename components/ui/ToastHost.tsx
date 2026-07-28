@@ -24,7 +24,7 @@ const TAB_SCREEN_CLEARANCE = MINI_PLAYER_HEIGHT + Spacing.sm;
 const PLAYER_CLEARANCE = 110;
 
 export function ToastHost() {
-  const { visible, message, hide } = useToastStore();
+  const { visible, message, variant, hide } = useToastStore();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const clearance = pathname.startsWith('/player') ? PLAYER_CLEARANCE : TAB_SCREEN_CLEARANCE;
@@ -32,6 +32,7 @@ export function ToastHost() {
   return (
     <Toast
       message={message}
+      variant={variant}
       visible={visible}
       onHide={hide}
       style={{

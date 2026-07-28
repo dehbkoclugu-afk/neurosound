@@ -34,6 +34,14 @@ import * as playerController from '@/lib/audio/playerController';
  *  on the right. Four names in four identical pills told the user nothing
  *  about the difference between "dark" and "night", which is the entire
  *  reason both exist. `auto` shows both, because that is what it does. */
+/** "6h 20m" / "48m" — hours only once there are any, and the tape-counter
+ *  face makes the digits line up between the two rows. */
+function formatListened(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const hours = Math.floor(minutes / 60);
+  return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
+}
+
 const THEME_OPTIONS: {
   value: ThemeMode;
   labelKey: string;
@@ -70,7 +78,13 @@ export default function SettingsScreen() {
     setMaxVolume,
     resetSettings,
   } = useSettingsStore();
-  const { favoriteIds, customMixes, reset: resetPresets } = usePresetsStore();
+  const {
+    favoriteIds,
+    customMixes,
+    listenedSeconds,
+    sessionCount,
+    reset: resetPresets,
+  } = usePresetsStore();
 
   const colors = useThemeColors();
 
@@ -93,7 +107,7 @@ export default function SettingsScreen() {
           // Every other control on this screen confirms itself by moving —
           // a switch flips, a theme repaints the app. Reset is the one that
           // does its work off-screen and left nothing behind to see.
-          showToast(t('settings.resetDone'));
+          showToast(t('settings.resetDone'), 'success');
         },
       },
     ]);
@@ -407,6 +421,29 @@ export default function SettingsScreen() {
             </Text>
             <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
+
+          {/* The deck's own counter. The app kept a ten-item history and
+              otherwise had no idea how much it had been used — in a
+              catalogue-and-tape world that is the one number the metaphor was
+              already promising. */}
+          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
+            <View style={styles.aboutRow}>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
+                {t('settings.totalListening')}
+              </Text>
+              <Text style={[styles.aboutValue, { color: colors.text }]}>
+                {formatListened(listenedSeconds)}
+              </Text>
+            </View>
+            <View style={styles.aboutRow}>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
+                {t('settings.sessions')}
+              </Text>
+              <Text style={[styles.aboutValue, { color: colors.text }]}>
+                {sessionCount}
+              </Text>
+            </View>
+          </View>
 
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.aboutRow}>

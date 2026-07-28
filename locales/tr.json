@@ -201,7 +201,9 @@
     "resetConfirm": "Favoriler, karışımlar ve tüm ayarlar silinecek. Bu geri alınamaz.",
     "resetHint": "{{favorites}} favori, {{mixes}} karışım",
     "privacyPolicy": "Gizlilik Politikası",
-    "resetDone": "Her şey sıfırlandı."
+    "resetDone": "Her şey sıfırlandı.",
+    "totalListening": "Toplam dinleme",
+    "sessions": "Oturum"
   },
   "privacy": {
     "title": "Gizlilik Politikası",

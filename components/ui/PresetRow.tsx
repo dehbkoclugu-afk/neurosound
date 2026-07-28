@@ -24,6 +24,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+
+import { useSettingsStore } from '@/stores/settingsStore';
 import { Spacing, Typography, FontFamily, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
@@ -49,6 +52,10 @@ interface PresetRowProps {
   /** Lower-cased search term to emphasise inside the name, so a filtered
    *  list shows *why* each row survived the filter. */
   highlight?: string;
+  /** Position in its list. Only used to stagger the entrance — the rows of a
+   *  long list arriving together read as one block dropping in, where 40ms
+   *  apart reads as a list being dealt out. */
+  index?: number;
   showFrequency?: boolean;
   style?: ViewStyle;
   size?: 'small' | 'medium' | 'large'; // kept for API compat, unused
@@ -91,6 +98,8 @@ function Subline({ preset, color, t }: { preset: FrequencyPreset; color: string;
     </Text>
   );
 }
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 /** The five binaural bands, in the order the ear climbs them. */
 const BINAURAL_BANDS = ['delta', 'theta', 'alpha', 'beta', 'gamma'] as const;
@@ -138,16 +147,23 @@ export function PresetRow({
   isFavorite = false,
   isPlaying = false,
   highlight,
+  index,
   style,
 }: PresetRowProps) {
   const { t } = useTranslation();
+  const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
   const categoryColors = useCategoryColors();
   const name = t(preset.nameKey);
   const match = highlight ? splitOnMatch(name, highlight) : null;
 
   return (
-    <TouchableOpacity
+    <AnimatedTouchable
+      entering={
+        reduceMotion || index === undefined
+          ? undefined
+          : FadeInDown.duration(220).delay(Math.min(index, 8) * 40)
+      }
       onPress={onPress}
       activeOpacity={0.6}
       style={[styles.row, { borderBottomColor: colors.cardBorder }, style]}
@@ -217,7 +233,7 @@ export function PresetRow({
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
       />
-    </TouchableOpacity>
+    </AnimatedTouchable>
   );
 }
 

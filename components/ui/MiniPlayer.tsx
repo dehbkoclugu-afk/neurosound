@@ -13,7 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Radius, Spacing, Typography } from '@/constants/theme';
+import { Spacing, Typography, withAlpha } from '@/constants/theme';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
 import * as haptics from '@/lib/haptics';
@@ -27,8 +27,15 @@ interface MiniPlayerProps {
 export function MiniPlayer({ onPress }: MiniPlayerProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { currentPreset, isPlaying, isLoading, isMixerPlaying, mixerChannels } =
-    useAudioStore();
+  const {
+    currentPreset,
+    isPlaying,
+    isLoading,
+    isMixerPlaying,
+    mixerChannels,
+    timerRemaining,
+    timerDuration,
+  } = useAudioStore();
 
   const colors = useThemeColors();
 
@@ -59,6 +66,14 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
     : `${mixerChannels.length} ${t('mixer.sounds')}`;
 
   const playing = currentPreset ? isPlaying : isMixerPlaying;
+
+  // A sleep timer runs across every screen, and the one strip of chrome that
+  // is always on screen said nothing about it. A hairline that drains along
+  // the top edge is the smallest thing that can: no numbers, no new row.
+  const timerFraction =
+    timerRemaining !== null && timerDuration
+      ? Math.max(0, Math.min(1, timerRemaining / (timerDuration * 60)))
+      : null;
 
   const handlePress = () => {
     if (onPress) {
@@ -99,6 +114,13 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         },
       ]}
     >
+      {timerFraction !== null && (
+        <View
+          style={[styles.timerTrace, { width: `${timerFraction * 100}%`, backgroundColor: colors.accent }]}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
+      )}
       <View style={styles.content}>
         {/* A pressable row wrapping the play/stop buttons would nest
             interactive elements inside one another — invalid HTML on web
@@ -139,15 +161,21 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             size={36}
             accessibilityLabel={playing ? t('accessibility.pauseButton') : t('accessibility.playButton')}
           />
+          {/* Same circular footprint as play, so the two read as one pair of
+              transport controls — but a quiet outline rather than a filled
+              disc, because this one ends the session and that one does not. */}
           <TouchableOpacity
             onPress={handleStop}
             activeOpacity={0.7}
-            style={styles.stopButton}
+            style={[
+              styles.stopButton,
+              { borderColor: colors.cardBorder, backgroundColor: withAlpha(colors.text, 0.04) },
+            ]}
             accessibilityRole="button"
             accessibilityLabel={t('common.stop')}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="close" size={20} color={colors.textSecondary} />
+            <Ionicons name="close" size={17} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -190,17 +218,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
   },
-  playButton: {
-    width: 36,
-    height: 36,
-    borderRadius: Radius.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   stopButton: {
     width: 36,
     height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  timerTrace: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: 2,
   },
 });

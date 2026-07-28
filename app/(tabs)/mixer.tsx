@@ -207,7 +207,7 @@ export default function MixerScreen() {
       setMixName('');
       setEditingMixId(null);
       setShowSaveDialog(false);
-      showToast(t('mixer.mixRenamed'));
+      showToast(t('mixer.mixRenamed'), 'success');
       return;
     }
 
@@ -227,7 +227,7 @@ export default function MixerScreen() {
     haptics.save();
     setMixName('');
     setShowSaveDialog(false);
-    showToast(t('mixer.mixSaved'));
+    showToast(t('mixer.mixSaved'), 'success');
   }, [mixName, channels, addCustomMix, updateCustomMix, editingMixId, showToast, t]);
 
   const handleLoadMix = useCallback(async (mix: typeof customMixes[0]) => {
