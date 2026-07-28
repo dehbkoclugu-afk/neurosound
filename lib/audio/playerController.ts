@@ -380,13 +380,20 @@ export function mixerStop(): void {
   useAudioStore.getState().setIsMixerPlaying(false);
 }
 
-/** A muted channel outputs nothing but keeps its level, so unmuting restores
- *  exactly what the user set. */
+/**
+ * The whole gain chain for one mixer channel, in one place: the channel's own
+ * level, times the master fader, times the settings safety cap.
+ *
+ * A muted channel outputs nothing but keeps its level, so unmuting restores
+ * exactly what the user set — the same reason the master scales channels
+ * rather than rewriting them.
+ */
 function channelVolume(
   ch: { volume: number; muted: boolean },
-  maxVolume: number
+  maxVolume: number,
+  master = useAudioStore.getState().mixerMasterVolume
 ): number {
-  return ch.muted ? 0 : ch.volume * maxVolume;
+  return ch.muted ? 0 : ch.volume * master * maxVolume;
 }
 
 export function mixerSetChannelMuted(channelId: string, muted: boolean): void {
@@ -450,7 +457,22 @@ export function mixerSetChannelVolume(channelId: string, volume: number): void {
   store.setMixerChannelMuted(channelId, false);
   mixerGenerators
     .get(channelId)
-    ?.setVolume(volume * useSettingsStore.getState().maxVolume);
+    ?.setVolume(
+      channelVolume({ volume, muted: false }, useSettingsStore.getState().maxVolume)
+    );
+}
+
+/** Move the master fader. Applies to every live channel at once and leaves
+ *  each channel's own level untouched. */
+export function mixerSetMasterVolume(volume: number): void {
+  useAudioStore.getState().setMixerMasterVolume(volume);
+  const { maxVolume } = useSettingsStore.getState();
+  // Re-read after the set: the store clamps, and a snapshot taken before it
+  // still holds the old value.
+  const { mixerChannels, mixerMasterVolume } = useAudioStore.getState();
+  mixerChannels.forEach((ch) =>
+    mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume, mixerMasterVolume))
+  );
 }
 
 /**

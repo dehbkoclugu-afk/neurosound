@@ -67,9 +67,12 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
    kapat. Timer, kaydet/yeniden adlandır ve ses seçici üçü de bunu kullanıyor.
    `tall` varyantı kaydırılan içerik için (bkz. #66).
 
-10. **[P2] Kart kenarlık dili tutarsız.** Home intent kartlarında `borderWidth: 1`
-    + `Radius.card`; Explore/Settings satırlarında sadece `borderBottomWidth:
-    hairline`, kutu yok. İkisine de "kart" deniyor.
+10. **[P2 — ÇÖZÜLDÜ] Kart kenarlık dili tutarsız.** İki sınırı tek biçime
+    zorlamadım — aralarındaki fark gerçek. Kural yazıldı (DESIGN.md): **kart**
+    kenarlıklı bir kutudur ve *aralarından seçtiğin* bir hedefi taşır (Home
+    intent kartları); **satır** listedeki bir öğedir, tek ayıracı hairline'dır,
+    kutusu yoktur. Asıl hata isimdeydi: `PresetCard` kendi başlık yorumunda
+    "no cards" derken kart adını taşıyordu, `PresetRow` oldu.
 
 11. **[P2] `withAlpha(color, 0.16)` dört yerde elle tekrarlanıyor** (PresetCard,
     mixer picker, mixer channel, index intentIconTag). Token'a çıkar:
@@ -79,10 +82,13 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     var (`Slider.tsx:217-226`), başka hiçbir yerde gölge yok. Ya sistemli bir
     yükseklik ölçeği ekle ya bu tekil gölgeyi kaldır.
 
-13. **[P2] `AccessibilitySize.minTouchTarget` (48) hem dokunma hedefi hem düzen
-    ölçüsü olarak kullanılıyor** (ör. `favoriteFilter` genişliği, `languageButton`
-    yüksekliği). Anlamsal olarak ayrı iki şey; düzen ölçüsü değişince
-    erişilebilirlik tabanı da kayar.
+13. **[P2 — ÇÖZÜLDÜ] `AccessibilitySize.minTouchTarget` hem dokunma hedefi hem
+    düzen ölçüsü.** Yeni `ControlSize` (`row: 48`, `cta: 52`) düzen yükseklikleri
+    için; `minTouchTarget` artık yalnızca sayının varlık sebebi parmağa yer
+    açmak olan yerlerde (kare ikon butonlar, `Button`'ın min ölçüleri). Böylece
+    tabanı yükseltmek uygulamanın yarısını sessizce yeniden boyutlandırmıyor ve
+    `minTouchTarget + 4` gibi bir ölçek olmayan sabit üzerinde aritmetik
+    kalmadı.
 
 14. **[P3] `Spacing` skalası 7 adım (4/8/16/24/32/48/64) ama 12 ve 20 elle
     yazılıyor** (`content.paddingBottom: 20` üç ekranda). Ya token ekle ya en
@@ -115,12 +121,15 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     Geçmiş yokken bölüm hiç çizilmiyor: boş bir "burada birikecek" paneli aynı
     dikey alanı yiyip hiçbir şey öğretmiyordu.
 
-19. **[P2] Wordmark ("NeuroSound") sadece Home'da.** Explore/Mixer/Settings'te yok.
-    Ya kaldır ya sistemli hale getir.
+19. **[P2 — ÇÖZÜLDÜ] Wordmark ("NeuroSound") sadece Home'da.** Kaldırıldı.
+    Dört sekmenin birinde duran bir marka izi sistem değil, kalıntı; katalog da
+    her sayfasına yayıncısının adını basmaz. Sayfa ~40px yukarı kaydı, bu da
+    #18'e ek olarak yaradı.
 
-20. **[P2] Katalog kodları (ND-01…04) tamamen kozmetik.** Hiçbir bilgi taşımıyor.
-    Öneri: kodu preset sayısıyla eşle (`ND-01 · 6 ses`) — katalog dili korunur,
-    bilgi kazanır.
+20. **[P2 — ÇÖZÜLDÜ] Katalog kodları (ND-01…04) tamamen kozmetik.** Artık
+    `ND-01 · 6 SOUNDS`: kod işaret ettiği şeyin boyunu da söylüyor. Kod mono
+    yüzünü koruyor, çevresindeki kelimeler Nunito'da kalıyor (iç içe `Text`) —
+    mono boşluk glifinin açtığı çift boşluk tuzağına düşmemek için.
 
 21. **[P2 — KISMEN ÇÖZÜLDÜ] Intent kartında süre yok.** Öne çıkan kartta artık
     saat ikonu + mono rakamla "30 min recommended" satırı var. Kompakt üç kartta
@@ -318,9 +327,20 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     mikser görünmeye devam ediyor, yani sesi mikserden *çıkarak* değil ona
     *uzanarak* seçiyorsun. Sayfa kapanırken arama metni de temizleniyor.
 
-67. **[P3] Kanal sırası değiştirilemiyor.**
+67. **[P3 — YAPILMADI, gerekçeli]** Kanal sırası değiştirilemiyor. Gerçek bir
+    mikserde sıra sinyal akışını anlatır; burada kanallar paralel ve sıranın
+    duyulabilir hiçbir etkisi yok. Dört satır için sürükle-bırak (ya da satır
+    başına iki ok daha) tamamen kozmetik bir sıralama uğruna zaten kalabalık
+    olan satıra kontrol eklemek olurdu. Kullanıcı isterse kanalı silip yeniden
+    ekleyebiliyor. Bu maddeyi kapatmıyorum, reddediyorum — isteyen açar.
 
-68. **[P3] Master (genel) ses seviyesi yok** — her kanal ayrı, toplu kontrol yok.
+68. **[P3 — ÇÖZÜLDÜ] Master (genel) ses seviyesi yok.** Kanal listesinin altında,
+    aralarına çizilen bir hairline ile ayrılmış tek fader. Kanal seviyelerini
+    yeniden yazmıyor, hepsini birlikte ölçekliyor — dengeyi kullanıcı kurdu,
+    sesi kısmak ona mal olmamalı. Kazanç zinciri tek noktada:
+    `kanal × master × maxVolume` (`channelVolume`). Tarayıcıda ölçüldü: master
+    %100 → %30 sürüklendi, iki kanal sliderı yerinde kaldı. Ayarın kendisi
+    kalıcı (bir oturum durumu değil).
 
 69. **[P3] Karışıma isim önerisi yok.** "Rain + Brown + Alpha" otomatik önerilebilir.
 
@@ -475,14 +495,19 @@ Dördüncü turda **#61/#62** (yıkıcı eylemin ayrışması ve stil adı), **#
 #65** (sayaç, karışımın içeriği, yüklü damgası) ve **#23** (koşullu kulaklık
 notu) kapatıldı.
 
+Beşinci turda **#19/#20** (wordmark ve katalog kodları), **#10/#13** (kart/satır
+kuralı ve kontrol ölçüleri) ve **#68** (master fader) kapatıldı; **#67** gerekçeli
+olarak reddedildi.
+
 Kalanlar için sıra önerisi:
 
 ## Önce şunlar
 
-1. **#19/#20** — wordmark yalnızca Home'da ve katalog kodları (ND-01…04) hâlâ
-   hiçbir bilgi taşımıyor; ikisi de ya sistemleşmeli ya kalkmalı.
-2. **#10/#13** — kart kenarlık dili tutarsız (kutu / yalnız alt çizgi) ve
-   `AccessibilitySize.minTouchTarget` hem dokunma hedefi hem düzen ölçüsü
-   olarak kullanılıyor.
-3. **#67/#68** — Mixer'da kanal sırası değiştirilemiyor ve master ses seviyesi
-   yok; ikisi de "gerçek mikser" iddiasının hâlâ eksik yarısı.
+1. **#24/#25** — intent kartında basılı tutma önizlemesi ve çalan preset'in
+   listede işaretlenmesi; ikisi de uygulamanın "şu an ne çalıyor" farkındalığını
+   artırıyor.
+2. **#12/#14** — sistemli bir yükseklik/gölge ölçeği yok (tek gölge Slider
+   thumb'ında) ve `Spacing` skalasının dışında elle yazılmış 12/20/52 değerleri
+   duruyor.
+3. **#69/#70** — karışıma otomatik isim önerisi ("Rain + Alpha") ve kaydedilmiş
+   karışımlara katalog kodu; ikisi de Home'daki katalog diliyle bağ kurar.

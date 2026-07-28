@@ -22,7 +22,7 @@ import { Spacing, Typography, FontFamily, Radius, BADGE_ALPHA, withAlpha } from 
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
-import { PresetCard } from '@/components/ui/PresetCard';
+import { PresetRow } from '@/components/ui/PresetRow';
 import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { intents, getSuggestedIntent } from '@/lib/intents';
@@ -122,14 +122,6 @@ export default function HomeScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Brand presence without a second settings entry point — the tab
-            already gives access, so this row only carries the wordmark. */}
-        <View style={styles.header}>
-          <Text style={[styles.wordmark, { color: colors.textSecondary }]}>
-            NeuroSound
-          </Text>
-        </View>
-
         {/* Intent Section — primary entry, typographic */}
         <View style={styles.section}>
           <Text
@@ -194,8 +186,9 @@ export default function HomeScreen() {
                   <Text style={styles.featuredMetaNumber}>{suggestedIntent.recommendedMinutes}</Text>
                   {t('home.recommendedMinutesSuffix')}
                 </Text>
-                <Text style={[styles.featuredMetaCode, { color: colors.textSecondary }]}>
-                  {suggestedIntent.catalogCode}
+                <Text style={[styles.intentCatalog, styles.featuredMetaCode, { color: colors.textSecondary }]}>
+                  <Text style={styles.intentCatalogCode}>{suggestedIntent.catalogCode}</Text>
+                  {` · ${t('home.soundCount', { n: suggestedIntent.presetIds.length })}`}
                 </Text>
               </View>
             </View>
@@ -211,7 +204,7 @@ export default function HomeScreen() {
             <View style={styles.recentSection}>
               <CategoryHeader title={t('home.recentlyPlayed')} />
               {recentPresets.map((item) => (
-                <PresetCard
+                <PresetRow
                   key={item.id}
                   preset={item}
                   onPress={() => handlePresetPress(item.id)}
@@ -245,8 +238,13 @@ export default function HomeScreen() {
 
                 <View style={styles.intentBody}>
                   <View style={styles.intentTopRow}>
+                    {/* A catalogue number that indexes nothing is decoration.
+                        Pairing it with the size of what it points at makes it
+                        a real index entry — and the code keeps the mono face
+                        while the words around it stay in Nunito. */}
                     <Text style={[styles.intentCatalog, { color: intentColors[intent.id] }]}>
-                      {intent.catalogCode}
+                      <Text style={styles.intentCatalogCode}>{intent.catalogCode}</Text>
+                      {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
                     </Text>
                     <View
                       style={[styles.intentIconTag, { backgroundColor: withAlpha(intentColors[intent.id], BADGE_ALPHA) }]}
@@ -284,7 +282,7 @@ export default function HomeScreen() {
           {favoritePresets.length > 0 ? (
             <View>
               {visibleFavorites.map((preset) => (
-                <PresetCard
+                <PresetRow
                   key={preset.id}
                   preset={preset}
                   onPress={() => handlePresetPress(preset.id)}
@@ -321,16 +319,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xl,
     paddingBottom: 20,
-  },
-  header: {
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.xl,
-  },
-  // Brand presence without spending the H1 on it.
-  wordmark: {
-    ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
-    letterSpacing: 0.4,
   },
   section: {
     marginBottom: Spacing.xl,
@@ -391,9 +379,6 @@ const styles = StyleSheet.create({
     ...Typography.numeral,
   },
   featuredMetaCode: {
-    ...Typography.label,
-    fontFamily: FontFamily.mono,
-    letterSpacing: 1.2,
     marginLeft: 'auto',
   },
   recentSection: {
@@ -418,6 +403,9 @@ const styles = StyleSheet.create({
   },
   intentCatalog: {
     ...Typography.label,
+    textTransform: 'uppercase',
+  },
+  intentCatalogCode: {
     fontFamily: FontFamily.mono,
     letterSpacing: 1.2,
   },

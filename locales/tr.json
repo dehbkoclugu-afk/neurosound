@@ -46,7 +46,8 @@
     },
     "otherIntents": "Ya da başka bir şey",
     "recommendedMinutes": "önerilen süre {{minutes}} dakika",
-    "recommendedMinutesSuffix": " dk önerilir"
+    "recommendedMinutesSuffix": " dk önerilir",
+    "soundCount": "{{n}} ses"
   },
   "explore": {
     "title": "Frekansları Keşfet",
@@ -125,6 +126,7 @@
     "title": "Ses Karıştırıcı",
     "addSound": "Ses Ekle",
     "volume": "Ses Seviyesi",
+    "master": "Ana Ses",
     "savePreset": "Preset Kaydet",
     "presetName": "Preset Adı",
     "namePlaceholder": "Özel Karışımım",

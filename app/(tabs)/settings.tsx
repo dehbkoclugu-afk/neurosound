@@ -19,7 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, AccessibilitySize, Typography, FontFamily, onPrimary, Radius } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, onPrimary, Radius, ControlSize } from '@/constants/theme';
 import { useSettingsStore, ThemeMode, Language } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: Radius.pill,
     borderWidth: 1,
-    minHeight: AccessibilitySize.minTouchTarget,
+    minHeight: ControlSize.row,
     justifyContent: 'center',
   },
   optionText: {
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     ...Typography.footnote,
   },
   resetRow: {
-    minHeight: AccessibilitySize.minTouchTarget,
+    minHeight: ControlSize.row,
     justifyContent: 'center',
   },
   aboutRow: {

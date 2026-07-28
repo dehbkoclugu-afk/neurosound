@@ -1,6 +1,13 @@
 /**
  * The one way a preset is presented outside the player: a typographic list
  * row, no cards, no gradients.
+ *
+ * It was called `PresetCard` while its own header said "no cards", which is
+ * how the app came to have two things named card that shared no visual
+ * language. The rule the name now follows: a **card** is a bordered box you
+ * choose between (Home's intent cards); a **row** is an item in a list,
+ * separated by a hairline and nothing else. See DESIGN.md.
+ *
  * Name carries the hierarchy; a quiet subline gives type and frequency.
  * The icon sits in a tinted circle rather than floating bare: a run of a
  * dozen identical rows read as one grey paragraph without something for the
@@ -32,7 +39,7 @@ export function presetIcon(preset: FrequencyPreset): IconConfig {
   return getPresetIcon('solfeggio');
 }
 
-interface PresetCardProps {
+interface PresetRowProps {
   preset: FrequencyPreset;
   onPress: () => void;
   isFavorite?: boolean;
@@ -79,12 +86,12 @@ function Subline({ preset, color, t }: { preset: FrequencyPreset; color: string;
   );
 }
 
-export function PresetCard({
+export function PresetRow({
   preset,
   onPress,
   isFavorite = false,
   style,
-}: PresetCardProps) {
+}: PresetRowProps) {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const categoryColors = useCategoryColors();

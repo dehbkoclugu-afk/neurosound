@@ -260,9 +260,29 @@ export const Colors = {
   },
 };
 
-// Minimum touch target size for accessibility (48x48 dp)
+/**
+ * The accessibility floor, and nothing else.
+ *
+ * `minTouchTarget` is a guarantee — no tappable thing may be smaller. Reading
+ * it as a layout measure made it load-bearing in two unrelated ways at once:
+ * raising the floor (a pure accessibility win) would have silently resized
+ * chips, rows and buttons across the app, and `minTouchTarget + 4` was
+ * arithmetic on a constant that is not a scale. Layout heights live in
+ * `ControlSize` below; use this only where the number exists to keep a finger
+ * target big enough.
+ */
 export const AccessibilitySize = {
   minTouchTarget: 48,
+};
+
+/** Chosen control heights — design decisions, free to change without touching
+ *  the accessibility floor (and, being >= it, never violating it). */
+export const ControlSize = {
+  /** List rows, option chips, icon-button rows. */
+  row: 48,
+  /** Primary calls to action: a step taller than a row, so the main button on
+   *  a screen is not the same size as the things it sits among. */
+  cta: 52,
 };
 
 /**

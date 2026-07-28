@@ -46,7 +46,8 @@
     },
     "otherIntents": "Or something else",
     "recommendedMinutes": "{{minutes}} min recommended",
-    "recommendedMinutesSuffix": " min recommended"
+    "recommendedMinutesSuffix": " min recommended",
+    "soundCount": "{{n}} sounds"
   },
   "explore": {
     "title": "Explore Frequencies",
@@ -125,6 +126,7 @@
     "title": "Sound Mixer",
     "addSound": "Add Sound",
     "volume": "Volume",
+    "master": "Master",
     "savePreset": "Save Preset",
     "presetName": "Preset Name",
     "namePlaceholder": "My Custom Mix",

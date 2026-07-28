@@ -59,6 +59,10 @@ export interface PlaybackState {
   // Mixer
   isMixerPlaying: boolean;
   mixerChannels: MixerChannelState[];
+  /** One fader over the whole mix. Channel levels are a balance the user
+   *  spent time on; turning the mix down should not cost them that balance,
+   *  so this scales every channel instead of editing any of them. */
+  mixerMasterVolume: number;
   /** Saved mix the current channels came from, so the list can show which one
    *  is loaded. Cleared as soon as the structure is edited. */
   activeMixId: string | null;
@@ -72,6 +76,7 @@ export interface PlaybackState {
   setTimer: (duration: number | null) => void;
   updateTimerRemaining: (remaining: number | null) => void;
   setIsMixerPlaying: (playing: boolean) => void;
+  setMixerMasterVolume: (volume: number) => void;
   addMixerChannel: (channel: MixerChannelState) => void;
   removeMixerChannel: (channelId: string) => void;
   updateMixerChannelVolume: (channelId: string, volume: number) => void;
@@ -101,6 +106,7 @@ const initialState = {
   timerEndsAt: null,
   isMixerPlaying: false,
   mixerChannels: [],
+  mixerMasterVolume: 1,
   activeMixId: null,
 };
 
@@ -129,6 +135,9 @@ export const useAudioStore = create<PlaybackState>()(
       updateTimerRemaining: (remaining) => set({ timerRemaining: remaining }),
 
       setIsMixerPlaying: (isMixerPlaying) => set({ isMixerPlaying }),
+
+      setMixerMasterVolume: (volume) =>
+        set({ mixerMasterVolume: Math.max(0, Math.min(1, volume)) }),
 
       addMixerChannel: (channel) =>
         set((state) => ({
@@ -163,9 +172,14 @@ export const useAudioStore = create<PlaybackState>()(
     {
       name: 'neurosound-audio',
       storage: createJSONStorage(() => safeStorage),
-      // Only the volume level survives a restart — playback, timers and mixer
-      // sessions die with the process and should not resume from stale state.
-      partialize: (state) => ({ volume: state.volume }),
+      // Only the two volume levels survive a restart — playback, timers and
+      // mixer sessions die with the process and should not resume from stale
+      // state. The master fader is a setting, not session state: coming back
+      // to a mix at a level you never chose is the thing it exists to prevent.
+      partialize: (state) => ({
+        volume: state.volume,
+        mixerMasterVolume: state.mixerMasterVolume,
+      }),
     }
   )
 );

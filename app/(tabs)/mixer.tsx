@@ -23,7 +23,7 @@ import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Icon } from '@/components/ui/Icon';
-import { presetIcon } from '@/components/ui/PresetCard';
+import { presetIcon } from '@/components/ui/PresetRow';
 import { Button } from '@/components/ui/Button';
 import { TransportButton } from '@/components/ui/TransportButton';
 import { Sheet } from '@/components/ui/Sheet';
@@ -79,6 +79,7 @@ export default function MixerScreen() {
     mixerChannels: channels,
     isMixerPlaying: isPlaying,
     activeMixId,
+    mixerMasterVolume,
     timerDuration,
     timerRemaining,
   } = useAudioStore();
@@ -137,6 +138,10 @@ export default function MixerScreen() {
 
   const handleVolumeChange = useCallback((channelId: string, volume: number) => {
     playerController.mixerSetChannelVolume(channelId, volume);
+  }, []);
+
+  const handleMasterVolume = useCallback((volume: number) => {
+    playerController.mixerSetMasterVolume(volume);
   }, []);
 
   const handleToggleMute = useCallback((channelId: string, muted: boolean) => {
@@ -418,6 +423,22 @@ export default function MixerScreen() {
           </TouchableOpacity>
           )}
         </View>
+
+        {/* One fader over the whole mix. Without it, turning a balanced mix
+            down meant dragging four sliders and losing the balance; the
+            channel levels are the part the user actually authored. Hidden
+            while empty — there is nothing to scale. */}
+        {!isEmpty && (
+          <View style={[styles.master, { borderTopColor: colors.cardBorder }]}>
+            <Slider
+              value={mixerMasterVolume}
+              onValueChange={handleMasterVolume}
+              max={1}
+              label={t('mixer.master')}
+              accessibilityLabel={t('mixer.master')}
+            />
+          </View>
+        )}
 
         {/* Transport — always present. Showing and hiding play/save as the
             first channel arrived made the whole page jump under the finger. */}
@@ -746,6 +767,13 @@ const styles = StyleSheet.create({
   },
   addRowText: {
     ...Typography.headline,
+  },
+  master: {
+    marginTop: Spacing.lg,
+    paddingTop: Spacing.lg,
+    // A rule between the parts and their sum — without it the master reads as
+    // a fifth channel that happens to be a different colour.
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   transport: {
     alignItems: 'center',

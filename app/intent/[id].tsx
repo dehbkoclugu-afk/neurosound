@@ -20,10 +20,10 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary, Radius } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary, Radius, ControlSize } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
-import { PresetCard } from '@/components/ui/PresetCard';
+import { PresetRow } from '@/components/ui/PresetRow';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import { getIntentById } from '@/lib/intents';
@@ -165,7 +165,7 @@ export default function IntentScreen() {
 
         <View style={[styles.list, contentColumn]}>
           {presets.map((preset) => (
-            <PresetCard
+            <PresetRow
               key={preset.id}
               preset={preset}
               onPress={() => handlePresetPress(preset.id)}
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: AccessibilitySize.minTouchTarget + 4,
+    minHeight: ControlSize.cta,
     borderRadius: Radius.pill,
     gap: Spacing.sm,
   },

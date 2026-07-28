@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, Radius } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, Radius, ControlSize } from '@/constants/theme';
 import { useSettingsStore, Language } from '@/stores/settingsStore';
 import i18n from '@/i18n';
 import { PressableScale } from '@/components/ui/PressableScale';
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   button: {
-    minHeight: AccessibilitySize.minTouchTarget + 4,
+    minHeight: ControlSize.cta,
     borderRadius: Radius.pill,
     alignItems: 'center',
     justifyContent: 'center',

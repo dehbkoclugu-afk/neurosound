@@ -21,10 +21,10 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, Radius } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, Radius, ControlSize } from '@/constants/theme';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { PresetCard } from '@/components/ui/PresetCard';
+import { PresetRow } from '@/components/ui/PresetRow';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import {
@@ -304,7 +304,7 @@ export default function ExploreScreen() {
               <View>
                 {presets.length > 0 ? (
                   presets.map((preset) => (
-                    <PresetCard
+                    <PresetRow
                       key={preset.id}
                       preset={preset}
                       onPress={() => handlePresetPress(preset.id)}
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
   tab: {
     paddingTop: Spacing.sm,
-    minHeight: AccessibilitySize.minTouchTarget,
+    minHeight: ControlSize.row,
     justifyContent: 'flex-end',
     gap: Spacing.sm,
   },
