@@ -74,7 +74,7 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     kutusu yoktur. Asıl hata isimdeydi: `PresetCard` kendi başlık yorumunda
     "no cards" derken kart adını taşıyordu, `PresetRow` oldu.
 
-11. **[P2] `withAlpha(color, 0.16)` dört yerde elle tekrarlanıyor** (PresetCard,
+11. **[P2 — ÇÖZÜLDÜ] `withAlpha(color, 0.16)` dört yerde elle tekrarlanıyor** (PresetCard,
     mixer picker, mixer channel, index intentIconTag). Token'a çıkar:
     `Alpha.badge = 0.16` — madde 2'nin düzeltmesi de tek yerden yapılabilir.
 
@@ -104,7 +104,7 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     eziyordu; silindi. Elle yazılan `minHeight: 52` ve `44` değerleri
     `ControlSize.row` ve yeni `ControlSize.field`'a bağlandı.
 
-15. **[P3] `CategoryColors` yorumu güncel değil.** "Her palette 3:1 geçer" diyor
+15. **[P3 — ÇÖZÜLDÜ] `CategoryColors` yorumu güncel değil.** "Her palette 3:1 geçer" diyor
     ama renk artık kendi rozetinin üstünde kullanılıyor — kural değişti, doküman
     değişmedi. Madde 2'nin kök nedeni budur.
 
@@ -186,9 +186,9 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     ("Binaural Vuruşlar / Solfeggio / Ortam Sesleri") ve büyük sistem yazı
     boyutunda kesin taşar. `ScrollView horizontal` yap.
 
-28. **[P1] Aktif sekme alt çizgisi ekran kenarına dayanıyor.** Sağ padding yok.
+28. **[P1 — ÇÖZÜLDÜ] Aktif sekme alt çizgisi ekran kenarına dayanıyor.** Sağ padding yok.
 
-29. **[P1] Arama kutusunda web'de tarayıcı odak halkası sızıyor** — odaklanınca
+29. **[P1 — ÇÖZÜLDÜ] Arama kutusunda web'de tarayıcı odak halkası sızıyor** — odaklanınca
     metnin etrafında açık renkli bir dikdörtgen beliriyor. Native'de görünmez,
     web hedefinde kırık duruyor.
 
@@ -199,33 +199,33 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     boşluk karakteri geniş olduğu için sayı ile "Hz" arasında fazladan boşluk
     okunuyor. Sadece sayıyı mono yap, "Hz"i normal fontta bırak.
 
-31. **[P1] Sonuç sayısı yok.** 33 preset, arama + favori filtresi var ama
+31. **[P1 — ÇÖZÜLDÜ] Sonuç sayısı yok.** 33 preset, arama + favori filtresi var ama
     "5 sonuç" bilgisi hiçbir yerde yok.
 
-32. **[P2] Favori filtresi çıplak ikon** (`explore.tsx:387`). Arama kutusunun
+32. **[P2 — ÇÖZÜLDÜ] Favori filtresi çıplak ikon** (`explore.tsx:387`). Arama kutusunun
     yanında ama onun gibi bir zemini yok — aynı satırdaki iki kontrol iki farklı
     dilde.
 
-33. **[P2] Kategori açıklaması body boyutunda 3-4 satır** ve listeyi aşağı itiyor.
+33. **[P2 — ÇÖZÜLDÜ] Kategori açıklaması body boyutunda 3-4 satır** ve listeyi aşağı itiyor.
     `footnote`'a indir.
 
-34. **[P2] Preset satırlarında açılım göstergesi (chevron) yok.** Tıklanabilirlik
+34. **[P2 — ÇÖZÜLDÜ] Preset satırlarında açılım göstergesi (chevron) yok.** Tıklanabilirlik
     sadece ikondan sezilmeye çalışılıyor.
 
-35. **[P2] Favori kalbi 16px, satırın en sağında** — tarama sırasında kaçıyor.
+35. **[P2 — ÇÖZÜLDÜ] Favori kalbi 16px, satırın en sağında** — tarama sırasında kaçıyor.
 
-36. **[P2] Frekans bandı görsel ölçek olarak sunulmuyor.** Delta→Gamma doğal bir
+36. **[P2 — ÇÖZÜLDÜ] Frekans bandı görsel ölçek olarak sunulmuyor.** Delta→Gamma doğal bir
     spektrum; mini bir bant göstergesi (0.5 Hz ——●—— 100 Hz) kategoriyi öğretir.
 
-37. **[P3] Sekmeler kategori rengini kullanmıyor.** `CategoryColors` var, sekme
+37. **[P3 — ÇÖZÜLDÜ] Sekmeler kategori rengini kullanmıyor.** `CategoryColors` var, sekme
     alt çizgisi hep `accent`. Her sekmenin kendi ince renk şeridi kart-katalog
     dilini pekiştirir.
 
-38. **[P3] Arama sonuçlarında eşleşen metin vurgulanmıyor.**
+38. **[P3 — ÇÖZÜLDÜ] Arama sonuçlarında eşleşen metin vurgulanmıyor.**
 
-39. **[P3] Sıralama seçeneği yok** (frekansa göre / alfabetik / en çok çalınan).
+39. **[P3 — ÇÖZÜLDÜ] Sıralama seçeneği yok** (frekansa göre / alfabetik / en çok çalınan).
 
-40. **[P3] Boş sonuç durumu tek satır metin.** "Filtreyi temizle" gibi bir çıkış
+40. **[P3 — ÇÖZÜLDÜ] Boş sonuç durumu tek satır metin.** "Filtreyi temizle" gibi bir çıkış
     yolu yok.
 
 ---
@@ -446,10 +446,10 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## I. MiniPlayer / tab bar / global chrome (90–96)
 
-90. **[P0] Tab etiketleri sistem fontunda** (madde 1 — bu bölüme de ait, çünkü
+90. **[P0 — ÇÖZÜLDÜ] Tab etiketleri sistem fontunda** (madde 1 — bu bölüme de ait, çünkü
     global chrome'un tamamını etkiliyor).
 
-91. **[P1] MiniPlayer'ın play butonu yuvarlak kare, diğer iki play daire**
+91. **[P1 — ÇÖZÜLDÜ, madde 8 ile] MiniPlayer'ın play butonu yuvarlak kare**
     (bkz. madde 8).
 
 92. **[P1] MiniPlayer'da zamanlayıcı/ilerleme izi yok.** Zamanlayıcı çalışırken
@@ -487,6 +487,18 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
      göstermiyor; katalog/teyp dilinde "çalma sayacı" zaten hazır bir metafor.
 
 ---
+
+## C bölümü notu (Explore)
+
+Explore turunda listede olmayan **iki gerçek hata** çıktı, ikisi de yalnızca
+tarayıcıda görünüyordu:
+
+- Arama kutusundaki temizle (×) düğmesi hiç görünmüyordu. Sebep DOM'a bakınca
+  çıktı: `TextInput`'in `flex: 1` var ama `minWidth: 0` yok, web'de flex
+  öğesinin varsayılan min genişliği içeriği kadardır, yani girdi kendi
+  yuvarlak kutusunu ~13px taşırıp düğmeyi sıralama butonunun altına itiyordu.
+  Aynı hata Mixer'ın seçici arama kutusunda da vardı; ikisi de düzeltildi.
+- Aynı taşma, kutunun kenarlığının da yanlış yerde bitmesine yol açıyordu.
 
 ## Durum
 

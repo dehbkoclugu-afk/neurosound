@@ -121,7 +121,10 @@
     "searchPlaceholder": "Search sounds",
     "favoritesOnly": "Favourites only",
     "aboutCategory": "About this category",
-    "noResults": "No sounds match your search."
+    "noResults": "No sounds match your search.",
+    "clearFilters": "Clear filters",
+    "sortByName": "Sort A–Z",
+    "clearSearch": "Clear search"
   },
   "mixer": {
     "title": "Sound Mixer",

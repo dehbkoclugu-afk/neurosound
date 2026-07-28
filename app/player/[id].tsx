@@ -21,12 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, { ZoomIn } from 'react-native-reanimated';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
-import {
-  Spacing,
-  Typography,
-  FontFamily,
-  withAlpha,
-} from '@/constants/theme';
+import { Spacing, Typography, FontFamily, withAlpha, BADGE_ALPHA } from '@/constants/theme';
 import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -158,7 +153,7 @@ export default function PlayerScreen() {
       {/* Atmospheric wash — the sound's colour bleeds softly from the top */}
       <LinearGradient
         colors={[
-          withAlpha(colors.primary, 0.16),
+          withAlpha(colors.primary, BADGE_ALPHA),
           withAlpha(colors.primary, 0.04),
           colors.background,
         ]}

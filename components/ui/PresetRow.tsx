@@ -24,7 +24,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Spacing, Typography, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
@@ -46,6 +46,9 @@ interface PresetRowProps {
   isFavorite?: boolean;
   /** This preset is the sound currently coming out of the speaker. */
   isPlaying?: boolean;
+  /** Lower-cased search term to emphasise inside the name, so a filtered
+   *  list shows *why* each row survived the filter. */
+  highlight?: string;
   showFrequency?: boolean;
   style?: ViewStyle;
   size?: 'small' | 'medium' | 'large'; // kept for API compat, unused
@@ -89,16 +92,59 @@ function Subline({ preset, color, t }: { preset: FrequencyPreset; color: string;
   );
 }
 
+/** The five binaural bands, in the order the ear climbs them. */
+const BINAURAL_BANDS = ['delta', 'theta', 'alpha', 'beta', 'gamma'] as const;
+
+/**
+ * Delta → Gamma is a real progression and the list was presenting it as five
+ * unrelated names. Five ticks with the current one raised put the row on a
+ * scale: you can see at a glance that Theta is near the bottom and Beta near
+ * the top without knowing what 6 Hz means.
+ */
+function BandScale({ preset, color }: { preset: FrequencyPreset; color: string }) {
+  const index = BINAURAL_BANDS.indexOf(preset.binauralType as (typeof BINAURAL_BANDS)[number]);
+  if (index < 0) return null;
+  return (
+    <View
+      style={styles.bandScale}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
+      {BINAURAL_BANDS.map((band, i) => (
+        <View
+          key={band}
+          style={[
+            styles.bandTick,
+            { backgroundColor: color, opacity: i === index ? 1 : 0.3 },
+            i === index && styles.bandTickActive,
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
+
+/** Splits `text` on the first case-insensitive occurrence of `term`. */
+function splitOnMatch(text: string, term: string): [string, string, string] | null {
+  if (!term) return null;
+  const at = text.toLowerCase().indexOf(term);
+  if (at < 0) return null;
+  return [text.slice(0, at), text.slice(at, at + term.length), text.slice(at + term.length)];
+}
+
 export function PresetRow({
   preset,
   onPress,
   isFavorite = false,
   isPlaying = false,
+  highlight,
   style,
 }: PresetRowProps) {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const categoryColors = useCategoryColors();
+  const name = t(preset.nameKey);
+  const match = highlight ? splitOnMatch(name, highlight) : null;
 
   return (
     <TouchableOpacity
@@ -110,7 +156,7 @@ export function PresetRow({
       // carries favourite state. Announcing the name alone dropped both, so a
       // screen reader user could not tell 6 Hz from 40 Hz.
       accessibilityLabel={[
-        t(preset.nameKey),
+        name,
         getSubline(preset, t),
         // The equalizer is decorative to a screen reader, so the state it
         // stands for has to be spoken here or it is simply missing.
@@ -129,24 +175,48 @@ export function PresetRow({
         <Icon icon={presetIcon(preset)} size={19} color={categoryColors[preset.type]} />
       </View>
       <View style={styles.rowText}>
-        <Text
-          style={[styles.name, { color: isPlaying ? colors.accent : colors.text }]}
-          numberOfLines={1}
-        >
-          {t(preset.nameKey)}
-        </Text>
-        <Subline preset={preset} color={colors.textSecondary} t={t} />
+        <View style={styles.nameRow}>
+          <Text
+            style={[styles.name, { color: isPlaying ? colors.accent : colors.text }]}
+            numberOfLines={1}
+          >
+            {match ? (
+              <>
+                {match[0]}
+                <Text style={[styles.nameMatch, { color: colors.accent }]}>{match[1]}</Text>
+                {match[2]}
+              </>
+            ) : (
+              name
+            )}
+          </Text>
+          {/* The heart used to sit at the far right margin at 16px, where it
+              was the easiest thing on the row to miss while scanning. It
+              belongs with the entry it marks, not out in the gutter. */}
+          {isFavorite && (
+            <Ionicons
+              name="heart"
+              size={14}
+              color={colors.accent}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+          )}
+        </View>
+        <View style={styles.sublineRow}>
+          <Subline preset={preset} color={colors.textSecondary} t={t} />
+          <BandScale preset={preset} color={categoryColors[preset.type]} />
+        </View>
       </View>
       {isPlaying && <EqualizerBars color={colors.accent} />}
-      {isFavorite && (
-        <Ionicons
-          name="heart"
-          size={16}
-          color={colors.accent}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        />
-      )}
+      {/* The rows navigate; nothing said so. */}
+      <Ionicons
+        name="chevron-forward"
+        size={16}
+        color={colors.tabIconDefault}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      />
     </TouchableOpacity>
   );
 }
@@ -172,8 +242,36 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
   name: {
     ...Typography.headline,
+    flexShrink: 1,
+  },
+  nameMatch: {
+    fontFamily: FontFamily.bold,
+  },
+  sublineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  bandScale: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 2,
+    height: 8,
+  },
+  bandTick: {
+    width: 2,
+    height: 4,
+    borderRadius: 1,
+  },
+  bandTickActive: {
+    height: 8,
   },
   subline: {
     ...Typography.footnote,

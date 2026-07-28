@@ -955,6 +955,8 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
+    // Same web flexbox release valve as Explore's field — see the note there.
+    minWidth: 0,
     ...Typography.body,
     paddingVertical: Spacing.sm,
   },

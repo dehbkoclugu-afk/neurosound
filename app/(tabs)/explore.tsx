@@ -20,8 +20,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, Radius, ControlSize } from '@/constants/theme';
+import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, AccessibilitySize, FontFamily, Radius, ControlSize, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { PresetRow } from '@/components/ui/PresetRow';
@@ -85,8 +85,14 @@ export default function ExploreScreen() {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Record<string, boolean>>({});
   const [pagerWidth, setPagerWidth] = useState(0);
+  // Web draws its own focus ring on a text input, ignoring every border this
+  // design owns. Suppressing it without replacing it would leave keyboard
+  // users with no focus indication at all, so the field draws its own.
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [sortBy, setSortBy] = useState<'default' | 'name'>('default');
 
   const colors = useThemeColors();
+  const categoryColors = useCategoryColors();
   const miniPlayerInset = useMiniPlayerInset();
   const isPresetPlaying = useIsPresetPlaying();
   const pagerRef = useRef<ScrollView>(null);
@@ -150,6 +156,11 @@ export default function ExploreScreen() {
     setExpandedDescriptions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const clearFilters = () => {
+    setQuery('');
+    setFavoritesOnly(false);
+  };
+
   const normalizedQuery = query.trim().toLowerCase();
 
   const filteredPresetsByCategory = useMemo(() => {
@@ -159,20 +170,27 @@ export default function ExploreScreen() {
       noise: [],
     };
     categories.forEach((category) => {
-      map[category.key] = category.presets.filter((preset) => {
+      const matching = category.presets.filter((preset) => {
         if (favoritesOnly && !isFavorite(preset.id)) return false;
         if (normalizedQuery && !t(preset.nameKey).toLowerCase().includes(normalizedQuery)) {
           return false;
         }
         return true;
       });
+      // The default order is ascending frequency, which is the catalogue's
+      // own order and carries real meaning (Delta at the bottom, Gamma at the
+      // top). A–Z is the alternative for when you know the name already.
+      map[category.key] =
+        sortBy === 'name'
+          ? [...matching].sort((a, b) => t(a.nameKey).localeCompare(t(b.nameKey)))
+          : matching;
     });
     return map;
     // isFavorite is a stable function reference (it reads favoriteIds via
     // get() internally), so it never changes and never invalidates this
     // memo on its own — favoriteIds is the dependency that actually moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [normalizedQuery, favoritesOnly, favoriteIds]);
+  }, [normalizedQuery, favoritesOnly, favoriteIds, sortBy]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -199,6 +217,10 @@ export default function ExploreScreen() {
       >
         {categories.map((category, index) => {
           const isActive = category.key === activeCategory;
+          // The tab is the index tab for its category, so it wears that
+          // category's colour rather than the app accent — the same colour
+          // the rows below it are about to use.
+          const tint = categoryColors[category.key];
           return (
             <TouchableOpacity
               key={category.key}
@@ -211,7 +233,7 @@ export default function ExploreScreen() {
               <Text
                 style={[
                   styles.tabText,
-                  { color: isActive ? colors.accent : colors.textSecondary },
+                  { color: isActive ? tint : colors.textSecondary },
                   isActive && styles.tabTextActive,
                 ]}
               >
@@ -220,7 +242,7 @@ export default function ExploreScreen() {
               <View
                 style={[
                   styles.tabUnderline,
-                  { backgroundColor: isActive ? colors.accent : 'transparent' },
+                  { backgroundColor: isActive ? tint : 'transparent' },
                 ]}
               />
             </TouchableOpacity>
@@ -231,27 +253,81 @@ export default function ExploreScreen() {
       {/* Search + favourites filter — 33 presets across the app had no way
           to narrow the list. */}
       <View style={[styles.toolbar, contentColumn]}>
-        <View style={[styles.searchBar, { backgroundColor: colors.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.searchBar,
+            {
+              backgroundColor: colors.backgroundSecondary,
+              borderColor: searchFocused ? colors.accent : 'transparent',
+            },
+          ]}
+        >
           <Ionicons name="search" size={18} color={colors.textSecondary} />
           <TextInput
             value={query}
             onChangeText={setQuery}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
             placeholder={t('explore.searchPlaceholder')}
             placeholderTextColor={colors.textSecondary}
             style={[styles.searchInput, { color: colors.text }]}
             accessibilityLabel={t('explore.searchPlaceholder')}
           />
+          {query.length > 0 && (
+            <TouchableOpacity
+              onPress={() => setQuery('')}
+              // Without flexShrink: 0 the flex:1 input next to it squeezes
+              // this to zero width and the button renders invisibly.
+              style={styles.searchClear}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityRole="button"
+              accessibilityLabel={t('explore.clearSearch')}
+            >
+              <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
+        {/* Both toggles were bare icons floating next to a filled search
+            field, which read as decoration rather than controls. They now
+            sit in the same box the field does, and fill in when they are on. */}
+        <TouchableOpacity
+          onPress={() => setSortBy((v) => (v === 'name' ? 'default' : 'name'))}
+          style={[
+            styles.toolbarToggle,
+            {
+              backgroundColor:
+                sortBy === 'name'
+                  ? withAlpha(colors.accent, BADGE_ALPHA)
+                  : colors.backgroundSecondary,
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityState={{ selected: sortBy === 'name' }}
+          accessibilityLabel={t('explore.sortByName')}
+        >
+          <Ionicons
+            name="text-outline"
+            size={19}
+            color={sortBy === 'name' ? colors.accent : colors.textSecondary}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setFavoritesOnly((v) => !v)}
-          style={styles.favoriteFilter}
+          style={[
+            styles.toolbarToggle,
+            {
+              backgroundColor: favoritesOnly
+                ? withAlpha(colors.accent, BADGE_ALPHA)
+                : colors.backgroundSecondary,
+            },
+          ]}
           accessibilityRole="button"
           accessibilityState={{ selected: favoritesOnly }}
           accessibilityLabel={t('explore.favoritesOnly')}
         >
           <Ionicons
             name={favoritesOnly ? 'heart' : 'heart-outline'}
-            size={20}
+            size={19}
             color={favoritesOnly ? colors.accent : colors.textSecondary}
           />
         </TouchableOpacity>
@@ -284,23 +360,33 @@ export default function ExploreScreen() {
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.descriptionRow}>
-                {showDescription ? (
-                  <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
-                    {t(category.descriptionKey)}
-                  </Text>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => toggleDescription(category.key)}
-                    style={styles.aboutButton}
-                    accessibilityRole="button"
-                    accessibilityLabel={t('explore.aboutCategory')}
-                  >
-                    <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
-                    <Text style={[styles.aboutButtonText, { color: colors.textSecondary }]}>
-                      {t('explore.aboutCategory')}
+                <View style={styles.descriptionMain}>
+                  {showDescription ? (
+                    <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
+                      {t(category.descriptionKey)}
                     </Text>
-                  </TouchableOpacity>
-                )}
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => toggleDescription(category.key)}
+                      style={styles.aboutButton}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('explore.aboutCategory')}
+                    >
+                      <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
+                      <Text style={[styles.aboutButtonText, { color: colors.textSecondary }]}>
+                        {t('explore.aboutCategory')}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                {/* 33 sounds behind a search box and a filter, and the list
+                    never said how many survived either one. */}
+                <Text style={[styles.resultCount, { color: colors.textSecondary }]}>
+                  <Text style={styles.resultCountNumber}>{presets.length}</Text>
+                  {presets.length === category.presets.length
+                    ? ''
+                    : `/${category.presets.length}`}
+                </Text>
               </View>
 
               <View>
@@ -312,12 +398,26 @@ export default function ExploreScreen() {
                       onPress={() => handlePresetPress(preset.id)}
                       isFavorite={isFavorite(preset.id)}
                       isPlaying={isPresetPlaying(preset.id)}
+                      highlight={normalizedQuery}
                     />
                   ))
                 ) : (
-                  <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-                    {t('explore.noResults')}
-                  </Text>
+                  <View style={styles.emptyState}>
+                    <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+                      {t('explore.noResults')}
+                    </Text>
+                    {/* A dead end told the user what happened and gave them no
+                        way out of it. */}
+                    <TouchableOpacity
+                      onPress={clearFilters}
+                      style={styles.clearFilters}
+                      accessibilityRole="button"
+                    >
+                      <Text style={[styles.clearFiltersText, { color: colors.accent }]}>
+                        {t('explore.clearFilters')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 )}
               </View>
             </ScrollView>
@@ -363,10 +463,21 @@ const styles = StyleSheet.create({
   tabTextActive: {
     fontFamily: FontFamily.semibold,
   },
+  emptyState: {
+    paddingVertical: Spacing.lg,
+    gap: Spacing.xs,
+  },
   emptyStateText: {
     ...Typography.body,
     lineHeight: 21,
-    paddingVertical: Spacing.sm,
+  },
+  clearFilters: {
+    minHeight: ControlSize.row,
+    justifyContent: 'center',
+  },
+  clearFiltersText: {
+    ...Typography.body,
+    fontFamily: FontFamily.semibold,
   },
   tabUnderline: {
     height: 2,
@@ -385,17 +496,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     borderRadius: Radius.card,
+    borderWidth: 1,
     paddingHorizontal: Spacing.md,
     minHeight: ControlSize.field,
   },
+  searchClear: {
+    flexShrink: 0,
+  },
   searchInput: {
     flex: 1,
+    // A flex item's default min-width is its content width, so on web the
+    // input refused to shrink, overflowed its own rounded box by ~13px and
+    // shoved the clear button out past the sort toggle. minWidth: 0 is the
+    // standard release valve; RN's Yoga does not need it, web does.
+    minWidth: 0,
     ...Typography.body,
     paddingVertical: Spacing.sm,
+    // Kills the browser's own focus ring on web; the container's accent
+    // border replaces it. `outlineStyle` is react-native-web only, hence the
+    // cast — RN's own types have no such property.
+    ...({ outlineStyle: 'none' } as object),
   },
-  favoriteFilter: {
+  toolbarToggle: {
     width: AccessibilitySize.minTouchTarget,
-    height: AccessibilitySize.minTouchTarget,
+    height: ControlSize.field,
+    borderRadius: Radius.card,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -403,12 +528,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
   descriptionRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.md,
     marginTop: Spacing.lg,
     marginBottom: Spacing.sm,
   },
+  descriptionMain: {
+    flex: 1,
+  },
+  // Footnote, not body: three or four lines of 17pt explanation pushed the
+  // list itself below the fold on first visit to every category.
   descriptionText: {
-    ...Typography.body,
-    lineHeight: 22,
+    ...Typography.footnote,
+    lineHeight: 19,
+  },
+  resultCount: {
+    ...Typography.footnote,
+    ...Typography.numeral,
+    paddingTop: 2,
+  },
+  resultCountNumber: {
+    ...Typography.numeral,
   },
   aboutButton: {
     flexDirection: 'row',

@@ -121,7 +121,10 @@
     "searchPlaceholder": "Ses ara",
     "favoritesOnly": "Sadece favoriler",
     "aboutCategory": "Bu kategori hakkında",
-    "noResults": "Aramanızla eşleşen ses yok."
+    "noResults": "Aramanızla eşleşen ses yok.",
+    "clearFilters": "Filtreleri temizle",
+    "sortByName": "A–Z sırala",
+    "clearSearch": "Aramayı temizle"
   },
   "mixer": {
     "title": "Ses Karıştırıcı",
