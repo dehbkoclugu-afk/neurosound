@@ -2,7 +2,7 @@
  * Settings Screen - User preferences and accessibility
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -20,11 +20,12 @@ import Constants from 'expo-constants';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, FontFamily, onPrimary, Radius, ControlSize, Colors, BADGE_ALPHA, withAlpha } from '@/constants/theme';
-import { useSettingsStore, ThemeMode, Language } from '@/stores/settingsStore';
+import { useSettingsStore, ThemeMode } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Slider } from '@/components/ui/Slider';
 import { useToastStore } from '@/stores/toastStore';
+import { LanguageRow, LanguageSheet } from '@/components/ui/LanguageSheet';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import i18n from '@/i18n';
@@ -53,13 +54,6 @@ const THEME_OPTIONS: {
   { value: 'auto', labelKey: 'settings.themes.auto', swatch: [Colors.light.background, Colors.dark.background] },
 ];
 
-/** The two-letter code is the catalogue register the rest of the app uses for
- *  identifiers; the name is what a person reads. */
-const LANGUAGE_OPTIONS: { value: Language; label: string; code: string }[] = [
-  { value: 'tr', label: 'Türkçe', code: 'TR' },
-  { value: 'en', label: 'English', code: 'EN' },
-];
-
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -72,8 +66,6 @@ export default function SettingsScreen() {
     setLowContrast,
     haptics,
     setHaptics,
-    language,
-    setLanguage,
     maxVolume,
     setMaxVolume,
     resetSettings,
@@ -89,6 +81,7 @@ export default function SettingsScreen() {
   const colors = useThemeColors();
 
   const showToast = useToastStore((st) => st.show);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const miniPlayerInset = useMiniPlayerInset();
 
   // resetSettings and presetsStore.reset both existed and were wired to
@@ -113,10 +106,6 @@ export default function SettingsScreen() {
     ]);
   }, [t, resetPresets, resetSettings, showToast]);
 
-  const handleLanguageChange = (newLanguage: Language) => {
-    setLanguage(newLanguage);
-    i18n.changeLanguage(newLanguage);
-  };
 
   // The cap is a hearing-safety control — it has to apply to audio that's
   // already playing, not just the next time a player screen happens to
@@ -321,41 +310,10 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <CategoryHeader title={t('settings.language')} style={styles.sectionHeader} />
 
+          {/* Eleven languages do not fit in a row of pills, and a settings
+              screen should not change shape because of what is in the list. */}
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <View style={styles.optionGroup}>
-              {LANGUAGE_OPTIONS.map(option => (
-                <TouchableOpacity
-                  key={option.value}
-                  onPress={() => handleLanguageChange(option.value)}
-                  style={[
-                    styles.optionButton,
-                    {
-                      backgroundColor: language === option.value ? colors.primary : colors.backgroundSecondary,
-                      borderColor: language === option.value ? colors.primary : colors.cardBorder,
-                    },
-                  ]}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: language === option.value }}
-                >
-                  <Text
-                    style={[
-                      styles.optionCode,
-                      { color: language === option.value ? onPrimary : colors.textSecondary },
-                    ]}
-                  >
-                    {option.code}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.optionText,
-                      { color: language === option.value ? onPrimary : colors.text },
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <LanguageRow onPress={() => setShowLanguageSheet(true)} />
           </View>
         </View>
 
@@ -458,6 +416,11 @@ export default function SettingsScreen() {
 
         </View>
       </ScrollView>
+
+      <LanguageSheet
+        visible={showLanguageSheet}
+        onClose={() => setShowLanguageSheet(false)}
+      />
     </SafeAreaView>
   );
 }

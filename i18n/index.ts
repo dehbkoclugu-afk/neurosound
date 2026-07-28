@@ -2,15 +2,13 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
 
-import tr from '../locales/tr.json';
-import en from '../locales/en.json';
+import { LANGUAGES, LANGUAGE_CODES } from '../locales';
 
-const resources = {
-  tr: { translation: tr },
-  en: { translation: en },
-};
+const resources = Object.fromEntries(
+  LANGUAGES.map((l) => [l.code, { translation: l.translation }])
+);
 
-export type SupportedLanguage = 'tr' | 'en';
+export type SupportedLanguage = string;
 
 // Get device language safely, default to Turkish
 let deviceLanguage = 'tr';
@@ -27,9 +25,13 @@ try {
  * Language used before anything is restored from storage. The settings store
  * seeds its default from this too — otherwise a first launch would run i18n in
  * the device language while Settings claimed Turkish was selected.
+ *
+ * `languageCode` is the bare tag ("pt", "zh"), so a Brazilian phone and a
+ * Portuguese one both land on pt, and every Chinese variant lands on zh. That
+ * is deliberate: one file per language, not per region.
  */
-export const deviceLanguageOrDefault: SupportedLanguage = ['tr', 'en'].includes(deviceLanguage)
-  ? (deviceLanguage as SupportedLanguage)
+export const deviceLanguageOrDefault: SupportedLanguage = LANGUAGE_CODES.includes(deviceLanguage)
+  ? deviceLanguage
   : 'tr';
 
 const supportedLanguage = deviceLanguageOrDefault;
@@ -39,7 +41,7 @@ i18n
   .init({
     resources,
     lng: supportedLanguage,
-    fallbackLng: 'tr',
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },

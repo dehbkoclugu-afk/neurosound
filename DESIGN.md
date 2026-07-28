@@ -40,6 +40,14 @@ Source of truth: `constants/theme.ts`.
 - **Home intent cards** — flat card, coloured left spine, catalog code in tracked mono caps, icon tag, title, description. No photography in the repeated grid; the Intent *detail* screen keeps its real photographic hero (a single full-bleed moment earns it; the repeated list does not).
 - **`CategoryHeader`** — section titles now render in the tracked-uppercase `label` style system-wide.
 
+## Languages
+
+Eleven: Turkish, plus the ten the App Store actually runs on (English, Chinese, Japanese, Spanish, German, French, Korean, Portuguese, Italian, Russian). `locales/index.ts` is the single source of truth — i18n's resource bundle, device detection, the picker and the parity test all read from it, so adding a twelfth is a JSON file and one row.
+
+Codes are bare two-letter tags (`pt`, not `pt-BR`): `expo-localization` reports `languageCode`, so detection is a lookup rather than locale matching, and there is one file per language rather than per region. New files are generated from `en.json`'s shape by `scripts/build-locale.py`, which refuses to write anything whose keys or `{{interpolation}}` placeholders don't match.
+
+The picker is a `Sheet`, not a row of pills: two fitted, eleven changed shape per language. Each language is listed under its own name — "Chinese" is no use to someone who only reads Chinese, and that is exactly who the list is for. Flags are a colour cue only, never the identifier; on Android, where system fonts have no flag glyphs, the regional-indicator pair falls back to rendering the two letters, which is the country code it replaced.
+
 ## Counters
 
 The app tracks total listening time and session count (`presetsStore`), shown in Settings → About in the tape-counter face. Time is measured as wall-clock deltas between playback start and stop, never a ticking counter: JS timers are throttled while the app is backgrounded, which is exactly when a sleep app is doing its job.

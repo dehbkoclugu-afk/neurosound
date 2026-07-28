@@ -20,8 +20,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, Radius, ControlSize, BADGE_ALPHA, withAlpha } from '@/constants/theme';
-import { useSettingsStore, Language } from '@/stores/settingsStore';
-import i18n from '@/i18n';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { languageFlag, languageLabel } from '@/locales';
+import { LanguageSheet } from '@/components/ui/LanguageSheet';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { contentColumn } from '@/constants/layout';
 
@@ -58,10 +59,10 @@ export default function OnboardingScreen() {
     setHasSeenHeadphoneWarning,
     reduceMotion,
     language,
-    setLanguage,
   } = useSettingsStore();
 
   const [step, setStep] = useState(0);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const isLast = step === STEPS.length - 1;
   const current = STEPS[step];
 
@@ -125,11 +126,6 @@ export default function OnboardingScreen() {
     closeOnboarding();
   };
 
-  const handleLanguage = (next: Language) => {
-    setLanguage(next);
-    i18n.changeLanguage(next);
-  };
-
   const handleBack = () => {
     if (step > 0) setStep(step - 1);
   };
@@ -167,35 +163,28 @@ export default function OnboardingScreen() {
       <View style={styles.topBar}>
         {/* Language lives here because the very first screen is already text
             the user may not read — asking them to find Settings first is
-            backwards. */}
-        <View style={styles.languageRow}>
-          {(['tr', 'en'] as Language[]).map((code) => (
-            <TouchableOpacity
-              key={code}
-              onPress={() => handleLanguage(code)}
-              style={[
-                styles.languageButton,
-                language === code && {
-                  backgroundColor: withAlpha(colors.accent, BADGE_ALPHA),
-                },
-              ]}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: language === code }}
-              accessibilityLabel={code === 'tr' ? 'Türkçe' : 'English'}
-            >
-              <Text
-                style={[
-                  styles.languageText,
-                  {
-                    color: language === code ? colors.accent : colors.textSecondary,
-                  },
-                ]}
-              >
-                {code.toUpperCase()}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+            backwards. Two codes fitted side by side; eleven do not, so this
+            is the current one and a tap opens the same sheet Settings uses. */}
+        <TouchableOpacity
+          onPress={() => setShowLanguageSheet(true)}
+          style={[
+            styles.languageButton,
+            { backgroundColor: withAlpha(colors.accent, BADGE_ALPHA) },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={`${t('settings.language')}: ${languageLabel(language)}`}
+        >
+          <Text
+            style={styles.languageFlag}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            {languageFlag(language)}
+          </Text>
+          <Text style={[styles.languageText, { color: colors.accent }]}>
+            {languageLabel(language)}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={finish}
@@ -307,6 +296,11 @@ export default function OnboardingScreen() {
           </PressableScale>
         </View>
       </View>
+
+      <LanguageSheet
+        visible={showLanguageSheet}
+        onClose={() => setShowLanguageSheet(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -322,18 +316,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.sm,
   },
-  languageRow: {
-    flexDirection: 'row',
-  },
   languageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
     minWidth: AccessibilitySize.minTouchTarget,
     height: ControlSize.field,
+    paddingHorizontal: Spacing.sm,
     borderRadius: Radius.card,
-    alignItems: 'center',
     justifyContent: 'center',
   },
+  languageFlag: {
+    fontSize: 15,
+  },
   languageText: {
-    ...Typography.body,
+    ...Typography.footnote,
     fontFamily: FontFamily.semibold,
   },
   skipButton: {
