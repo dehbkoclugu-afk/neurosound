@@ -200,7 +200,8 @@
     "resetTitle": "Reset data",
     "resetConfirm": "Favourites, mixes and all settings will be deleted. This cannot be undone.",
     "resetHint": "{{favorites}} favourites, {{mixes}} mixes",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "resetDone": "Everything has been reset."
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -236,7 +237,8 @@
     "relaxDesc": "Nature sounds and soft tones to unwind",
     "meditate": "Meditate",
     "meditateDesc": "Deep, calm tones for turning inward",
-    "startSession": "Start {{minutes}} min session"
+    "startSession": "Start {{minutes}} min session",
+    "startsWith": "Starts with {{name}}"
   },
   "onboarding": {
     "step1Title": "Tune into sound",

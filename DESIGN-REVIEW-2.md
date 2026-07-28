@@ -379,67 +379,67 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## F. Settings (71–78)
 
-71. **[P1] Bölüm başlıkları uygulamanın geri kalanıyla uyumsuz** (bkz. madde 5).
+71. **[P1 — ÇÖZÜLDÜ] Bölüm başlıkları uygulamanın geri kalanıyla uyumsuz** (bkz. madde 5).
 
-72. **[P1] "Reset data" satırı normal satır gibi görünüyor,** sadece metin rengi
+72. **[P1 — ÇÖZÜLDÜ] "Reset data" satırı normal satır gibi görünüyor,** sadece metin rengi
     `error`. Yıkıcı eylem için ikon + ayrı bölüm ya da kenarlık gerekir.
 
-73. **[P2] Epilepsi uyarısı iki switch arasında serbest yüzüyor** — kendi
+73. **[P2 — ÇÖZÜLDÜ] Epilepsi uyarısı iki switch arasında serbest yüzüyor** — kendi
     zemini/kenarlığı yok, hangi ayara ait olduğu görsel olarak belirsiz (koda
     göre Reduce Motion'a ait).
 
-74. **[P2] Tema seçenekleri 4 hap buton, `flexWrap` ile sarmalanıyor.** Türkçe'de
+74. **[P2 — ÇÖZÜLDÜ] Tema seçenekleri 4 hap buton, `flexWrap` ile sarmalanıyor.** Türkçe'de
     ("Açık/Koyu/Gece/Otomatik") iki satıra düşme riski var.
 
-75. **[P2] Tema seçenekleri sadece metin** — hiçbir renk önizlemesi yok. Her
+75. **[P2 — ÇÖZÜLDÜ] Tema seçenekleri sadece metin** — hiçbir renk önizlemesi yok. Her
     butonda küçük bir palet noktası seçimi anında anlaşılır kılar.
 
-76. **[P2] Maksimum ses sınırının ne yaptığı görsel değil.** Player'daki slider'ın
+76. **[P2 — ÇÖZÜLDÜ] Maksimum ses sınırının ne yaptığı görsel değil.** Player'daki slider'ın
     üstünde bir "tavan" işareti bu bağı kurar.
 
-77. **[P3] Dil seçimi "Türkçe/English"** — yeterli, ama katalog dilinde bir kod
+77. **[P3 — ÇÖZÜLDÜ] Dil seçimi "Türkçe/English"** — yeterli, ama katalog dilinde bir kod
     (TR/EN) Home'daki ND-01 mantığıyla daha tutarlı olurdu.
 
-78. **[P3] Ayar değişikliklerinde görsel onay yok** (tema hariç, o zaten görünür).
+78. **[P3 — ÇÖZÜLDÜ] Ayar değişikliklerinde görsel onay yok** (tema hariç, o zaten görünür).
     Haptik var, görsel yok.
 
 ---
 
 ## G. Onboarding (79–84)
 
-79. **[P1] Birincil buton 26px hap,** uygulamanın geri kalanı 10px. Kullanıcının
+79. **[P1 — ÇÖZÜLDÜ] Birincil buton 26px hap,** uygulamanın geri kalanı 10px. Kullanıcının
     gördüğü ilk ekran, sistemin dışında.
 
-80. **[P2] Geri butonu yok** — sadece Skip ve Next; 2. adımdan 1'e dönülemiyor.
+80. **[P2 — ÇÖZÜLDÜ] Geri butonu yok** — sadece Skip ve Next; 2. adımdan 1'e dönülemiyor.
 
-81. **[P2] İçerik dikeyde ortalanmış, üstte ve altta çok büyük boşluk.** 40px ikon
+81. **[P2 — ÇÖZÜLDÜ] İçerik dikeyde ortalanmış, üstte ve altta çok büyük boşluk.** 40px ikon
     + başlık + iki satır — ekranın ~%60'ı boş.
 
-82. **[P2] Adım ikonu tek başına dekoratif,** kadran kimliğiyle bağı yok. Öneri:
+82. **[P2 — ÇÖZÜLDÜ] Adım ikonu tek başına dekoratif,** kadran kimliğiyle bağı yok. Öneri:
     her adımda kadranın farklı bir açısı.
 
-83. **[P3] Dil seçimi "TR / EN" sol üstte, çok silik** — ilk kullanıcının en
+83. **[P3 — ÇÖZÜLDÜ] Dil seçimi "TR / EN" sol üstte, çok silik** — ilk kullanıcının en
     kritik kararı.
 
-84. **[P3] Adım geçişinde yatay kaydırma jesti yok** — nokta göstergesi kaydırma
+84. **[P3 — ÇÖZÜLDÜ] Adım geçişinde yatay kaydırma jesti yok** — nokta göstergesi kaydırma
     vaat ediyor ama sadece buton çalışıyor.
 
 ---
 
 ## H. Intent (85–89)
 
-85. **[P1] Fotoğraf kullanan tek ekran burası.** Home artık düz kart, burada 260px
+85. **[P1 — KORUNDU, gerekçeli] Fotoğraf kullanan tek ekran burası.** Home artık düz kart, burada 260px
     fotoğraf kahraman. Bilinçli bir karardı (`DESIGN.md`'de yazılı) ama uygulamada
     kopukluk yaratıyor — ya Home'a bir fotoğraf izi dönmeli ya buradaki azalmalı.
 
-86. **[P1] Başlat butonu 26px hap** (bkz. madde 4).
+86. **[P1 — ÇÖZÜLDÜ] Başlat butonu 26px hap** (bkz. madde 4).
 
-87. **[P2] Geri butonunun fotoğraf üzerinde zemini yok** — açık bir fotoğraf
+87. **[P2 — ÇÖZÜLDÜ] Geri butonunun fotoğraf üzerinde zemini yok** — açık bir fotoğraf
     bölgesinde beyaz ok kaybolur.
 
-88. **[P2] Kahraman metni sabit beyaz** (`#FFFFFF`, `intent:210`) — token dışı.
+88. **[P2 — ÇÖZÜLDÜ] Kahraman metni sabit beyaz** (`#FFFFFF`, `intent:210`) — token dışı.
 
-89. **[P3] "30 dk seans başlat" ne çalacağını söylemiyor.** İlk preset'in adı
+89. **[P3 — ÇÖZÜLDÜ] "30 dk seans başlat" ne çalacağını söylemiyor.** İlk preset'in adı
     butonun altında yazabilir.
 
 ---
@@ -487,6 +487,24 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
      göstermiyor; katalog/teyp dilinde "çalma sayacı" zaten hazır bir metafor.
 
 ---
+
+## F/G/H bölümleri notu (Settings, Onboarding, Intent)
+
+- **#85 (tek fotoğraflı ekran) korundu.** Bu, DESIGN.md'de zaten savunulmuş
+  bilinçli bir karar: tek bir tam-kanama an fotoğrafı hak eder, Home'un
+  tekrarlı ızgarası etmez. Bunun yerine ekranı dile bağladım — kahramanda
+  artık Home'un kullandığı `ND-01 · 6 SOUNDS` satırı var, yani fotoğraf
+  başıboş bir görsel değil katalogun kapak sayfası gibi okunuyor.
+- **#75 (tema önizlemesi)** iki tonlu bir swatch ile çözüldü: solda kâğıt,
+  sağda mürekkep. "Dark" ile "Night" arasındaki farkı isimlerden anlamak
+  mümkün değildi, oysa ikisinin ayrı var olma sebebi tam olarak o fark.
+- **#76 (ses tavanı görünmüyor)** `Slider`'a `cap` prop'u eklendi; Player'ın
+  ses barında tavanın üstünde kalan bölge üstü çizili gibi soluyor. Böylece
+  "%100'e kadar sürüklüyorum ama daha kısık" durumu ekranda görünüyor.
+- **#79/#86** aynı hataydı: uygulamadaki son iki 26px hap düğme. İkisi de
+  `Radius.card`'a alındı, `Button` bileşeninin kullandığı değer.
+- **#88** `#FFFFFF` artık `onImage` adında bir token; beyaz olması doğru
+  (kâğıt neutral'i parlak bir fotoğrafa yeniliyor), adsız olması değildi.
 
 ## D bölümü notu (Player + Dial)
 

@@ -200,7 +200,8 @@
     "resetTitle": "Verileri sıfırla",
     "resetConfirm": "Favoriler, karışımlar ve tüm ayarlar silinecek. Bu geri alınamaz.",
     "resetHint": "{{favorites}} favori, {{mixes}} karışım",
-    "privacyPolicy": "Gizlilik Politikası"
+    "privacyPolicy": "Gizlilik Politikası",
+    "resetDone": "Her şey sıfırlandı."
   },
   "privacy": {
     "title": "Gizlilik Politikası",
@@ -236,7 +237,8 @@
     "relaxDesc": "Gevşemek için doğa sesleri ve yumuşak tonlar",
     "meditate": "Meditasyon",
     "meditateDesc": "İçe dönmek için derin, sakin tonlar",
-    "startSession": "{{minutes}} dk seans başlat"
+    "startSession": "{{minutes}} dk seans başlat",
+    "startsWith": "{{name}} ile başlar"
   },
   "onboarding": {
     "step1Title": "Sese odaklan",

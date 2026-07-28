@@ -32,6 +32,11 @@ interface SliderProps {
    *  channel's category colour so four stacked channels read as four
    *  different sounds rather than one repeated control. */
   fillColor?: string;
+  /** 0–1. Marks the part of the track that will not be heard, because a
+   *  ceiling elsewhere clips it. Without this the Player's slider ran to
+   *  100% while the output stopped at the cap, so full travel sounded
+   *  quieter than it looked and nothing on screen explained why. */
+  cap?: number;
   style?: ViewStyle;
 }
 
@@ -46,6 +51,7 @@ export function Slider({
   formatValue = (v) => `${Math.round(v * 100)}%`,
   accessibilityLabel,
   fillColor,
+  cap,
   style,
 }: SliderProps) {
   const [sliderWidth, setSliderWidth] = useState(0);
@@ -163,6 +169,21 @@ export function Slider({
           ]}
         />
 
+        {/* Everything above the ceiling, struck through. Drawn over the
+            fill so it reads as "this part is not doing anything". */}
+        {cap !== undefined && cap < 1 && (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.capZone,
+              {
+                backgroundColor: colors.background,
+                left: `${cap * 100}%`,
+              },
+            ]}
+          />
+        )}
+
         {/* Thumb */}
         <View
           pointerEvents="none"
@@ -214,6 +235,13 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     borderRadius: Radius.tag,
+  },
+  capZone: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    opacity: 0.55,
   },
   thumb: {
     position: 'absolute',

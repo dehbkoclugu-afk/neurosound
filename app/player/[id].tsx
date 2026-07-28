@@ -326,6 +326,7 @@ export default function PlayerScreen() {
             value={volume}
             onValueChange={setVolume}
             max={1}
+            cap={maxVolume}
             label={t('mixer.volume')}
             accessibilityLabel={t('accessibility.volumeSlider')}
           />

@@ -19,26 +19,37 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, onPrimary, Radius, ControlSize } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, onPrimary, Radius, ControlSize, Colors, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useSettingsStore, ThemeMode, Language } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Slider } from '@/components/ui/Slider';
+import { useToastStore } from '@/stores/toastStore';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import i18n from '@/i18n';
 import * as playerController from '@/lib/audio/playerController';
 
-const THEME_OPTIONS: { value: ThemeMode; labelKey: string }[] = [
-  { value: 'light', labelKey: 'settings.themes.light' },
-  { value: 'dark', labelKey: 'settings.themes.dark' },
-  { value: 'night', labelKey: 'settings.themes.night' },
-  { value: 'auto', labelKey: 'settings.themes.auto' },
+/** Each theme shows what it looks like: paper colour on the left half, ink
+ *  on the right. Four names in four identical pills told the user nothing
+ *  about the difference between "dark" and "night", which is the entire
+ *  reason both exist. `auto` shows both, because that is what it does. */
+const THEME_OPTIONS: {
+  value: ThemeMode;
+  labelKey: string;
+  swatch: [string, string];
+}[] = [
+  { value: 'light', labelKey: 'settings.themes.light', swatch: [Colors.light.background, Colors.light.accent] },
+  { value: 'dark', labelKey: 'settings.themes.dark', swatch: [Colors.dark.background, Colors.dark.accent] },
+  { value: 'night', labelKey: 'settings.themes.night', swatch: [Colors.night.background, Colors.night.accent] },
+  { value: 'auto', labelKey: 'settings.themes.auto', swatch: [Colors.light.background, Colors.dark.background] },
 ];
 
-const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
-  { value: 'tr', label: 'Türkçe' },
-  { value: 'en', label: 'English' },
+/** The two-letter code is the catalogue register the rest of the app uses for
+ *  identifiers; the name is what a person reads. */
+const LANGUAGE_OPTIONS: { value: Language; label: string; code: string }[] = [
+  { value: 'tr', label: 'Türkçe', code: 'TR' },
+  { value: 'en', label: 'English', code: 'EN' },
 ];
 
 export default function SettingsScreen() {
@@ -62,6 +73,8 @@ export default function SettingsScreen() {
   const { favoriteIds, customMixes, reset: resetPresets } = usePresetsStore();
 
   const colors = useThemeColors();
+
+  const showToast = useToastStore((st) => st.show);
   const miniPlayerInset = useMiniPlayerInset();
 
   // resetSettings and presetsStore.reset both existed and were wired to
@@ -77,10 +90,14 @@ export default function SettingsScreen() {
           resetPresets();
           resetSettings();
           i18n.changeLanguage(useSettingsStore.getState().language);
+          // Every other control on this screen confirms itself by moving —
+          // a switch flips, a theme repaints the app. Reset is the one that
+          // does its work off-screen and left nothing behind to see.
+          showToast(t('settings.resetDone'));
         },
       },
     ]);
-  }, [t, resetPresets, resetSettings]);
+  }, [t, resetPresets, resetSettings, showToast]);
 
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);
@@ -132,6 +149,7 @@ export default function SettingsScreen() {
                   onPress={() => setTheme(option.value)}
                   style={[
                     styles.optionButton,
+                    styles.optionButtonHalf,
                     {
                       backgroundColor: theme === option.value ? colors.primary : colors.backgroundSecondary,
                       borderColor: theme === option.value ? colors.primary : colors.cardBorder,
@@ -140,6 +158,14 @@ export default function SettingsScreen() {
                   accessibilityRole="radio"
                   accessibilityState={{ selected: theme === option.value }}
                 >
+                  <View
+                    style={[styles.swatch, { borderColor: colors.cardBorder }]}
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                  >
+                    <View style={[styles.swatchHalf, { backgroundColor: option.swatch[0] }]} />
+                    <View style={[styles.swatchHalf, { backgroundColor: option.swatch[1] }]} />
+                  </View>
                   <Text
                     style={[
                       styles.optionText,
@@ -190,7 +216,15 @@ export default function SettingsScreen() {
 
           {/* Sits with Reduce Motion because that is the control that
               answers it — the warning is about the breathing ring. */}
-          <View style={styles.warningCard}>
+          <View
+            style={[
+              styles.warningCard,
+              {
+                borderColor: withAlpha(colors.warning, 0.35),
+                backgroundColor: withAlpha(colors.warning, 0.07),
+              },
+            ]}
+          >
             <View style={styles.warningHeading}>
               <Ionicons
                 name="warning-outline"
@@ -291,6 +325,14 @@ export default function SettingsScreen() {
                 >
                   <Text
                     style={[
+                      styles.optionCode,
+                      { color: language === option.value ? onPrimary : colors.textSecondary },
+                    ]}
+                  >
+                    {option.code}
+                  </Text>
+                  <Text
+                    style={[
                       styles.optionText,
                       { color: language === option.value ? onPrimary : colors.text },
                     ]}
@@ -324,12 +366,23 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <CategoryHeader title={t('settings.about')} style={styles.sectionHeader} />
 
+          {/* The one irreversible control in Settings, and the only thing
+              separating it from "Privacy policy" was the colour of four
+              words. It carries the destructive icon in a tinted badge, the
+              same language the mixer's delete uses. */}
           <TouchableOpacity
             onPress={handleReset}
             style={[styles.card, styles.resetRow, { borderBottomColor: colors.cardBorder }]}
             accessibilityRole="button"
             accessibilityLabel={t('settings.reset')}
           >
+            <View
+              style={[styles.resetBadge, { backgroundColor: withAlpha(colors.error, BADGE_ALPHA) }]}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              <Ionicons name="trash-outline" size={18} color={colors.error} />
+            </View>
             <View style={styles.switchText}>
               <Text style={[styles.cardTitle, { color: colors.error }]}>
                 {t('settings.reset')}
@@ -419,6 +472,40 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: Spacing.sm,
   },
+  // Two per row, equal width: four pills wrapping on their own put three on
+  // one line and one orphan below in English and two-and-two in Turkish, so
+  // the same control had a different shape per language.
+  optionButtonHalf: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  swatch: {
+    flexDirection: 'row',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  swatchHalf: {
+    flex: 1,
+  },
+  optionCode: {
+    ...Typography.label,
+    fontFamily: FontFamily.mono,
+    letterSpacing: 1,
+    marginRight: Spacing.xs,
+  },
+  resetBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   optionButton: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
@@ -451,8 +538,10 @@ const styles = StyleSheet.create({
     ...Typography.footnote,
   },
   resetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
     minHeight: ControlSize.row,
-    justifyContent: 'center',
   },
   aboutRow: {
     flexDirection: 'row',
@@ -466,8 +555,13 @@ const styles = StyleSheet.create({
     ...Typography.footnote,
     ...Typography.numeral,
   },
+  // It sat between two switch rows with nothing but whitespace around it,
+  // so it read as a stray paragraph rather than a notice.
   warningCard: {
-    paddingVertical: Spacing.md,
+    borderRadius: Radius.card,
+    borderWidth: 1,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
     gap: Spacing.xs,
   },
   warningHeading: {

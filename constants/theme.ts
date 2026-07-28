@@ -27,6 +27,15 @@ const inkBlueDark = '#1F3F5E';
  * notes in PRODUCT.md/DESIGN.md); every pairing below clears 6:1.
  */
 export const onPrimary = '#F7F2E7';
+
+/**
+ * Text/icon colour for anything sitting ON a photograph — the Intent hero,
+ * and nowhere else. It is pure white on purpose (the paper neutral loses to
+ * a bright image), which is exactly why it needs a name: a bare '#FFFFFF' in
+ * a stylesheet reads as somebody forgetting the palette existed. It is only
+ * legible because the hero lays a dark scrim under it.
+ */
+export const onImage = '#FFFFFF';
 const onPrimaryDark = '#0F1A24';
 const onPrimaryNight = '#0A1520';
 
