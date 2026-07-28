@@ -13,10 +13,6 @@ export interface Intent {
   nameKey: string;
   descKey: string;
   icon: IconConfig;
-  /** Index-label colour — a muted ink tone, not the old saturated
-   *  photo-gradient hue. Clears 3:1 (icon/graphic bar) on every theme's
-   *  card and background surface. */
-  color: string;
   /** Atmospheric background for the Intent detail hero only — a single
    *  full-bleed moment earns the photo; the repeated Home card grid does
    *  not (see DESIGN.md). */
@@ -37,7 +33,6 @@ export const intents: Intent[] = [
     nameKey: 'intents.sleep',
     descKey: 'intents.sleepDesc',
     icon: { name: 'moon', library: 'ionicon' },
-    color: '#5A7FA2',
     image: require('@/assets/images/intents/sleep.jpg'),
     catalogCode: 'ND-01',
     presetIds: [
@@ -55,7 +50,6 @@ export const intents: Intent[] = [
     nameKey: 'intents.focus',
     descKey: 'intents.focusDesc',
     icon: { name: 'flash', library: 'ionicon' },
-    color: '#9A733A',
     image: require('@/assets/images/intents/focus.jpg'),
     catalogCode: 'ND-02',
     presetIds: [
@@ -72,7 +66,6 @@ export const intents: Intent[] = [
     nameKey: 'intents.relax',
     descKey: 'intents.relaxDesc',
     icon: { name: 'leaf', library: 'ionicon' },
-    color: '#6E8C61',
     image: require('@/assets/images/intents/relax.jpg'),
     catalogCode: 'ND-03',
     presetIds: [
@@ -90,7 +83,6 @@ export const intents: Intent[] = [
     nameKey: 'intents.meditate',
     descKey: 'intents.meditateDesc',
     icon: { name: 'meditation', library: 'material' },
-    color: '#8F6C8C',
     image: require('@/assets/images/intents/meditate.jpg'),
     catalogCode: 'ND-04',
     presetIds: [

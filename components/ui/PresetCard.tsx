@@ -16,8 +16,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Spacing, Typography, FontFamily, CategoryColors, withAlpha } from '@/constants/theme';
-import { useThemeColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, FontFamily, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
 
@@ -93,6 +93,7 @@ export function PresetCard({
 }: PresetCardProps) {
   const { t } = useTranslation();
   const colors = useThemeColors();
+  const categoryColors = useCategoryColors();
 
   return (
     <TouchableOpacity
@@ -112,9 +113,12 @@ export function PresetCard({
         .join(', ')}
     >
       <View
-        style={[styles.iconBadge, { backgroundColor: withAlpha(CategoryColors[preset.type], 0.16) }]}
+        style={[
+          styles.iconBadge,
+          { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
+        ]}
       >
-        <Icon icon={presetIcon(preset)} size={19} color={CategoryColors[preset.type]} />
+        <Icon icon={presetIcon(preset)} size={19} color={categoryColors[preset.type]} />
       </View>
       <View style={styles.rowText}>
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
@@ -150,6 +154,7 @@ export function PresetCardSmall({
   style,
 }: PresetCardSmallProps) {
   const colors = useThemeColors();
+  const categoryColors = useCategoryColors();
   const frequency = getFrequencyOnly(preset);
 
   return (
@@ -160,7 +165,7 @@ export function PresetCardSmall({
       accessibilityRole="button"
       accessibilityLabel={frequency ? `${name}, ${frequency}` : name}
     >
-      <Icon icon={presetIcon(preset)} size={15} color={CategoryColors[preset.type]} />
+      <Icon icon={presetIcon(preset)} size={15} color={categoryColors[preset.type]} />
       <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
         {name}
       </Text>

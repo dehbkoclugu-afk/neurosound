@@ -11,17 +11,26 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## A. Sistem tutarlılığı — token kayması (1–15)
 
-1. **[P0] Tab bar etiketleri Nunito değil, sistem fontunda.** `app/(tabs)/_layout.tsx:48`
+1. **[P0 — ÇÖZÜLDÜ] Tab bar etiketleri Nunito değil, sistem fontunda.** `app/(tabs)/_layout.tsx:48`
    ham `fontWeight: '600'` kullanıyor, `fontFamily` yok. Kod tabanı bu hatayı iki
    ayrı yerde belgeliyor (`settings.tsx:410`, `Button.tsx:87`): React Native
    yüklenmiş Nunito Sans için ağırlık sentezlemez, sessizce sistem fontuna düşer.
    Ekranın her yerinde sürekli duran 4 etiket yanlış fontta render oluyor.
 
-2. **[P0] Solfeggio ikon rozeti kontrast eşiğinin altında.** `#9A5A6B`, kendi
-   %16 alfalı rozetinin üstünde, koyu kart yüzeyinde (`#1D1A14`) → **2.88:1**,
-   grafik öğeler için gereken 3:1'in altında. Redesign sırasında renk-vs-yüzey
-   hesaplandı ama renk-vs-kendi-rozeti hesaplanmadı. Rozet alfasını 0.16→0.22
-   çıkarmak ya da solfeggio tonunu bir adım açmak çözer.
+2. **[P0 — ÇÖZÜLDÜ] Kategori/intent renkleri iki ayrı eşiği birden kaçırıyordu.**
+   Solfeggio ikonu kendi %16 alfalı rozetinin üstünde **2.88:1** (grafik için
+   gereken 3:1'in altında); daha kötüsü, Home'daki katalog kodu (`ND-01`)
+   intent rengini **11px metin** olarak kullanıyordu, yani 3:1 değil 4.5:1
+   gerekiyordu — ve 20 yüzey/tema kombinasyonunun **16'sında** kalıyordu
+   (en kötü 3.42:1).
+
+   *Not: bu maddenin ilk halinde "rozet alfasını 0.16→0.22 çıkar" yazıyordu;
+   ölçüm bunun tersini gösterdi — alfayı artırmak rozeti ikonun rengine
+   yaklaştırıp kontrastı düşürüyor.* Gerçek kök neden mimariydi: her renk
+   paletle değişirken kategori/intent renkleri tek sabitti ve `#F7F2E7` ile
+   `#050403` arasında değişen beş yüzeye tek ton yetmiyordu. Renkler palete
+   taşındı (açık/koyu iki çözülmüş set), rozet alfası 0.16'da kaldı, ve
+   `constants/__tests__/contrast.test.ts` her iki eşiği de sabitledi.
 
 3. **[P1] `Radius` token'ı var, 20 yerde ham sayı kullanılıyor.** `Radius = {tag:4,
    card:10, sheet:20}` tanımlı ama: `onboarding:319` (26), `intent:226` (26),
@@ -127,7 +136,7 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## C. Explore (27–40)
 
-27. **[P0] Kategori sekmeleri taşma riski taşıyor.** `tabsContainer` sabit
+27. **[P0 — ÇÖZÜLDÜ] Kategori sekmeleri taşma riski taşıyor.** `tabsContainer` sabit
     `flexDirection: row` + `gap: Spacing.lg`, kaydırma yok (`explore.tsx:339-344`).
     Mevcut ekran görüntüsünde "Ambient Sounds" sağ kenara *değiyor*. Türkçe'de
     ("Binaural Vuruşlar / Solfeggio / Ortam Sesleri") ve büyük sistem yazı
@@ -176,7 +185,7 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## D. Player + Dial (41–56)
 
-41. **[P0] `Dial`'ın `isLoading` prop'u alınıyor ama hiç kullanılmıyor**
+41. **[P0 — ÇÖZÜLDÜ] `Dial`'ın `isLoading` prop'u alınıyor ama hiç kullanılmıyor**
     (`Dial.tsx:40,49` — destructuring'de var, gövdede hiç geçmiyor). Player
     yükleme durumunu geçiyor, kadran görmezden geliyor → ses yüklenirken ekranda
     hiçbir işaret yok. Eski tasarımda halka sönük durup hazır olunca nefes almaya
@@ -199,7 +208,7 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 46. **[P2] Kadranın tıklanabilirliği zayıf işaretli.** Altındaki 13px "Play"
     etiketi dışında affordance yok.
 
-47. **[P2] Gece temasında minör tikler kaybolacak.** `withAlpha(color, 0.28)`,
+47. **[P2 — ÇÖZÜLDÜ] Gece temasında minör tikler kaybolacak.** `withAlpha(color, 0.28)`,
     1.5px genişlik, `#050403` zemin — OLED'de neredeyse görünmez.
 
 48. **[P2] Alt kontrol satırı seyrek.** Zamanlayıcı ve mixer ikonları
@@ -384,15 +393,18 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ---
 
+## Durum
+
+**P0'ların tamamı düzeltildi** (#1/#90, #2, #27, #41) — ayrıca #47 ve, kontrast
+testi yazılırken ortaya çıkan, listede olmayan bir hata daha:
+`lowContrastLight.textSecondary` ikincil yüzeyde 4.15:1'di (yorum "AA on both
+surface levels" diyordu ama ikinci yüzey hiç ölçülmemişti) → 4.74:1.
+
+Kalanlar için sıra önerisi:
+
 ## Önce şunlar
 
-1. **#1 ve #90** — tab etiketleri sistem fontunda. Tek satırlık düzeltme, ekranın
-   her yerinde görünür.
-2. **#2** — ölçülmüş kontrast ihlali (2.88:1). Tek token değişikliği.
-3. **#41** — `isLoading` ölü prop; Player'da yükleme geri bildirimi yok.
-4. **#27** — sekme taşması. Türkçe'de ve büyük yazı boyutunda kırılır, şu an
-   sınırda duruyor.
-5. **#3/#4/#5/#6/#7** — token kayması. Beşi birlikte yapılırsa sistem gerçekten
+1. **#3/#4/#5/#6/#7** — token kayması. Beşi birlikte yapılırsa sistem gerçekten
    tek bir sistem olur; ayrı ayrı yapılırsa hiçbiri fark edilmez.
-6. **#42/#44** — kadranı gerçekten kadran yap (sürükle → ses). Redesign'ın tezi
+2. **#42/#44** — kadranı gerçekten kadran yap (sürükle → ses). Redesign'ın tezi
    şu an yarım: enstrüman gibi *görünüyor*, enstrüman gibi *davranmıyor*.

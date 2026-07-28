@@ -83,16 +83,55 @@ export const NoiseIcons: Record<string, { name: string; library: 'ionicon' | 'ma
 export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const };
 
 /**
- * Category markers — record-label ink family, not the old blue/plum/green.
- * Decorative only (icon tint, a small index-tab swatch): each clears 3:1
- * against every surface in every palette below, the bar for non-text
- * graphics, not the 4.5:1 bar for text.
+ * Category and intent markers — record-label ink family.
+ *
+ * These are palette-scoped, not one fixed value each. A single mid-tone
+ * cannot clear its threshold against five surfaces that span #F7F2E7 to
+ * #050403: the first pass shipped one flat set and it failed twice —
+ * the solfeggio icon landed at 2.88:1 on its own badge, and the Home
+ * catalog code (coloured 11px *text*, so a 4.5:1 case, not 3:1) came in
+ * under AA on 16 of 20 surface/theme combinations.
+ *
+ * Both sets below are solved so every colour clears **3.6:1 against its
+ * own 16%-alpha badge** and **4.8:1 as text** on every surface its palette
+ * group uses. Light palettes take the darkened set, dark/night the
+ * lightened one; resolve them through `useCategoryColors()` /
+ * `useIntentColors()` rather than importing directly.
  */
-export const CategoryColors: Record<'binaural' | 'solfeggio' | 'noise', string> = {
-  binaural: '#5D7A9E', // cool ink blue-gray — kin to the main accent
-  solfeggio: '#9A5A6B', // dusty maroon — record-label red gone quiet
-  noise: '#6B7F55', // moss — the one naturalistic note
+export type CategoryKey = 'binaural' | 'solfeggio' | 'noise';
+export type IntentKey = 'sleep' | 'focus' | 'relax' | 'meditate';
+
+const categoryColorsLight: Record<CategoryKey, string> = {
+  binaural: '#4D637E', // cool ink blue-gray — kin to the main accent
+  solfeggio: '#8A515F', // dusty maroon — record-label red gone quiet
+  noise: '#576644', // moss — the one naturalistic note
 };
+const categoryColorsDark: Record<CategoryKey, string> = {
+  binaural: '#7A91AC',
+  solfeggio: '#B2828B',
+  noise: '#84946F',
+};
+
+const intentColorsLight: Record<IntentKey, string> = {
+  sleep: '#49647D',
+  focus: '#7B5C2E',
+  relax: '#536747',
+  meditate: '#755970',
+};
+const intentColorsDark: Record<IntentKey, string> = {
+  sleep: '#7492AD',
+  focus: '#AB8A59',
+  relax: '#7C966E',
+  meditate: '#A3869E',
+};
+
+export const CategoryColorSets = { light: categoryColorsLight, dark: categoryColorsDark };
+export const IntentColorSets = { light: intentColorsLight, dark: intentColorsDark };
+
+/** Tint strength for the circular icon badge behind a category/intent glyph.
+ *  The contrast solve above is pinned to this value — changing it invalidates
+ *  both thresholds, so it lives here rather than being retyped at call sites. */
+export const BADGE_ALPHA = 0.16;
 
 export const Colors = {
   light: {
@@ -172,7 +211,10 @@ export const Colors = {
   // near-white); it must never push text under AA.
   lowContrastLight: {
     text: '#4A4436',
-    textSecondary: '#726B5A', // AA on both surface levels
+    // Was #726B5A, which cleared AA against `background` (4.61:1) but not
+    // against `backgroundSecondary` (4.15:1) — the comment claimed both
+    // levels but only one had ever been measured. Now 5.28 / 4.74.
+    textSecondary: '#696252',
     background: '#F4EFE3',
     backgroundSecondary: '#EBE3D2',
     card: '#F8F4EA',

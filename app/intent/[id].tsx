@@ -19,7 +19,7 @@ import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
-import { useThemeColors } from '@/hooks/use-theme-colors';
+import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
@@ -38,6 +38,7 @@ export default function IntentScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const colors = useThemeColors();
+  const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
   const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, reduceMotion } = useSettingsStore();
   const { isFavorite } = usePresetsStore();
@@ -124,7 +125,7 @@ export default function IntentScreen() {
           {/* Same split as the home blocks: colour is decorative, the
               legibility floor is its own vertical pass. */}
           <LinearGradient
-            colors={[withAlpha(intent.color, 0.33), 'transparent']}
+            colors={[withAlpha(intentColors[intent.id], 0.33), 'transparent']}
             locations={[0, 0.6]}
             style={StyleSheet.absoluteFill}
           />

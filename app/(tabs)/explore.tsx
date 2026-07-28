@@ -184,14 +184,15 @@ export default function ExploreScreen() {
         </Text>
       </View>
 
-      {/* Category Tabs — text with amber underline. Swipe convention for a
-          tab strip matches the pager below, so either gesture works. */}
-      <View
-        style={[
-          styles.tabsContainer,
-          contentColumn,
-          { borderBottomColor: colors.cardBorder },
-        ]}
+      {/* Category Tabs — text with an accent underline. Horizontally
+          scrollable: three fixed-width tabs already reach the right edge in
+          English, and Turkish labels ("Binaural Vuruşlar / Ortam Sesleri")
+          plus a large system font size push them off-screen entirely. */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={[styles.tabsScroll, { borderBottomColor: colors.cardBorder }]}
+        contentContainerStyle={[styles.tabsContainer, contentColumn]}
         accessibilityRole="tablist"
       >
         {categories.map((category, index) => {
@@ -223,7 +224,7 @@ export default function ExploreScreen() {
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
 
       {/* Search + favourites filter — 33 presets across the app had no way
           to narrow the list. */}
@@ -336,11 +337,16 @@ const styles = StyleSheet.create({
   title: {
     ...Typography.largeTitle,
   },
+  // flexGrow: 0 stops the horizontal ScrollView from claiming the vertical
+  // space the pager below it needs.
+  tabsScroll: {
+    flexGrow: 0,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
   tabsContainer: {
     flexDirection: 'row',
     paddingHorizontal: Spacing.md,
     gap: Spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   tab: {
     paddingTop: Spacing.sm,

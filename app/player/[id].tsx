@@ -20,13 +20,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, { ZoomIn } from 'react-native-reanimated';
 
-import { useThemeColors } from '@/hooks/use-theme-colors';
+import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import {
   Spacing,
   Typography,
   FontFamily,
   withAlpha,
-  CategoryColors,
 } from '@/constants/theme';
 import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -56,6 +55,7 @@ export default function PlayerScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const colors = useThemeColors();
+  const categoryColors = useCategoryColors();
   const { maxVolume, reduceMotion } = useSettingsStore();
   const { isPlaying, isLoading, playbackError, volume, setVolume, timerRemaining, timerDuration } = useAudioStore();
   const { favoriteIds, addFavorite, removeFavorite, addRecentlyPlayed } = usePresetsStore();
@@ -234,7 +234,7 @@ export default function PlayerScreen() {
             <View
               style={[
                 styles.categoryDot,
-                { backgroundColor: CategoryColors[preset.type] },
+                { backgroundColor: categoryColors[preset.type] },
               ]}
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"

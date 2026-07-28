@@ -31,6 +31,11 @@ const MAJOR_EVERY = 7;
 // Needle rests just past zero rather than at dead-centre — a dial sitting
 // exactly at 0 reads as "off"; a hair past it reads as "idle, ready."
 const RESTING_ANGLE = -34;
+
+/** How far the whole dial dims at the bottom of the warming-up breath.
+ *  Deliberately shallow — this is a "still waking up" signal, not a
+ *  flash. */
+const LOADING_DIM = 0.45;
 const SWEEP_MIN = -46;
 const SWEEP_MAX = 40;
 const SWEEP_MS = 2600;
@@ -55,6 +60,7 @@ export function Dial({
   const needle = useSharedValue(RESTING_ANGLE);
   const glow = useSharedValue(isPlaying ? 1 : 0.35);
   const press = useSharedValue(0);
+  const load = useSharedValue(isLoading ? LOADING_DIM : 1);
 
   useEffect(() => {
     cancelAnimation(needle);
@@ -79,6 +85,31 @@ export function Dial({
     glow.value = withTiming(isPlaying ? 1 : 0.35, { duration: 400 });
   }, [isPlaying, glow]);
 
+  // Warming up: the dial dims and breathes slowly rather than spinning a
+  // spinner at someone about to fall asleep. Generating sound is not a
+  // spinner's kind of wait, and shipping no loading affordance at all (the
+  // first cut of this component accepted `isLoading` and ignored it) left
+  // the screen looking simply unresponsive while audio decoded.
+  useEffect(() => {
+    cancelAnimation(load);
+    if (!isLoading) {
+      load.value = withTiming(1, { duration: 260 });
+      return;
+    }
+    if (reduceMotion) {
+      load.value = LOADING_DIM;
+      return;
+    }
+    load.value = withRepeat(
+      withSequence(
+        withTiming(LOADING_DIM, { duration: 900, easing: Easing.inOut(Easing.sin) }),
+        withTiming(1, { duration: 900, easing: Easing.inOut(Easing.sin) })
+      ),
+      -1,
+      true
+    );
+  }, [isLoading, reduceMotion, load]);
+
   const handlePressIn = () => {
     press.value = withTiming(1, { duration: 90 });
   };
@@ -90,11 +121,14 @@ export function Dial({
     transform: [{ rotate: `${needle.value}deg` }],
   }));
   const faceStyle = useAnimatedStyle(() => ({
-    opacity: 0.85 + glow.value * 0.15,
+    opacity: (0.85 + glow.value * 0.15) * load.value,
     transform: [{ scale: 1 - press.value * 0.02 }],
   }));
   const glowStyle = useAnimatedStyle(() => ({
-    opacity: glow.value,
+    opacity: glow.value * load.value,
+  }));
+  const rimStyle = useAnimatedStyle(() => ({
+    opacity: load.value,
   }));
 
   const ticks = Array.from({ length: TICK_COUNT });
@@ -104,20 +138,23 @@ export function Dial({
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      disabled={isLoading}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ busy: isLoading, disabled: isLoading }}
       style={styles.hitArea}
     >
       <View style={[styles.dial, { width: DIAL_SIZE, height: DIAL_SIZE, borderRadius: DIAL_SIZE / 2 }]}>
         {ticks.map((_, i) => {
           const isMajor = i % MAJOR_EVERY === 0;
           return (
-            <View
+            <Animated.View
               key={i}
               style={[
                 StyleSheet.absoluteFillObject,
                 styles.tickPivot,
                 { transform: [{ rotate: `${(360 / TICK_COUNT) * i}deg` }] },
+                rimStyle,
               ]}
             >
               <View
@@ -126,11 +163,14 @@ export function Dial({
                   {
                     height: isMajor ? 9 : 5,
                     width: isMajor ? 2 : 1.5,
-                    backgroundColor: withAlpha(color, isMajor ? 0.55 : 0.28),
+                    // Minor ticks were at 0.28, which disappears against a
+                    // true-black night surface; 0.40 keeps the rim readable
+                    // there without the ticks competing with the needle.
+                    backgroundColor: withAlpha(color, isMajor ? 0.7 : 0.4),
                   },
                 ]}
               />
-            </View>
+            </Animated.View>
           );
         })}
 

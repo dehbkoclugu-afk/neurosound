@@ -16,8 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, Radius, withAlpha } from '@/constants/theme';
+import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, FontFamily, Radius, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -41,6 +41,7 @@ export default function HomeScreen() {
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
+  const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
 
@@ -124,17 +125,17 @@ export default function HomeScreen() {
               >
                 {/* Index-tab spine, like a coloured card-catalogue edge —
                     the one place each intent's own colour still shows. */}
-                <View style={[styles.intentSpine, { backgroundColor: intent.color }]} />
+                <View style={[styles.intentSpine, { backgroundColor: intentColors[intent.id] }]} />
 
                 <View style={styles.intentBody}>
                   <View style={styles.intentTopRow}>
-                    <Text style={[styles.intentCatalog, { color: intent.color }]}>
+                    <Text style={[styles.intentCatalog, { color: intentColors[intent.id] }]}>
                       {intent.catalogCode}
                     </Text>
                     <View
-                      style={[styles.intentIconTag, { backgroundColor: withAlpha(intent.color, 0.16) }]}
+                      style={[styles.intentIconTag, { backgroundColor: withAlpha(intentColors[intent.id], BADGE_ALPHA) }]}
                     >
-                      <Icon icon={intent.icon} size={18} color={intent.color} />
+                      <Icon icon={intent.icon} size={18} color={intentColors[intent.id]} />
                     </View>
                   </View>
                   <Text style={[styles.intentName, { color: colors.text }]}>

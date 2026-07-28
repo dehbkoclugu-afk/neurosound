@@ -21,8 +21,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, CategoryColors, withAlpha } from '@/constants/theme';
+import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -80,6 +80,7 @@ export default function MixerScreen() {
   const showToast = useToastStore((s) => s.show);
 
   const colors = useThemeColors();
+  const categoryColors = useCategoryColors();
   const miniPlayerInset = useMiniPlayerInset();
 
   const isEmpty = channels.length === 0;
@@ -259,12 +260,12 @@ export default function MixerScreen() {
                 style={[
                   styles.channelIcon,
                   {
-                    backgroundColor: withAlpha(CategoryColors[channel.preset.type], 0.16),
+                    backgroundColor: withAlpha(categoryColors[channel.preset.type], BADGE_ALPHA),
                     opacity: channel.muted ? 0.5 : 1,
                   },
                 ]}
               >
-                <Icon icon={presetIcon(channel.preset)} size={18} color={CategoryColors[channel.preset.type]} />
+                <Icon icon={presetIcon(channel.preset)} size={18} color={categoryColors[channel.preset.type]} />
               </View>
               <View style={styles.channelBody}>
                 <View style={styles.channelHeader}>
@@ -529,10 +530,10 @@ export default function MixerScreen() {
                       <View
                         style={[
                           styles.presetItemIcon,
-                          { backgroundColor: withAlpha(CategoryColors[preset.type], 0.16) },
+                          { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
                         ]}
                       >
-                        <Icon icon={presetIcon(preset)} size={17} color={CategoryColors[preset.type]} />
+                        <Icon icon={presetIcon(preset)} size={17} color={categoryColors[preset.type]} />
                       </View>
                       <Text style={[styles.presetItemName, { color: colors.text }]}>
                         {t(preset.nameKey)}
