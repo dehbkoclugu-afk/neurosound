@@ -39,12 +39,14 @@ import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
 
-const getFrequencyLine = (preset: FrequencyPreset): string | null => {
+/** The Hz values to print, as bare numbers — the unit and separator are
+ *  added at render time so only the numeral takes the tape-counter face. */
+const getFrequencyParts = (preset: FrequencyPreset): number[] | null => {
   if (preset.type === 'binaural' && preset.baseFrequency && preset.beatFrequency) {
-    return `${preset.baseFrequency} Hz · ${preset.beatFrequency} Hz`;
+    return [preset.baseFrequency, preset.beatFrequency];
   }
   if (preset.type === 'solfeggio' && preset.frequency) {
-    return `${preset.frequency} Hz`;
+    return [preset.frequency];
   }
   return null;
 };
@@ -149,7 +151,7 @@ export default function PlayerScreen() {
     );
   }
 
-  const frequencyLine = getFrequencyLine(preset);
+  const frequencyParts = getFrequencyParts(preset);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -203,6 +205,8 @@ export default function PlayerScreen() {
           <Dial
             isPlaying={isPlaying}
             isLoading={isLoading}
+            volume={volume}
+            onVolumeChange={setVolume}
             color={colors.primary}
             reduceMotion={reduceMotion}
             onPress={handlePlayPause}
@@ -240,7 +244,16 @@ export default function PlayerScreen() {
               importantForAccessibility="no-hide-descendants"
             />
             <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
-              {frequencyLine ?? t(`explore.categories.${preset.type}`)}
+              {frequencyParts ? (
+                frequencyParts.map((value, i) => (
+                  <Text key={value}>
+                    {i > 0 ? ' · ' : ''}
+                    <Text style={styles.frequencyNumeral}>{value}</Text> Hz
+                  </Text>
+                ))
+              ) : (
+                t(`explore.categories.${preset.type}`)
+              )}
             </Text>
           </View>
 
@@ -433,9 +446,9 @@ const styles = StyleSheet.create({
   },
   frequencyLine: {
     ...Typography.body,
-    fontFamily: FontFamily.mono,
-    fontVariant: ['tabular-nums'],
-    letterSpacing: 0.4,
+  },
+  frequencyNumeral: {
+    ...Typography.numeral,
   },
   presetDescription: {
     ...Typography.body,
@@ -478,8 +491,6 @@ const styles = StyleSheet.create({
   },
   volumeCapText: {
     ...Typography.caption,
-    fontFamily: FontFamily.mono,
-    fontVariant: ['tabular-nums'],
   },
   sliderWrapper: {
     flex: 1,
@@ -498,8 +509,7 @@ const styles = StyleSheet.create({
   },
   timerBadge: {
     ...Typography.caption,
-    fontFamily: FontFamily.mono,
-    fontVariant: ['tabular-nums'],
+    ...Typography.numeral,
     marginTop: 2,
   },
   errorText: {

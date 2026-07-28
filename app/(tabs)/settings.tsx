@@ -19,9 +19,10 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, AccessibilitySize, Typography, FontFamily, onPrimary } from '@/constants/theme';
+import { Spacing, AccessibilitySize, Typography, FontFamily, onPrimary, Radius } from '@/constants/theme';
 import { useSettingsStore, ThemeMode, Language } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
+import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Slider } from '@/components/ui/Slider';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
@@ -117,12 +118,7 @@ export default function SettingsScreen() {
 
         {/* Appearance Section */}
         <View style={styles.section}>
-          <Text
-            style={[styles.sectionTitle, { color: colors.text }]}
-            accessibilityRole="header"
-          >
-            {t('settings.appearance')}
-          </Text>
+          <CategoryHeader title={t('settings.appearance')} style={styles.sectionHeader} />
 
           {/* Theme */}
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
@@ -275,12 +271,7 @@ export default function SettingsScreen() {
 
         {/* Language Section */}
         <View style={styles.section}>
-          <Text
-            style={[styles.sectionTitle, { color: colors.text }]}
-            accessibilityRole="header"
-          >
-            {t('settings.language')}
-          </Text>
+          <CategoryHeader title={t('settings.language')} style={styles.sectionHeader} />
 
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <View style={styles.optionGroup}>
@@ -314,12 +305,7 @@ export default function SettingsScreen() {
 
         {/* Audio Section */}
         <View style={styles.section}>
-          <Text
-            style={[styles.sectionTitle, { color: colors.text }]}
-            accessibilityRole="header"
-          >
-            {t('settings.audio')}
-          </Text>
+          <CategoryHeader title={t('settings.audio')} style={styles.sectionHeader} />
 
           <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
             <Slider
@@ -336,12 +322,7 @@ export default function SettingsScreen() {
 
         {/* About Section */}
         <View style={styles.section}>
-          <Text
-            style={[styles.sectionTitle, { color: colors.text }]}
-            accessibilityRole="header"
-          >
-            {t('settings.about')}
-          </Text>
+          <CategoryHeader title={t('settings.about')} style={styles.sectionHeader} />
 
           <TouchableOpacity
             onPress={handleReset}
@@ -417,9 +398,11 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Spacing.lg,
   },
-  sectionTitle: {
-    ...Typography.title,
-    marginBottom: Spacing.md,
+  // CategoryHeader already carries the shared label styling and its own
+  // vertical rhythm; this only trims its top margin, since a Settings
+  // section sits directly under the previous card's divider.
+  sectionHeader: {
+    marginTop: Spacing.md,
   },
   card: {
     paddingVertical: Spacing.md,
@@ -440,7 +423,7 @@ const styles = StyleSheet.create({
   optionButton: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    borderRadius: 20,
+    borderRadius: Radius.pill,
     borderWidth: 1,
     minHeight: AccessibilitySize.minTouchTarget,
     justifyContent: 'center',
@@ -482,8 +465,7 @@ const styles = StyleSheet.create({
   },
   aboutValue: {
     ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
-    fontVariant: ['tabular-nums'],
+    ...Typography.numeral,
   },
   warningCard: {
     paddingVertical: Spacing.md,

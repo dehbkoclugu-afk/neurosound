@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, BADGE_ALPHA, withAlpha, Radius } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -820,7 +820,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    borderRadius: 12,
+    borderRadius: Radius.card,
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.sm,
     minHeight: 44,
@@ -836,7 +836,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: Radius.card,
     padding: Spacing.md,
     marginBottom: Spacing.md,
     ...Typography.body,

@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, FontFamily, Radius, Spacing, Typography } from '@/constants/theme';
+import { AccessibilitySize, Radius, Spacing, Typography } from '@/constants/theme';
 
 interface SliderProps {
   value: number;
@@ -191,9 +191,7 @@ const styles = StyleSheet.create({
   },
   value: {
     ...Typography.body,
-    fontFamily: FontFamily.mono,
-    fontVariant: ['tabular-nums'],
-    letterSpacing: 0.5,
+    ...Typography.numeral,
   },
   sliderContainer: {
     height: AccessibilitySize.minTouchTarget,

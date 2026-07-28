@@ -32,26 +32,28 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
    taşındı (açık/koyu iki çözülmüş set), rozet alfası 0.16'da kaldı, ve
    `constants/__tests__/contrast.test.ts` her iki eşiği de sabitledi.
 
-3. **[P1] `Radius` token'ı var, 20 yerde ham sayı kullanılıyor.** `Radius = {tag:4,
-   card:10, sheet:20}` tanımlı ama: `onboarding:319` (26), `intent:226` (26),
-   `settings:443` (20), `explore:378` (12), `mixer:641/708/780/810/822/838`,
-   `index:288` (16), `Slider:216` (12), `PresetCard:194/218` (18/20). Sistem
-   kağıt üstünde var, ekranda yok.
+3. **[P1 — ÇÖZÜLDÜ] `Radius` token'ı var ama atlanıyordu.** Denetleyince 20 ham
+   değerin çoğunun aslında `boyut/2` daire olduğu görüldü — bunlar kayma değil,
+   doğru kullanım (bir dairenin yarıçapı token'lanmaz). Gerçek kaymalar hap
+   butonlar (26/20) ve arama kutularıydı (12); hepsi `Radius.pill` / `Radius.card`
+   oldu. Kalan ham değerler yalnızca daireler ve 1px tik yuvarlamaları.
 
-4. **[P1] `Radius` skalasında "pill" yok.** Onboarding ve Intent'in birincil
+4. **[P1 — ÇÖZÜLDÜ] `Radius` skalasında "pill" yok.** Onboarding ve Intent'in birincil
    butonları 26px hap; token'da karşılığı olmadığı için ikisi de elle yazılmış.
    Ya `Radius.pill` ekle ya bu butonları `Radius.card`'a indir.
 
-5. **[P1] Bölüm başlıkları iki farklı sistemde.** `CategoryHeader` yeni
+5. **[P1 — ÇÖZÜLDÜ] Bölüm başlıkları iki farklı sistemde.** Settings artık aynı
+   `CategoryHeader` bileşenini kullanıyor — stilleri eşlemek yerine bileşeni
+   paylaşarak, ki tek uygulama kalsın. `CategoryHeader` yeni
    `Typography.label` (11px, tracked, uppercase) kullanıyor; `settings.tsx:419`
    `sectionTitle` hâlâ `Typography.title` (22px). Home/Mixer'da "RECENTLY PLAYED",
    Settings'te "Appearance" — aynı hiyerarşi seviyesi, iki farklı görünüm.
 
-6. **[P1] Tape-counter mono kuralı MiniPlayer'da uygulanmamış.** `MiniPlayer.tsx:185`
+6. **[P1 — ÇÖZÜLDÜ] Tape-counter mono kuralı MiniPlayer'da uygulanmamış.** `MiniPlayer.tsx:185`
    `presetType` sadece `tabular-nums` alıyor, `FontFamily.mono` almıyor. PresetCard,
    Player, Slider ve timer rozeti mono; ekranın altında sürekli duran satır değil.
 
-7. **[P1] Settings'teki versiyon numarası da mono değil.** `aboutValue`'da
+7. **[P1 — ÇÖZÜLDÜ] Settings'teki versiyon numarası da mono değil.** `aboutValue`'da
    `tabular-nums` var, `FontFamily.mono` yok — "1.0.0" tam olarak tape-counter
    kuralının kapsadığı türden bir okuma.
 
@@ -148,7 +150,10 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     metnin etrafında açık renkli bir dikdörtgen beliriyor. Native'de görünmez,
     web hedefinde kırık duruyor.
 
-30. **[P1] Mono Hz'de çift boşluk etkisi.** "Binaural Beats · 2␣␣Hz" — monospace
+30. **[P1 — ÇÖZÜLDÜ] Mono Hz'de çift boşluk etkisi.** Kural `Typography.numeral`
+    olarak tokenlandı: mono **yalnızca sayıya** uygulanıyor, birim ve çevresindeki
+    kelimeler Nunito'da kalıyor. Aynı denetimde redesign'ın kendi soktuğu bir hata
+    da çıktı: Player'daki "Volume capped at 80%" **cümlesinin tamamı** monospace'ti. "Binaural Beats · 2␣␣Hz" — monospace
     boşluk karakteri geniş olduğu için sayı ile "Hz" arasında fazladan boşluk
     okunuyor. Sadece sayıyı mono yap, "Hz"i normal fontta bırak.
 
@@ -191,14 +196,25 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     hiçbir işaret yok. Eski tasarımda halka sönük durup hazır olunca nefes almaya
     başlıyordu; bu affordance redesign'da kayboldu.
 
-42. **[P1] Kadran bir kadran gibi davranmıyor.** Döndürülemiyor, ses seviyesine
+42. **[P1 — ÇÖZÜLDÜ] Kadran bir kadran gibi davranmıyor.** Artık sürüklenerek ses
+    ayarlanıyor (dikey hareket — donanım fader'larının ve DAW knob'larının standart
+    jesti; gerçek rotary takip merkeze yakın kullanışsız ve tek elle karanlıkta
+    daha da kötü). Dokunma hâlâ çal/duraklat: hareket eşiği (6px) ikisini ayırıyor.
+    *Slider kaldırılmadı* — bu maddede "slider'ı kaldır" demiştim ama kaldırmak
+    hassasiyeti ve daha önemlisi ekran okuyucu erişimini kaybettirirdi
+    (`accessibilityRole="adjustable"` zaten çal/duraklat butonu olan bir düğüme
+    verilemez). Kadran ifade edici kontrol, slider hassas ve erişilebilir olan. Döndürülemiyor, ses seviyesine
     bağlı değil; altında ayrı bir yatay slider var. Kadranı sürükleyerek ses
     ayarlamak "analog enstrüman" tezini gerçek yapar, slider'ı da gereksiz kılar.
 
-43. **[P1] Kadranda ölçek/rakam yok.** Gerçek bir VU/gain kadranında sayı ya da
+43. **[P1 — ÇÖZÜLDÜ] Kadranda ölçek/rakam yok.** Tikler artık tam çember değil,
+    altta ölü bölge bırakan 270°'lik bir gain yayı boyunca diziliyor ve %0/25/50/75/100
+    uzun tik alıyor — seviyeyi karşısında okuyabileceğin gerçek bir ölçek. Gerçek bir VU/gain kadranında sayı ya da
     min–max işareti olur; buradaki 28 tik tamamen dekoratif.
 
-44. **[P1] İbre ses seviyesini değil sabit bir salınımı gösteriyor.** `SWEEP_MIN/MAX`
+44. **[P1 — ÇÖZÜLDÜ] İbre ses seviyesini değil sabit bir salınımı gösteriyor.**
+    İbre artık mevcut sesi gösteriyor; çalarken o seviyenin etrafında hafifçe
+    titriyor (gerçek bir VU ibresi gibi), sabit bir döngüde gidip gelmiyor. `SWEEP_MIN/MAX`
     sabit; `volume` bilgisi Dial'a hiç gitmiyor. (Eski `WaveVisualizer`
     `intensity={volume}` alıyordu — bu bağ koptu.)
 
@@ -395,16 +411,26 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## Durum
 
-**P0'ların tamamı düzeltildi** (#1/#90, #2, #27, #41) — ayrıca #47 ve, kontrast
-testi yazılırken ortaya çıkan, listede olmayan bir hata daha:
-`lowContrastLight.textSecondary` ikincil yüzeyde 4.15:1'di (yorum "AA on both
-surface levels" diyordu ama ikinci yüzey hiç ölçülmemişti) → 4.74:1.
+**P0'ların tamamı düzeltildi** (#1/#90, #2, #27, #41), ardından **token kayması
+(#3–#7)** ve **kadran davranışı (#42/#43/#44)**. Yol boyunca listede olmayan üç
+hata daha çıktı ve düzeltildi:
+
+- `lowContrastLight.textSecondary` ikincil yüzeyde 4.15:1'di (yorumu "AA on both
+  surface levels" diyordu ama ikinci yüzey hiç ölçülmemişti) → 4.74:1. Kontrast
+  testi yazılır yazılmaz yakaladı.
+- Player'daki "Volume capped at 80%" cümlesinin **tamamı** monospace'ti — mono
+  kuralını uygularken redesign'ın kendi soktuğu bir hata.
+- #47 (gece temasında kaybolan minör tikler).
+
+Ayrıca #3'ün kendisi de fazla iddialıymış: 20 ham `borderRadius` değerinin çoğu
+`boyut/2` daireydi, yani kayma değil doğru kullanım.
 
 Kalanlar için sıra önerisi:
 
 ## Önce şunlar
 
-1. **#3/#4/#5/#6/#7** — token kayması. Beşi birlikte yapılırsa sistem gerçekten
-   tek bir sistem olur; ayrı ayrı yapılırsa hiçbiri fark edilmez.
-2. **#42/#44** — kadranı gerçekten kadran yap (sürükle → ses). Redesign'ın tezi
-   şu an yarım: enstrüman gibi *görünüyor*, enstrüman gibi *davranmıyor*.
+1. **#8** — üç farklı play düğmesi şekli (kadran / dolu daire / yuvarlak kare).
+   Kadran artık yerine oturduğuna göre sıradaki en görünür tutarsızlık bu.
+2. **#57/#59/#60** — Mixer boş durumu ve 4 tekrarlı slider; ekranın alt yarısı
+   hâlâ ölü ve boş durum jenerik SaaS kalıbında.
+3. **#16/#17** — Home'un dört özdeş kartı ve saat farkındalığının yokluğu.

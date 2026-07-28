@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, Radius } from '@/constants/theme';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    borderRadius: 12,
+    borderRadius: Radius.card,
     paddingHorizontal: Spacing.md,
     minHeight: 44,
   },

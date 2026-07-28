@@ -44,12 +44,19 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
 
   const title = currentPreset ? t(currentPreset.nameKey) : t('mixer.title');
 
-  const subline = currentPreset
+  // The number alone takes the tape-counter face; the unit and any prose
+  // stay in Nunito (see Typography.numeral).
+  const sublineHz = currentPreset
     ? currentPreset.type === 'binaural'
-      ? `${currentPreset.beatFrequency} Hz`
+      ? currentPreset.beatFrequency
       : currentPreset.type === 'solfeggio'
-        ? `${currentPreset.frequency} Hz`
-        : t('explore.categories.noise')
+        ? currentPreset.frequency
+        : null
+    : null;
+  const sublineText = currentPreset
+    ? sublineHz === null
+      ? t('explore.categories.noise')
+      : null
     : `${mixerChannels.length} ${t('mixer.sounds')}`;
 
   const playing = currentPreset ? isPlaying : isMixerPlaying;
@@ -115,7 +122,13 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             style={[styles.presetType, { color: colors.textSecondary }]}
             numberOfLines={1}
           >
-            {subline}
+            {sublineHz !== null ? (
+              <>
+                <Text style={styles.presetTypeNumeral}>{sublineHz}</Text> Hz
+              </>
+            ) : (
+              sublineText
+            )}
           </Text>
         </TouchableOpacity>
 
@@ -182,7 +195,9 @@ const styles = StyleSheet.create({
   },
   presetType: {
     ...Typography.caption,
-    fontVariant: ['tabular-nums'],
+  },
+  presetTypeNumeral: {
+    ...Typography.numeral,
   },
   rightSection: {
     flexDirection: 'row',

@@ -20,7 +20,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary, Radius } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetCard } from '@/components/ui/PresetCard';
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: AccessibilitySize.minTouchTarget + 4,
-    borderRadius: 26,
+    borderRadius: Radius.pill,
     gap: Spacing.sm,
   },
   startButtonIcon: {

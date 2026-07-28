@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Spacing, Typography, FontFamily, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import { Spacing, Typography, FontFamily, BADGE_ALPHA, withAlpha, Radius } from '@/constants/theme';
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
@@ -50,23 +50,24 @@ function getSubline(preset: FrequencyPreset, t: (k: string) => string): string {
   return t('explore.categories.noise');
 }
 
-// Same string as getSubline(), but with the Hz reading split into its own
-// nested Text so only the numeral gets the tape-counter mono treatment —
-// monospacing the category word alongside it read as a font glitch, not a
-// considered typographic choice.
+// Same content as getSubline(), but with the *number alone* in the
+// tape-counter face. The unit and the separator stay in Nunito: the
+// monospace space glyph is much wider, so wrapping "2 Hz" as one run
+// rendered a visible double gap ("2␣␣Hz"), and monospacing the category
+// word alongside it read as a font glitch rather than a choice.
 function Subline({ preset, color, t }: { preset: FrequencyPreset; color: string; t: (k: string) => string }) {
   if (preset.type === 'binaural' && preset.beatFrequency) {
     return (
       <Text style={[styles.subline, { color }]} numberOfLines={1}>
         {t('explore.categories.binaural')} ·{' '}
-        <Text style={styles.sublineFreq}>{preset.beatFrequency} Hz</Text>
+        <Text style={styles.sublineFreq}>{preset.beatFrequency}</Text> Hz
       </Text>
     );
   }
   if (preset.type === 'solfeggio' && preset.frequency) {
     return (
-      <Text style={[styles.subline, styles.sublineFreq, { color }]} numberOfLines={1}>
-        {preset.frequency} Hz
+      <Text style={[styles.subline, { color }]} numberOfLines={1}>
+        <Text style={styles.sublineFreq}>{preset.frequency}</Text> Hz
       </Text>
     );
   }
@@ -211,16 +212,14 @@ const styles = StyleSheet.create({
     ...Typography.footnote,
   },
   sublineFreq: {
-    fontFamily: FontFamily.mono,
-    fontVariant: ['tabular-nums'],
-    letterSpacing: 0.3,
+    ...Typography.numeral,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 20,
+    borderRadius: Radius.pill,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     marginRight: Spacing.sm,
@@ -232,7 +231,6 @@ const styles = StyleSheet.create({
   },
   chipFrequency: {
     ...Typography.caption,
-    fontFamily: FontFamily.mono,
-    fontVariant: ['tabular-nums'],
+    ...Typography.numeral,
   },
 });

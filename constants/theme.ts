@@ -13,7 +13,7 @@
  * legible ink blue so selected states remain readable, never plain gray).
  */
 
-import { Platform } from 'react-native';
+import { Platform, TextStyle } from 'react-native';
 
 // Primary brand colour — deep record-label ink blue, not the old amber.
 const inkBlue = '#2F5C8A';
@@ -275,6 +275,11 @@ export const Radius = {
   tag: 4,
   card: 10,
   sheet: 20,
+  /** Fully rounded ends. Only for genuinely capsule-shaped controls (the
+   *  onboarding/intent primary buttons, filter chips) — a circle whose
+   *  radius is simply half its own size stays inline as `size / 2` rather
+   *  than pretending to be a token. */
+  pill: 999,
 };
 
 // Spacing constants - Modern generous spacing
@@ -342,6 +347,16 @@ export const Typography = {
     lineHeight: 16,
     letterSpacing: 0.15,
   },
+  /** Tape-counter numerals. Apply to the **number only**, as a nested
+   *  `<Text>`, never to the phrase around it: the monospace space glyph is
+   *  far wider than Nunito's, so styling "2 Hz" wholesale renders as
+   *  "2␣␣Hz", and a whole sentence ("Volume capped at 80%") comes out
+   *  looking like a terminal dump rather than a readout. */
+  numeral: {
+    fontFamily: FontFamily.mono,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 0.3,
+  } as TextStyle,
   /** Small printed-label caption: category tags, index tabs. Tracked
    *  uppercase is otherwise banned (craft-floor) — this is the one named
    *  system use, not a decoration sprinkled per-section. */
