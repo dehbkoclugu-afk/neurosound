@@ -18,7 +18,8 @@
     "seeAll": "See all",
     "showLess": "Show less",
     "rename": "Rename",
-    "close": "Close"
+    "close": "Close",
+    "nowPlaying": "now playing"
   },
   "tabs": {
     "home": "Home",
@@ -46,7 +47,7 @@
     },
     "otherIntents": "Or something else",
     "recommendedMinutes": "{{minutes}} min recommended",
-    "recommendedMinutesSuffix": " min recommended",
+    "recommendedMinutesSuffix": " min",
     "soundCount": "{{n}} sounds"
   },
   "explore": {

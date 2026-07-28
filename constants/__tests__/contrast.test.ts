@@ -149,3 +149,51 @@ describe('destructive colour', () => {
     expect(failures).toEqual([]);
   });
 });
+
+/**
+ * The slider thumb has to be findable at every position. It is drawn as a
+ * filled knob with a 2px ring in the empty-track colour, so two relationships
+ * carry it and both are pinned here:
+ *
+ *   thumb vs. empty track — reads on the unfilled part of the bar
+ *   ring (= track colour) vs. fill — reads on the filled part
+ *
+ * It failed the first of these outright: in three of the five palettes
+ * `sliderThumb` was the same hex as `accent`, so at full volume the knob was
+ * drawn in exactly the colour of the fill behind it and disappeared. A drop
+ * shadow had been hiding that. 3:1 is the floor — a control is a non-text
+ * graphic.
+ *
+ * No flat colour clears 3:1 against both a near-black track and the mid-tone
+ * category fills (those fills are mid-tone *because* they must clear 3:1
+ * against the background), which is exactly why the ring exists rather than
+ * being decoration.
+ */
+describe('slider thumb', () => {
+  it('separates from the empty track in every palette', () => {
+    const failures: string[] = [];
+    for (const [name, c] of Object.entries(Colors)) {
+      const ratio = contrast(c.sliderThumb, c.slider);
+      if (ratio < GRAPHIC) {
+        failures.push(`${name}.sliderThumb on track: ${ratio.toFixed(2)}:1`);
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+
+  it('its ring separates from every colour that can fill the bar', () => {
+    const failures: string[] = [];
+    for (const [name, c] of Object.entries(Colors)) {
+      const isDark = name === 'dark' || name === 'night' || name === 'lowContrastDark';
+      const fills = [c.accent, ...Object.values(CategoryColorSets[isDark ? 'dark' : 'light'])];
+      for (const fill of fills) {
+        // The ring is drawn in the empty-track colour.
+        const ratio = contrast(c.slider, fill);
+        if (ratio < GRAPHIC) {
+          failures.push(`${name} ring on fill ${fill}: ${ratio.toFixed(2)}:1`);
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+});

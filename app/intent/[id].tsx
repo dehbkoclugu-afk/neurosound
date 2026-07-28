@@ -25,6 +25,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetRow } from '@/components/ui/PresetRow';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import { getIntentById } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
@@ -40,6 +41,7 @@ export default function IntentScreen() {
   const colors = useThemeColors();
   const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
+  const isPresetPlaying = useIsPresetPlaying();
   const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, reduceMotion } = useSettingsStore();
   const { isFavorite } = usePresetsStore();
 
@@ -170,6 +172,7 @@ export default function IntentScreen() {
               preset={preset}
               onPress={() => handlePresetPress(preset.id)}
               isFavorite={isFavorite(preset.id)}
+              isPlaying={isPresetPlaying(preset.id)}
             />
           ))}
         </View>

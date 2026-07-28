@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, BADGE_ALPHA, withAlpha, Radius } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, BADGE_ALPHA, withAlpha, Radius, ControlSize } from '@/constants/theme';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -55,6 +55,12 @@ const EMPTY_SLOTS = Array.from(
   { length: playerController.MAX_MIXER_CHANNELS },
   (_, i) => i
 );
+
+/** "ND-M03" — the saved-mix half of Home's catalogue codes. Falls back to
+ *  list position for mixes saved before catalogue numbers existed. */
+function mixCatalogCode(mix: { catalogNumber?: number }, index: number): string {
+  return `ND-M${String(mix.catalogNumber ?? index + 1).padStart(2, '0')}`;
+}
 
 // A saved mix stores preset ids; the row needs the presets themselves to show
 // what it is made of. An id that no longer resolves — a preset removed in a
@@ -163,6 +169,25 @@ export default function MixerScreen() {
     setEditingMixId(null);
     setShowSaveDialog(false);
   }, []);
+
+  /** "Rain + Alpha (8-14 Hz)" — the mix already describes itself, so the
+   *  field opens with that rather than empty. It is prefilled, not forced:
+   *  the text is selected-in-place and typing replaces it. */
+  const suggestedMixName = useCallback(
+    () =>
+      channels
+        .map((c) => t(c.preset.nameKey))
+        .join(' + ')
+        // Long enough to name three sounds, short enough that the saved-mix
+        // row is not permanently truncated.
+        .slice(0, 40),
+    [channels, t]
+  );
+
+  const openSaveDialog = useCallback(() => {
+    setMixName(suggestedMixName());
+    setShowSaveDialog(true);
+  }, [suggestedMixName]);
 
   const handleRenameMix = useCallback((mix: typeof customMixes[0]) => {
     setEditingMixId(mix.id);
@@ -495,7 +520,7 @@ export default function MixerScreen() {
 
           <Button
             title={t('mixer.savePreset')}
-            onPress={() => setShowSaveDialog(true)}
+            onPress={openSaveDialog}
             disabled={isEmpty}
             variant="secondary"
             accessibilityHint={isEmpty ? t('mixer.transportDisabled') : undefined}
@@ -515,7 +540,7 @@ export default function MixerScreen() {
         {customMixes.length > 0 && (
           <View style={styles.section}>
             <CategoryHeader title={t('mixer.myMixes')} />
-            {customMixes.map(mix => {
+            {customMixes.map((mix, mixIndex) => {
               const isActive = mix.id === activeMixId;
               return (
                 /* Row and delete are siblings, not nested touchables — the
@@ -565,6 +590,9 @@ export default function MixerScreen() {
                           category badges do both, in the same alphabet the
                           channel rows above use. */}
                       <View style={styles.mixIcons}>
+                        <Text style={[styles.mixCatalog, { color: colors.textSecondary }]}>
+                          {mixCatalogCode(mix, mixIndex)}
+                        </Text>
                         {mixPresets(mix).map((preset, i) => (
                           <View
                             key={`${preset.id}-${i}`}
@@ -682,6 +710,7 @@ export default function MixerScreen() {
           placeholder={t('mixer.namePlaceholder')}
           placeholderTextColor={colors.textSecondary}
           autoFocus
+          selectTextOnFocus
           style={[
             styles.input,
             {
@@ -706,7 +735,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: Spacing.md,
-    paddingBottom: 20,
   },
   header: {
     marginTop: Spacing.xxl,
@@ -763,7 +791,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     paddingVertical: Spacing.md,
-    minHeight: 52,
+    minHeight: ControlSize.row,
   },
   addRowText: {
     ...Typography.headline,
@@ -834,7 +862,14 @@ const styles = StyleSheet.create({
   },
   mixIcons: {
     flexDirection: 'row',
-    gap: 4,
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  mixCatalog: {
+    ...Typography.label,
+    fontFamily: FontFamily.mono,
+    letterSpacing: 1.2,
+    marginRight: 2,
   },
   mixIcon: {
     width: 22,
@@ -883,7 +918,7 @@ const styles = StyleSheet.create({
   },
   sampleButton: {
     paddingVertical: Spacing.sm,
-    minHeight: 44,
+    minHeight: ControlSize.field,
     justifyContent: 'center',
   },
   sampleButtonText: {
@@ -896,7 +931,7 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
     paddingVertical: Spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    minHeight: 52,
+    minHeight: ControlSize.row,
   },
   presetItemIcon: {
     width: 32,
@@ -916,7 +951,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.card,
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.sm,
-    minHeight: 44,
+    minHeight: ControlSize.field,
   },
   searchInput: {
     flex: 1,

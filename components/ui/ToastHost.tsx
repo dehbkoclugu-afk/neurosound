@@ -37,6 +37,8 @@ export function ToastHost() {
       style={{
         bottom: insets.bottom + clearance,
         zIndex: 1000,
+        // Android stacks by elevation, not zIndex — this is z-order, not a
+        // shadow, and it is the only elevation left in the app.
         elevation: 10,
       }}
     />

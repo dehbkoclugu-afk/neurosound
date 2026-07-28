@@ -153,7 +153,11 @@ export const Colors = {
     warning: '#8A5A1E', // AA on both surface levels
     error: '#A34B37', // AA on both surface levels
     slider: '#E2D8C3',
-    sliderThumb: inkBlueDark,
+    // Ink on paper, not ink on ink: the thumb used to be the accent colour
+    // in every palette — in three of them literally the same hex — so at full
+    // value it sat invisible on its own fill. Matching `text` gives it
+    // contrast against both the empty track and every fill by construction.
+    sliderThumb: '#231F17',
     overlay: 'rgba(20, 16, 8, 0.5)',
     miniPlayer: '#FBF8F1',
   },
@@ -176,7 +180,7 @@ export const Colors = {
     warning: '#D9A253',
     error: '#D98267',
     slider: '#332D22',
-    sliderThumb: inkBlueLight,
+    sliderThumb: '#F2EBDD',
     overlay: 'rgba(0, 0, 0, 0.7)',
     miniPlayer: '#1D1A14',
   },
@@ -201,7 +205,7 @@ export const Colors = {
     warning: '#C1954F',
     error: '#B56A54',
     slider: '#1E1A14',
-    sliderThumb: '#6F98BE',
+    sliderThumb: '#C7BCA5',
     overlay: 'rgba(0, 0, 0, 0.8)',
     miniPlayer: '#0A0806',
   },
@@ -231,7 +235,7 @@ export const Colors = {
     warning: '#82591F', // AA on both surface levels
     error: '#96513C', // AA on both surface levels
     slider: '#DED4BE',
-    sliderThumb: '#3F6690',
+    sliderThumb: '#4A4436',
     overlay: 'rgba(20, 16, 8, 0.3)',
     miniPlayer: '#F8F4EA',
   },
@@ -254,7 +258,7 @@ export const Colors = {
     warning: '#C7A166',
     error: '#BD826C',
     slider: '#352F24',
-    sliderThumb: '#7FA8CC',
+    sliderThumb: '#D6CDB9',
     overlay: 'rgba(0, 0, 0, 0.5)',
     miniPlayer: '#27231B',
   },
@@ -275,6 +279,32 @@ export const AccessibilitySize = {
   minTouchTarget: 48,
 };
 
+/**
+ * The only elevation in the app, and the rule for it: a control that the
+ * finger *moves along a surface* has to read as sitting on top of that
+ * surface. Nothing else is raised — no raised cards, no floating sheets, no
+ * elevated buttons. The interface is die-cut print with exactly one knob on
+ * it.
+ *
+ * This started as an unnamed shadow on the slider thumb, the app's only one.
+ * Removing it (rather than naming it) looked correct in the stylesheet and
+ * was wrong on screen: at full volume the thumb sits on the accent fill,
+ * which is its own colour family, and with nothing lifting it off the bar it
+ * read as a hole punched through the track.
+ */
+export const Elevation = {
+  control: Platform.select({
+    web: { boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)' },
+    default: {
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+    },
+  }),
+};
+
 /** Chosen control heights — design decisions, free to change without touching
  *  the accessibility floor (and, being >= it, never violating it). */
 export const ControlSize = {
@@ -283,6 +313,9 @@ export const ControlSize = {
   /** Primary calls to action: a step taller than a row, so the main button on
    *  a screen is not the same size as the things it sits among. */
   cta: 52,
+  /** Text fields and search bars — shorter than a row on purpose: an input
+   *  sits inside a layout rather than being one of its rows. */
+  field: 44,
 };
 
 /**

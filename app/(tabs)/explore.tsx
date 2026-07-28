@@ -26,6 +26,7 @@ import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { PresetRow } from '@/components/ui/PresetRow';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import {
   binauralPresets,
@@ -87,6 +88,7 @@ export default function ExploreScreen() {
 
   const colors = useThemeColors();
   const miniPlayerInset = useMiniPlayerInset();
+  const isPresetPlaying = useIsPresetPlaying();
   const pagerRef = useRef<ScrollView>(null);
 
   // Deep link / param changes (and the initial layout pass) move the pager
@@ -309,6 +311,7 @@ export default function ExploreScreen() {
                       preset={preset}
                       onPress={() => handlePresetPress(preset.id)}
                       isFavorite={isFavorite(preset.id)}
+                      isPlaying={isPresetPlaying(preset.id)}
                     />
                   ))
                 ) : (
@@ -383,7 +386,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     borderRadius: Radius.card,
     paddingHorizontal: Spacing.md,
-    minHeight: 44,
+    minHeight: ControlSize.field,
   },
   searchInput: {
     flex: 1,
@@ -398,7 +401,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: Spacing.md,
-    paddingBottom: 20,
   },
   descriptionRow: {
     marginTop: Spacing.lg,

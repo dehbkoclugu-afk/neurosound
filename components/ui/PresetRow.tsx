@@ -28,6 +28,7 @@ import { Spacing, Typography, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
+import { EqualizerBars } from './EqualizerBars';
 
 export function presetIcon(preset: FrequencyPreset): IconConfig {
   if (preset.type === 'binaural' && preset.binauralType) {
@@ -43,6 +44,8 @@ interface PresetRowProps {
   preset: FrequencyPreset;
   onPress: () => void;
   isFavorite?: boolean;
+  /** This preset is the sound currently coming out of the speaker. */
+  isPlaying?: boolean;
   showFrequency?: boolean;
   style?: ViewStyle;
   size?: 'small' | 'medium' | 'large'; // kept for API compat, unused
@@ -90,6 +93,7 @@ export function PresetRow({
   preset,
   onPress,
   isFavorite = false,
+  isPlaying = false,
   style,
 }: PresetRowProps) {
   const { t } = useTranslation();
@@ -108,6 +112,9 @@ export function PresetRow({
       accessibilityLabel={[
         t(preset.nameKey),
         getSubline(preset, t),
+        // The equalizer is decorative to a screen reader, so the state it
+        // stands for has to be spoken here or it is simply missing.
+        isPlaying ? t('common.nowPlaying') : null,
         isFavorite ? t('common.addedToFavorites') : null,
       ]
         .filter(Boolean)
@@ -122,11 +129,15 @@ export function PresetRow({
         <Icon icon={presetIcon(preset)} size={19} color={categoryColors[preset.type]} />
       </View>
       <View style={styles.rowText}>
-        <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+        <Text
+          style={[styles.name, { color: isPlaying ? colors.accent : colors.text }]}
+          numberOfLines={1}
+        >
           {t(preset.nameKey)}
         </Text>
         <Subline preset={preset} color={colors.textSecondary} t={t} />
       </View>
+      {isPlaying && <EqualizerBars color={colors.accent} />}
       {isFavorite && (
         <Ionicons
           name="heart"

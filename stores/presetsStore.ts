@@ -45,6 +45,18 @@ export interface CustomMix {
     volume: number;
   }[];
   createdAt: number;
+  /**
+   * Catalogue number for the "ND-M01" stamp, assigned once at creation and
+   * never reused. Deriving it from list position would have renumbered every
+   * mix below a deleted one, which makes it a row number wearing an
+   * identifier's clothes — the exact complaint that got the intent codes
+   * changed.
+   *
+   * Optional because mixes saved before this field existed do not have one;
+   * the UI falls back to their position for those and they keep it as long as
+   * nothing earlier is deleted. Not worth a migration for a stamp.
+   */
+  catalogNumber?: number;
 }
 
 export interface RecentlyPlayed {
@@ -113,6 +125,11 @@ export const usePresetsStore = create<PresetsState>()(
               ...mix,
               id,
               createdAt: Date.now(),
+              catalogNumber:
+                state.customMixes.reduce(
+                  (highest, m) => Math.max(highest, m.catalogNumber ?? 0),
+                  state.customMixes.length
+                ) + 1,
             },
           ],
         }));

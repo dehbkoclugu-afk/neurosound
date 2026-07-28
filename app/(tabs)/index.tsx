@@ -27,6 +27,7 @@ import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { intents, getSuggestedIntent } from '@/lib/intents';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
@@ -48,6 +49,7 @@ export default function HomeScreen() {
   const colors = useThemeColors();
   const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
+  const isPresetPlaying = useIsPresetPlaying();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
 
   // Read once per mount, not on a ticking timer: this is a launcher, not a
@@ -60,6 +62,17 @@ export default function HomeScreen() {
   const otherIntents = useMemo(
     () => intents.filter((i) => i.id !== suggestedIntent.id),
     [suggestedIntent.id]
+  );
+
+  // The first id in an intent's list is its recommended sound. Naming it on
+  // the card answers "what would this actually play?" before the tap —
+  // without playing it. A long-press audio preview (review #24) would have
+  // to stop whatever is already running, since a preset and the mixer are
+  // mutually exclusive by design, so a preview could silently end the sleep
+  // sound it was meant to help you choose.
+  const suggestedSound = useMemo(
+    () => getPresetById(suggestedIntent.presetIds[0]),
+    [suggestedIntent.presetIds]
   );
 
   // Route guard, not a post-render push: rendering Home for a frame and then
@@ -146,7 +159,15 @@ export default function HomeScreen() {
               },
             ]}
             accessibilityRole="button"
-            accessibilityLabel={`${t(`home.suggestedFor.${band}`)}. ${t(suggestedIntent.nameKey)}. ${t(suggestedIntent.descKey)}. ${t('home.recommendedMinutes', { minutes: suggestedIntent.recommendedMinutes })}`}
+            accessibilityLabel={[
+              t(`home.suggestedFor.${band}`),
+              t(suggestedIntent.nameKey),
+              t(suggestedIntent.descKey),
+              t('home.recommendedMinutes', { minutes: suggestedIntent.recommendedMinutes }),
+              suggestedSound ? t(suggestedSound.nameKey) : null,
+            ]
+              .filter(Boolean)
+              .join('. ')}
           >
             <View
               style={[
@@ -182,9 +203,13 @@ export default function HomeScreen() {
                   it is the most useful thing to know before tapping in. */}
               <View style={styles.featuredMeta}>
                 <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
-                <Text style={[styles.featuredMetaText, { color: colors.textSecondary }]}>
+                <Text
+                  style={[styles.featuredMetaText, { color: colors.textSecondary }]}
+                  numberOfLines={1}
+                >
                   <Text style={styles.featuredMetaNumber}>{suggestedIntent.recommendedMinutes}</Text>
                   {t('home.recommendedMinutesSuffix')}
+                  {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
                 </Text>
                 <Text style={[styles.intentCatalog, styles.featuredMetaCode, { color: colors.textSecondary }]}>
                   <Text style={styles.intentCatalogCode}>{suggestedIntent.catalogCode}</Text>
@@ -209,6 +234,7 @@ export default function HomeScreen() {
                   preset={item}
                   onPress={() => handlePresetPress(item.id)}
                   isFavorite={favoriteIds.includes(item.id)}
+                  isPlaying={isPresetPlaying(item.id)}
                 />
               ))}
             </View>
@@ -287,6 +313,7 @@ export default function HomeScreen() {
                   preset={preset}
                   onPress={() => handlePresetPress(preset.id)}
                   isFavorite={true}
+                  isPlaying={isPresetPlaying(preset.id)}
                 />
               ))}
             </View>
@@ -318,7 +345,6 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xl,
-    paddingBottom: 20,
   },
   section: {
     marginBottom: Spacing.xl,
@@ -374,6 +400,7 @@ const styles = StyleSheet.create({
   },
   featuredMetaText: {
     ...Typography.footnote,
+    flexShrink: 1,
   },
   featuredMetaNumber: {
     ...Typography.numeral,

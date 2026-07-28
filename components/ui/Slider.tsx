@@ -13,11 +13,10 @@ import {
   PanResponder,
   AccessibilityInfo,
   ViewStyle,
-  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Radius, Spacing, Typography, ControlSize } from '@/constants/theme';
+import { Radius, Spacing, Typography, ControlSize, Elevation } from '@/constants/theme';
 
 interface SliderProps {
   value: number;
@@ -171,6 +170,10 @@ export function Slider({
             styles.thumb,
             {
               backgroundColor: colors.sliderThumb,
+              // Ring in the empty-track colour so the knob still separates
+              // from the fill at full value, where the two are the same
+              // colour family. The lift comes from Elevation.control.
+              borderColor: colors.slider,
               left: Math.max(0, Math.min(sliderWidth - 24, thumbPosition - 12)),
             },
           ]}
@@ -217,17 +220,9 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
+    borderWidth: 2,
     top: '50%',
     marginTop: -12,
-    ...Platform.select({
-      web: { boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)' },
-      default: {
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-    }),
+    ...Elevation.control,
   },
 });

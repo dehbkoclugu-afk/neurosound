@@ -18,7 +18,8 @@
     "seeAll": "Tümü",
     "showLess": "Daha az",
     "rename": "Yeniden adlandır",
-    "close": "Kapat"
+    "close": "Kapat",
+    "nowPlaying": "çalıyor"
   },
   "tabs": {
     "home": "Ana Sayfa",
@@ -46,7 +47,7 @@
     },
     "otherIntents": "Ya da başka bir şey",
     "recommendedMinutes": "önerilen süre {{minutes}} dakika",
-    "recommendedMinutesSuffix": " dk önerilir",
+    "recommendedMinutesSuffix": " dk",
     "soundCount": "{{n}} ses"
   },
   "explore": {

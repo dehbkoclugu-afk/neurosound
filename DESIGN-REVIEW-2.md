@@ -78,9 +78,17 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     mixer picker, mixer channel, index intentIconTag). Token'a çıkar:
     `Alpha.badge = 0.16` — madde 2'nin düzeltmesi de tek yerden yapılabilir.
 
-12. **[P2] Derinlik/gölge dili yok.** Slider thumb'ında `elevation: 3` + shadow
-    var (`Slider.tsx:217-226`), başka hiçbir yerde gölge yok. Ya sistemli bir
-    yükseklik ölçeği ekle ya bu tekil gölgeyi kaldır.
+12. **[P2 — ÇÖZÜLDÜ, ama önce yanlış çözdüm.]** Önce "tek gölgeyi kaldır"
+    dedim ve kaldırdım. Stylesheet'te doğru göründü, ekranda yanlıştı: %100'de
+    thumb accent dolgunun üstünde kalıyor ve **barda açılmış bir delik gibi**
+    okunuyordu. Ekran görüntüsünü büyütünce asıl sebep çıktı — beş paletin
+    üçünde `sliderThumb` ile `accent` **birebir aynı hex**'ti; gölge yıllardır
+    bir token hatasını örtüyormuş. Şimdi: `sliderThumb` her palette `text`
+    değerine çekildi (kâğıt üstüne mürekkep), 2px halka boş oluğun renginde,
+    ve gölge `Elevation.control` adıyla tek bir token olarak geri kondu —
+    kuralı da yazılı: yüzey boyunca *parmakla sürüklenen* kontrol o yüzeyin
+    üstünde durmalı, başka hiçbir şey yükseltilmez. İki ilişki teste
+    sabitlendi (thumb↔boş oluk, halka↔her dolgu rengi).
 
 13. **[P2 — ÇÖZÜLDÜ] `AccessibilitySize.minTouchTarget` hem dokunma hedefi hem
     düzen ölçüsü.** Yeni `ControlSize` (`row: 48`, `cta: 52`) düzen yükseklikleri
@@ -90,9 +98,11 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     `minTouchTarget + 4` gibi bir ölçek olmayan sabit üzerinde aritmetik
     kalmadı.
 
-14. **[P3] `Spacing` skalası 7 adım (4/8/16/24/32/48/64) ama 12 ve 20 elle
-    yazılıyor** (`content.paddingBottom: 20` üç ekranda). Ya token ekle ya en
-    yakın adıma yuvarla.
+14. **[P3 — ÇÖZÜLDÜ] `Spacing` skalası dışında elle yazılan değerler.**
+    Dört ekrandaki `content.paddingBottom: 20` zaten ölüydü — aynı
+    `contentContainerStyle` dizisinde satır içi mini-player boşluğu onu
+    eziyordu; silindi. Elle yazılan `minHeight: 52` ve `44` değerleri
+    `ControlSize.row` ve yeni `ControlSize.field`'a bağlandı.
 
 15. **[P3] `CategoryColors` yorumu güncel değil.** "Her palette 3:1 geçer" diyor
     ama renk artık kendi rozetinin üstünde kullanılıyor — kural değişti, doküman
@@ -147,11 +157,21 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     doğrulandı: geçmişsiz → yok, yalnız gürültü geçmişi → yok, binaural
     geçmişi → var.
 
-24. **[P3] Intent kartlarında basılı tutma önizlemesi yok.** Long-press → o
-    intent'in önerilen sesini 3 sn çal.
+24. **[P3 — KISMEN: bilgi evet, ses hayır.]** Öne çıkan kart artık ne
+    çalacağını söylüyor: `⏱ 45 dk · Beta (14-30 Hz)`. Sesli önizlemeyi
+    yapmadım, çünkü tek preset ile mikser tasarım gereği birbirini dışlıyor:
+    3 saniyelik bir önizleme, seçmene yardım etmesi gereken uyku sesini
+    sessizce sonlandırırdı. Ayrıca karanlıkta ani ses, bu uygulamanın kullanım
+    sahnesinde tam olarak istenmeyen şey.
 
-25. **[P3] Çalan preset Home'da işaretlenmiyor.** Favoriler/Recently listesinde
-    çalan öğe için küçük bir ekolayzer animasyonu.
+25. **[P3 — ÇÖZÜLDÜ] Çalan preset listede işaretlenmiyor.** Yeni
+    `EqualizerBars` + `PresetRow`'un `isPlaying` prop'u: ad accent rengine
+    geçiyor, sağda üç çubuk oynuyor. Home'la sınırlı kalmadı — bileşen paylaşımlı
+    olduğu için Explore ve Intent ekranlarında da çalışıyor. `reduceMotion`
+    açıkken çubuklar üç farklı yükseklikte duruyor (işaret bilgi, hareket
+    yalnızca dikkat). Ekran okuyucu için çubuklar dekoratif, o yüzden durum
+    satırın etiketine yazılıyor: tarayıcıda "Rain, Ambient Sounds, now playing"
+    olarak doğrulandı.
 
 26. **[P3] Kartların giriş animasyonu yok.** 40ms aralıklı stagger, ekranın ana
     kararını daha okunur yapar.
@@ -342,10 +362,18 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     %100 → %30 sürüklendi, iki kanal sliderı yerinde kaldı. Ayarın kendisi
     kalıcı (bir oturum durumu değil).
 
-69. **[P3] Karışıma isim önerisi yok.** "Rain + Brown + Alpha" otomatik önerilebilir.
+69. **[P3 — ÇÖZÜLDÜ] Karışıma isim önerisi yok.** Kaydet sayfası artık
+    "Ocean Waves + Alpha (8-14 Hz)" ile açılıyor (40 karakterde kesiliyor;
+    daha uzunu satırı kalıcı olarak kırpık bırakıyor). Dayatma değil öneri:
+    `selectTextOnFocus` ile yazmaya başlayınca siliniyor.
 
-70. **[P3] Kaydedilmiş karışımların katalog kodu yok** (ND-M01 gibi) — Home'daki
-    dille bağ kurulabilir.
+70. **[P3 — ÇÖZÜLDÜ] Kaydedilmiş karışımların katalog kodu yok.** `ND-M01`
+    damgası kanal rozetlerinin soluna geldi. Numara liste konumundan değil,
+    oluşturma anında verilen ve tekrar kullanılmayan `catalogNumber`'dan
+    geliyor — konumdan türetseydim silinen bir karışımın altındakiler yeniden
+    numaralanırdı, yani #20'de şikâyet edilen "kimlik kılığındaki satır
+    numarası" olurdu. Alan opsiyonel: eski kayıtlar için konuma düşülüyor,
+    bir damga uğruna migration yazmaya değmez.
 
 ---
 
@@ -499,15 +527,19 @@ Beşinci turda **#19/#20** (wordmark ve katalog kodları), **#10/#13** (kart/sat
 kuralı ve kontrol ölçüleri) ve **#68** (master fader) kapatıldı; **#67** gerekçeli
 olarak reddedildi.
 
+Altıncı turda **#25** (çalan satırın işaretlenmesi), **#12/#14** (tek yükseklik
+token'ı ve elle yazılan ölçüler) ve **#69/#70** (isim önerisi, karışım katalog
+kodu) kapatıldı; **#24**'ün yalnız bilgi tarafı yapıldı. Bu tur asıl kazancı
+gözle bakmak verdi: #12'yi ilk denemede yanlış çözdüm ve ekran görüntüsünü
+büyütmek beş paletin üçünde duran gerçek bir token hatasını ortaya çıkardı.
+
 Kalanlar için sıra önerisi:
 
 ## Önce şunlar
 
-1. **#24/#25** — intent kartında basılı tutma önizlemesi ve çalan preset'in
-   listede işaretlenmesi; ikisi de uygulamanın "şu an ne çalıyor" farkındalığını
-   artırıyor.
-2. **#12/#14** — sistemli bir yükseklik/gölge ölçeği yok (tek gölge Slider
-   thumb'ında) ve `Spacing` skalasının dışında elle yazılmış 12/20/52 değerleri
-   duruyor.
-3. **#69/#70** — karışıma otomatik isim önerisi ("Rain + Alpha") ve kaydedilmiş
-   karışımlara katalog kodu; ikisi de Home'daki katalog diliyle bağ kurar.
+1. **#26** — kartların/satırların giriş animasyonu yok; 40ms aralıklı bir
+   stagger ekranın ana kararını daha okunur yapar.
+2. **#28/#29/#31** (Explore) ve **#48–#56** (Player/Dial) — bu iki bölümde
+   hâlâ dokunulmamış P2/P3'ler var; sıradaki turda toplu bakılmalı.
+3. **#96–#100** — kilit ekranı görseli, widget, oturum sayacı: kimlik
+   fırsatları, hiçbiri açılmadı.
