@@ -13,6 +13,20 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.neurosound.app",
       "infoPlist": {
+        "_localizationsNote": "Without CFBundleLocalizations iOS reports the app as English-only: the App Store listing shows no other languages and the system picks en for a device set to, say, Japanese even though ja.json exists. Keep in sync with locales/index.ts.",
+        "CFBundleLocalizations": [
+          "tr",
+          "en",
+          "de",
+          "es",
+          "fr",
+          "it",
+          "ja",
+          "ko",
+          "pt",
+          "ru",
+          "zh-Hans"
+        ],
         "UIBackgroundModes": [
           "audio"
         ]

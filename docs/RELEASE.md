@@ -44,12 +44,19 @@ gerektiren maddeler):
 - [ ] Binaural uyarısı kulaklıksız/kulaklıklı gerçek farkı hissettiriyor
 - [ ] iPad'de gerçek düzen (kod `maxWidth: 640` ile sınırlıyor, hiç gerçek
       cihazda görülmedi)
-- [ ] TR/EN geçişi; VoiceOver/TalkBack ile ana akış gezilebiliyor
+- [ ] Dil geçişi (11 dil), özellikle CJK ve Almanca'da satır taşması;
+      VoiceOver/TalkBack ile ana akış gezilebiliyor
+- [ ] Sistem dili Japonca/Almanca olan bir cihazda uygulama gerçekten o dilde
+      açılıyor (`CFBundleLocalizations` bunun için eklendi, cihazda doğrula)
 
 ## 4. Yasal + mağaza metadata
 
 - [ ] Uygulama içindeki Gizlilik Politikası (`app/privacy.tsx` metni) bir web
       sayfasına taşınıp yayınlandı (GitHub Pages yeterli), URL'i not al
+- [ ] **11 dil için mağaza metni.** Uygulama içi çeviriler bitti ama mağaza
+      listelemesi ayrı: her dil için başlık, alt başlık, açıklama, anahtar
+      kelimeler. Zorunlu değil (İngilizce'ye düşer) ama o dillerde çevirmemenin
+      tek anlamı, çevirdiğin dillerde bulunamamak.
 - [ ] Play Console: paket adı `com.neurosound.app`, Veri Güvenliği formu
       ("veri toplanmıyor" — kod bunu destekliyor, hiç network isteği yok),
       içerik derecelendirme anketi, ekran görüntüleri, feature graphic
@@ -58,8 +65,11 @@ gerektiren maddeler):
       formu (veri toplanmıyor), ekran görüntüleri (iPhone + tablet destekli
       olduğu için muhtemelen iPad), destek URL/e-posta, açıklama
 - [ ] Play Console'da servis hesabı oluşturup JSON key'i indir, repo köküne
-      `google-services.json` olarak koy (`.gitignore`'da zaten hariç
-      tutuluyor — asla commit'lenmeyecek)
+      `play-service-account.json` olarak koy (`.gitignore`'da hariç tutuluyor
+      — asla commit'lenmeyecek). Adı bilerek `google-services.json` değil:
+      o ad Firebase'in Android yapılandırma dosyasına ait, ikisini aynı ada
+      koymak ileride Firebase eklendiğinde gönderim anahtarını sessizce
+      ezmek demek.
 - [ ] `eas.json`'a `submit.production.ios` bloğunu ekle (ilk
       `eas submit --platform ios` çalıştırıldığında CLI interaktif olarak
       sorup dolduruyor)
