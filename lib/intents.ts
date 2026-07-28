@@ -99,3 +99,40 @@ export const intents: Intent[] = [
 export function getIntentById(id: string): Intent | undefined {
   return intents.find((i) => i.id === id);
 }
+
+/** Time-of-day bands. Named rather than numeric so the label the Home screen
+ *  prints ("Tonight", "This morning") stays tied to the rule that picked it. */
+export type TimeBand = 'night' | 'morning' | 'day' | 'evening';
+
+const BAND_INTENT: Record<TimeBand, IntentId> = {
+  night: 'sleep',
+  morning: 'meditate',
+  day: 'focus',
+  evening: 'relax',
+};
+
+/**
+ * Which band a wall-clock hour (0–23) falls in.
+ *
+ * An app whose whole premise is "what do you need right now?" was asking the
+ * question at 3am and 3pm with the identical four answers in the identical
+ * order. The clock is the one thing it already knows about the moment.
+ *
+ * Bands are contiguous and cover all 24 hours; night wraps midnight.
+ */
+export function getTimeBand(hour: number): TimeBand {
+  if (hour >= 22 || hour < 6) return 'night';
+  if (hour < 9) return 'morning';
+  if (hour < 17) return 'day';
+  return 'evening';
+}
+
+/** The intent to surface first, given the hour. Never throws: every band maps
+ *  to an intent that exists in `intents`. */
+export function getSuggestedIntent(hour: number): { intent: Intent; band: TimeBand } {
+  const band = getTimeBand(hour);
+  const id = BAND_INTENT[band];
+  // `intents` is a static list containing all four ids, so this cannot miss.
+  const intent = intents.find((i) => i.id === id)!;
+  return { intent, band };
+}

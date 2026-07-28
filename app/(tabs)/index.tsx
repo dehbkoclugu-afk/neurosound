@@ -4,7 +4,7 @@
  * here gave two paths to one destination.
  */
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, FontFamily, Radius, BADGE_ALPHA, withAlpha } from '@/constants/theme';
@@ -24,7 +25,7 @@ import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
 import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
-import { intents } from '@/lib/intents';
+import { intents, getSuggestedIntent } from '@/lib/intents';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
@@ -44,6 +45,18 @@ export default function HomeScreen() {
   const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
+
+  // Read once per mount, not on a ticking timer: this is a launcher, not a
+  // clock, and re-rendering the list every minute would fight the user's
+  // scroll for a change nobody is waiting to see.
+  const { intent: suggestedIntent, band } = useMemo(
+    () => getSuggestedIntent(new Date().getHours()),
+    []
+  );
+  const otherIntents = useMemo(
+    () => intents.filter((i) => i.id !== suggestedIntent.id),
+    [suggestedIntent.id]
+  );
 
   // Route guard, not a post-render push: rendering Home for a frame and then
   // navigating away read as a flash, and left onboarding with no history to
@@ -109,8 +122,75 @@ export default function HomeScreen() {
           >
             {t('home.intentsTitle')}
           </Text>
+          {/* The clock's answer, given room. Four identical cards asked the
+              question and then refused to help answer it; at 2am the app can
+              reasonably lead with Sleep. The other three stay one tap away
+              below, so the guess is a suggestion, not a decision. */}
+          <PressableScale
+            onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
+            scaleTo={0.99}
+            pressedOpacity={0.85}
+            style={[
+              styles.intentCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: withAlpha(intentColors[suggestedIntent.id], 0.45),
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={`${t(`home.suggestedFor.${band}`)}. ${t(suggestedIntent.nameKey)}. ${t(suggestedIntent.descKey)}. ${t('home.recommendedMinutes', { minutes: suggestedIntent.recommendedMinutes })}`}
+          >
+            <View
+              style={[
+                styles.intentSpine,
+                styles.featuredSpine,
+                { backgroundColor: intentColors[suggestedIntent.id] },
+              ]}
+            />
+            <View style={[styles.intentBody, styles.featuredBody]}>
+              <View style={styles.intentTopRow}>
+                {/* A word, not a catalogue code — so it takes the printed-label
+                    style without the tape-counter monospace the codes use. */}
+                <Text style={[styles.featuredKicker, { color: intentColors[suggestedIntent.id] }]}>
+                  {t(`home.suggestedFor.${band}`)}
+                </Text>
+                <View
+                  style={[
+                    styles.intentIconTag,
+                    styles.featuredIconTag,
+                    { backgroundColor: withAlpha(intentColors[suggestedIntent.id], BADGE_ALPHA) },
+                  ]}
+                >
+                  <Icon icon={suggestedIntent.icon} size={22} color={intentColors[suggestedIntent.id]} />
+                </View>
+              </View>
+              <Text style={[styles.featuredName, { color: colors.text }]}>
+                {t(suggestedIntent.nameKey)}
+              </Text>
+              <Text style={[styles.intentDesc, { color: colors.textSecondary }]}>
+                {t(suggestedIntent.descKey)}
+              </Text>
+              {/* The curated session length was buried on the detail screen;
+                  it is the most useful thing to know before tapping in. */}
+              <View style={styles.featuredMeta}>
+                <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
+                <Text style={[styles.featuredMetaText, { color: colors.textSecondary }]}>
+                  <Text style={styles.featuredMetaNumber}>{suggestedIntent.recommendedMinutes}</Text>
+                  {t('home.recommendedMinutesSuffix')}
+                </Text>
+                <Text style={[styles.featuredMetaCode, { color: colors.textSecondary }]}>
+                  {suggestedIntent.catalogCode}
+                </Text>
+              </View>
+            </View>
+          </PressableScale>
+
+          <Text style={[styles.otherIntentsLabel, { color: colors.textSecondary }]}>
+            {t('home.otherIntents')}
+          </Text>
+
           <View style={styles.intentStack}>
-            {intents.map((intent) => (
+            {otherIntents.map((intent) => (
               <PressableScale
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
@@ -266,6 +346,54 @@ const styles = StyleSheet.create({
   },
   intentSpine: {
     width: 6,
+  },
+  // The suggested card is the same object at a louder volume: wider spine,
+  // roomier body, bigger name — not a different component with different
+  // rules.
+  featuredSpine: {
+    width: 10,
+  },
+  featuredBody: {
+    padding: Spacing.lg,
+    gap: 6,
+  },
+  featuredKicker: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+  },
+  featuredIconTag: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  featuredName: {
+    ...Typography.largeTitle,
+    fontSize: 28,
+    lineHeight: 34,
+  },
+  featuredMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  featuredMetaText: {
+    ...Typography.footnote,
+  },
+  featuredMetaNumber: {
+    ...Typography.numeral,
+  },
+  featuredMetaCode: {
+    ...Typography.label,
+    fontFamily: FontFamily.mono,
+    letterSpacing: 1.2,
+    marginLeft: 'auto',
+  },
+  otherIntentsLabel: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
   intentBody: {
     flex: 1,

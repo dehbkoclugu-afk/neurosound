@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, BADGE_ALPHA, withAlpha, Radius } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, BADGE_ALPHA, withAlpha, Radius } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
@@ -30,7 +30,7 @@ import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Icon } from '@/components/ui/Icon';
 import { presetIcon } from '@/components/ui/PresetCard';
 import { Button } from '@/components/ui/Button';
-import { PressableScale } from '@/components/ui/PressableScale';
+import { TransportButton } from '@/components/ui/TransportButton';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
 import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
@@ -51,6 +51,13 @@ const pickerGroups = [
   { titleKey: 'explore.categories.solfeggio', presets: solfeggioPresets },
   { titleKey: 'explore.categories.noise', presets: noisePresets },
 ];
+
+// Ghost channel strips shown before the first sound is added — one per
+// available channel, so the empty screen states the capacity by shape.
+const EMPTY_SLOTS = Array.from(
+  { length: playerController.MAX_MIXER_CHANNELS },
+  (_, i) => i
+);
 
 // One-tap sample mix for the empty state
 const SAMPLE_MIX = [
@@ -228,26 +235,78 @@ export default function MixerScreen() {
             subtitle={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
           />
 
-          {/* Empty state teaches the mixer with a one-tap sample. An icon
-              anchor keeps the gap between "no channels yet" and the transport
-              row below from reading as blank/broken rather than intentional. */}
+          {/* Empty state is the mixer itself, not a poster about the mixer:
+              four unfilled channel strips where the real ones will land. It
+              states the capacity by shape, shows what a channel is made of,
+              and fills the page instead of leaving the lower half blank —
+              without the centred-icon-and-headline pattern every other app
+              reaches for.
+
+              The ghost track is deliberately thinner than the live slider's
+              48pt touch target: at full height the four slots push the
+              transport row off the first screen, which trades one layout
+              problem for a worse one. So the strip previews the arrangement,
+              not the exact metrics. */}
           {channels.length === 0 && (
-            <View style={styles.emptyState}>
-              <View style={[styles.emptyStateIcon, { backgroundColor: withAlpha(colors.primary, 0.14) }]}>
-                <Ionicons name="layers-outline" size={28} color={colors.primary} />
-              </View>
-              <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-                {t('mixer.emptyDesc')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
-                style={styles.sampleButton}
-                accessibilityRole="button"
-              >
-                <Text style={[styles.sampleButtonText, { color: colors.accent }]}>
-                  {t('mixer.trySample')}
+            <View>
+              {EMPTY_SLOTS.map((slot) => (
+                <TouchableOpacity
+                  key={slot}
+                  onPress={() => setShowPresetPicker(true)}
+                  activeOpacity={0.6}
+                  style={[
+                    styles.channelRow,
+                    styles.slotRow,
+                    { borderBottomColor: colors.cardBorder, opacity: 1 - slot * 0.18 },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('mixer.addSound')}
+                  // Four identical "add sound" targets would be read out four
+                  // times over; only the first is exposed.
+                  accessibilityElementsHidden={slot > 0}
+                  importantForAccessibility={slot > 0 ? 'no-hide-descendants' : 'yes'}
+                >
+                  <View
+                    style={[
+                      styles.channelIcon,
+                      styles.slotIcon,
+                      { borderColor: slot === 0 ? colors.accent : colors.cardBorder },
+                    ]}
+                  >
+                    {slot === 0 && <Ionicons name="add" size={18} color={colors.accent} />}
+                  </View>
+                  <View style={styles.channelBody}>
+                    <View style={styles.channelHeader}>
+                      <Text
+                        style={[
+                          styles.channelName,
+                          { color: slot === 0 ? colors.accent : colors.textSecondary },
+                        ]}
+                      >
+                        {slot === 0 ? t('mixer.addSound') : t('mixer.emptySlot')}
+                      </Text>
+                    </View>
+                    {/* A flat, empty track at zero — the same bar the live
+                        channel uses, just with nothing in it. */}
+                    <View style={[styles.slotTrack, { backgroundColor: colors.slider }]} />
+                  </View>
+                </TouchableOpacity>
+              ))}
+
+              <View style={styles.emptyFooter}>
+                <Text style={[styles.emptyHint, { color: colors.textSecondary }]}>
+                  {t('mixer.emptyHint')}
                 </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
+                  style={styles.sampleButton}
+                  accessibilityRole="button"
+                >
+                  <Text style={[styles.sampleButtonText, { color: colors.accent }]}>
+                    {t('mixer.trySample')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
 
@@ -308,6 +367,10 @@ export default function MixerScreen() {
                     onValueChange={(v) => handleVolumeChange(channel.id, v)}
                     max={1}
                     showValue={false}
+                    // Four stacked sliders in one accent colour read as one
+                    // control repeated; tinting each track with its own
+                    // category colour makes the strip legible at a glance.
+                    fillColor={categoryColors[channel.preset.type]}
                     accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
                   />
                 </View>
@@ -315,8 +378,12 @@ export default function MixerScreen() {
             </View>
           ))}
 
-          {/* Add Channel — always rendered. Letting it vanish at 4/4 left the
-              user hunting for a button that had silently removed itself. */}
+          {/* Add Channel — rendered whenever there is at least one channel,
+              including at 4/4 where it turns into the "full" notice. Letting
+              it vanish at the cap left the user hunting for a button that had
+              silently removed itself. It is skipped only in the empty state,
+              where the first ghost slot above already is this button. */}
+          {!isEmpty && (
           <TouchableOpacity
             onPress={() => setShowPresetPicker(true)}
             activeOpacity={0.6}
@@ -340,6 +407,7 @@ export default function MixerScreen() {
               {isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
             </Text>
           </TouchableOpacity>
+          )}
         </View>
 
         {/* Transport — always present. Showing and hiding play/save as the
@@ -382,21 +450,13 @@ export default function MixerScreen() {
               )}
             </TouchableOpacity>
 
-            <PressableScale
+            <TransportButton
+              playing={isPlaying}
               onPress={handlePlayPause}
               disabled={isEmpty}
-              style={[styles.playButton, { backgroundColor: colors.primary }]}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: isEmpty }}
+              size={72}
               accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
-            >
-              <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
-                size={32}
-                color={onPrimary}
-                style={isPlaying ? undefined : { marginLeft: 4 }}
-              />
-            </PressableScale>
+            />
 
             {/* Balances the timer slot so play stays centred. */}
             <View style={styles.timerButton} />
@@ -703,13 +763,6 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     marginTop: 2,
   },
-  playButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   mixRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -769,23 +822,27 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
     marginBottom: Spacing.sm,
   },
-  emptyState: {
+  // Ghost slot: the live channel's arrangement (badge, name, track) at a
+  // reduced height — see the note at the call site.
+  slotRow: {
     alignItems: 'center',
-    paddingVertical: Spacing.lg,
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
   },
-  emptyStateIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  slotIcon: {
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    marginTop: 0,
+  },
+  slotTrack: {
+    height: 6,
+    borderRadius: Radius.tag,
+  },
+  emptyFooter: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.xs,
+    paddingTop: Spacing.lg,
+    gap: Spacing.xs,
   },
-  emptyStateText: {
-    ...Typography.body,
-    lineHeight: 21,
+  emptyHint: {
+    ...Typography.footnote,
     textAlign: 'center',
   },
   sampleButton: {

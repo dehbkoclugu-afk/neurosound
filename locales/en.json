@@ -37,7 +37,16 @@
     "intentsTitle": "What do you need right now?",
     "favoritesEmpty": "Tap the heart on any sound you like; it will collect here.",
     "headphoneNote": "Binaural beats need headphones to work.",
-    "recentlyPlayedEmpty": "Sounds you play will collect here."
+    "recentlyPlayedEmpty": "Sounds you play will collect here.",
+    "suggestedFor": {
+      "night": "Tonight",
+      "morning": "This morning",
+      "day": "Right now",
+      "evening": "This evening"
+    },
+    "otherIntents": "Or something else",
+    "recommendedMinutes": "{{minutes}} min recommended",
+    "recommendedMinutesSuffix": " min recommended"
   },
   "explore": {
     "title": "Explore Frequencies",
@@ -129,6 +138,8 @@
     "mixSaved": "Your mix has been saved!",
     "deleteMix": "Delete mix",
     "emptyDesc": "Layer sounds like rain, brown noise, and alpha, then save the mix to play it again anytime.",
+    "emptySlot": "Empty channel",
+    "emptyHint": "Layer up to four sounds, then save the mix.",
     "trySample": "Try a sample mix",
     "mute": "Mute",
     "channelsFull": "4 of 4 — remove one to add another",

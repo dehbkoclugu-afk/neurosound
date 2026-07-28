@@ -57,9 +57,10 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
    `tabular-nums` var, `FontFamily.mono` yok — "1.0.0" tam olarak tape-counter
    kuralının kapsadığı türden bir okuma.
 
-8. **[P1] Üç farklı play düğmesi dili.** Player: kadran (216px daire). Mixer:
-   `borderRadius: 36` dolu daire, 72px. MiniPlayer: `Radius.card` (10) yuvarlak
-   kare, 36px. Aynı eylem, üç ayrı şekil.
+8. **[P1 — ÇÖZÜLDÜ] Üç farklı play düğmesi dili.** Mixer ve MiniPlayer artık
+   tek bir `TransportButton` bileşenini iki boyda (72 / 36) kullanıyor: aynı
+   daire, aynı ikon, aynı optik merkez düzeltmesi. Kadran ayrı kalıyor —
+   o bir düğme değil, sürüklenen bir alet.
 
 9. **[P2] İki farklı modal deseni.** TimerModal ortalanmış diyalog
    (`maxWidth: 320`), Mixer'ın kaydet/yeniden adlandır diyaloğu alt sayfa. Aynı
@@ -94,14 +95,17 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## B. Home (16–26)
 
-16. **[P1] Dört intent kartı birebir aynı boy ve yapıda.** Craft-floor'un "aynı
-    boy kart dizisi sayfa yapısı olarak" uyarısı. Öneri: ilk kart (ya da günün
-    saatine göre önerilen) ~1.4× yüksek olsun, alt satırında o intent'in ilk
-    preset'inin adı görünsün.
+16. **[P1 — ÇÖZÜLDÜ] Dört intent kartı birebir aynı boy ve yapıda.** Saatin
+    önerdiği intent artık öne çıkan bir kart: 10px sırt, `Spacing.lg` iç boşluk,
+    28px ad, 40px ikon rozeti ve kendi renginde kenarlık. Kalan üçü eski kompakt
+    biçimde, "OR SOMETHING ELSE" başlığının altında.
 
-17. **[P1] Gece uygulaması ama saat farkındalığı yok.** 23:00'te açılan Home ile
-    09:00'da açılan aynı. Öneri: gece saatlerinde Sleep başa gelsin/vurgulansın,
-    "Bu gece" mikro-başlığı.
+17. **[P1 — ÇÖZÜLDÜ] Gece uygulaması ama saat farkındalığı yok.** `getTimeBand()`
+    saati dört kuşağa ayırıyor (22–06 gece → Sleep, 06–09 sabah → Meditate,
+    09–17 gündüz → Focus, 17–22 akşam → Relax) ve kartın üstüne "TONIGHT / THIS
+    MORNING / RIGHT NOW / THIS EVENING" mikro-başlığını basıyor. Kural saf bir
+    fonksiyon ve `lib/__tests__/intents.test.ts`'te 24 saatin tamamı için
+    sınanıyor; ekran onu mount başına bir kez okuyor (dakikalık re-render yok).
 
 18. **[P2] "Recently Played" katlamanın altında kalıyor.** Dört kart + başlık onu
     aşağı itiyor; ilk kullanıcıda zaten boş olduğu için bu bölümün varlığı hiç
@@ -114,9 +118,9 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     Öneri: kodu preset sayısıyla eşle (`ND-01 · 6 ses`) — katalog dili korunur,
     bilgi kazanır.
 
-21. **[P2] Intent kartında süre yok.** `recommendedMinutes` veride var (30/45/20/15)
-    ama Home'da görünmüyor; kullanıcı Intent ekranına girmeden "30 dk" bilgisini
-    alamıyor.
+21. **[P2 — KISMEN ÇÖZÜLDÜ] Intent kartında süre yok.** Öne çıkan kartta artık
+    saat ikonu + mono rakamla "30 min recommended" satırı var. Kompakt üç kartta
+    hâlâ yok — dört kartın hepsine koymak öne çıkanın farkını siliyordu.
 
 22. **[P2] Aynı ekranda iki farklı preset gösterimi.** Favoriler `PresetCard`
     (liste satırı), Recently Played `PresetCardSmall` (chip).
@@ -256,18 +260,26 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 
 ## E. Mixer (57–70)
 
-57. **[P1] Boş durumda dev bir boşluk var.** "Add Sound" ile play butonu arasında
-    ~120px hiçlik, sonra devre dışı play + Save Preset. Ekranın alt yarısı ölü.
+57. **[P1 — ÇÖZÜLDÜ] Boş durumda dev bir boşluk var.** Boş durum artık dört
+    hayalet kanal şeridi; alt yarı doluyor, transport 844px'lik ekranda görünür
+    kalıyor.
 
 58. **[P1] Devre dışı play butonu gri dolu daire** — devre dışı olduğu anlaşılıyor,
     *neden* olduğu anlaşılmıyor.
 
-59. **[P1] Boş durum jenerik SaaS kalıbı** (daire-içinde-ikon + başlık + alt metin
-    + link). Plak/kadran dünyasına hiç bağlanmıyor. Öneri: 4 boş kanal yuvası
-    çiz, "her yuvaya bir ses" desin — hem boşluğu doldurur hem mikseri öğretir.
+59. **[P1 — ÇÖZÜLDÜ] Boş durum jenerik SaaS kalıbı.** Daire-içinde-ikon +
+    başlık + link kalıbı kalktı; yerine kapasiteyi biçimle söyleyen dört yuva
+    (kesikli rozet, ad, boş oluk) geldi. İlk yuva "Add Sound", kalanı "Empty
+    channel" ve giderek soluyor. Hayalet oluk canlı slider'ın 48pt dokunma
+    hedefinden bilinçli olarak ince: tam boyda dört yuva transport'u ilk
+    ekranın dışına itiyordu.
 
-60. **[P1] 4 kanal = 4 tam genişlik slider,** görsel olarak çok tekrarlı. Kanalları
-    yan yana dikey fader şeridi olarak dizmek gerçek mikser dilidir.
+60. **[P1 — ÇÖZÜLDÜ, farklı çözümle] 4 kanal = 4 tam genişlik slider.** Dikey
+    fader şeridi önerisini uygulamadım: karanlıkta tek elle kullanılan bir
+    uygulamada ince dikey fader'lar dokunma doğruluğunu düşürüyor. Bunun yerine
+    `Slider`'a `fillColor` eklendi ve her kanal kendi kategori rengini taşıyor —
+    üst üste dizili kanallar tek kontrolün tekrarı gibi değil, üç ayrı ses gibi
+    okunuyor.
 
 61. **[P2] Sil ve yeniden adlandır ikonları aynı boy, aynı renk.** Yıkıcı eylem
     ayrışmıyor.
@@ -425,12 +437,21 @@ hata daha çıktı ve düzeltildi:
 Ayrıca #3'ün kendisi de fazla iddialıymış: 20 ham `borderRadius` değerinin çoğu
 `boyut/2` daireydi, yani kayma değil doğru kullanım.
 
+Sonraki turda **#8** (tek `TransportButton`), **#57/#59/#60** (Mixer'ın boş
+durumu ve tekrarlı slider'ları) ve **#16/#17/#21** (Home'un saat farkındalığı ve
+öne çıkan kart) kapatıldı. Bu turda da listede olmayan iki şey düzeldi:
+`MiniPlayer` ve `mixer` ekranlarında ölü kalan importlar, ve öne çıkan kartın
+mikro-başlığı — önce katalog kodlarının mono stilini kullanıyordu, oysa "TONIGHT"
+bir kod değil kelime; `Typography.label`'a alındı.
+
 Kalanlar için sıra önerisi:
 
 ## Önce şunlar
 
-1. **#8** — üç farklı play düğmesi şekli (kadran / dolu daire / yuvarlak kare).
-   Kadran artık yerine oturduğuna göre sıradaki en görünür tutarsızlık bu.
-2. **#57/#59/#60** — Mixer boş durumu ve 4 tekrarlı slider; ekranın alt yarısı
-   hâlâ ölü ve boş durum jenerik SaaS kalıbında.
-3. **#16/#17** — Home'un dört özdeş kartı ve saat farkındalığının yokluğu.
+1. **#58** — devre dışı play düğmesi *neden* devre dışı olduğunu söylemiyor.
+   Mixer'ın boş durumu artık öğretici olduğuna göre bu boşluk daha da göze
+   çarpıyor.
+2. **#18/#22** — Home'da "Recently Played" katlamanın çok altında kalıyor ve aynı
+   ekranda iki farklı preset gösterimi (`PresetCard` / `PresetCardSmall`) var.
+3. **#9/#66** — iki farklı modal grameri (ortalanmış diyalog / alt sayfa); aynı
+   uygulamada iki modal dili.

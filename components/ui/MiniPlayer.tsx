@@ -9,16 +9,15 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Radius, Spacing, Typography, onPrimary } from '@/constants/theme';
+import { Radius, Spacing, Typography } from '@/constants/theme';
 import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
 import * as haptics from '@/lib/haptics';
-import { PressableScale } from './PressableScale';
+import { TransportButton } from './TransportButton';
 import { useTranslation } from 'react-i18next';
 
 interface MiniPlayerProps {
@@ -133,26 +132,13 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         </TouchableOpacity>
 
         <View style={styles.rightSection}>
-          <PressableScale
+          <TransportButton
+            playing={playing}
             onPress={handlePlayPause}
-            disabled={isLoading}
-            style={[styles.playButton, { backgroundColor: colors.primary }]}
-            accessibilityRole="button"
+            loading={isLoading}
+            size={36}
             accessibilityLabel={playing ? t('accessibility.pauseButton') : t('accessibility.playButton')}
-            accessibilityState={{ busy: isLoading }}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            {isLoading ? (
-              <ActivityIndicator size="small" color={onPrimary} />
-            ) : (
-              <Ionicons
-                name={playing ? 'pause' : 'play'}
-                size={18}
-                color={onPrimary}
-                style={playing ? undefined : { marginLeft: 2 }}
-              />
-            )}
-          </PressableScale>
+          />
           <TouchableOpacity
             onPress={handleStop}
             activeOpacity={0.7}

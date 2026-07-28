@@ -37,7 +37,16 @@
     "intentsTitle": "Ne yapmak istiyorsun?",
     "favoritesEmpty": "Bir sesi beğendiğinde kalbe dokun; burada toplanır.",
     "headphoneNote": "Binaural ritimler kulaklıkla çalışır.",
-    "recentlyPlayedEmpty": "Dinlediğin sesler burada birikir."
+    "recentlyPlayedEmpty": "Dinlediğin sesler burada birikir.",
+    "suggestedFor": {
+      "night": "Bu gece",
+      "morning": "Bu sabah",
+      "day": "Şu an",
+      "evening": "Bu akşam"
+    },
+    "otherIntents": "Ya da başka bir şey",
+    "recommendedMinutes": "önerilen süre {{minutes}} dakika",
+    "recommendedMinutesSuffix": " dk önerilir"
   },
   "explore": {
     "title": "Frekansları Keşfet",
@@ -129,6 +138,8 @@
     "mixSaved": "Karışımınız kaydedildi!",
     "deleteMix": "Karışımı sil",
     "emptyDesc": "Yağmur, kahverengi gürültü ve alpha gibi sesleri üst üste bindir; karışımı kaydet, ne zaman istersen tekrar çal.",
+    "emptySlot": "Boş kanal",
+    "emptyHint": "Dört sese kadar üst üste bindir, sonra karışımı kaydet.",
     "trySample": "Örnek karışımı dene",
     "mute": "Sustur",
     "channelsFull": "4/4 dolu — eklemek için birini çıkar",

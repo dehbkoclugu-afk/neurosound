@@ -29,6 +29,10 @@ interface SliderProps {
   showValue?: boolean;
   formatValue?: (value: number) => string;
   accessibilityLabel?: string;
+  /** Track fill colour. Defaults to the theme accent; the Mixer passes each
+   *  channel's category colour so four stacked channels read as four
+   *  different sounds rather than one repeated control. */
+  fillColor?: string;
   style?: ViewStyle;
 }
 
@@ -42,6 +46,7 @@ export function Slider({
   showValue = true,
   formatValue = (v) => `${Math.round(v * 100)}%`,
   accessibilityLabel,
+  fillColor,
   style,
 }: SliderProps) {
   const [sliderWidth, setSliderWidth] = useState(0);
@@ -153,7 +158,7 @@ export function Slider({
           style={[
             styles.trackFill,
             {
-              backgroundColor: colors.accent,
+              backgroundColor: fillColor ?? colors.accent,
               width: `${normalizedValue * 100}%`,
             },
           ]}
