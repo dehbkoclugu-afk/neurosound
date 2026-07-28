@@ -17,7 +17,8 @@
     "addedToFavorites": "favourited",
     "seeAll": "See all",
     "showLess": "Show less",
-    "rename": "Rename"
+    "rename": "Rename",
+    "close": "Close"
   },
   "tabs": {
     "home": "Home",
@@ -37,7 +38,6 @@
     "intentsTitle": "What do you need right now?",
     "favoritesEmpty": "Tap the heart on any sound you like; it will collect here.",
     "headphoneNote": "Binaural beats need headphones to work.",
-    "recentlyPlayedEmpty": "Sounds you play will collect here.",
     "suggestedFor": {
       "night": "Tonight",
       "morning": "This morning",
@@ -137,9 +137,8 @@
     "addSoundFirst": "Add at least one sound to save a mix.",
     "mixSaved": "Your mix has been saved!",
     "deleteMix": "Delete mix",
-    "emptyDesc": "Layer sounds like rain, brown noise, and alpha, then save the mix to play it again anytime.",
     "emptySlot": "Empty channel",
-    "emptyHint": "Layer up to four sounds, then save the mix.",
+    "transportDisabled": "Add a sound to play or save this mix.",
     "trySample": "Try a sample mix",
     "mute": "Mute",
     "channelsFull": "4 of 4 — remove one to add another",

@@ -12,10 +12,6 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
-  Modal,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +19,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, FontFamily, BADGE_ALPHA, withAlpha, Radius } from '@/constants/theme';
-import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -31,6 +26,7 @@ import { Icon } from '@/components/ui/Icon';
 import { presetIcon } from '@/components/ui/PresetCard';
 import { Button } from '@/components/ui/Button';
 import { TransportButton } from '@/components/ui/TransportButton';
+import { Sheet } from '@/components/ui/Sheet';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
 import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
@@ -68,7 +64,6 @@ const SAMPLE_MIX = [
 
 export default function MixerScreen() {
   const { t } = useTranslation();
-  const { reduceMotion } = useSettingsStore();
   const { addCustomMix, updateCustomMix, customMixes, deleteCustomMix } = usePresetsStore();
   const {
     mixerChannels: channels,
@@ -137,6 +132,13 @@ export default function MixerScreen() {
   const handleToggleMute = useCallback((channelId: string, muted: boolean) => {
     haptics.select();
     playerController.mixerSetChannelMuted(channelId, muted);
+  }, []);
+
+  const closePresetPicker = useCallback(() => {
+    // Drop the search text with the sheet; a stale filter reappearing next
+    // time reads as the picker having lost half the catalogue.
+    setPickerQuery('');
+    setShowPresetPicker(false);
   }, []);
 
   const closeSaveDialog = useCallback(() => {
@@ -294,9 +296,6 @@ export default function MixerScreen() {
               ))}
 
               <View style={styles.emptyFooter}>
-                <Text style={[styles.emptyHint, { color: colors.textSecondary }]}>
-                  {t('mixer.emptyHint')}
-                </Text>
                 <TouchableOpacity
                   onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
                   style={styles.sampleButton}
@@ -456,6 +455,7 @@ export default function MixerScreen() {
               disabled={isEmpty}
               size={72}
               accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
+              accessibilityHint={isEmpty ? t('mixer.transportDisabled') : undefined}
             />
 
             {/* Balances the timer slot so play stays centred. */}
@@ -467,7 +467,17 @@ export default function MixerScreen() {
             onPress={() => setShowSaveDialog(true)}
             disabled={isEmpty}
             variant="secondary"
+            accessibilityHint={isEmpty ? t('mixer.transportDisabled') : undefined}
           />
+
+          {/* A greyed circle says "not now" and nothing else. Two dead
+              controls next to each other without a reason is the point at
+              which an interface stops explaining itself. */}
+          {isEmpty && (
+            <Text style={[styles.transportHint, { color: colors.textSecondary }]}>
+              {t('mixer.transportDisabled')}
+            </Text>
+          )}
         </View>
 
         {/* Saved Mixes */}
@@ -538,133 +548,84 @@ export default function MixerScreen() {
         onClose={() => setShowTimerModal(false)}
       />
 
-      {/* Preset Picker Modal */}
-      <Modal
+      {/* Preset picker — a tall sheet rather than a full screen. 33 items
+          need the height, but taking over the whole display made picking a
+          sound feel like leaving the mixer rather than reaching into it. */}
+      <Sheet
         visible={showPresetPicker}
-        animationType={reduceMotion ? 'none' : 'slide'}
-        onRequestClose={() => {
-          setPickerQuery('');
-          setShowPresetPicker(false);
-        }}
-        accessibilityViewIsModal
+        onClose={closePresetPicker}
+        title={t('mixer.addSound')}
+        tall
       >
-        <View style={[styles.modal, { backgroundColor: colors.background }]}>
-          <SafeAreaView style={styles.modalInner}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                {t('mixer.addSound')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setPickerQuery('');
-                  setShowPresetPicker(false);
-                }}
-                style={styles.closeButton}
-              >
-                <Ionicons name="close" size={28} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-            <View style={[styles.searchBar, { backgroundColor: colors.backgroundSecondary }]}>
-              <Ionicons name="search" size={18} color={colors.textSecondary} />
-              <TextInput
-                value={pickerQuery}
-                onChangeText={setPickerQuery}
-                placeholder={t('explore.searchPlaceholder')}
-                placeholderTextColor={colors.textSecondary}
-                style={[styles.searchInput, { color: colors.text }]}
-              />
-            </View>
-            <ScrollView style={styles.presetList}>
-              {filteredPickerGroups.map(group => (
-                <View key={group.titleKey}>
-                  <Text style={[styles.pickerGroupTitle, { color: colors.textSecondary }]}>
-                    {t(group.titleKey)}
-                  </Text>
-                  {group.presets.map(preset => (
-                    <TouchableOpacity
-                      key={preset.id}
-                      onPress={() => handleAddChannel(preset)}
-                      activeOpacity={0.6}
-                      style={[styles.presetItem, { borderBottomColor: colors.cardBorder }]}
-                    >
-                      <View
-                        style={[
-                          styles.presetItemIcon,
-                          { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
-                        ]}
-                      >
-                        <Icon icon={presetIcon(preset)} size={17} color={categoryColors[preset.type]} />
-                      </View>
-                      <Text style={[styles.presetItemName, { color: colors.text }]}>
-                        {t(preset.nameKey)}
-                      </Text>
-                      <Ionicons name="add" size={22} color={colors.accent} />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              ))}
-            </ScrollView>
-          </SafeAreaView>
+        <View style={[styles.searchBar, { backgroundColor: colors.background }]}>
+          <Ionicons name="search" size={18} color={colors.textSecondary} />
+          <TextInput
+            value={pickerQuery}
+            onChangeText={setPickerQuery}
+            placeholder={t('explore.searchPlaceholder')}
+            placeholderTextColor={colors.textSecondary}
+            style={[styles.searchInput, { color: colors.text }]}
+          />
         </View>
-      </Modal>
-
-      {/* Save / Rename Dialog — a single text field doesn't need a full
-          screen, so it lives in a bottom sheet like the timer picker. */}
-      <Modal
-        visible={showSaveDialog}
-        transparent
-        animationType={reduceMotion ? 'none' : 'slide'}
-        onRequestClose={closeSaveDialog}
-        accessibilityViewIsModal
-      >
-        <KeyboardAvoidingView
-          style={styles.sheetOverlayWrap}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-          <Pressable
-            style={[styles.sheetOverlay, { backgroundColor: colors.overlay }]}
-            onPress={closeSaveDialog}
-          >
-            <Pressable
-              style={[styles.sheet, { backgroundColor: colors.backgroundSecondary }]}
-              onPress={(e) => e.stopPropagation()}
-            >
-              <View style={styles.sheetHeader}>
-                <Text style={[styles.sheetTitle, { color: colors.text }]} accessibilityRole="header">
-                  {editingMixId ? t('mixer.renameMix') : t('mixer.savePreset')}
-                </Text>
-                <TouchableOpacity
-                  onPress={closeSaveDialog}
-                  style={styles.closeButton}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('common.cancel')}
-                >
-                  <Ionicons name="close" size={24} color={colors.textSecondary} />
-                </TouchableOpacity>
-              </View>
-              <Text style={[styles.label, { color: colors.text }]}>
-                {t('mixer.presetName')}
+        <ScrollView style={styles.presetList} keyboardShouldPersistTaps="handled">
+          {filteredPickerGroups.map(group => (
+            <View key={group.titleKey}>
+              <Text style={[styles.pickerGroupTitle, { color: colors.textSecondary }]}>
+                {t(group.titleKey)}
               </Text>
-              <TextInput
-                value={mixName}
-                onChangeText={setMixName}
-                placeholder={t('mixer.namePlaceholder')}
-                placeholderTextColor={colors.textSecondary}
-                autoFocus
-                style={[
-                  styles.input,
-                  {
-                    color: colors.text,
-                    backgroundColor: colors.background,
-                    borderColor: colors.cardBorder,
-                  },
-                ]}
-              />
-              <Button title={t('common.save')} onPress={handleSaveMix} />
-            </Pressable>
-          </Pressable>
-        </KeyboardAvoidingView>
-      </Modal>
+              {group.presets.map(preset => (
+                <TouchableOpacity
+                  key={preset.id}
+                  onPress={() => handleAddChannel(preset)}
+                  activeOpacity={0.6}
+                  style={[styles.presetItem, { borderBottomColor: colors.cardBorder }]}
+                >
+                  <View
+                    style={[
+                      styles.presetItemIcon,
+                      { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
+                    ]}
+                  >
+                    <Icon icon={presetIcon(preset)} size={17} color={categoryColors[preset.type]} />
+                  </View>
+                  <Text style={[styles.presetItemName, { color: colors.text }]}>
+                    {t(preset.nameKey)}
+                  </Text>
+                  <Ionicons name="add" size={22} color={colors.accent} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </ScrollView>
+      </Sheet>
+
+      {/* Save / Rename — a single text field, so a compact sheet. */}
+      <Sheet
+        visible={showSaveDialog}
+        onClose={closeSaveDialog}
+        title={editingMixId ? t('mixer.renameMix') : t('mixer.savePreset')}
+        avoidKeyboard
+      >
+        <Text style={[styles.label, { color: colors.text }]}>
+          {t('mixer.presetName')}
+        </Text>
+        <TextInput
+          value={mixName}
+          onChangeText={setMixName}
+          placeholder={t('mixer.namePlaceholder')}
+          placeholderTextColor={colors.textSecondary}
+          autoFocus
+          style={[
+            styles.input,
+            {
+              color: colors.text,
+              backgroundColor: colors.background,
+              borderColor: colors.cardBorder,
+            },
+          ]}
+        />
+        <Button title={t('common.save')} onPress={handleSaveMix} />
+      </Sheet>
     </SafeAreaView>
   );
 }
@@ -790,29 +751,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modal: {
-    flex: 1,
-  },
-  modalInner: {
-    flex: 1,
-    padding: Spacing.md,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-    paddingTop: Spacing.md,
-  },
-  modalTitle: {
-    ...Typography.title,
-  },
-  closeButton: {
-    width: AccessibilitySize.minTouchTarget,
-    height: AccessibilitySize.minTouchTarget,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   presetList: {
     flex: 1,
   },
@@ -841,7 +779,7 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.lg,
     gap: Spacing.xs,
   },
-  emptyHint: {
+  transportHint: {
     ...Typography.footnote,
     textAlign: 'center',
   },
@@ -897,27 +835,5 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     marginBottom: Spacing.md,
     ...Typography.body,
-  },
-  sheetOverlayWrap: {
-    flex: 1,
-  },
-  sheetOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: Spacing.lg,
-    paddingBottom: Spacing.xxl,
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  sheetTitle: {
-    ...Typography.title,
   },
 });

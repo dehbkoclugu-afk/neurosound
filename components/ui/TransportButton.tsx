@@ -24,6 +24,9 @@ interface TransportButtonProps {
   /** Diameter. The two call sites use 36 (MiniPlayer) and 72 (Mixer). */
   size?: number;
   accessibilityLabel: string;
+  /** Why the button is disabled. A greyed circle says "not now" but never
+   *  says what would change that, and a screen reader gets nothing at all. */
+  accessibilityHint?: string;
 }
 
 export function TransportButton({
@@ -33,6 +36,7 @@ export function TransportButton({
   loading = false,
   size = 56,
   accessibilityLabel,
+  accessibilityHint,
 }: TransportButtonProps) {
   const colors = useThemeColors();
   const iconSize = Math.round(size * 0.45);
@@ -53,6 +57,7 @@ export function TransportButton({
       accessibilityRole="button"
       accessibilityState={{ disabled, busy: loading }}
       accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     >
       {loading ? (

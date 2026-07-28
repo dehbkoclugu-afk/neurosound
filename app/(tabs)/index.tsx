@@ -22,7 +22,7 @@ import { Spacing, Typography, FontFamily, Radius, BADGE_ALPHA, withAlpha } from 
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
-import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
+import { PresetCard } from '@/components/ui/PresetCard';
 import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { intents, getSuggestedIntent } from '@/lib/intents';
@@ -31,9 +31,13 @@ import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
 
-// Category data for grid cards
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
+
+// Recently played is a "pick up where you left off" shortcut, not an archive.
+// Three rows keep it above the fold; ten pushed favourites off the page and
+// nobody scrolls that far to replay something they can also find in Explore.
+const RECENT_PREVIEW = 3;
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -91,9 +95,9 @@ export default function HomeScreen() {
     .filter((p): p is FrequencyPreset => p !== undefined);
 
   const recentPresets = recentlyPlayed
-    .slice(0, 10)
     .map(r => getPresetById(r.presetId))
-    .filter((p): p is FrequencyPreset => p !== undefined);
+    .filter((p): p is FrequencyPreset => p !== undefined)
+    .slice(0, RECENT_PREVIEW);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -185,6 +189,26 @@ export default function HomeScreen() {
             </View>
           </PressableScale>
 
+          {/* Placed between the suggestion and the rest of the intents: a
+              returning user's most likely next action is replaying last
+              night's sound, and at the bottom of the page — under four
+              intent cards — that shortcut was never found. Rendered only
+              when there is history; an empty "nothing here yet" panel taught
+              nothing and cost the same vertical space. */}
+          {recentPresets.length > 0 && (
+            <View style={styles.recentSection}>
+              <CategoryHeader title={t('home.recentlyPlayed')} />
+              {recentPresets.map((item) => (
+                <PresetCard
+                  key={item.id}
+                  preset={item}
+                  onPress={() => handlePresetPress(item.id)}
+                  isFavorite={favoriteIds.includes(item.id)}
+                />
+              ))}
+            </View>
+          )}
+
           <Text style={[styles.otherIntentsLabel, { color: colors.textSecondary }]}>
             {t('home.otherIntents')}
           </Text>
@@ -231,33 +255,6 @@ export default function HomeScreen() {
               </PressableScale>
             ))}
           </View>
-        </View>
-
-        {/* Recently Played Section */}
-        <View style={styles.section}>
-          <CategoryHeader title={t('home.recentlyPlayed')} />
-          {recentPresets.length > 0 ? (
-            /* A horizontal FlatList nested in a ScrollView cancels its own
-               virtualisation; ten chips do not need it. */
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
-            >
-              {recentPresets.map((item) => (
-                <PresetCardSmall
-                  key={item.id}
-                  preset={item}
-                  name={t(item.nameKey)}
-                  onPress={() => handlePresetPress(item.id)}
-                />
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-              {t('home.recentlyPlayedEmpty')}
-            </Text>
-          )}
         </View>
 
         {/* Favorites Section — teaches the heart affordance when empty */}
@@ -389,6 +386,9 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     marginLeft: 'auto',
   },
+  recentSection: {
+    marginTop: Spacing.xl,
+  },
   otherIntentsLabel: {
     ...Typography.label,
     textTransform: 'uppercase',
@@ -434,8 +434,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.md,
     marginBottom: Spacing.lg,
-  },
-  horizontalList: {
-    paddingRight: Spacing.md,
   },
 });

@@ -62,9 +62,10 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
    daire, aynı ikon, aynı optik merkez düzeltmesi. Kadran ayrı kalıyor —
    o bir düğme değil, sürüklenen bir alet.
 
-9. **[P2] İki farklı modal deseni.** TimerModal ortalanmış diyalog
-   (`maxWidth: 320`), Mixer'ın kaydet/yeniden adlandır diyaloğu alt sayfa. Aynı
-   uygulamada iki modal grameri.
+9. **[P2 — ÇÖZÜLDÜ] İki farklı modal deseni.** Yeni `components/ui/Sheet.tsx`
+   tek gramer: her şey alt kenardan geliyor, tutamak + solda başlık + sağda
+   kapat. Timer, kaydet/yeniden adlandır ve ses seçici üçü de bunu kullanıyor.
+   `tall` varyantı kaydırılan içerik için (bkz. #66).
 
 10. **[P2] Kart kenarlık dili tutarsız.** Home intent kartlarında `borderWidth: 1`
     + `Radius.card`; Explore/Settings satırlarında sadece `borderBottomWidth:
@@ -107,9 +108,12 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     fonksiyon ve `lib/__tests__/intents.test.ts`'te 24 saatin tamamı için
     sınanıyor; ekran onu mount başına bir kez okuyor (dakikalık re-render yok).
 
-18. **[P2] "Recently Played" katlamanın altında kalıyor.** Dört kart + başlık onu
-    aşağı itiyor; ilk kullanıcıda zaten boş olduğu için bu bölümün varlığı hiç
-    öğrenilmiyor.
+18. **[P2 — ÇÖZÜLDÜ] "Recently Played" katlamanın altında kalıyor.** Bölüm artık
+    öne çıkan kart ile "OR SOMETHING ELSE" grubunun arasında, ilk ekranda
+    görünür (390×844'te başlık ~450px). Üç satırla sınırlı — geri dönen bir
+    kullanıcının en olası eylemi dün geceki sesi tekrar açmak, arşiv değil.
+    Geçmiş yokken bölüm hiç çizilmiyor: boş bir "burada birikecek" paneli aynı
+    dikey alanı yiyip hiçbir şey öğretmiyordu.
 
 19. **[P2] Wordmark ("NeuroSound") sadece Home'da.** Explore/Mixer/Settings'te yok.
     Ya kaldır ya sistemli hale getir.
@@ -122,8 +126,9 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     saat ikonu + mono rakamla "30 min recommended" satırı var. Kompakt üç kartta
     hâlâ yok — dört kartın hepsine koymak öne çıkanın farkını siliyordu.
 
-22. **[P2] Aynı ekranda iki farklı preset gösterimi.** Favoriler `PresetCard`
-    (liste satırı), Recently Played `PresetCardSmall` (chip).
+22. **[P2 — ÇÖZÜLDÜ] Aynı ekranda iki farklı preset gösterimi.** Home'un iki
+    listesi de `PresetCard` satırı. `PresetCardSmall` başka hiçbir yerde
+    kullanılmıyordu, silindi (`getFrequencyOnly` ve chip stilleriyle birlikte).
 
 23. **[P3] Kulaklık notu sayfanın dibinde, ortalanmış, warning renginde** — hiçbir
     eyleme bağlı değil, her zaman orada. Öneri: sadece binaural bir preset
@@ -264,8 +269,10 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
     hayalet kanal şeridi; alt yarı doluyor, transport 844px'lik ekranda görünür
     kalıyor.
 
-58. **[P1] Devre dışı play butonu gri dolu daire** — devre dışı olduğu anlaşılıyor,
-    *neden* olduğu anlaşılmıyor.
+58. **[P1 — ÇÖZÜLDÜ] Devre dışı play butonu gri dolu daire.** Kanal yokken
+    transport'un altında "Add a sound to play or save this mix." satırı var;
+    aynı metin hem play düğmesinin hem Save Preset'in `accessibilityHint`'i —
+    ekran okuyucu daha önce hiçbir gerekçe almıyordu.
 
 59. **[P1 — ÇÖZÜLDÜ] Boş durum jenerik SaaS kalıbı.** Daire-içinde-ikon +
     başlık + link kalıbı kalktı; yerine kapasiteyi biçimle söyleyen dört yuva
@@ -296,8 +303,10 @@ edeceği net tutarsızlık · **P2** cila · **P3** fırsat.
 65. **[P2] Yüklü karışım göstergesi sadece renk + "Loaded" metni.** Katalog
     dilinde bir "çalıyor" damgası daha güçlü olur.
 
-66. **[P2] Ses seçici tam ekran modal, kaydetme alt sayfa** — aynı ekranda iki
-    modal boyu.
+66. **[P2 — ÇÖZÜLDÜ] Ses seçici tam ekran modal, kaydetme alt sayfa.** Seçici
+    artık `Sheet tall` (%85 yükseklik): 33 öğe için gereken boy var ama arkada
+    mikser görünmeye devam ediyor, yani sesi mikserden *çıkarak* değil ona
+    *uzanarak* seçiyorsun. Sayfa kapanırken arama metni de temizleniyor.
 
 67. **[P3] Kanal sırası değiştirilemiyor.**
 
@@ -444,14 +453,22 @@ durumu ve tekrarlı slider'ları) ve **#16/#17/#21** (Home'un saat farkındalı�
 mikro-başlığı — önce katalog kodlarının mono stilini kullanıyordu, oysa "TONIGHT"
 bir kod değil kelime; `Typography.label`'a alındı.
 
+Onu izleyen turda **#58** (devre dışı transport'un gerekçesi), **#18/#22**
+(Home'un tek preset gösterimi ve yukarı taşınan geçmişi) ve **#9/#66** (tek
+modal grameri) kapatıldı. Yol boyunca üç şey daha temizlendi: `PresetCardSmall`
+artık kullanılmıyordu, silindi; `mixer.emptyDesc`, `mixer.emptyHint` ve
+`home.recentlyPlayedEmpty` anahtarları ekranda karşılıksız kalmıştı, kaldırıldı;
+`Sheet`'e geçince `mixer.tsx`'te `Modal`/`Pressable`/`KeyboardAvoidingView` ve
+on kadar ölü stil kaldı, onlar da gitti.
+
 Kalanlar için sıra önerisi:
 
 ## Önce şunlar
 
-1. **#58** — devre dışı play düğmesi *neden* devre dışı olduğunu söylemiyor.
-   Mixer'ın boş durumu artık öğretici olduğuna göre bu boşluk daha da göze
-   çarpıyor.
-2. **#18/#22** — Home'da "Recently Played" katlamanın çok altında kalıyor ve aynı
-   ekranda iki farklı preset gösterimi (`PresetCard` / `PresetCardSmall`) var.
-3. **#9/#66** — iki farklı modal grameri (ortalanmış diyalog / alt sayfa); aynı
-   uygulamada iki modal dili.
+1. **#61/#62** — Mixer'da sil ve yeniden adlandır aynı boy/aynı renk (yıkıcı
+   eylem ayrışmıyor), üstelik yeniden adlandırma butonu `styles.deleteButton`
+   kullanıyor: kozmetik değil, bakım tuzağı.
+2. **#63/#64/#65** — kaydedilmiş karışım satırı hangi seslerden oluştuğunu
+   göstermiyor ve "0/4" sayacı okunamayacak kadar silik.
+3. **#23** — kulaklık notu her zaman sayfanın dibinde, hiçbir eyleme bağlı
+   değil; yalnızca binaural bir preset görünürken gösterilmeli.

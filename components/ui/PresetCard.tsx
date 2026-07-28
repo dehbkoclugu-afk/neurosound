@@ -1,5 +1,6 @@
 /**
- * Preset rows — typographic list items, no cards, no gradients.
+ * The one way a preset is presented outside the player: a typographic list
+ * row, no cards, no gradients.
  * Name carries the hierarchy; a quiet subline gives type and frequency.
  * The icon sits in a tinted circle rather than floating bare: a run of a
  * dozen identical rows read as one grey paragraph without something for the
@@ -16,7 +17,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Spacing, Typography, FontFamily, BADGE_ALPHA, withAlpha, Radius } from '@/constants/theme';
+import { Spacing, Typography, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
@@ -78,14 +79,6 @@ function Subline({ preset, color, t }: { preset: FrequencyPreset; color: string;
   );
 }
 
-// Chip already carries category through its icon and colour, so it only
-// needs the frequency — repeating "Binaural Beats · 6 Hz" would overflow.
-function getFrequencyOnly(preset: FrequencyPreset): string | null {
-  if (preset.type === 'binaural' && preset.beatFrequency) return `${preset.beatFrequency} Hz`;
-  if (preset.type === 'solfeggio' && preset.frequency) return `${preset.frequency} Hz`;
-  return null;
-}
-
 export function PresetCard({
   preset,
   onPress,
@@ -140,50 +133,6 @@ export function PresetCard({
   );
 }
 
-// Compact chip for horizontal "recently played" strips — text only
-interface PresetCardSmallProps {
-  preset: FrequencyPreset;
-  name: string;
-  onPress: () => void;
-  style?: ViewStyle;
-}
-
-export function PresetCardSmall({
-  preset,
-  name,
-  onPress,
-  style,
-}: PresetCardSmallProps) {
-  const colors = useThemeColors();
-  const categoryColors = useCategoryColors();
-  const frequency = getFrequencyOnly(preset);
-
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.6}
-      style={[styles.chip, { borderColor: colors.cardBorder }, style]}
-      accessibilityRole="button"
-      accessibilityLabel={frequency ? `${name}, ${frequency}` : name}
-    >
-      <Icon icon={presetIcon(preset)} size={15} color={categoryColors[preset.type]} />
-      <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
-        {name}
-      </Text>
-      {frequency && (
-        <Text
-          style={[styles.chipFrequency, { color: colors.textSecondary }]}
-          numberOfLines={1}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          {frequency}
-        </Text>
-      )}
-    </TouchableOpacity>
-  );
-}
-
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
@@ -212,25 +161,6 @@ const styles = StyleSheet.create({
     ...Typography.footnote,
   },
   sublineFreq: {
-    ...Typography.numeral,
-  },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: Radius.pill,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    marginRight: Spacing.sm,
-    minHeight: 40,
-  },
-  chipText: {
-    ...Typography.body,
-    fontFamily: FontFamily.semibold,
-  },
-  chipFrequency: {
-    ...Typography.caption,
     ...Typography.numeral,
   },
 });

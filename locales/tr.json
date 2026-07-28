@@ -17,7 +17,8 @@
     "addedToFavorites": "favorilerde",
     "seeAll": "Tümü",
     "showLess": "Daha az",
-    "rename": "Yeniden adlandır"
+    "rename": "Yeniden adlandır",
+    "close": "Kapat"
   },
   "tabs": {
     "home": "Ana Sayfa",
@@ -37,7 +38,6 @@
     "intentsTitle": "Ne yapmak istiyorsun?",
     "favoritesEmpty": "Bir sesi beğendiğinde kalbe dokun; burada toplanır.",
     "headphoneNote": "Binaural ritimler kulaklıkla çalışır.",
-    "recentlyPlayedEmpty": "Dinlediğin sesler burada birikir.",
     "suggestedFor": {
       "night": "Bu gece",
       "morning": "Bu sabah",
@@ -137,9 +137,8 @@
     "addSoundFirst": "Kaydetmek için en az bir ses ekleyin.",
     "mixSaved": "Karışımınız kaydedildi!",
     "deleteMix": "Karışımı sil",
-    "emptyDesc": "Yağmur, kahverengi gürültü ve alpha gibi sesleri üst üste bindir; karışımı kaydet, ne zaman istersen tekrar çal.",
     "emptySlot": "Boş kanal",
-    "emptyHint": "Dört sese kadar üst üste bindir, sonra karışımı kaydet.",
+    "transportDisabled": "Çalmak ya da kaydetmek için bir ses ekle.",
     "trySample": "Örnek karışımı dene",
     "mute": "Sustur",
     "channelsFull": "4/4 dolu — eklemek için birini çıkar",
