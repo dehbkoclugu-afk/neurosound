@@ -1,0 +1,44 @@
+name: Production Android Release Once
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/production-android-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Verify release credentials
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          test -n "$EXPO_TOKEN" || { echo "EXPO_TOKEN eksik"; exit 1; }
+          test -n "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" || { echo "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON eksik"; exit 1; }
+          printf '%s' "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" > play-service-account.json
+          jq -e . play-service-account.json >/dev/null
+          chmod 600 play-service-account.json
+      - name: Build production Android AAB
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli build --platform android --profile production --non-interactive --wait
+      - name: Submit to Google Play Internal Testing
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli submit --platform android --profile production --latest --non-interactive
+      - name: Remove temporary Play credential
+        if: always()
+        run: rm -f play-service-account.json
