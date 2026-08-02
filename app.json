@@ -3,6 +3,7 @@
     "name": "NeuroSound",
     "slug": "neurosound",
     "version": "1.0.0",
+    "_orientationNote": "Portrait-locked on purpose (design review #56). A sleep app is used lying down, where the accelerometer flips the screen on every roll; and the dial plus transport are laid out for one-handed reach on a phone held upright in the dark. Landscape would need a second layout for the one screen that matters and would still rotate under someone who is not moving.",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "neurosound",
@@ -12,6 +13,20 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.neurosound.app",
       "infoPlist": {
+        "_localizationsNote": "Without CFBundleLocalizations iOS reports the app as English-only: the App Store listing shows no other languages and the system picks en for a device set to, say, Japanese even though ja.json exists. Keep in sync with locales/index.ts.",
+        "CFBundleLocalizations": [
+          "tr",
+          "en",
+          "de",
+          "es",
+          "fr",
+          "it",
+          "ja",
+          "ko",
+          "pt",
+          "ru",
+          "zh-Hans"
+        ],
         "UIBackgroundModes": [
           "audio"
         ]
@@ -20,7 +35,7 @@
     "android": {
       "package": "com.neurosound.app",
       "adaptiveIcon": {
-        "backgroundColor": "#131110",
+        "backgroundColor": "#15130F",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -40,9 +55,9 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#FAF7F2",
+          "backgroundColor": "#F7F2E7",
           "dark": {
-            "backgroundColor": "#131110"
+            "backgroundColor": "#15130F"
           }
         }
       ],

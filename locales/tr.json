@@ -17,7 +17,9 @@
     "addedToFavorites": "favorilerde",
     "seeAll": "Tümü",
     "showLess": "Daha az",
-    "rename": "Yeniden adlandır"
+    "rename": "Yeniden adlandır",
+    "close": "Kapat",
+    "nowPlaying": "çalıyor"
   },
   "tabs": {
     "home": "Ana Sayfa",
@@ -37,7 +39,16 @@
     "intentsTitle": "Ne yapmak istiyorsun?",
     "favoritesEmpty": "Bir sesi beğendiğinde kalbe dokun; burada toplanır.",
     "headphoneNote": "Binaural ritimler kulaklıkla çalışır.",
-    "recentlyPlayedEmpty": "Dinlediğin sesler burada birikir."
+    "suggestedFor": {
+      "night": "Bu gece",
+      "morning": "Bu sabah",
+      "day": "Şu an",
+      "evening": "Bu akşam"
+    },
+    "otherIntents": "Ya da başka bir şey",
+    "recommendedMinutes": "önerilen süre {{minutes}} dakika",
+    "recommendedMinutesSuffix": " dk",
+    "soundCount": "{{n}} ses"
   },
   "explore": {
     "title": "Frekansları Keşfet",
@@ -110,13 +121,16 @@
     "searchPlaceholder": "Ses ara",
     "favoritesOnly": "Sadece favoriler",
     "aboutCategory": "Bu kategori hakkında",
-    "noResults": "Aramanızla eşleşen ses yok."
+    "noResults": "Aramanızla eşleşen ses yok.",
+    "clearFilters": "Filtreleri temizle",
+    "sortByName": "A–Z sırala",
+    "clearSearch": "Aramayı temizle"
   },
   "mixer": {
     "title": "Ses Karıştırıcı",
-    "description": "Birden fazla sesi birleştirerek özel karışımınızı oluşturun. Hızlı erişim için kaydedin.",
     "addSound": "Ses Ekle",
     "volume": "Ses Seviyesi",
+    "master": "Ana Ses",
     "savePreset": "Preset Kaydet",
     "presetName": "Preset Adı",
     "namePlaceholder": "Özel Karışımım",
@@ -129,7 +143,8 @@
     "addSoundFirst": "Kaydetmek için en az bir ses ekleyin.",
     "mixSaved": "Karışımınız kaydedildi!",
     "deleteMix": "Karışımı sil",
-    "emptyDesc": "Birden fazla sesi üst üste bindir: yağmur + kahverengi gürültü + alpha gibi.",
+    "emptySlot": "Boş kanal",
+    "transportDisabled": "Çalmak ya da kaydetmek için bir ses ekle.",
     "trySample": "Örnek karışımı dene",
     "mute": "Sustur",
     "channelsFull": "4/4 dolu — eklemek için birini çıkar",
@@ -185,7 +200,10 @@
     "resetTitle": "Verileri sıfırla",
     "resetConfirm": "Favoriler, karışımlar ve tüm ayarlar silinecek. Bu geri alınamaz.",
     "resetHint": "{{favorites}} favori, {{mixes}} karışım",
-    "privacyPolicy": "Gizlilik Politikası"
+    "privacyPolicy": "Gizlilik Politikası",
+    "resetDone": "Her şey sıfırlandı.",
+    "totalListening": "Toplam dinleme",
+    "sessions": "Oturum"
   },
   "privacy": {
     "title": "Gizlilik Politikası",
@@ -221,7 +239,8 @@
     "relaxDesc": "Gevşemek için doğa sesleri ve yumuşak tonlar",
     "meditate": "Meditasyon",
     "meditateDesc": "İçe dönmek için derin, sakin tonlar",
-    "startSession": "{{minutes}} dk seans başlat"
+    "startSession": "{{minutes}} dk seans başlat",
+    "startsWith": "{{name}} ile başlar"
   },
   "onboarding": {
     "step1Title": "Sese odaklan",

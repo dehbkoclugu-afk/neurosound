@@ -4,37 +4,41 @@
  * here gave two paths to one destination.
  */
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
 
-import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, withAlpha } from '@/constants/theme';
+import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, FontFamily, Radius, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
-import { PresetCard, PresetCardSmall } from '@/components/ui/PresetCard';
+import { PresetRow } from '@/components/ui/PresetRow';
 import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
-import { intents } from '@/lib/intents';
+import { intents, getSuggestedIntent } from '@/lib/intents';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 
 
-// Category data for grid cards
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
+
+// Recently played is a "pick up where you left off" shortcut, not an archive.
+// Three rows keep it above the fold; ten pushed favourites off the page and
+// nobody scrolls that far to replay something they can also find in Explore.
+const RECENT_PREVIEW = 3;
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -43,8 +47,33 @@ export default function HomeScreen() {
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
+  const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
+  const isPresetPlaying = useIsPresetPlaying();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
+
+  // Read once per mount, not on a ticking timer: this is a launcher, not a
+  // clock, and re-rendering the list every minute would fight the user's
+  // scroll for a change nobody is waiting to see.
+  const { intent: suggestedIntent, band } = useMemo(
+    () => getSuggestedIntent(new Date().getHours()),
+    []
+  );
+  const otherIntents = useMemo(
+    () => intents.filter((i) => i.id !== suggestedIntent.id),
+    [suggestedIntent.id]
+  );
+
+  // The first id in an intent's list is its recommended sound. Naming it on
+  // the card answers "what would this actually play?" before the tap —
+  // without playing it. A long-press audio preview (review #24) would have
+  // to stop whatever is already running, since a preset and the mixer are
+  // mutually exclusive by design, so a preview could silently end the sleep
+  // sound it was meant to help you choose.
+  const suggestedSound = useMemo(
+    () => getPresetById(suggestedIntent.presetIds[0]),
+    [suggestedIntent.presetIds]
+  );
 
   // Route guard, not a post-render push: rendering Home for a frame and then
   // navigating away read as a flash, and left onboarding with no history to
@@ -79,19 +108,24 @@ export default function HomeScreen() {
     .filter((p): p is FrequencyPreset => p !== undefined);
 
   const recentPresets = recentlyPlayed
-    .slice(0, 10)
     .map(r => getPresetById(r.presetId))
-    .filter((p): p is FrequencyPreset => p !== undefined);
+    .filter((p): p is FrequencyPreset => p !== undefined)
+    .slice(0, RECENT_PREVIEW);
+
+  const visibleFavorites = showAllFavorites
+    ? favoritePresets
+    : favoritePresets.slice(0, FAVORITES_PREVIEW);
+
+  // The note only earns its place when a binaural preset is actually on the
+  // page. Parked at the foot of every visit it was a permanent warning about
+  // nothing in particular, which is the fastest way to teach someone not to
+  // read warnings — and the first binaural play already raises a dialog.
+  const showsBinaural = [...recentPresets, ...visibleFavorites].some(
+    (preset) => preset.type === 'binaural'
+  );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Soft warm atmosphere at the top, fading into the background */}
-      <LinearGradient
-        colors={[withAlpha(colors.primary, 0.1), colors.background]}
-        locations={[0, 0.4]}
-        style={styles.atmosphere}
-        pointerEvents="none"
-      />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -101,14 +135,6 @@ export default function HomeScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Brand presence without a second settings entry point — the tab
-            already gives access, so this row only carries the wordmark. */}
-        <View style={styles.header}>
-          <Text style={[styles.wordmark, { color: colors.textSecondary }]}>
-            NeuroSound
-          </Text>
-        </View>
-
         {/* Intent Section — primary entry, typographic */}
         <View style={styles.section}>
           <Text
@@ -117,81 +143,154 @@ export default function HomeScreen() {
           >
             {t('home.intentsTitle')}
           </Text>
+          {/* The clock's answer, given room. Four identical cards asked the
+              question and then refused to help answer it; at 2am the app can
+              reasonably lead with Sleep. The other three stay one tap away
+              below, so the guess is a suggestion, not a decision. */}
+          <PressableScale
+            onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
+            scaleTo={0.99}
+            pressedOpacity={0.85}
+            style={[
+              styles.intentCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: withAlpha(intentColors[suggestedIntent.id], 0.45),
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={[
+              t(`home.suggestedFor.${band}`),
+              t(suggestedIntent.nameKey),
+              t(suggestedIntent.descKey),
+              t('home.recommendedMinutes', { minutes: suggestedIntent.recommendedMinutes }),
+              suggestedSound ? t(suggestedSound.nameKey) : null,
+            ]
+              .filter(Boolean)
+              .join('. ')}
+          >
+            <View
+              style={[
+                styles.intentSpine,
+                styles.featuredSpine,
+                { backgroundColor: intentColors[suggestedIntent.id] },
+              ]}
+            />
+            <View style={[styles.intentBody, styles.featuredBody]}>
+              <View style={styles.intentTopRow}>
+                {/* A word, not a catalogue code — so it takes the printed-label
+                    style without the tape-counter monospace the codes use. */}
+                <Text style={[styles.featuredKicker, { color: intentColors[suggestedIntent.id] }]}>
+                  {t(`home.suggestedFor.${band}`)}
+                </Text>
+                <View
+                  style={[
+                    styles.intentIconTag,
+                    styles.featuredIconTag,
+                    { backgroundColor: withAlpha(intentColors[suggestedIntent.id], BADGE_ALPHA) },
+                  ]}
+                >
+                  <Icon icon={suggestedIntent.icon} size={22} color={intentColors[suggestedIntent.id]} />
+                </View>
+              </View>
+              <Text style={[styles.featuredName, { color: colors.text }]}>
+                {t(suggestedIntent.nameKey)}
+              </Text>
+              <Text style={[styles.intentDesc, { color: colors.textSecondary }]}>
+                {t(suggestedIntent.descKey)}
+              </Text>
+              {/* The curated session length was buried on the detail screen;
+                  it is the most useful thing to know before tapping in. */}
+              <View style={styles.featuredMeta}>
+                <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
+                <Text
+                  style={[styles.featuredMetaText, { color: colors.textSecondary }]}
+                  numberOfLines={1}
+                >
+                  <Text style={styles.featuredMetaNumber}>{suggestedIntent.recommendedMinutes}</Text>
+                  {t('home.recommendedMinutesSuffix')}
+                  {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
+                </Text>
+                <Text style={[styles.intentCatalog, styles.featuredMetaCode, { color: colors.textSecondary }]}>
+                  <Text style={styles.intentCatalogCode}>{suggestedIntent.catalogCode}</Text>
+                  {` · ${t('home.soundCount', { n: suggestedIntent.presetIds.length })}`}
+                </Text>
+              </View>
+            </View>
+          </PressableScale>
+
+          {/* Placed between the suggestion and the rest of the intents: a
+              returning user's most likely next action is replaying last
+              night's sound, and at the bottom of the page — under four
+              intent cards — that shortcut was never found. Rendered only
+              when there is history; an empty "nothing here yet" panel taught
+              nothing and cost the same vertical space. */}
+          {recentPresets.length > 0 && (
+            <View style={styles.recentSection}>
+              <CategoryHeader title={t('home.recentlyPlayed')} />
+              {recentPresets.map((item) => (
+                <PresetRow
+                  key={item.id}
+                  preset={item}
+                  onPress={() => handlePresetPress(item.id)}
+                  isFavorite={favoriteIds.includes(item.id)}
+                  isPlaying={isPresetPlaying(item.id)}
+                />
+              ))}
+            </View>
+          )}
+
+          <Text style={[styles.otherIntentsLabel, { color: colors.textSecondary }]}>
+            {t('home.otherIntents')}
+          </Text>
+
           <View style={styles.intentStack}>
-            {intents.map((intent) => (
+            {otherIntents.map((intent) => (
               <PressableScale
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
-                // Large surfaces need less travel than buttons to read as
-                // pressed rather than shrinking.
-                scaleTo={0.985}
-                pressedOpacity={0.9}
-                style={styles.intentBlock}
+                scaleTo={0.99}
+                pressedOpacity={0.85}
+                style={[
+                  styles.intentCard,
+                  { backgroundColor: colors.card, borderColor: colors.cardBorder },
+                ]}
                 accessibilityRole="button"
                 accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
-                <Image
-                  source={intent.image}
-                  style={StyleSheet.absoluteFill}
-                  contentFit="cover"
-                  transition={300}
-                />
-                {/* Tint: decorative, diagonal, carries the intent's colour. */}
-                <LinearGradient
-                  colors={[withAlpha(intent.color, 0.4), 'transparent']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                {/* Legibility: vertical and separate, so the whole text band
-                    darkens evenly. A diagonal scrim left the bottom-LEFT — where
-                    the title actually sits — in its lightest stop, which is
-                    2.4:1 over a bright photo. Placeholder images are random, so
-                    the floor has to be guaranteed, not hoped for. */}
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.62)']}
-                  locations={[0.35, 0.7, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.intentRow}>
-                  <View style={styles.intentText}>
-                    <Text style={styles.intentName}>{t(intent.nameKey)}</Text>
-                    <Text style={styles.intentDesc} numberOfLines={2}>
-                      {t(intent.descKey)}
+                {/* Index-tab spine, like a coloured card-catalogue edge —
+                    the one place each intent's own colour still shows. */}
+                <View style={[styles.intentSpine, { backgroundColor: intentColors[intent.id] }]} />
+
+                <View style={styles.intentBody}>
+                  <View style={styles.intentTopRow}>
+                    {/* A catalogue number that indexes nothing is decoration.
+                        Pairing it with the size of what it points at makes it
+                        a real index entry — and the code keeps the mono face
+                        while the words around it stay in Nunito. */}
+                    <Text style={[styles.intentCatalog, { color: intentColors[intent.id] }]}>
+                      <Text style={styles.intentCatalogCode}>{intent.catalogCode}</Text>
+                      {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
                     </Text>
+                    <View
+                      style={[styles.intentIconTag, { backgroundColor: withAlpha(intentColors[intent.id], BADGE_ALPHA) }]}
+                    >
+                      <Icon icon={intent.icon} size={18} color={intentColors[intent.id]} />
+                    </View>
                   </View>
-                  <Icon icon={intent.icon} size={26} color="rgba(255,255,255,0.95)" />
+                  <Text style={[styles.intentName, { color: colors.text }]}>
+                    {t(intent.nameKey)}
+                  </Text>
+                  <Text
+                    style={[styles.intentDesc, { color: colors.textSecondary }]}
+                    numberOfLines={2}
+                  >
+                    {t(intent.descKey)}
+                  </Text>
                 </View>
               </PressableScale>
             ))}
           </View>
-        </View>
-
-        {/* Recently Played Section */}
-        <View style={styles.section}>
-          <CategoryHeader title={t('home.recentlyPlayed')} />
-          {recentPresets.length > 0 ? (
-            /* A horizontal FlatList nested in a ScrollView cancels its own
-               virtualisation; ten chips do not need it. */
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
-            >
-              {recentPresets.map((item) => (
-                <PresetCardSmall
-                  key={item.id}
-                  preset={item}
-                  name={t(item.nameKey)}
-                  onPress={() => handlePresetPress(item.id)}
-                />
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-              {t('home.recentlyPlayedEmpty')}
-            </Text>
-          )}
         </View>
 
         {/* Favorites Section — teaches the heart affordance when empty */}
@@ -208,15 +307,13 @@ export default function HomeScreen() {
           />
           {favoritePresets.length > 0 ? (
             <View>
-              {(showAllFavorites
-                ? favoritePresets
-                : favoritePresets.slice(0, FAVORITES_PREVIEW)
-              ).map((preset) => (
-                <PresetCard
+              {visibleFavorites.map((preset) => (
+                <PresetRow
                   key={preset.id}
                   preset={preset}
                   onPress={() => handlePresetPress(preset.id)}
                   isFavorite={true}
+                  isPlaying={isPresetPlaying(preset.id)}
                 />
               ))}
             </View>
@@ -227,10 +324,11 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Quiet headphone note */}
-        <Text style={[styles.headphoneNote, { color: colors.warning }]}>
-          {t('home.headphoneNote')}
-        </Text>
+        {showsBinaural && (
+          <Text style={[styles.headphoneNote, { color: colors.warning }]}>
+            {t('home.headphoneNote')}
+          </Text>
+        )}
 
       </ScrollView>
     </SafeAreaView>
@@ -241,30 +339,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  atmosphere: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 280,
-  },
   scrollView: {
     flex: 1,
   },
   content: {
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xl,
-    paddingBottom: 20,
-  },
-  header: {
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.xl,
-  },
-  // Brand presence without spending the H1 on it.
-  wordmark: {
-    ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
-    letterSpacing: 0.4,
   },
   section: {
     marginBottom: Spacing.xl,
@@ -276,32 +356,98 @@ const styles = StyleSheet.create({
   intentStack: {
     gap: Spacing.sm,
   },
-  intentBlock: {
-    // minHeight, not height: the block holds a 22pt title over a 13pt line,
-    // and a fixed box clips both once the system text size grows.
-    minHeight: 108,
-    borderRadius: 20,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  intentRow: {
+  // A flat printed card, not a photo block: a coloured spine on the left
+  // (like a card-catalogue tab) carries the intent's identity instead of a
+  // full-bleed gradient photo repeated four times down the page.
+  intentCard: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    gap: Spacing.md,
+    borderRadius: Radius.card,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
-  intentText: {
+  intentSpine: {
+    width: 6,
+  },
+  // The suggested card is the same object at a louder volume: wider spine,
+  // roomier body, bigger name — not a different component with different
+  // rules.
+  featuredSpine: {
+    width: 10,
+  },
+  featuredBody: {
+    padding: Spacing.lg,
+    gap: 6,
+  },
+  featuredKicker: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+  },
+  featuredIconTag: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  featuredName: {
+    ...Typography.largeTitle,
+    fontSize: 28,
+    lineHeight: 34,
+  },
+  featuredMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  featuredMetaText: {
+    ...Typography.footnote,
+    flexShrink: 1,
+  },
+  featuredMetaNumber: {
+    ...Typography.numeral,
+  },
+  featuredMetaCode: {
+    marginLeft: 'auto',
+  },
+  recentSection: {
+    marginTop: Spacing.xl,
+  },
+  otherIntentsLabel: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+  },
+  intentBody: {
     flex: 1,
-    gap: 2,
+    padding: Spacing.md,
+    gap: 4,
+  },
+  intentTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 2,
+  },
+  intentCatalog: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+  },
+  intentCatalogCode: {
+    fontFamily: FontFamily.mono,
+    letterSpacing: 1.2,
+  },
+  intentIconTag: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   intentName: {
     ...Typography.title,
-    color: '#FFFFFF',
   },
   intentDesc: {
     ...Typography.footnote,
-    color: 'rgba(255,255,255,0.85)',
   },
   emptyStateText: {
     ...Typography.body,
@@ -313,8 +459,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.md,
     marginBottom: Spacing.lg,
-  },
-  horizontalList: {
-    paddingRight: Spacing.md,
   },
 });

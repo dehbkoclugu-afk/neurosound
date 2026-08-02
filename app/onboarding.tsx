@@ -8,19 +8,21 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Animated,
   Easing,
+  PanResponder,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary } from '@/constants/theme';
-import { useSettingsStore, Language } from '@/stores/settingsStore';
-import i18n from '@/i18n';
+import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, Radius, ControlSize, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { languageFlag, languageLabel } from '@/locales';
+import { LanguageSheet } from '@/components/ui/LanguageSheet';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { contentColumn } from '@/constants/layout';
 
@@ -42,6 +44,11 @@ const STEPS = [
   },
 ];
 
+/** Ticks around the step icon — the dial's own mark, at the one moment the
+ *  user has never seen the dial. A bare 40pt stock glyph was the first thing
+ *  the app showed and it belonged to no design in particular. */
+const RING_TICKS = 16;
+
 export default function OnboardingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -52,12 +59,17 @@ export default function OnboardingScreen() {
     setHasSeenHeadphoneWarning,
     reduceMotion,
     language,
-    setLanguage,
   } = useSettingsStore();
 
   const [step, setStep] = useState(0);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const isLast = step === STEPS.length - 1;
   const current = STEPS[step];
+
+  // The PanResponder is built once, so it reads the handlers through a ref
+  // rather than closing over stale ones — the same trap the Slider and the
+  // Dial each hit before.
+  const stepRef = useRef({ next: () => {}, back: () => {} });
 
   // One value drives every dot; each interpolates its own width from the
   // distance to the current step, so the indicator glides instead of snapping.
@@ -114,10 +126,22 @@ export default function OnboardingScreen() {
     closeOnboarding();
   };
 
-  const handleLanguage = (next: Language) => {
-    setLanguage(next);
-    i18n.changeLanguage(next);
+  const handleBack = () => {
+    if (step > 0) setStep(step - 1);
   };
+
+  // Three screens with a Next button and no way back is a form, not an
+  // introduction. Both the button and the horizontal drag now go both ways.
+  const swipe = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_e, g) =>
+        Math.abs(g.dx) > 24 && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderRelease: (_e, g) => {
+        if (g.dx < -40) stepRef.current.next();
+        else if (g.dx > 40) stepRef.current.back();
+      },
+    })
+  ).current;
 
   const handleNext = () => {
     if (isLast) {
@@ -132,35 +156,35 @@ export default function OnboardingScreen() {
     }
   };
 
+  stepRef.current = { next: handleNext, back: handleBack };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
         {/* Language lives here because the very first screen is already text
             the user may not read — asking them to find Settings first is
-            backwards. */}
-        <View style={styles.languageRow}>
-          {(['tr', 'en'] as Language[]).map((code) => (
-            <TouchableOpacity
-              key={code}
-              onPress={() => handleLanguage(code)}
-              style={styles.languageButton}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: language === code }}
-              accessibilityLabel={code === 'tr' ? 'Türkçe' : 'English'}
-            >
-              <Text
-                style={[
-                  styles.languageText,
-                  {
-                    color: language === code ? colors.accent : colors.textSecondary,
-                  },
-                ]}
-              >
-                {code.toUpperCase()}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+            backwards. Two codes fitted side by side; eleven do not, so this
+            is the current one and a tap opens the same sheet Settings uses. */}
+        <TouchableOpacity
+          onPress={() => setShowLanguageSheet(true)}
+          style={[
+            styles.languageButton,
+            { backgroundColor: withAlpha(colors.accent, BADGE_ALPHA) },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={`${t('settings.language')}: ${languageLabel(language)}`}
+        >
+          <Text
+            style={styles.languageFlag}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            {languageFlag(language)}
+          </Text>
+          <Text style={[styles.languageText, { color: colors.accent }]}>
+            {languageLabel(language)}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={finish}
@@ -175,6 +199,7 @@ export default function OnboardingScreen() {
       </View>
 
       <Animated.View
+        {...swipe.panHandlers}
         style={[
           styles.content,
           {
@@ -192,14 +217,30 @@ export default function OnboardingScreen() {
           },
         ]}
       >
-        <Ionicons
-          name={current.icon}
-          size={40}
-          color={colors.accent}
-          style={styles.stepIcon}
+        <View
+          style={styles.stepMark}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
-        />
+        >
+          {Array.from({ length: RING_TICKS }).map((_, i) => (
+            <View
+              key={i}
+              style={[
+                StyleSheet.absoluteFillObject,
+                styles.tickPivot,
+                { transform: [{ rotate: `${(360 / RING_TICKS) * i}deg` }] },
+              ]}
+            >
+              <View
+                style={[
+                  styles.tick,
+                  { backgroundColor: withAlpha(colors.accent, i % 4 === 0 ? 0.7 : 0.35) },
+                ]}
+              />
+            </View>
+          ))}
+          <Ionicons name={current.icon} size={36} color={colors.accent} />
+        </View>
         <Text
           style={[styles.title, { color: colors.text }]}
           accessibilityRole="header"
@@ -232,17 +273,34 @@ export default function OnboardingScreen() {
           ))}
         </View>
 
-        <PressableScale
-          onPress={handleNext}
-          style={[styles.button, { backgroundColor: colors.primary }]}
-          accessibilityRole="button"
-          accessibilityLabel={isLast ? t('onboarding.start') : t('onboarding.next')}
-        >
-          <Text style={styles.buttonText}>
-            {isLast ? t('onboarding.start') : t('onboarding.next')}
-          </Text>
-        </PressableScale>
+        <View style={styles.buttonRow}>
+          {step > 0 && (
+            <TouchableOpacity
+              onPress={handleBack}
+              style={[styles.backButton, { borderColor: colors.cardBorder }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+            >
+              <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
+          <PressableScale
+            onPress={handleNext}
+            style={[styles.button, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
+            accessibilityLabel={isLast ? t('onboarding.start') : t('onboarding.next')}
+          >
+            <Text style={styles.buttonText}>
+              {isLast ? t('onboarding.start') : t('onboarding.next')}
+            </Text>
+          </PressableScale>
+        </View>
       </View>
+
+      <LanguageSheet
+        visible={showLanguageSheet}
+        onClose={() => setShowLanguageSheet(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -258,17 +316,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.sm,
   },
-  languageRow: {
-    flexDirection: 'row',
-  },
   languageButton: {
-    minWidth: AccessibilitySize.minTouchTarget,
-    height: AccessibilitySize.minTouchTarget,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: Spacing.xs,
+    minWidth: AccessibilitySize.minTouchTarget,
+    height: ControlSize.field,
+    paddingHorizontal: Spacing.sm,
+    borderRadius: Radius.card,
     justifyContent: 'center',
   },
+  languageFlag: {
+    fontSize: 15,
+  },
   languageText: {
-    ...Typography.body,
+    ...Typography.footnote,
     fontFamily: FontFamily.semibold,
   },
   skipButton: {
@@ -280,13 +342,29 @@ const styles = StyleSheet.create({
   skipText: {
     ...Typography.body,
   },
-  stepIcon: {
-    marginBottom: Spacing.lg,
+  stepMark: {
+    width: 108,
+    height: 108,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.xl,
   },
+  tickPivot: {
+    alignItems: 'center',
+  },
+  tick: {
+    width: 1.5,
+    height: 6,
+    borderRadius: 1,
+  },
+  // Was centred in the whole screen, which left a third of the page empty
+  // above the title and another third below it. Sitting a little high puts
+  // the words where the eye lands.
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingBottom: Spacing.xxl,
     paddingHorizontal: Spacing.xl,
   },
   title: {
@@ -314,9 +392,26 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: Spacing.sm,
+  },
+  backButton: {
+    width: ControlSize.cta,
+    minHeight: ControlSize.cta,
+    borderRadius: Radius.card,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Radius.card, like every other button in the app. A 26px pill here and on
+  // the Intent screen were the only two survivors of the old rounded
+  // language.
   button: {
-    minHeight: AccessibilitySize.minTouchTarget + 4,
-    borderRadius: 26,
+    flex: 1,
+    minHeight: ControlSize.cta,
+    borderRadius: Radius.card,
     alignItems: 'center',
     justifyContent: 'center',
   },

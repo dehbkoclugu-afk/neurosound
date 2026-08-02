@@ -8,9 +8,11 @@
 
 import { AppState, Platform } from 'react-native';
 import type { AudioPlayer } from 'expo-audio';
+import { Asset } from 'expo-asset';
 
 import i18n from '@/i18n';
 import { useAudioStore, MixerChannelState } from '@/stores/audioStore';
+import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { FrequencyPreset, getPresetById } from '../frequencies';
 import {
@@ -51,11 +53,37 @@ function watchLockScreenPlayer(player: AudioPlayer): void {
   });
 }
 
+/**
+ * The lock screen's artwork slot was left empty, so the one place the app
+ * appears while the phone is face-down showed a blank square.
+ *
+ * Resolved once and cached: `Asset.fromModule` is synchronous for a bundled
+ * image but its `localUri` only exists after a download on Android, so the
+ * first call kicks that off and later calls get the real path. A missing
+ * artwork is not worth failing playback over, hence the catch.
+ */
+let artworkUri: string | null = null;
+function ensureArtwork(): string | undefined {
+  if (artworkUri) return artworkUri;
+  try {
+    const asset = Asset.fromModule(require('@/assets/images/icon.png'));
+    artworkUri = asset.localUri ?? asset.uri ?? null;
+    if (!asset.localUri) void asset.downloadAsync().catch(() => {});
+  } catch {
+    return undefined;
+  }
+  return artworkUri ?? undefined;
+}
+
 function setNowPlaying(title: string): void {
   if (Platform.OS === 'web') return;
   const player = generator?.getNativePlayer() ?? null;
   if (!player) return;
-  player.setActiveForLockScreen(true, { title, artist: 'NeuroSound' });
+  player.setActiveForLockScreen(true, {
+    title,
+    artist: 'NeuroSound',
+    artworkUrl: ensureArtwork(),
+  });
   watchLockScreenPlayer(player);
 }
 
@@ -138,6 +166,36 @@ function ramp(to: number, ms: number, onDone?: () => void): void {
   }, 30);
 }
 
+/**
+ * Fade a generator we are done with down to silence on its own timer, then
+ * stop it — the module-level `ramp` only ever drives the *current* generator,
+ * and by the time we retire one it is no longer that.
+ *
+ * Switching presets used to cut the outgoing sound dead. Letting it fall
+ * away while the incoming one fades up (play() already ramps in over
+ * FADE_IN_MS) turns the switch into a crossfade, which matters most in the
+ * one situation this app is for: someone half-asleep changing their mind.
+ *
+ * This is only safe because `getBinauralPlayer()` and friends hand back a
+ * fresh instance each call. If they ever become singletons, retiring the
+ * outgoing one would silence the incoming one 250ms after it started.
+ */
+function retireGenerator(gen: Generator, fromVolume: number): void {
+  const steps = 12;
+  const stepMs = FADE_OUT_MS / steps;
+  let i = 0;
+  const timer = setInterval(() => {
+    i += 1;
+    if (i >= steps) {
+      clearInterval(timer);
+      gen.stop();
+      gen.dispose();
+      return;
+    }
+    gen.setVolume(fromVolume * (1 - i / steps));
+  }, stepMs);
+}
+
 /** Load a preset. Same preset = no-op so playback continues untouched. */
 export function loadPreset(preset: FrequencyPreset): void {
   if (currentId === preset.id && generator) return;
@@ -145,10 +203,17 @@ export function loadPreset(preset: FrequencyPreset): void {
   mixerStop(); // single preset and mixer are mutually exclusive
 
   if (generator) {
+    const outgoing = generator;
+    const outgoingVolume = lastVolume;
+    const wasPlaying = useAudioStore.getState().isPlaying;
     cancelRamp();
-    generator.stop();
-    generator.dispose();
     generator = null;
+    if (wasPlaying && outgoingVolume > 0) {
+      retireGenerator(outgoing, outgoingVolume);
+    } else {
+      outgoing.stop();
+      outgoing.dispose();
+    }
   }
   useAudioStore.getState().setIsPlaying(false);
   useAudioStore.getState().setPlaybackError(false);
@@ -156,6 +221,29 @@ export function loadPreset(preset: FrequencyPreset): void {
   generator = createGenerator(preset);
   currentId = preset.id;
   useAudioStore.getState().setCurrentPreset(preset);
+}
+
+/**
+ * Listening time, measured rather than guessed.
+ *
+ * Wall-clock deltas between "started" and "stopped", not a ticking counter:
+ * JS timers are throttled while the app is backgrounded, which is precisely
+ * when this app is doing its job, so a counter would undercount every night.
+ * Both playback paths — single preset and mixer — funnel through here.
+ */
+let listeningStartedAt: number | null = null;
+
+function beginListening(): void {
+  if (listeningStartedAt !== null) return;
+  listeningStartedAt = Date.now();
+  usePresetsStore.getState().recordSessionStart();
+}
+
+function endListening(): void {
+  if (listeningStartedAt === null) return;
+  const seconds = (Date.now() - listeningStartedAt) / 1000;
+  listeningStartedAt = null;
+  if (seconds >= 1) usePresetsStore.getState().recordListening(Math.round(seconds));
 }
 
 let playPending = false;
@@ -184,6 +272,7 @@ export async function play(): Promise<void> {
     }
     ramp(effectiveVolume(), FADE_IN_MS);
     useAudioStore.getState().setIsPlaying(true);
+    beginListening();
     const preset = useAudioStore.getState().currentPreset;
     if (preset) setNowPlaying(i18n.t(preset.nameKey));
   } catch (e) {
@@ -198,6 +287,7 @@ export async function play(): Promise<void> {
 export function pause(immediate: boolean = false): void {
   const gen = generator;
   useAudioStore.getState().setIsPlaying(false);
+  endListening();
   if (!gen) return;
   if (immediate) {
     cancelRamp();
@@ -369,6 +459,7 @@ async function startMixerChannels(
     await gen.play();
   }
   useAudioStore.getState().setIsMixerPlaying(true);
+  beginListening();
 }
 
 export function mixerStop(): void {
@@ -378,15 +469,23 @@ export function mixerStop(): void {
   });
   mixerGenerators.clear();
   useAudioStore.getState().setIsMixerPlaying(false);
+  endListening();
 }
 
-/** A muted channel outputs nothing but keeps its level, so unmuting restores
- *  exactly what the user set. */
+/**
+ * The whole gain chain for one mixer channel, in one place: the channel's own
+ * level, times the master fader, times the settings safety cap.
+ *
+ * A muted channel outputs nothing but keeps its level, so unmuting restores
+ * exactly what the user set — the same reason the master scales channels
+ * rather than rewriting them.
+ */
 function channelVolume(
   ch: { volume: number; muted: boolean },
-  maxVolume: number
+  maxVolume: number,
+  master = useAudioStore.getState().mixerMasterVolume
 ): number {
-  return ch.muted ? 0 : ch.volume * maxVolume;
+  return ch.muted ? 0 : ch.volume * master * maxVolume;
 }
 
 export function mixerSetChannelMuted(channelId: string, muted: boolean): void {
@@ -450,7 +549,22 @@ export function mixerSetChannelVolume(channelId: string, volume: number): void {
   store.setMixerChannelMuted(channelId, false);
   mixerGenerators
     .get(channelId)
-    ?.setVolume(volume * useSettingsStore.getState().maxVolume);
+    ?.setVolume(
+      channelVolume({ volume, muted: false }, useSettingsStore.getState().maxVolume)
+    );
+}
+
+/** Move the master fader. Applies to every live channel at once and leaves
+ *  each channel's own level untouched. */
+export function mixerSetMasterVolume(volume: number): void {
+  useAudioStore.getState().setMixerMasterVolume(volume);
+  const { maxVolume } = useSettingsStore.getState();
+  // Re-read after the set: the store clamps, and a snapshot taken before it
+  // still holds the old value.
+  const { mixerChannels, mixerMasterVolume } = useAudioStore.getState();
+  mixerChannels.forEach((ch) =>
+    mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume, mixerMasterVolume))
+  );
 }
 
 /**

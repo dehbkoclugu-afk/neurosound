@@ -13,11 +13,10 @@ import {
   PanResponder,
   AccessibilityInfo,
   ViewStyle,
-  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, Spacing, Typography } from '@/constants/theme';
+import { Radius, Spacing, Typography, ControlSize, Elevation } from '@/constants/theme';
 
 interface SliderProps {
   value: number;
@@ -29,6 +28,15 @@ interface SliderProps {
   showValue?: boolean;
   formatValue?: (value: number) => string;
   accessibilityLabel?: string;
+  /** Track fill colour. Defaults to the theme accent; the Mixer passes each
+   *  channel's category colour so four stacked channels read as four
+   *  different sounds rather than one repeated control. */
+  fillColor?: string;
+  /** 0–1. Marks the part of the track that will not be heard, because a
+   *  ceiling elsewhere clips it. Without this the Player's slider ran to
+   *  100% while the output stopped at the cap, so full travel sounded
+   *  quieter than it looked and nothing on screen explained why. */
+  cap?: number;
   style?: ViewStyle;
 }
 
@@ -42,6 +50,8 @@ export function Slider({
   showValue = true,
   formatValue = (v) => `${Math.round(v * 100)}%`,
   accessibilityLabel,
+  fillColor,
+  cap,
   style,
 }: SliderProps) {
   const [sliderWidth, setSliderWidth] = useState(0);
@@ -153,11 +163,26 @@ export function Slider({
           style={[
             styles.trackFill,
             {
-              backgroundColor: colors.accent,
+              backgroundColor: fillColor ?? colors.accent,
               width: `${normalizedValue * 100}%`,
             },
           ]}
         />
+
+        {/* Everything above the ceiling, struck through. Drawn over the
+            fill so it reads as "this part is not doing anything". */}
+        {cap !== undefined && cap < 1 && (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.capZone,
+              {
+                backgroundColor: colors.background,
+                left: `${cap * 100}%`,
+              },
+            ]}
+          />
+        )}
 
         {/* Thumb */}
         <View
@@ -166,6 +191,10 @@ export function Slider({
             styles.thumb,
             {
               backgroundColor: colors.sliderThumb,
+              // Ring in the empty-track colour so the knob still separates
+              // from the fill at full value, where the two are the same
+              // colour family. The lift comes from Elevation.control.
+              borderColor: colors.slider,
               left: Math.max(0, Math.min(sliderWidth - 24, thumbPosition - 12)),
             },
           ]}
@@ -191,11 +220,11 @@ const styles = StyleSheet.create({
   },
   value: {
     ...Typography.body,
-    fontVariant: ['tabular-nums'],
+    ...Typography.numeral,
   },
   sliderContainer: {
-    height: AccessibilitySize.minTouchTarget,
-    borderRadius: AccessibilitySize.borderRadius,
+    height: ControlSize.row,
+    borderRadius: Radius.tag,
     justifyContent: 'center',
     position: 'relative',
     overflow: 'hidden',
@@ -205,24 +234,23 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    borderRadius: AccessibilitySize.borderRadius,
+    borderRadius: Radius.tag,
+  },
+  capZone: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    opacity: 0.55,
   },
   thumb: {
     position: 'absolute',
     width: 24,
     height: 24,
     borderRadius: 12,
+    borderWidth: 2,
     top: '50%',
     marginTop: -12,
-    ...Platform.select({
-      web: { boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)' },
-      default: {
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-    }),
+    ...Elevation.control,
   },
 });

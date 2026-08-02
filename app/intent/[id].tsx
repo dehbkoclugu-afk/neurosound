@@ -8,7 +8,6 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Alert,
 } from 'react-native';
@@ -17,15 +16,16 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
-import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary } from '@/constants/theme';
+import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary, Radius, ControlSize, onImage, FontFamily } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
-import { PresetCard } from '@/components/ui/PresetCard';
+import { PresetRow } from '@/components/ui/PresetRow';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
+import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import { getIntentById } from '@/lib/intents';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
@@ -39,7 +39,9 @@ export default function IntentScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const colors = useThemeColors();
+  const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
+  const isPresetPlaying = useIsPresetPlaying();
   const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, reduceMotion } = useSettingsStore();
   const { isFavorite } = usePresetsStore();
 
@@ -125,7 +127,7 @@ export default function IntentScreen() {
           {/* Same split as the home blocks: colour is decorative, the
               legibility floor is its own vertical pass. */}
           <LinearGradient
-            colors={[withAlpha(intent.color, 0.33), 'transparent']}
+            colors={[withAlpha(intentColors[intent.id], 0.33), 'transparent']}
             locations={[0, 0.6]}
             style={StyleSheet.absoluteFill}
           />
@@ -134,14 +136,25 @@ export default function IntentScreen() {
             locations={[0.3, 0.72, 1]}
             style={StyleSheet.absoluteFill}
           />
+          {/* The arrow was bare white over an image whose brightness is
+              whatever the photograph happens to be at that corner. */}
           <TouchableOpacity
             onPress={() => router.back()}
             style={[styles.backButton, { top: insets.top + Spacing.sm }]}
             accessibilityLabel={t('common.back')}
           >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+            <View style={styles.backScrim}>
+              <Ionicons name="arrow-back" size={22} color={onImage} />
+            </View>
           </TouchableOpacity>
           <View style={styles.heroText}>
+            {/* The photo screen now speaks the same catalogue language as
+                the cards that lead to it, so it reads as this app's one
+                full-bleed moment rather than a stray image. */}
+            <Text style={styles.heroCatalog}>
+              <Text style={styles.heroCatalogCode}>{intent.catalogCode}</Text>
+              {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
+            </Text>
             <Text style={styles.heroTitle} accessibilityRole="header">
               {t(intent.nameKey)}
             </Text>
@@ -154,22 +167,37 @@ export default function IntentScreen() {
             onPress={handleStartSession}
             style={[styles.startButton, { backgroundColor: colors.primary }]}
             accessibilityRole="button"
-            accessibilityLabel={t('intents.startSession', { minutes: intent.recommendedMinutes })}
+            accessibilityLabel={[
+              t('intents.startSession', { minutes: intent.recommendedMinutes }),
+              presets[0] ? t('intents.startsWith', { name: t(presets[0].nameKey) }) : null,
+            ]
+              .filter(Boolean)
+              .join('. ')}
           >
             <Ionicons name="play" size={18} color={onPrimary} style={styles.startButtonIcon} />
             <Text style={[styles.startButtonText, { color: onPrimary }]}>
               {t('intents.startSession', { minutes: intent.recommendedMinutes })}
             </Text>
           </PressableScale>
+          {/* "Start a 30 minute session" never said what would come out of
+              the speaker. The first preset in the list is the recommended
+              one, so it is the one that starts. */}
+          {presets[0] && (
+            <Text style={[styles.startHint, { color: colors.textSecondary }]}>
+              {t('intents.startsWith', { name: t(presets[0].nameKey) })}
+            </Text>
+          )}
         </View>
 
         <View style={[styles.list, contentColumn]}>
-          {presets.map((preset) => (
-            <PresetCard
+          {presets.map((preset, i) => (
+            <PresetRow
               key={preset.id}
               preset={preset}
               onPress={() => handlePresetPress(preset.id)}
               isFavorite={isFavorite(preset.id)}
+              isPlaying={isPresetPlaying(preset.id)}
+              index={i}
             />
           ))}
         </View>
@@ -201,14 +229,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  backScrim: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
   heroText: {
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.md,
     gap: Spacing.xs,
   },
+  heroCatalog: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.8)',
+  },
+  heroCatalogCode: {
+    fontFamily: FontFamily.mono,
+    letterSpacing: 1.2,
+  },
   heroTitle: {
     ...Typography.largeTitle,
-    color: '#FFFFFF',
+    color: onImage,
   },
   heroDesc: {
     ...Typography.body,
@@ -223,9 +268,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: AccessibilitySize.minTouchTarget + 4,
-    borderRadius: 26,
+    minHeight: ControlSize.cta,
+    // Radius.card, like every other button. This and the onboarding CTA were
+    // the last two 26px pills in the app.
+    borderRadius: Radius.card,
     gap: Spacing.sm,
+  },
+  startHint: {
+    ...Typography.footnote,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
   },
   startButtonIcon: {
     marginLeft: -2,

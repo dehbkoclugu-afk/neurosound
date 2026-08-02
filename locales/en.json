@@ -17,7 +17,9 @@
     "addedToFavorites": "favourited",
     "seeAll": "See all",
     "showLess": "Show less",
-    "rename": "Rename"
+    "rename": "Rename",
+    "close": "Close",
+    "nowPlaying": "now playing"
   },
   "tabs": {
     "home": "Home",
@@ -37,7 +39,16 @@
     "intentsTitle": "What do you need right now?",
     "favoritesEmpty": "Tap the heart on any sound you like; it will collect here.",
     "headphoneNote": "Binaural beats need headphones to work.",
-    "recentlyPlayedEmpty": "Sounds you play will collect here."
+    "suggestedFor": {
+      "night": "Tonight",
+      "morning": "This morning",
+      "day": "Right now",
+      "evening": "This evening"
+    },
+    "otherIntents": "Or something else",
+    "recommendedMinutes": "{{minutes}} min recommended",
+    "recommendedMinutesSuffix": " min",
+    "soundCount": "{{n}} sounds"
   },
   "explore": {
     "title": "Explore Frequencies",
@@ -110,13 +121,16 @@
     "searchPlaceholder": "Search sounds",
     "favoritesOnly": "Favourites only",
     "aboutCategory": "About this category",
-    "noResults": "No sounds match your search."
+    "noResults": "No sounds match your search.",
+    "clearFilters": "Clear filters",
+    "sortByName": "Sort A–Z",
+    "clearSearch": "Clear search"
   },
   "mixer": {
     "title": "Sound Mixer",
-    "description": "Create your custom mix by combining multiple sounds. Save it for quick access later.",
     "addSound": "Add Sound",
     "volume": "Volume",
+    "master": "Master",
     "savePreset": "Save Preset",
     "presetName": "Preset Name",
     "namePlaceholder": "My Custom Mix",
@@ -129,7 +143,8 @@
     "addSoundFirst": "Add at least one sound to save a mix.",
     "mixSaved": "Your mix has been saved!",
     "deleteMix": "Delete mix",
-    "emptyDesc": "Layer multiple sounds: rain + brown noise + alpha, for example.",
+    "emptySlot": "Empty channel",
+    "transportDisabled": "Add a sound to play or save this mix.",
     "trySample": "Try a sample mix",
     "mute": "Mute",
     "channelsFull": "4 of 4 — remove one to add another",
@@ -185,7 +200,10 @@
     "resetTitle": "Reset data",
     "resetConfirm": "Favourites, mixes and all settings will be deleted. This cannot be undone.",
     "resetHint": "{{favorites}} favourites, {{mixes}} mixes",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "resetDone": "Everything has been reset.",
+    "totalListening": "Total listening",
+    "sessions": "Sessions"
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -221,7 +239,8 @@
     "relaxDesc": "Nature sounds and soft tones to unwind",
     "meditate": "Meditate",
     "meditateDesc": "Deep, calm tones for turning inward",
-    "startSession": "Start {{minutes}} min session"
+    "startSession": "Start {{minutes}} min session",
+    "startsWith": "Starts with {{name}}"
   },
   "onboarding": {
     "step1Title": "Tune into sound",

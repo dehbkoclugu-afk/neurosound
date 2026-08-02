@@ -45,6 +45,18 @@ export interface CustomMix {
     volume: number;
   }[];
   createdAt: number;
+  /**
+   * Catalogue number for the "ND-M01" stamp, assigned once at creation and
+   * never reused. Deriving it from list position would have renumbered every
+   * mix below a deleted one, which makes it a row number wearing an
+   * identifier's clothes — the exact complaint that got the intent codes
+   * changed.
+   *
+   * Optional because mixes saved before this field existed do not have one;
+   * the UI falls back to their position for those and they keep it as long as
+   * nothing earlier is deleted. Not worth a migration for a stamp.
+   */
+  catalogNumber?: number;
 }
 
 export interface RecentlyPlayed {
@@ -62,6 +74,14 @@ interface PresetsState {
   // Recently played
   recentlyPlayed: RecentlyPlayed[];
 
+  /** Total seconds of playback, ever. A tape counter for the whole deck —
+   *  the app kept a ten-item history and otherwise had no idea how much it
+   *  had been used, which in a catalogue/tape world is the one number the
+   *  metaphor was already promising. */
+  listenedSeconds: number;
+  /** How many times playback has been started. */
+  sessionCount: number;
+
   // Actions
   addFavorite: (presetId: string) => void;
   removeFavorite: (presetId: string) => void;
@@ -73,6 +93,8 @@ interface PresetsState {
 
   addRecentlyPlayed: (presetId: string) => void;
   clearRecentlyPlayed: () => void;
+  recordListening: (seconds: number) => void;
+  recordSessionStart: () => void;
 
   reset: () => void;
 }
@@ -82,6 +104,8 @@ const MAX_RECENTLY_PLAYED = 10;
 const initialState = {
   favoriteIds: [],
   customMixes: [],
+  listenedSeconds: 0,
+  sessionCount: 0,
   recentlyPlayed: [],
 };
 
@@ -113,6 +137,11 @@ export const usePresetsStore = create<PresetsState>()(
               ...mix,
               id,
               createdAt: Date.now(),
+              catalogNumber:
+                state.customMixes.reduce(
+                  (highest, m) => Math.max(highest, m.catalogNumber ?? 0),
+                  state.customMixes.length
+                ) + 1,
             },
           ],
         }));
@@ -146,6 +175,12 @@ export const usePresetsStore = create<PresetsState>()(
         }),
 
       clearRecentlyPlayed: () => set({ recentlyPlayed: [] }),
+
+      recordListening: (seconds) =>
+        set((state) => ({ listenedSeconds: state.listenedSeconds + Math.max(0, seconds) })),
+
+      recordSessionStart: () =>
+        set((state) => ({ sessionCount: state.sessionCount + 1 })),
 
       reset: () => set(initialState),
     }),

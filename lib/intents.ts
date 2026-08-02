@@ -13,13 +13,13 @@ export interface Intent {
   nameKey: string;
   descKey: string;
   icon: IconConfig;
-  color: string;
-  gradient: [string, string];
-  /** Atmospheric background — a generated glow-and-grain gradient in the
-   *  intent's own colour (assets/images/intents/), not a photo. Swap for
-   *  art-directed photography if/when that's shot; the shape (require'd
-   *  local asset) stays the same either way. */
+  /** Atmospheric background for the Intent detail hero only — a single
+   *  full-bleed moment earns the photo; the repeated Home card grid does
+   *  not (see DESIGN.md). */
   image: number;
+  /** Cosmetic catalog code for the Home label cards — a record-label
+   *  numbering convention, not a real product SKU. */
+  catalogCode: string;
   presetIds: string[];
   /** One-tap "start session" duration, in minutes — preset + timer + a
    *  comfortable volume together, instead of three separate steps every
@@ -33,9 +33,8 @@ export const intents: Intent[] = [
     nameKey: 'intents.sleep',
     descKey: 'intents.sleepDesc',
     icon: { name: 'moon', library: 'ionicon' },
-    color: '#6D83C9',
-    gradient: ['#1C2440', '#6D83C9'],
     image: require('@/assets/images/intents/sleep.jpg'),
+    catalogCode: 'ND-01',
     presetIds: [
       'binaural-delta',
       'noise-rain',
@@ -51,9 +50,8 @@ export const intents: Intent[] = [
     nameKey: 'intents.focus',
     descKey: 'intents.focusDesc',
     icon: { name: 'flash', library: 'ionicon' },
-    color: '#D99A4E',
-    gradient: ['#3D2A12', '#D99A4E'],
     image: require('@/assets/images/intents/focus.jpg'),
+    catalogCode: 'ND-02',
     presetIds: [
       'binaural-beta',
       'binaural-gamma',
@@ -68,9 +66,8 @@ export const intents: Intent[] = [
     nameKey: 'intents.relax',
     descKey: 'intents.relaxDesc',
     icon: { name: 'leaf', library: 'ionicon' },
-    color: '#7FB069',
-    gradient: ['#1E2E18', '#7FB069'],
     image: require('@/assets/images/intents/relax.jpg'),
+    catalogCode: 'ND-03',
     presetIds: [
       'binaural-alpha',
       'noise-ocean',
@@ -86,9 +83,8 @@ export const intents: Intent[] = [
     nameKey: 'intents.meditate',
     descKey: 'intents.meditateDesc',
     icon: { name: 'meditation', library: 'material' },
-    color: '#A78BFA',
-    gradient: ['#2A2244', '#A78BFA'],
     image: require('@/assets/images/intents/meditate.jpg'),
+    catalogCode: 'ND-04',
     presetIds: [
       'binaural-theta',
       'solfeggio-528',
@@ -102,4 +98,41 @@ export const intents: Intent[] = [
 
 export function getIntentById(id: string): Intent | undefined {
   return intents.find((i) => i.id === id);
+}
+
+/** Time-of-day bands. Named rather than numeric so the label the Home screen
+ *  prints ("Tonight", "This morning") stays tied to the rule that picked it. */
+export type TimeBand = 'night' | 'morning' | 'day' | 'evening';
+
+const BAND_INTENT: Record<TimeBand, IntentId> = {
+  night: 'sleep',
+  morning: 'meditate',
+  day: 'focus',
+  evening: 'relax',
+};
+
+/**
+ * Which band a wall-clock hour (0–23) falls in.
+ *
+ * An app whose whole premise is "what do you need right now?" was asking the
+ * question at 3am and 3pm with the identical four answers in the identical
+ * order. The clock is the one thing it already knows about the moment.
+ *
+ * Bands are contiguous and cover all 24 hours; night wraps midnight.
+ */
+export function getTimeBand(hour: number): TimeBand {
+  if (hour >= 22 || hour < 6) return 'night';
+  if (hour < 9) return 'morning';
+  if (hour < 17) return 'day';
+  return 'evening';
+}
+
+/** The intent to surface first, given the hour. Never throws: every band maps
+ *  to an intent that exists in `intents`. */
+export function getSuggestedIntent(hour: number): { intent: Intent; band: TimeBand } {
+  const band = getTimeBand(hour);
+  const id = BAND_INTENT[band];
+  // `intents` is a static list containing all four ids, so this cannot miss.
+  const intent = intents.find((i) => i.id === id)!;
+  return { intent, band };
 }

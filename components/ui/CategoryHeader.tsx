@@ -16,6 +16,10 @@ import { Spacing, Typography, FontFamily } from '@/constants/theme';
 interface CategoryHeaderProps {
   title: string;
   subtitle?: string;
+  /** A readout, not a caption: "3/4". Set in the tape-counter face and sized
+   *  a step above `subtitle`, which left the mixer's channel count looking
+   *  like fine print rather than a gauge. */
+  counter?: string;
   onSeeAll?: () => void;
   seeAllText?: string;
   iconName?: string; // kept for API compat, unused
@@ -25,6 +29,7 @@ interface CategoryHeaderProps {
 export function CategoryHeader({
   title,
   subtitle,
+  counter,
   onSeeAll,
   seeAllText = 'See All',
   style,
@@ -46,6 +51,11 @@ export function CategoryHeader({
           </Text>
         )}
       </View>
+      {counter && (
+        <Text style={[styles.counter, { color: colors.textSecondary }]}>
+          {counter}
+        </Text>
+      )}
       {onSeeAll && (
         <TouchableOpacity
           onPress={onSeeAll}
@@ -77,11 +87,16 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   title: {
-    ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
+    ...Typography.label,
+    textTransform: 'uppercase',
   },
   subtitle: {
     ...Typography.caption,
+  },
+  counter: {
+    ...Typography.footnote,
+    ...Typography.numeral,
+    paddingLeft: Spacing.sm,
   },
   seeAllButton: {
     paddingVertical: Spacing.xs,

@@ -10,7 +10,7 @@ import { Text, ViewStyle, TextStyle } from 'react-native';
 
 import { PressableScale } from './PressableScale';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, Spacing, Typography, onPrimary } from '@/constants/theme';
+import { AccessibilitySize, Radius, Spacing, Typography, onPrimary } from '@/constants/theme';
 
 interface ButtonProps {
   title: string;
@@ -45,7 +45,7 @@ export function Button({
     const baseStyle: ViewStyle = {
       minHeight: AccessibilitySize.minTouchTarget,
       minWidth: AccessibilitySize.minTouchTarget,
-      borderRadius: AccessibilitySize.borderRadius,
+      borderRadius: Radius.card,
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: iconPosition === 'right' ? 'row-reverse' : 'row',
@@ -68,7 +68,7 @@ export function Button({
       },
       secondary: {
         backgroundColor: 'transparent',
-        borderWidth: 2,
+        borderWidth: 1.5,
         borderColor: colors.primary,
       },
       ghost: {

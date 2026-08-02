@@ -40,7 +40,9 @@ const safeStorage: StateStorage = {
 };
 
 export type ThemeMode = 'light' | 'dark' | 'night' | 'auto';
-export type Language = 'tr' | 'en';
+/** Any code in `locales/index.ts`. Kept as a plain string rather than a
+ *  union so adding a language is one row in that file and nothing else. */
+export type Language = string;
 
 interface SettingsState {
   // Appearance
@@ -85,7 +87,7 @@ const initialState = {
   lowContrast: false,
   haptics: true,
   // Seeded from the device locale so a first launch agrees with i18n
-  language: deviceLanguageOrDefault as Language,
+  language: deviceLanguageOrDefault,
   maxVolume: 0.8,
   defaultVolume: 0.5,
   hasSeenOnboarding: false,
