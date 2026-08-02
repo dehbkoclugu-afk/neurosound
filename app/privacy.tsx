@@ -11,7 +11,7 @@ import { contentColumn } from '@/constants/layout';
 
 // App never leaves 1.0.0 without a version bump, so this doubles as the
 // policy's own "last updated" date without a second constant to keep in sync.
-const LAST_UPDATED = '2026-07-26';
+const LAST_UPDATED = '2026-08-01';
 
 const SECTIONS = [
   ['summaryTitle', 'summaryBody'],
@@ -20,6 +20,7 @@ const SECTIONS = [
   ['accountsTitle', 'accountsBody'],
   ['childrenTitle', 'childrenBody'],
   ['changesTitle', 'changesBody'],
+  ['contactTitle', 'contactBody'],
 ] as const;
 
 export default function PrivacyScreen() {

@@ -28,7 +28,7 @@ type Generator = BinauralPlayer | NoisePlayer | TonePlayer;
 
 let generator: Generator | null = null;
 let currentId: string | null = null;
-let timerInterval: ReturnType<typeof setInterval> | null = null;
+let timerTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // ---------------------------------------------------------------------------
 // Lock screen / now-playing — a background sound app with no lock screen
@@ -39,17 +39,42 @@ let timerInterval: ReturnType<typeof setInterval> | null = null;
 
 let lockScreenPlayer: AudioPlayer | null = null;
 let lockScreenSubscription: { remove: () => void } | null = null;
+let lockScreenOwner: 'single' | 'mixer' | null = null;
+let mirroringMediaCommand = false;
 
 /** Mirrors a lock-screen-triggered play/pause back into the store, so the
  *  in-app button reflects reality if the user opens the app again without
  *  having touched it directly. */
-function watchLockScreenPlayer(player: AudioPlayer): void {
-  if (player === lockScreenPlayer) return;
+function watchLockScreenPlayer(player: AudioPlayer, owner: 'single' | 'mixer'): void {
+  if (player === lockScreenPlayer && owner === lockScreenOwner) return;
   lockScreenSubscription?.remove();
   lockScreenPlayer = player;
+  lockScreenOwner = owner;
   lockScreenSubscription = player.addListener('playbackStatusUpdate', (status) => {
-    if (useAudioStore.getState().isMixerPlaying) return; // owned by the mixer path
-    useAudioStore.getState().setIsPlaying(status.playing);
+    if (mirroringMediaCommand) return;
+    const store = useAudioStore.getState();
+    if (owner === 'single') {
+      if (store.isPlaying === status.playing) return;
+      store.setIsPlaying(status.playing);
+      if (status.playing) beginListening();
+      else endListening();
+      return;
+    }
+    if (store.isMixerPlaying === status.playing) return;
+    mirroringMediaCommand = true;
+    try {
+      mixerGenerators.forEach((gen) => {
+        const nativePlayer = gen.getNativePlayer();
+        if (!nativePlayer || nativePlayer === player) return;
+        if (status.playing) nativePlayer.play();
+        else nativePlayer.pause();
+      });
+      store.setIsMixerPlaying(status.playing);
+      if (status.playing) beginListening();
+      else endListening();
+    } finally {
+      mirroringMediaCommand = false;
+    }
   });
 }
 
@@ -75,24 +100,30 @@ function ensureArtwork(): string | undefined {
   return artworkUri ?? undefined;
 }
 
-function setNowPlaying(title: string): void {
+function setNowPlaying(
+  player: AudioPlayer | null,
+  title: string,
+  owner: 'single' | 'mixer'
+): void {
   if (Platform.OS === 'web') return;
-  const player = generator?.getNativePlayer() ?? null;
   if (!player) return;
+  if (lockScreenPlayer && lockScreenPlayer !== player) clearNowPlaying();
   player.setActiveForLockScreen(true, {
     title,
     artist: 'NeuroSound',
     artworkUrl: ensureArtwork(),
-  });
-  watchLockScreenPlayer(player);
+  }, { showSeekBackward: false, showSeekForward: false });
+  watchLockScreenPlayer(player, owner);
 }
 
 function clearNowPlaying(): void {
   if (Platform.OS === 'web') return;
+  const player = lockScreenPlayer;
   lockScreenSubscription?.remove();
   lockScreenSubscription = null;
   lockScreenPlayer = null;
-  generator?.getNativePlayer()?.clearLockScreenControls();
+  lockScreenOwner = null;
+  player?.clearLockScreenControls();
 }
 
 function createGenerator(preset: FrequencyPreset): Generator | null {
@@ -262,7 +293,9 @@ export async function play(): Promise<void> {
   store.setPlaybackError(false);
   try {
     setGenVolume(0); // fade in from silence
-    await gen.play();
+    const nativePlayer = gen.getNativePlayer();
+    if (nativePlayer && gen.getIsPlaying()) nativePlayer.play();
+    else await gen.play();
     if (generator !== gen || !gen.getIsPlaying()) {
       // Either superseded (unloaded/switched while awaiting) or the
       // generator swallowed its own error — either way, this attempt is
@@ -274,7 +307,7 @@ export async function play(): Promise<void> {
     useAudioStore.getState().setIsPlaying(true);
     beginListening();
     const preset = useAudioStore.getState().currentPreset;
-    if (preset) setNowPlaying(i18n.t(preset.nameKey));
+    if (preset) setNowPlaying(gen.getNativePlayer(), i18n.t(preset.nameKey), 'single');
   } catch (e) {
     if (generator === gen) useAudioStore.getState().setPlaybackError(true);
   } finally {
@@ -294,8 +327,10 @@ export function pause(immediate: boolean = false): void {
     gen.stop();
     return;
   }
+  const nativePlayer = gen.getNativePlayer();
   ramp(0, FADE_OUT_MS, () => {
-    gen.stop();
+    if (nativePlayer) nativePlayer.pause();
+    else gen.stop();
   });
 }
 
@@ -337,9 +372,9 @@ export function unload(): void {
 }
 
 function clearTimer(): void {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+  if (timerTimeout) {
+    clearTimeout(timerTimeout);
+    timerTimeout = null;
   }
   useAudioStore.getState().setTimer(null);
 }
@@ -373,6 +408,8 @@ function stopForTimer(): void {
 }
 
 function evaluateTimer(): void {
+  if (timerTimeout) clearTimeout(timerTimeout);
+  timerTimeout = null;
   const { timerEndsAt, updateTimerRemaining, isPlaying, isMixerPlaying } =
     useAudioStore.getState();
   if (timerEndsAt === null) {
@@ -394,18 +431,20 @@ function evaluateTimer(): void {
   if ((isPlaying || isMixerPlaying) && remaining <= TIMER_FADE_WINDOW_S && !rampInterval) {
     applyTimerFade(remaining / TIMER_FADE_WINDOW_S);
   }
+
+  timerTimeout = setTimeout(evaluateTimer, Math.min(1000, remaining * 1000));
 }
 
 /** Sleep timer: counts down globally, pauses playback when done. */
 export function startTimer(minutes: number | null): void {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+  if (timerTimeout) {
+    clearTimeout(timerTimeout);
+    timerTimeout = null;
   }
   useAudioStore.getState().setTimer(minutes);
   if (!minutes) return;
 
-  timerInterval = setInterval(evaluateTimer, 1000);
+  evaluateTimer();
 }
 
 // A suspended JS thread stops ticking; re-evaluating on resume closes the gap.
@@ -447,22 +486,36 @@ async function startMixerChannels(
   mixerChannels: MixerChannelState[],
   maxVolume: number
 ): Promise<void> {
-  for (const ch of mixerChannels) {
-    let gen = mixerGenerators.get(ch.id);
-    if (!gen) {
-      const created = createGenerator(ch.preset);
-      if (!created) continue;
-      gen = created;
-      mixerGenerators.set(ch.id, gen);
+  try {
+    for (const ch of mixerChannels) {
+      let gen = mixerGenerators.get(ch.id);
+      if (!gen) {
+        const created = createGenerator(ch.preset);
+        if (!created) continue;
+        gen = created;
+        mixerGenerators.set(ch.id, gen);
+      }
+      gen.setVolume(channelVolume(ch, maxVolume));
+      await gen.play();
+      if (!gen.getIsPlaying()) throw new Error(`Mixer channel failed: ${ch.id}`);
     }
-    gen.setVolume(channelVolume(ch, maxVolume));
-    await gen.play();
+    useAudioStore.getState().setIsMixerPlaying(true);
+    beginListening();
+    const leader = mixerGenerators.values().next().value as Generator | undefined;
+    setNowPlaying(leader?.getNativePlayer() ?? null, 'NeuroSound Mixer', 'mixer');
+  } catch {
+    mixerGenerators.forEach((gen) => {
+      gen.stop();
+      gen.dispose();
+    });
+    mixerGenerators.clear();
+    useAudioStore.getState().setIsMixerPlaying(false);
+    useAudioStore.getState().setPlaybackError(true);
   }
-  useAudioStore.getState().setIsMixerPlaying(true);
-  beginListening();
 }
 
 export function mixerStop(): void {
+  if (lockScreenOwner === 'mixer') clearNowPlaying();
   mixerGenerators.forEach((gen) => {
     gen.stop();
     gen.dispose();

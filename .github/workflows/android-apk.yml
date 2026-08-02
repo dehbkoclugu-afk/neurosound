@@ -83,18 +83,20 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
+            set -euo pipefail
             adb install app-release.apk
             adb logcat -c
-            adb shell monkey -p com.neurosound.app -c android.intent.category.LAUNCHER 1
+            adb shell am start -W -n com.neurosound.app/.MainActivity
             sleep 30
             adb logcat -d > logcat.txt
-            echo "===== JAVA CRASH ====="
-            grep -B 2 -A 80 "FATAL EXCEPTION" logcat.txt || echo "yok"
-            echo "===== NATIVE CRASH ====="
-            grep -B 2 -A 80 -E "Fatal signal|tombstoned" logcat.txt || echo "yok"
-            echo "===== UYGULAMA IZLERI ====="
-            grep -E "neurosound|AndroidRuntime|ReactNativeJS|E ReactNative|Hermes|hermes|SoLoader|UnsatisfiedLink" logcat.txt | tail -150 || true
-            adb shell pidof com.neurosound.app && echo "SUREC CALISIYOR" || echo "SUREC OLU"
+            if ! adb shell pidof com.neurosound.app; then
+              echo "Uygulama süreci çalışmıyor"
+              exit 1
+            fi
+            if grep -E "FATAL EXCEPTION|Fatal signal|tombstoned" logcat.txt; then
+              echo "Fatal Android çökmesi bulundu"
+              exit 1
+            fi
 
       - name: Logcat'i yükle
         if: always()

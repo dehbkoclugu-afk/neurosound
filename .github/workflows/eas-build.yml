@@ -46,6 +46,23 @@ jobs:
 
       - run: npm ci
 
+      - name: Yayın girdilerini doğrula
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          test -n "$EXPO_TOKEN" || { echo "EXPO_TOKEN eksik"; exit 1; }
+          if [[ "${{ inputs.submit }}" == "true" ]]; then
+            [[ "${{ inputs.profile }}" == "production" ]] || { echo "Submit yalnız production profile ile yapılabilir"; exit 1; }
+            if [[ "${{ inputs.platform }}" == "android" || "${{ inputs.platform }}" == "all" ]]; then
+              test -n "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" || { echo "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON eksik"; exit 1; }
+              printf '%s' "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" > play-service-account.json
+              jq -e . play-service-account.json >/dev/null
+              chmod 600 play-service-account.json
+            fi
+          fi
+
       - name: EAS build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -56,12 +73,28 @@ jobs:
             --non-interactive \
             --wait
 
-      - name: EAS submit
-        if: ${{ inputs.submit }}
+      - name: Android mağazaya gönder
+        if: ${{ inputs.submit && (inputs.platform == 'android' || inputs.platform == 'all') }}
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           npx eas-cli submit \
-            --platform ${{ inputs.platform }} \
+            --platform android \
+            --profile production \
             --latest \
             --non-interactive
+
+      - name: iOS mağazaya gönder
+        if: ${{ inputs.submit && (inputs.platform == 'ios' || inputs.platform == 'all') }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npx eas-cli submit \
+            --platform ios \
+            --profile production \
+            --latest \
+            --non-interactive
+
+      - name: Geçici mağaza anahtarını sil
+        if: always()
+        run: rm -f play-service-account.json

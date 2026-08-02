@@ -62,7 +62,7 @@
     "noiseDescription": "Il rumore di fondo può coprire i suoni fastidiosi e migliorare la concentrazione o il sonno.",
     "binauralTypes": {
       "delta": "Delta (0,5–4 Hz)",
-      "deltaDesc": "Sonno profondo, recupero",
+      "deltaDesc": "Suono del sonno a bassa frequenza",
       "theta": "Theta (4–8 Hz)",
       "thetaDesc": "Meditazione, creatività",
       "alpha": "Alfa (8–14 Hz)",
@@ -211,7 +211,7 @@
     "summaryTitle": "In breve",
     "summaryBody": "NeuroSound non raccoglie, non conserva e non trasmette alcun tuo dato. Tutto ciò che fai in questa app — preferiti, mix personalizzati e impostazioni — resta sul tuo dispositivo.",
     "dataTitle": "Cosa salva l'app",
-    "dataBody": "I tuoi preferiti, i mix salvati e le preferenze (tema, lingua, volume, impostazioni di accessibilità) sono salvati localmente sul dispositivo nella memoria standard di sistema. Questi dati non lasciano mai il dispositivo, non vengono mai inviati a noi né ad altri, e vengono eliminati se disinstalli l'app o usi «Azzera i dati» nelle impostazioni.",
+    "dataBody": "Preferiti, mix e impostazioni sono salvati localmente. Il backup cloud Android è disattivato. I dati non vengono inviati a noi o a terzi e vengono eliminati disinstallando o azzerando l'app.",
     "networkTitle": "Accesso alla rete",
     "networkBody": "NeuroSound non effettua alcuna richiesta di rete. Funziona completamente offline e non comunica con alcun server, servizio di analisi o terza parte.",
     "accountsTitle": "Account e identificatori",
@@ -219,7 +219,9 @@
     "childrenTitle": "Minori",
     "childrenBody": "Poiché non si raccolgono dati da nessuno, questo vale allo stesso modo per utenti di qualsiasi età.",
     "changesTitle": "Modifiche a questa informativa",
-    "changesBody": "Se questa informativa cambierà, l'aggiornamento arriverà con una nuova versione dell'app e la data qui sopra cambierà di conseguenza."
+    "changesBody": "Se questa informativa cambierà, l'aggiornamento arriverà con una nuova versione dell'app e la data qui sopra cambierà di conseguenza.",
+    "contactTitle": "Sviluppatore e contatto",
+    "contactBody": "Sviluppatore: DEHB Koçluğu. Contatto: dehbkoclugu@gmail.com"
   },
   "accessibility": {
     "playButton": "Pulsante riproduci",

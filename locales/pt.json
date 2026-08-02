@@ -62,7 +62,7 @@
     "noiseDescription": "O ruído de fundo pode mascarar sons incômodos e melhorar a concentração ou o sono.",
     "binauralTypes": {
       "delta": "Delta (0,5–4 Hz)",
-      "deltaDesc": "Sono profundo, recuperação",
+      "deltaDesc": "Som de sono de baixa frequência",
       "theta": "Theta (4–8 Hz)",
       "thetaDesc": "Meditação, criatividade",
       "alpha": "Alfa (8–14 Hz)",
@@ -211,7 +211,7 @@
     "summaryTitle": "Em resumo",
     "summaryBody": "O NeuroSound não coleta, não armazena e não transmite nenhum dado seu. Tudo o que você faz neste app — favoritos, mixagens personalizadas e ajustes — fica no seu dispositivo.",
     "dataTitle": "O que o app armazena",
-    "dataBody": "Seus favoritos, mixagens salvas e preferências (tema, idioma, volume, ajustes de acessibilidade) são salvos localmente no seu dispositivo usando o armazenamento padrão do sistema. Esses dados nunca saem do seu dispositivo, nunca são enviados para nós nem para ninguém, e são apagados se você desinstalar o app ou usar «Apagar dados» nos ajustes.",
+    "dataBody": "Favoritos, mixagens e ajustes ficam armazenados localmente. O backup em nuvem do Android está desativado. Os dados não são enviados para nós nem para terceiros e são apagados ao desinstalar ou redefinir o app.",
     "networkTitle": "Acesso à rede",
     "networkBody": "O NeuroSound não faz nenhuma requisição de rede. Funciona totalmente offline e não se comunica com nenhum servidor, serviço de análise ou terceiro.",
     "accountsTitle": "Contas e identificadores",
@@ -219,7 +219,9 @@
     "childrenTitle": "Crianças",
     "childrenBody": "Como nenhum dado é coletado de ninguém, isso vale igualmente para pessoas de qualquer idade.",
     "changesTitle": "Alterações nesta política",
-    "changesBody": "Se esta política mudar, a atualização virá com uma nova versão do app e a data acima será alterada."
+    "changesBody": "Se esta política mudar, a atualização virá com uma nova versão do app e a data acima será alterada.",
+    "contactTitle": "Desenvolvedor e contato",
+    "contactBody": "Desenvolvedor: DEHB Koçluğu. Contato: dehbkoclugu@gmail.com"
   },
   "accessibility": {
     "playButton": "Botão de reprodução",

@@ -45,6 +45,9 @@ export type ThemeMode = 'light' | 'dark' | 'night' | 'auto';
 export type Language = string;
 
 interface SettingsState {
+  // Runtime-only persistence lifecycle
+  hasHydrated: boolean;
+
   // Appearance
   theme: ThemeMode;
   reduceMotion: boolean;
@@ -77,10 +80,12 @@ interface SettingsState {
   setHasSeenHeadphoneWarning: (seen: boolean) => void;
   setHasSeenEpilepsyWarning: (seen: boolean) => void;
   markCategoryDescriptionSeen: (category: string) => void;
+  setHasHydrated: (hydrated: boolean) => void;
   resetSettings: () => void;
 }
 
 const initialState = {
+  hasHydrated: false,
   // Dark-first: the primary use case is at night, in a dark room
   theme: 'dark' as ThemeMode,
   reduceMotion: false,
@@ -115,7 +120,9 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({
           seenCategoryDescriptions: { ...state.seenCategoryDescriptions, [category]: true },
         })),
-      resetSettings: () => set(initialState),
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+      resetSettings: () =>
+        set((state) => ({ ...initialState, hasHydrated: state.hasHydrated })),
     }),
     {
       name: 'neurosound-settings',
@@ -127,6 +134,7 @@ export const useSettingsStore = create<SettingsState>()(
         if (state?.language && i18n.language !== state.language) {
           i18n.changeLanguage(state.language).catch(() => {});
         }
+        state?.setHasHydrated(true);
       },
     }
   )

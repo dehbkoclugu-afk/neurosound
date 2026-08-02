@@ -11,6 +11,7 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
@@ -43,7 +44,12 @@ const RECENT_PREVIEW = 3;
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, hasSeenOnboarding } = useSettingsStore();
+  const {
+    hasHydrated,
+    hasSeenHeadphoneWarning,
+    setHasSeenHeadphoneWarning,
+    hasSeenOnboarding,
+  } = useSettingsStore();
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
@@ -74,6 +80,17 @@ export default function HomeScreen() {
     () => getPresetById(suggestedIntent.presetIds[0]),
     [suggestedIntent.presetIds]
   );
+
+  // AsyncStorage hydration must finish before the onboarding default is used.
+  if (!hasHydrated) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.hydrationLoading}>
+          <ActivityIndicator size="small" color={colors.tint} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // Route guard, not a post-render push: rendering Home for a frame and then
   // navigating away read as a flash, and left onboarding with no history to
@@ -338,6 +355,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  hydrationLoading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scrollView: {
     flex: 1,

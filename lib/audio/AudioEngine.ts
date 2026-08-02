@@ -21,7 +21,7 @@ async function initAudioMode() {
       allowsRecording: false,
       playsInSilentMode: true,
       shouldPlayInBackground: true,
-      interruptionMode: 'duckOthers',
+      interruptionMode: 'doNotMix',
       shouldRouteThroughEarpiece: false,
     });
   } catch (e) {
