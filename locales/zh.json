@@ -62,7 +62,7 @@
     "noiseDescription": "背景噪声可以掩盖干扰的声音，帮助集中注意力或改善睡眠。",
     "binauralTypes": {
       "delta": "δ 波（0.5–4 Hz）",
-      "deltaDesc": "深度睡眠、恢复",
+      "deltaDesc": "低频睡眠声音",
       "theta": "θ 波（4–8 Hz）",
       "thetaDesc": "冥想、创造力",
       "alpha": "α 波（8–14 Hz）",
@@ -211,7 +211,7 @@
     "summaryTitle": "简而言之",
     "summaryBody": "NeuroSound 不收集、不存储、也不传输你的任何数据。你在这个应用里做的一切——收藏、自定义混音和设置——都留在你的设备上。",
     "dataTitle": "应用保存了什么",
-    "dataBody": "你的收藏、已保存的混音和偏好设置（主题、语言、音量、辅助功能设置）通过系统标准存储保存在本机。这些数据从不离开你的设备，从不发送给我们或任何第三方，卸载应用或在设置中使用「清除数据」后即被删除。",
+    "dataBody": "收藏、混音和设置保存在设备本地。Android 云备份已关闭。数据不会发送给我们或第三方，并会在卸载或重置应用时删除。",
     "networkTitle": "网络访问",
     "networkBody": "NeuroSound 不发起任何网络请求。它完全离线运行，不与任何服务器、分析服务或第三方通信。",
     "accountsTitle": "账户与标识符",
@@ -219,7 +219,9 @@
     "childrenTitle": "儿童",
     "childrenBody": "由于不从任何人处收集数据，这一点对所有年龄的使用者同样适用。",
     "changesTitle": "本政策的变更",
-    "changesBody": "如果本政策有变更，更新会随新版本应用一起发布，上方日期也会相应更改。"
+    "changesBody": "如果本政策有变更，更新会随新版本应用一起发布，上方日期也会相应更改。",
+    "contactTitle": "开发者与联系方式",
+    "contactBody": "开发者：DEHB Koçluğu。联系邮箱：dehbkoclugu@gmail.com"
   },
   "accessibility": {
     "playButton": "播放按钮",

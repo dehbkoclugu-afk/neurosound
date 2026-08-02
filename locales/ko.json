@@ -62,7 +62,7 @@
     "noiseDescription": "배경 소음은 방해되는 소리를 덮어 집중이나 수면에 도움이 될 수 있습니다.",
     "binauralTypes": {
       "delta": "델타 (0.5~4 Hz)",
-      "deltaDesc": "깊은 수면, 회복",
+      "deltaDesc": "저주파 수면 사운드",
       "theta": "세타 (4~8 Hz)",
       "thetaDesc": "명상, 창의성",
       "alpha": "알파 (8~14 Hz)",
@@ -211,7 +211,7 @@
     "summaryTitle": "요약",
     "summaryBody": "NeuroSound는 어떤 데이터도 수집·저장·전송하지 않습니다. 이 앱에서 하는 모든 것(즐겨찾기, 직접 만든 믹스, 설정)은 기기 안에 머뭅니다.",
     "dataTitle": "앱이 저장하는 것",
-    "dataBody": "즐겨찾기, 저장한 믹스, 환경설정(테마, 언어, 음량, 접근성 설정)은 기기의 표준 저장소에 로컬로 저장됩니다. 이 데이터는 기기를 벗어나지 않으며, 저희나 제3자에게 전송되지 않고, 앱을 삭제하거나 설정에서 '데이터 초기화'를 사용하면 지워집니다.",
+    "dataBody": "즐겨찾기, 믹스와 설정은 기기에 로컬로 저장됩니다. Android 클라우드 백업은 비활성화되어 있습니다. 데이터는 저희나 제3자에게 전송되지 않으며 앱 삭제 또는 초기화 시 지워집니다.",
     "networkTitle": "네트워크 접근",
     "networkBody": "NeuroSound는 어떤 네트워크 요청도 하지 않습니다. 완전히 오프라인으로 작동하며 서버, 분석 서비스, 제3자와 통신하지 않습니다.",
     "accountsTitle": "계정과 식별자",
@@ -219,7 +219,9 @@
     "childrenTitle": "어린이",
     "childrenBody": "누구에게서도 데이터를 수집하지 않으므로 모든 연령의 사용자에게 동일하게 적용됩니다.",
     "changesTitle": "방침 변경",
-    "changesBody": "이 방침이 바뀌면 새 앱 버전과 함께 반영되며 위의 날짜도 그에 맞게 변경됩니다."
+    "changesBody": "이 방침이 바뀌면 새 앱 버전과 함께 반영되며 위의 날짜도 그에 맞게 변경됩니다.",
+    "contactTitle": "개발자 및 연락처",
+    "contactBody": "개발자: DEHB Koçluğu. 연락처: dehbkoclugu@gmail.com"
   },
   "accessibility": {
     "playButton": "재생 버튼",

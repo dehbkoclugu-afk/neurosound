@@ -62,7 +62,7 @@
     "noiseDescription": "Arka plan gürültüsü dikkat dağıtıcı sesleri maskeleyerek odaklanma veya uyku kalitesini artırabilir.",
     "binauralTypes": {
       "delta": "Delta (0.5-4 Hz)",
-      "deltaDesc": "Derin uyku, iyileşme",
+      "deltaDesc": "Düşük frekanslı uyku sesi",
       "theta": "Theta (4-8 Hz)",
       "thetaDesc": "Meditasyon, yaratıcılık",
       "alpha": "Alpha (8-14 Hz)",
@@ -211,7 +211,7 @@
     "summaryTitle": "Kısaca",
     "summaryBody": "NeuroSound hiçbir verinizi toplamaz, saklamaz ya da başka bir yere göndermez. Uygulamada yaptığınız her şey — favoriler, özel karışımlar ve ayarlar — yalnızca cihazınızda kalır.",
     "dataTitle": "Uygulama neyi saklıyor",
-    "dataBody": "Favorileriniz, kaydettiğiniz karışımlar ve tercihleriniz (tema, dil, ses seviyesi, erişilebilirlik ayarları) cihazınızda standart yerel depolama ile saklanır. Bu veriler cihazınızdan hiçbir zaman çıkmaz, bize ya da başka birine gönderilmez; uygulamayı kaldırdığınızda veya Ayarlar'daki Verileri sıfırla seçeneğini kullandığınızda otomatik olarak silinir.",
+    "dataBody": "Favorileriniz, kaydettiğiniz karışımlar ve tercihleriniz cihazınızda yerel olarak saklanır. Android bulut yedeklemesi kapalıdır. Bu veriler bize veya üçüncü taraflara gönderilmez; uygulamayı kaldırdığınızda ya da Verileri sıfırla seçeneğini kullandığınızda silinir.",
     "networkTitle": "Ağ erişimi",
     "networkBody": "NeuroSound hiçbir ağ isteği yapmaz. Tamamen çevrimdışı çalışır; hiçbir sunucu, analiz servisi ya da üçüncü tarafla iletişim kurmaz.",
     "accountsTitle": "Hesaplar ve kimlikler",
@@ -219,7 +219,9 @@
     "childrenTitle": "Çocuklar",
     "childrenBody": "Kimseden hiçbir veri toplanmadığı için bu, her yaştan kullanıcı için aynı şekilde geçerlidir.",
     "changesTitle": "Bu politikadaki değişiklikler",
-    "changesBody": "Bu politika değişirse, güncelleme yeni bir uygulama sürümüyle birlikte gelir ve yukarıdaki tarih buna göre değişir."
+    "changesBody": "Bu politika değişirse, güncelleme yeni bir uygulama sürümüyle birlikte gelir ve yukarıdaki tarih buna göre değişir.",
+    "contactTitle": "Geliştirici ve iletişim",
+    "contactBody": "Geliştirici: DEHB Koçluğu. İletişim: dehbkoclugu@gmail.com"
   },
   "accessibility": {
     "playButton": "Oynat butonu",

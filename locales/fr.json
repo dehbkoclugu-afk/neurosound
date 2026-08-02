@@ -62,7 +62,7 @@
     "noiseDescription": "Un bruit de fond peut masquer les sons gênants et améliorer la concentration ou le sommeil.",
     "binauralTypes": {
       "delta": "Delta (0,5–4 Hz)",
-      "deltaDesc": "Sommeil profond, récupération",
+      "deltaDesc": "Son de sommeil basse fréquence",
       "theta": "Thêta (4–8 Hz)",
       "thetaDesc": "Méditation, créativité",
       "alpha": "Alpha (8–14 Hz)",
@@ -211,7 +211,7 @@
     "summaryTitle": "En bref",
     "summaryBody": "NeuroSound ne collecte, ne stocke et ne transmet aucune de vos données. Tout ce que vous faites dans cette application — favoris, mix personnalisés et réglages — reste sur votre appareil.",
     "dataTitle": "Ce que l'application enregistre",
-    "dataBody": "Vos favoris, vos mix enregistrés et vos préférences (thème, langue, volume, réglages d'accessibilité) sont conservés localement sur votre appareil, dans le stockage standard. Ces données ne quittent jamais votre appareil, ne nous sont jamais envoyées ni à quiconque, et sont supprimées si vous désinstallez l'application ou utilisez « Réinitialiser les données » dans les réglages.",
+    "dataBody": "Vos favoris, mix et réglages sont stockés localement. La sauvegarde cloud Android est désactivée. Les données ne nous sont pas envoyées, ni à des tiers, et sont supprimées lors de la désinstallation ou de la réinitialisation.",
     "networkTitle": "Accès au réseau",
     "networkBody": "NeuroSound n'effectue aucune requête réseau. L'application fonctionne entièrement hors ligne et ne communique avec aucun serveur, service d'analyse ou tiers.",
     "accountsTitle": "Comptes et identifiants",
@@ -219,7 +219,9 @@
     "childrenTitle": "Enfants",
     "childrenBody": "Puisqu'aucune donnée n'est collectée, cela vaut de la même façon pour les utilisateurs de tout âge.",
     "changesTitle": "Modifications de cette politique",
-    "changesBody": "Si cette politique change, la mise à jour sera publiée avec une nouvelle version de l'application et la date ci-dessus sera modifiée en conséquence."
+    "changesBody": "Si cette politique change, la mise à jour sera publiée avec une nouvelle version de l'application et la date ci-dessus sera modifiée en conséquence.",
+    "contactTitle": "Développeur et contact",
+    "contactBody": "Développeur : DEHB Koçluğu. Contact : dehbkoclugu@gmail.com"
   },
   "accessibility": {
     "playButton": "Bouton lecture",
