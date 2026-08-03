@@ -6,6 +6,10 @@ name: Android APK
 
 on:
   workflow_dispatch:
+  push:
+    branches: [agent/fix-light-card-fit]
+    paths:
+      - .github/workflows/android-apk.yml
 
 jobs:
   apk:
