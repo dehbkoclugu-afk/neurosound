@@ -87,7 +87,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            set -euo pipefail
+            set -eu
             adb install app-release.apk
             adb logcat -c
             adb shell am start -W -n com.neurosound.app/.MainActivity
