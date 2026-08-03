@@ -18,8 +18,8 @@ import { useRouter, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, Radius, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import { useThemeColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, FontFamily, Radius } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -31,6 +31,8 @@ import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
+import { ArtBackground } from '@/components/ui/ArtBackground';
+import { intentArt } from '@/lib/artAssets';
 
 
 // How many favourites the home screen previews before offering the rest.
@@ -53,7 +55,6 @@ export default function HomeScreen() {
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
-  const intentColors = useIntentColors();
   const miniPlayerInset = useMiniPlayerInset();
   const isPresetPlaying = useIsPresetPlaying();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
@@ -152,7 +153,7 @@ export default function HomeScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Intent Section — primary entry, typographic */}
+        {/* Intent Section — primary entry, led by cinematic local artwork. */}
         <View style={styles.section}>
           <Text
             style={[styles.intentsTitle, { color: colors.text }]}
@@ -168,13 +169,7 @@ export default function HomeScreen() {
             onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
             scaleTo={0.99}
             pressedOpacity={0.85}
-            style={[
-              styles.intentCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: withAlpha(intentColors[suggestedIntent.id], 0.45),
-              },
-            ]}
+            style={styles.intentCard}
             accessibilityRole="button"
             accessibilityLabel={[
               t(`home.suggestedFor.${band}`),
@@ -186,54 +181,51 @@ export default function HomeScreen() {
               .filter(Boolean)
               .join('. ')}
           >
-            <View
-              style={[
-                styles.intentSpine,
-                styles.featuredSpine,
-                { backgroundColor: intentColors[suggestedIntent.id] },
-              ]}
-            />
-            <View style={[styles.intentBody, styles.featuredBody]}>
+            <ArtBackground
+              source={intentArt(suggestedIntent.id)}
+              style={[styles.intentSurface, styles.featuredBody]}
+              variant="card"
+            >
               <View style={styles.intentTopRow}>
                 {/* A word, not a catalogue code — so it takes the printed-label
                     style without the tape-counter monospace the codes use. */}
-                <Text style={[styles.featuredKicker, { color: intentColors[suggestedIntent.id] }]}>
+                <Text style={[styles.featuredKicker, styles.artPrimaryText]}>
                   {t(`home.suggestedFor.${band}`)}
                 </Text>
                 <View
                   style={[
                     styles.intentIconTag,
                     styles.featuredIconTag,
-                    { backgroundColor: withAlpha(intentColors[suggestedIntent.id], BADGE_ALPHA) },
+                    styles.artIconTag,
                   ]}
                 >
-                  <Icon icon={suggestedIntent.icon} size={22} color={intentColors[suggestedIntent.id]} />
+                  <Icon icon={suggestedIntent.icon} size={22} color="#FFFFFF" />
                 </View>
               </View>
-              <Text style={[styles.featuredName, { color: colors.text }]}>
+              <Text style={[styles.featuredName, styles.artPrimaryText]}>
                 {t(suggestedIntent.nameKey)}
               </Text>
-              <Text style={[styles.intentDesc, { color: colors.textSecondary }]}>
+              <Text style={[styles.intentDesc, styles.artSecondaryText]}>
                 {t(suggestedIntent.descKey)}
               </Text>
               {/* The curated session length was buried on the detail screen;
                   it is the most useful thing to know before tapping in. */}
               <View style={styles.featuredMeta}>
-                <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
+                <Ionicons name="time-outline" size={14} color="rgba(255,255,255,0.76)" />
                 <Text
-                  style={[styles.featuredMetaText, { color: colors.textSecondary }]}
+                  style={[styles.featuredMetaText, styles.artSecondaryText]}
                   numberOfLines={1}
                 >
                   <Text style={styles.featuredMetaNumber}>{suggestedIntent.recommendedMinutes}</Text>
                   {t('home.recommendedMinutesSuffix')}
                   {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
                 </Text>
-                <Text style={[styles.intentCatalog, styles.featuredMetaCode, { color: colors.textSecondary }]}>
+                <Text style={[styles.intentCatalog, styles.featuredMetaCode, styles.artSecondaryText]}>
                   <Text style={styles.intentCatalogCode}>{suggestedIntent.catalogCode}</Text>
                   {` · ${t('home.soundCount', { n: suggestedIntent.presetIds.length })}`}
                 </Text>
               </View>
-            </View>
+            </ArtBackground>
           </PressableScale>
 
           {/* Placed between the suggestion and the rest of the intents: a
@@ -268,43 +260,40 @@ export default function HomeScreen() {
                 onPress={() => router.push(`/intent/${intent.id}`)}
                 scaleTo={0.99}
                 pressedOpacity={0.85}
-                style={[
-                  styles.intentCard,
-                  { backgroundColor: colors.card, borderColor: colors.cardBorder },
-                ]}
+                style={styles.intentCard}
                 accessibilityRole="button"
                 accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
-                {/* Index-tab spine, like a coloured card-catalogue edge —
-                    the one place each intent's own colour still shows. */}
-                <View style={[styles.intentSpine, { backgroundColor: intentColors[intent.id] }]} />
-
-                <View style={styles.intentBody}>
+                <ArtBackground
+                  source={intentArt(intent.id)}
+                  style={styles.intentSurface}
+                  variant="card"
+                >
                   <View style={styles.intentTopRow}>
                     {/* A catalogue number that indexes nothing is decoration.
                         Pairing it with the size of what it points at makes it
                         a real index entry — and the code keeps the mono face
                         while the words around it stay in Nunito. */}
-                    <Text style={[styles.intentCatalog, { color: intentColors[intent.id] }]}>
+                    <Text style={[styles.intentCatalog, styles.artSecondaryText]}>
                       <Text style={styles.intentCatalogCode}>{intent.catalogCode}</Text>
                       {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
                     </Text>
                     <View
-                      style={[styles.intentIconTag, { backgroundColor: withAlpha(intentColors[intent.id], BADGE_ALPHA) }]}
+                      style={[styles.intentIconTag, styles.artIconTag]}
                     >
-                      <Icon icon={intent.icon} size={18} color={intentColors[intent.id]} />
+                      <Icon icon={intent.icon} size={18} color="#FFFFFF" />
                     </View>
                   </View>
-                  <Text style={[styles.intentName, { color: colors.text }]}>
+                  <Text style={[styles.intentName, styles.artPrimaryText]}>
                     {t(intent.nameKey)}
                   </Text>
                   <Text
-                    style={[styles.intentDesc, { color: colors.textSecondary }]}
+                    style={[styles.intentDesc, styles.artSecondaryText]}
                     numberOfLines={2}
                   >
                     {t(intent.descKey)}
                   </Text>
-                </View>
+                </ArtBackground>
               </PressableScale>
             ))}
           </View>
@@ -378,25 +367,18 @@ const styles = StyleSheet.create({
   intentStack: {
     gap: Spacing.sm,
   },
-  // A flat printed card, not a photo block: a coloured spine on the left
-  // (like a card-catalogue tab) carries the intent's identity instead of a
-  // full-bleed gradient photo repeated four times down the page.
   intentCard: {
-    flexDirection: 'row',
     borderRadius: Radius.card,
-    borderWidth: 1,
     overflow: 'hidden',
+    backgroundColor: '#0B1018',
   },
-  intentSpine: {
-    width: 6,
-  },
-  // The suggested card is the same object at a louder volume: wider spine,
-  // roomier body, bigger name — not a different component with different
-  // rules.
-  featuredSpine: {
-    width: 10,
+  intentSurface: {
+    minHeight: 142,
+    padding: Spacing.md,
+    gap: 4,
   },
   featuredBody: {
+    minHeight: 210,
     padding: Spacing.lg,
     gap: 6,
   },
@@ -439,11 +421,6 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
     marginBottom: Spacing.sm,
   },
-  intentBody: {
-    flex: 1,
-    padding: Spacing.md,
-    gap: 4,
-  },
   intentTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -470,6 +447,15 @@ const styles = StyleSheet.create({
   },
   intentDesc: {
     ...Typography.footnote,
+  },
+  artPrimaryText: {
+    color: '#FFFFFF',
+  },
+  artSecondaryText: {
+    color: 'rgba(255,255,255,0.76)',
+  },
+  artIconTag: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
   },
   emptyStateText: {
     ...Typography.body,
