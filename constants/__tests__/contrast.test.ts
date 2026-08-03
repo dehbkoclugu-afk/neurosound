@@ -61,6 +61,30 @@ function surfacesFor(palette: keyof typeof Colors): string[] {
 const AA_TEXT = 4.5; // WCAG AA, normal-size text
 const GRAPHIC = 3; // WCAG AA, non-text graphics
 
+describe('approved light shell tokens', () => {
+  it('uses cool fog surfaces instead of the retired warm paper palette', () => {
+    expect(Colors.light).toMatchObject({
+      text: '#18212B',
+      textSecondary: '#566575',
+      background: '#F1F4F7',
+      backgroundSecondary: '#E8EDF2',
+      card: '#F8FAFC',
+      cardBorder: '#D5DDE6',
+      slider: '#D5DDE6',
+      miniPlayer: '#F8FAFC',
+    });
+
+    expect(Colors.lowContrastLight).toMatchObject({
+      text: '#3F4A56',
+      textSecondary: '#596775',
+      background: '#EEF2F5',
+      backgroundSecondary: '#E3E9EF',
+      card: '#F4F7F9',
+      cardBorder: '#D2DAE3',
+    });
+  });
+});
+
 describe('marker colour contrast', () => {
   const cases: [string, Record<string, string>, readonly string[]][] = [
     ['category/light', CategoryColorSets.light, LIGHT_PALETTES],

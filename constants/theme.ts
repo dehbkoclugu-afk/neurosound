@@ -20,7 +20,7 @@ const inkBlueDark = '#1F3F5E';
 
 /**
  * Text/icon colour for anything sitting ON a filled primary surface.
- * Computed against each theme's own primary fill (see constants/__contrast
+ * Computed against each theme's own primary fill (see constants/__tests__
  * notes in PRODUCT.md/DESIGN.md); every pairing below clears 6:1.
  */
 export const onPrimary = '#F7F9FC';
@@ -89,7 +89,7 @@ export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const
  * Category and intent markers — record-label ink family.
  *
  * These are palette-scoped, not one fixed value each. A single mid-tone
- * cannot clear its threshold against five surfaces that span #F7F2E7 to
+ * cannot clear its threshold against surfaces that span #F1F4F7 to
  * #050403: the first pass shipped one flat set and it failed twice —
  * the solfeggio icon landed at 2.88:1 on its own badge, and the Home
  * catalog code (coloured 11px *text*, so a 4.5:1 case, not 3:1) came in
@@ -138,31 +138,31 @@ export const BADGE_ALPHA = 0.16;
 
 export const Colors = {
   light: {
-    text: '#231F17',
-    textSecondary: '#6B6153',
-    background: '#F7F2E7',
-    backgroundSecondary: '#EFE7D6',
-    card: '#FBF8F1',
-    cardBorder: '#E2D8C3',
+    text: '#18212B',
+    textSecondary: '#566575',
+    background: '#F1F4F7',
+    backgroundSecondary: '#E8EDF2',
+    card: '#F8FAFC',
+    cardBorder: '#D5DDE6',
     cardElevated: '#FFFFFF',
     tint: inkBlue,
     primary: inkBlue,
     primaryLight: '#5C82AA',
     accent: inkBlue, // 6.23:1 on both surface levels
-    icon: '#6B6153',
-    tabIconDefault: '#B0A48C',
+    icon: '#566575',
+    tabIconDefault: '#8A98A8',
     tabIconSelected: inkBlueDark,
     success: '#4C7A4C',
     warning: '#8A5A1E', // AA on both surface levels
     error: '#A34B37', // AA on both surface levels
-    slider: '#E2D8C3',
-    // Ink on paper, not ink on ink: the thumb used to be the accent colour
+    slider: '#D5DDE6',
+    // Foreground on track: the thumb used to be the accent colour
     // in every palette — in three of them literally the same hex — so at full
     // value it sat invisible on its own fill. Matching `text` gives it
     // contrast against both the empty track and every fill by construction.
-    sliderThumb: '#231F17',
-    overlay: 'rgba(20, 16, 8, 0.5)',
-    miniPlayer: '#FBF8F1',
+    sliderThumb: '#18212B',
+    overlay: 'rgba(16, 24, 32, 0.42)',
+    miniPlayer: '#F8FAFC',
   },
   dark: {
     text: '#F2F5F8',
@@ -192,30 +192,27 @@ export const Colors = {
   // gray). "Low contrast" softens the *ceiling* (no near-black on
   // near-white); it must never push text under AA.
   lowContrastLight: {
-    text: '#4A4436',
-    // Was #726B5A, which cleared AA against `background` (4.61:1) but not
-    // against `backgroundSecondary` (4.15:1) — the comment claimed both
-    // levels but only one had ever been measured. Now 5.28 / 4.74.
-    textSecondary: '#696252',
-    background: '#F4EFE3',
-    backgroundSecondary: '#EBE3D2',
-    card: '#F8F4EA',
-    cardBorder: '#DED4BE',
+    text: '#3F4A56',
+    textSecondary: '#596775',
+    background: '#EEF2F5',
+    backgroundSecondary: '#E3E9EF',
+    card: '#F4F7F9',
+    cardBorder: '#D2DAE3',
     cardElevated: '#FFFFFF',
     tint: '#3F6690',
     primary: '#3F6690',
     primaryLight: '#6D8CAC',
     accent: '#3F6690', // AA on both surface levels
-    icon: '#7C725F',
-    tabIconDefault: '#C7BCA2',
+    icon: '#687686',
+    tabIconDefault: '#9AA7B4',
     tabIconSelected: '#33547A',
     success: '#6D946D',
     warning: '#82591F', // AA on both surface levels
     error: '#96513C', // AA on both surface levels
-    slider: '#DED4BE',
-    sliderThumb: '#4A4436',
-    overlay: 'rgba(20, 16, 8, 0.3)',
-    miniPlayer: '#F8F4EA',
+    slider: '#D2DAE3',
+    sliderThumb: '#3F4A56',
+    overlay: 'rgba(20, 30, 40, 0.3)',
+    miniPlayer: '#F4F7F9',
   },
   lowContrastDark: {
     text: '#D9E0E8',
