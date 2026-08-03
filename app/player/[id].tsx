@@ -1,7 +1,13 @@
 /**
- * Player Screen — "Night Deck": a rotary dial instrument, not a flat card.
- * The dial (components/ui/Dial.tsx) is both the play/pause control and the
- * level visualizer; everything else stays typographic and quiet around it.
+ * THESIS: A sound opens as a place, not a dial; the Player refuses the giant
+ * instrument control that used to crowd every state into one viewport.
+ * OWN-WORLD: Cinematic preset artwork, neutral near-black graphite, one
+ * ink-blue action, solid tonal panels, and Nunito with mono measurements.
+ * STORY: Recognize the sound, control playback, understand it, then adjust or
+ * layer it without losing place.
+ * FIRST VIEWPORT: Artwork owns the upper half; transport bridges into one
+ * continuous identity block, followed by error, volume, and two actions.
+ * FORM: Immersive scroll, approved comp A; existing preset art is the source.
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -12,32 +18,45 @@ import {
   TouchableOpacity,
   Animated,
   Alert,
+  ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Reanimated, { ZoomIn } from 'react-native-reanimated';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, withAlpha, BADGE_ALPHA, Radius, ControlSize } from '@/constants/theme';
+import {
+  Spacing,
+  Typography,
+  FontFamily,
+  withAlpha,
+  BADGE_ALPHA,
+  Radius,
+  ControlSize,
+} from '@/constants/theme';
 import { contentColumn } from '@/constants/layout';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
-import { Dial } from '@/components/ui/Dial';
 import { Slider } from '@/components/ui/Slider';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
+import { TransportButton } from '@/components/ui/TransportButton';
+import { ArtBackground } from '@/components/ui/ArtBackground';
 import { useToastStore } from '@/stores/toastStore';
+import { presetArt } from '@/lib/artAssets';
+import { useArtwork } from '@/hooks/use-artwork';
 import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
 
-/** The Hz values to print, as bare numbers — the unit and separator are
- *  added at render time so only the numeral takes the tape-counter face. */
 const getFrequencyParts = (preset: FrequencyPreset): number[] | null => {
-  if (preset.type === 'binaural' && preset.baseFrequency && preset.beatFrequency) {
+  if (
+    preset.type === 'binaural' &&
+    preset.baseFrequency &&
+    preset.beatFrequency
+  ) {
     return [preset.baseFrequency, preset.beatFrequency];
   }
   if (preset.type === 'solfeggio' && preset.frequency) {
@@ -50,18 +69,30 @@ export default function PlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const { t } = useTranslation();
   const colors = useThemeColors();
   const categoryColors = useCategoryColors();
+  const artwork = useArtwork();
   const { maxVolume, reduceMotion } = useSettingsStore();
-  const { isPlaying, isLoading, playbackError, volume, setVolume, timerRemaining, timerDuration } = useAudioStore();
-  const { favoriteIds, addFavorite, removeFavorite, addRecentlyPlayed } = usePresetsStore();
+  const {
+    isPlaying,
+    isLoading,
+    playbackError,
+    volume,
+    setVolume,
+    timerRemaining,
+    timerDuration,
+  } = useAudioStore();
+  const { favoriteIds, addFavorite, removeFavorite, addRecentlyPlayed } =
+    usePresetsStore();
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
   const [showTimerModal, setShowTimerModal] = useState(false);
   const showToast = useToastStore((s) => s.show);
+  const heartScale = useRef(new Animated.Value(1)).current;
+  const heroScale = useRef(new Animated.Value(1)).current;
 
-  // Load preset into the global controller (same preset = keeps playing)
   useEffect(() => {
     if (!id) return;
     const loadedPreset = getPresetById(id);
@@ -72,18 +103,27 @@ export default function PlayerScreen() {
     }
   }, [id, addRecentlyPlayed]);
 
-  // Update volume
   useEffect(() => {
     playerController.syncVolume();
   }, [volume, maxVolume]);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      heroScale.setValue(1);
+      return;
+    }
+    Animated.timing(heroScale, {
+      toValue: isPlaying ? 1.025 : 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [isPlaying, reduceMotion, heroScale]);
 
   const handlePlayPause = useCallback(async () => {
     haptics.commit();
     await playerController.toggle();
   }, []);
 
-  // The most requested action next to a sound is layering it into a mix —
-  // this used to be a decorative empty view "for symmetry".
   const handleAddToMixer = useCallback(async () => {
     if (!preset) return;
     const added = await playerController.mixerAddChannel(preset);
@@ -97,10 +137,6 @@ export default function PlayerScreen() {
 
   const isFavorite = id ? favoriteIds.includes(id) : false;
 
-  // Favouriting is rare and rewarding — the one place a little delight earns
-  // its keep. Removing gets no pop; it is not an achievement.
-  const heartScale = useRef(new Animated.Value(1)).current;
-
   const handleFavoriteToggle = useCallback(() => {
     if (!id) return;
     if (favoriteIds.includes(id)) {
@@ -111,11 +147,15 @@ export default function PlayerScreen() {
 
     haptics.save();
     addFavorite(id);
-
     if (reduceMotion) return;
+
     heartScale.setValue(1);
     Animated.sequence([
-      Animated.timing(heartScale, { toValue: 1.3, duration: 120, useNativeDriver: true }),
+      Animated.timing(heartScale, {
+        toValue: 1.3,
+        duration: 120,
+        useNativeDriver: true,
+      }),
       Animated.spring(heartScale, {
         toValue: 1,
         friction: 4,
@@ -125,21 +165,15 @@ export default function PlayerScreen() {
     ]).start();
   }, [id, favoriteIds, addFavorite, removeFavorite, reduceMotion, heartScale]);
 
-  // Close only dismisses the modal — audio keeps playing, MiniPlayer takes over.
-  // Arriving here from a deep link means there is no history to pop, so back
-  // would exit the app instead of returning to it.
   const handleClose = useCallback(() => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)');
   }, [router]);
 
   if (!preset) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.errorText, { color: colors.text }]}>
+        <Text style={[styles.missingText, { color: colors.text }]}>
           {t('common.error')}
         </Text>
       </View>
@@ -147,254 +181,298 @@ export default function PlayerScreen() {
   }
 
   const frequencyParts = getFrequencyParts(preset);
+  const heroHeight = Math.max(360, Math.min(500, height * 0.54));
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Atmospheric wash — the sound's colour bleeds softly from the top */}
-      <LinearGradient
-        colors={[
-          withAlpha(colors.primary, BADGE_ALPHA),
-          withAlpha(colors.primary, 0.04),
-          colors.background,
-        ]}
-        locations={[0, 0.42, 0.82]}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
-
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + Spacing.lg }]}>
-        <TouchableOpacity
-          onPress={handleClose}
-          style={styles.headerButton}
-          accessibilityLabel={t('common.back')}
-        >
-          <Ionicons name="chevron-down" size={26} color={colors.textSecondary} />
-        </TouchableOpacity>
-        <Text
-          style={[styles.headerTitle, { color: colors.textSecondary }]}
-          accessibilityLiveRegion="polite"
-          accessibilityRole="text"
-        >
-          {isPlaying ? t('player.nowPlaying') : t('player.paused')}
-        </Text>
-        <TouchableOpacity
-          onPress={handleFavoriteToggle}
-          style={styles.headerButton}
-          accessibilityLabel={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
-        >
-          <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-            {/* 20 for the heart as a *control*, 14 for the heart as a
-                *marker* on a list row. One meaning, two jobs, two sizes —
-                stated here so the next person does not average them. */}
-            <Ionicons
-              name={isFavorite ? 'heart' : 'heart-outline'}
-              size={20}
-              color={isFavorite ? colors.accent : colors.textSecondary}
-            />
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
-
-      {/* The dial — instrument, not icon. Tapping it plays/pauses; the
-          needle stands in for the old breathing rings. */}
-      <View style={styles.content}>
-        <View style={styles.visualWrap}>
-          <Dial
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            volume={volume}
-            onVolumeChange={setVolume}
-            color={colors.primary}
-            reduceMotion={reduceMotion}
-            onPress={handlePlayPause}
-            accessibilityLabel={isPlaying ? t('accessibility.pauseButton') : t('accessibility.playButton')}
-            timerRemaining={timerRemaining}
-            timerDuration={timerDuration}
-            timerLabel={
-              timerRemaining !== null && timerRemaining > 0
-                ? formatTimerValue(timerRemaining)
-                : null
-            }
-          />
-          {/* A 13pt caption under a 216pt circle was the only thing saying
-              the circle was pressable. A bordered legend reads as a control,
-              not as a description of one. */}
-          <View
-            style={[styles.dialLegend, { borderColor: colors.cardBorder }]}
-            pointerEvents="none"
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
+      >
+        <View style={[styles.heroShell, { height: heroHeight + 42 }]}>
+          <Animated.View
+            style={[
+              styles.heroClip,
+              { backgroundColor: colors.backgroundSecondary },
+              { height: heroHeight, transform: [{ scale: heroScale }] },
+            ]}
           >
-            <Ionicons
-              name={isPlaying ? 'pause' : 'play'}
-              size={13}
-              color={colors.textSecondary}
-              style={isPlaying ? undefined : { marginLeft: 2 }}
+            <ArtBackground
+              source={artwork.source(presetArt(preset.id))}
+              style={styles.hero}
+              variant="hero"
+            >
+              <View
+                style={[
+                  styles.heroHeader,
+                  { paddingTop: insets.top + Spacing.sm },
+                ]}
+              >
+                <TouchableOpacity
+                  onPress={handleClose}
+                  style={[
+                    styles.heroButton,
+                    { backgroundColor: artwork.foreground.badge },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.back')}
+                >
+                  <Ionicons
+                    name="chevron-down"
+                    size={26}
+                    color={artwork.foreground.primary}
+                  />
+                </TouchableOpacity>
+
+                <Text
+                  style={[
+                    styles.heroStatus,
+                    { color: artwork.foreground.primary },
+                  ]}
+                  accessibilityLiveRegion="polite"
+                >
+                  {isPlaying ? t('player.nowPlaying') : t('player.paused')}
+                </Text>
+
+                <TouchableOpacity
+                  onPress={handleFavoriteToggle}
+                  style={[
+                    styles.heroButton,
+                    { backgroundColor: artwork.foreground.badge },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    isFavorite
+                      ? t('common.removeFromFavorites')
+                      : t('common.addToFavorites')
+                  }
+                >
+                  <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+                    <Ionicons
+                      name={isFavorite ? 'heart' : 'heart-outline'}
+                      size={23}
+                      color={artwork.foreground.primary}
+                    />
+                  </Animated.View>
+                </TouchableOpacity>
+              </View>
+            </ArtBackground>
+          </Animated.View>
+
+          <View style={styles.heroTransport}>
+            <TransportButton
+              playing={isPlaying}
+              onPress={handlePlayPause}
+              loading={isLoading}
+              size={84}
+              accessibilityLabel={
+                isPlaying
+                  ? t('accessibility.pauseButton')
+                  : t('accessibility.playButton')
+              }
             />
-            <Text style={[styles.dialIconLabel, { color: colors.textSecondary }]}>
-              {isPlaying ? t('common.pause') : t('common.play')}
-            </Text>
           </View>
         </View>
 
-        <View style={styles.infoContainer}>
-          <Text
-            style={[styles.presetName, { color: colors.text }]}
-            accessibilityRole="header"
-          >
-            {t(preset.nameKey)}
-          </Text>
+        <View style={[styles.body, contentColumn]}>
+          <View style={styles.identityBlock}>
+            <Text
+              style={[styles.presetName, { color: colors.text }]}
+              accessibilityRole="header"
+            >
+              {t(preset.nameKey)}
+            </Text>
 
-          <View style={styles.metaRow}>
-            {/* A 6px dot was carrying the category on the one screen devoted
-                to a single sound — the colour was there and said nothing.
-                The same tinted-tag language the lists use, with the name in
-                it. */}
-            <View
+            <View style={styles.metaRow}>
+              <View
+                style={[
+                  styles.categoryTag,
+                  {
+                    backgroundColor: withAlpha(
+                      categoryColors[preset.type],
+                      BADGE_ALPHA,
+                    ),
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.categoryTagText,
+                    { color: categoryColors[preset.type] },
+                  ]}
+                >
+                  {t(`explore.categories.${preset.type}`)}
+                </Text>
+              </View>
+
+              {frequencyParts && (
+                <Text
+                  style={[
+                    styles.frequencyLine,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {frequencyParts.map((value, index) => (
+                    <Text key={`${value}-${index}`}>
+                      {index > 0 ? ' · ' : ''}
+                      <Text style={styles.frequencyNumeral}>{value}</Text> Hz
+                    </Text>
+                  ))}
+                </Text>
+              )}
+            </View>
+
+            <Text
               style={[
-                styles.categoryTag,
-                { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
+                styles.description,
+                { color: colors.textSecondary },
+                preset.type === 'solfeggio' && styles.disclaimer,
               ]}
             >
-              <Text style={[styles.categoryTagText, { color: categoryColors[preset.type] }]}>
-                {t(`explore.categories.${preset.type}`)}
-              </Text>
-            </View>
-            {/* Noise presets have no frequency to print, and the fallback
-                used to be the category name — which the tag beside it now
-                already says, so the row read "AMBIENT SOUNDS Ambient Sounds". */}
-            {frequencyParts && (
-              <Text style={[styles.frequencyLine, { color: colors.textSecondary }]}>
-                {frequencyParts.map((value, i) => (
-                  <Text key={value}>
-                    {i > 0 ? ' · ' : ''}
-                    <Text style={styles.frequencyNumeral}>{value}</Text> Hz
-                  </Text>
-                ))}
-              </Text>
+              {t(preset.descriptionKey)}
+            </Text>
+
+            {preset.type === 'binaural' && (
+              <View style={styles.mechanismRow}>
+                <Ionicons
+                  name="headset-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
+                <Text
+                  style={[styles.mechanism, { color: colors.textSecondary }]}
+                >
+                  {t('explore.binauralDescription')}
+                </Text>
+              </View>
             )}
           </View>
 
-          <Text
-            style={[
-              styles.presetDescription,
-              { color: colors.textSecondary },
-              preset.type === 'solfeggio' && styles.disclaimer,
-            ]}
-          >
-            {t(preset.descriptionKey)}
-          </Text>
-
-          {/* One sentence of description and no explanation of the mechanism
-              anywhere on the screen that plays it. Binaural is the only type
-              whose effect depends on the listener doing something (wearing
-              headphones), so it is the only one that gets the extra line. */}
-          {preset.type === 'binaural' && (
-            <Text style={[styles.mechanism, { color: colors.textSecondary }]}>
-              {t('explore.binauralDescription')}
-            </Text>
-          )}
-
           {playbackError && (
-            <View style={styles.playbackError} accessibilityLiveRegion="assertive">
+            <View
+              style={[
+                styles.errorPanel,
+                {
+                  backgroundColor: withAlpha(colors.error, 0.08),
+                  borderColor: withAlpha(colors.error, 0.34),
+                },
+              ]}
+              accessibilityLiveRegion="assertive"
+            >
               <Ionicons
                 name="alert-circle-outline"
-                size={16}
+                size={20}
                 color={colors.error}
-                accessibilityElementsHidden
-                importantForAccessibility="no-hide-descendants"
               />
-              <Text style={[styles.playbackErrorText, { color: colors.error }]}>
+              <Text style={[styles.errorText, { color: colors.error }]}>
                 {t('player.playbackError')}
               </Text>
             </View>
           )}
-        </View>
-      </View>
 
-      {/* Controls */}
-      <View
-        style={[
-          styles.controls,
-          contentColumn,
-          { paddingBottom: insets.bottom + Spacing.xl },
-        ]}
-      >
-        <View style={styles.volumeSection}>
-          {/* The two flanking speaker icons said which way is louder; the
-              printed percentage says it better and exactly, so they go and
-              the track gets the full width back. */}
-          <Slider
-            value={volume}
-            onValueChange={setVolume}
-            max={1}
-            cap={maxVolume}
-            label={t('mixer.volume')}
-            accessibilityLabel={t('accessibility.volumeSlider')}
-          />
-
-          {/* The safety cap is invisible otherwise: the slider runs to 100%
-              while the output stops at maxVolume, so full travel sounds
-              quieter than it looks with no explanation anywhere. */}
-          {maxVolume < 1 && (
-            <TouchableOpacity
-              onPress={() => router.push('/(tabs)/settings')}
-              style={styles.volumeCap}
-              accessibilityRole="button"
-              accessibilityLabel={`${t('player.volumeCapped', {
-                percent: Math.round(maxVolume * 100),
-              })}. ${t('common.settings')}`}
-            >
-              <Text style={[styles.volumeCapText, { color: colors.textSecondary }]}>
-                {t('player.volumeCapped', { percent: Math.round(maxVolume * 100) })}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View style={styles.mainControls}>
-          <TouchableOpacity
-            onPress={() => setShowTimerModal(true)}
-            style={styles.sideButton}
-            accessibilityRole="button"
-            accessibilityLabel={
-              timerRemaining !== null && timerRemaining > 0
-                ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
-                : t('player.timer')
-            }
+          <View
+            style={[
+              styles.volumePanel,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}
           >
-            <Reanimated.View entering={reduceMotion ? undefined : ZoomIn.duration(200)}>
+            <Slider
+              value={volume}
+              onValueChange={setVolume}
+              max={1}
+              cap={maxVolume}
+              label={t('mixer.volume')}
+              accessibilityLabel={t('accessibility.volumeSlider')}
+            />
+
+            {maxVolume < 1 && (
+              <TouchableOpacity
+                onPress={() => router.push('/(tabs)/settings')}
+                style={styles.volumeCap}
+                accessibilityRole="button"
+                accessibilityLabel={`${t('player.volumeCapped', {
+                  percent: Math.round(maxVolume * 100),
+                })}. ${t('common.settings')}`}
+              >
+                <Text
+                  style={[
+                    styles.volumeCapText,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t('player.volumeCapped', {
+                    percent: Math.round(maxVolume * 100),
+                  })}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.actionsRow}>
+            <TouchableOpacity
+              onPress={() => setShowTimerModal(true)}
+              style={[
+                styles.actionButton,
+                {
+                  backgroundColor: colors.backgroundSecondary,
+                  borderColor: colors.cardBorder,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                timerRemaining !== null && timerRemaining > 0
+                  ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
+                  : t('player.timer')
+              }
+            >
               <Ionicons
                 name="timer-outline"
-                size={22}
+                size={23}
                 color={timerDuration ? colors.accent : colors.textSecondary}
               />
-            </Reanimated.View>
-            {/* Two unlabelled icons with 48pt of nothing between them read as
-                leftovers. The countdown itself has moved onto the dial, so
-                this row can say what it is instead of repeating it. */}
-            <Text
-              style={[
-                styles.sideButtonLabel,
-                { color: timerDuration ? colors.accent : colors.textSecondary },
-              ]}
-            >
-              {t('player.timer')}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.actionLabel,
+                  {
+                    color: timerDuration ? colors.accent : colors.textSecondary,
+                  },
+                ]}
+                numberOfLines={2}
+              >
+                {t('player.timer')}
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleAddToMixer}
-            style={styles.sideButton}
-            accessibilityRole="button"
-            accessibilityLabel={t('mixer.addToMixer')}
-          >
-            <Ionicons name="layers-outline" size={22} color={colors.textSecondary} />
-            <Text style={[styles.sideButtonLabel, { color: colors.textSecondary }]}>
-              {t('mixer.addToMixer')}
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleAddToMixer}
+              style={[
+                styles.actionButton,
+                {
+                  backgroundColor: colors.backgroundSecondary,
+                  borderColor: colors.cardBorder,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={t('mixer.addToMixer')}
+            >
+              <Ionicons
+                name="layers-outline"
+                size={23}
+                color={colors.textSecondary}
+              />
+              <Text
+                style={[styles.actionLabel, { color: colors.textSecondary }]}
+                numberOfLines={2}
+              >
+                {t('mixer.addToMixer')}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
 
       <TimerModal
         visible={showTimerModal}
@@ -408,64 +486,69 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.lg,
+  heroShell: {
+    width: '100%',
+    position: 'relative',
+    marginBottom: Spacing.lg,
   },
-  headerButton: {
+  heroClip: {
+    width: '100%',
+    overflow: 'hidden',
+    borderBottomLeftRadius: Radius.sheet,
+    borderBottomRightRadius: Radius.sheet,
+  },
+  hero: {
+    flex: 1,
+  },
+  heroHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+  },
+  heroButton: {
     width: 48,
     height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: {
+  heroStatus: {
     ...Typography.footnote,
     fontFamily: FontFamily.semibold,
   },
-  content: {
-    flex: 1,
+  heroTransport: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
-    gap: Spacing.xxl,
   },
-  visualWrap: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.sm,
+  body: {
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.md,
   },
-  dialLegend: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: Radius.pill,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 5,
-  },
-  dialIconLabel: {
-    ...Typography.footnote,
-  },
-  infoContainer: {
+  identityBlock: {
     alignItems: 'center',
     gap: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+    marginBottom: Spacing.sm,
   },
   presetName: {
-    ...Typography.title,
+    ...Typography.largeTitle,
     textAlign: 'center',
   },
   metaRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.sm,
   },
   categoryTag: {
     borderRadius: Radius.tag,
     paddingHorizontal: Spacing.sm,
-    paddingVertical: 3,
+    paddingVertical: 4,
   },
   categoryTagText: {
     ...Typography.label,
@@ -477,70 +560,82 @@ const styles = StyleSheet.create({
   frequencyNumeral: {
     ...Typography.numeral,
   },
-  presetDescription: {
+  description: {
     ...Typography.body,
     textAlign: 'center',
-    lineHeight: 21,
-    maxWidth: 300,
+    maxWidth: 520,
   },
-  // The disclaimer is context, not a claim about the sound — it sits back.
   disclaimer: {
     ...Typography.footnote,
-    lineHeight: 18,
-    maxWidth: 280,
+    lineHeight: 19,
   },
-  mechanism: {
-    ...Typography.footnote,
-    textAlign: 'center',
-    lineHeight: 18,
-    maxWidth: 300,
-    marginTop: Spacing.xs,
-  },
-  playbackError: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-    marginTop: Spacing.sm,
-  },
-  playbackErrorText: {
-    ...Typography.body,
-    textAlign: 'center',
-  },
-  controls: {
-    paddingHorizontal: Spacing.xl,
-  },
-  volumeSection: {
-    marginBottom: Spacing.xl,
-  },
-
-  volumeCap: {
-    alignSelf: 'center',
-    paddingTop: Spacing.sm,
-    paddingHorizontal: Spacing.sm,
-    minHeight: 32,
-  },
-  volumeCapText: {
-    ...Typography.caption,
-  },
-  mainControls: {
+  mechanismRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    gap: Spacing.lg,
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
   },
-  sideButton: {
-    minWidth: 96,
+  mechanism: {
+    ...Typography.footnote,
+    flexShrink: 1,
+    maxWidth: 480,
+  },
+  errorPanel: {
     minHeight: ControlSize.row,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  sideButtonLabel: {
-    ...Typography.caption,
+    gap: Spacing.sm,
+    borderWidth: 1,
+    borderRadius: Radius.card,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
   },
   errorText: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+    flex: 1,
+  },
+  volumePanel: {
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: Spacing.md,
+  },
+  volumeCap: {
+    minHeight: 36,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.sm,
+    paddingTop: Spacing.xs,
+  },
+  volumeCapText: {
+    ...Typography.caption,
+    textAlign: 'center',
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  actionButton: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 84,
+    borderWidth: 1,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+  },
+  actionLabel: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+    textAlign: 'center',
+  },
+  missingText: {
     ...Typography.body,
     textAlign: 'center',
-    marginTop: Spacing.xxl,
+    marginTop: Spacing.xxxl,
   },
 });

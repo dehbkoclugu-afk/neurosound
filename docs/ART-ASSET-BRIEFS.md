@@ -1,12 +1,20 @@
 # NeuroSound — Cinematic Sound Atlas Prompts
 
-All 37 production images were generated with ChatGPT's built-in image generation and bundled locally. The app never downloads imagery at runtime.
+All 76 production images were generated with ChatGPT's built-in image generation and bundled locally. The app never downloads imagery at runtime. Every dark asset has a matching light-theme asset with the same filename under `assets/images/art/light/`.
 
 ## Shared production prompt
 
 Append the asset-specific scene below to this prompt:
 
 > Premium cinematic editorial photography with restrained surrealism, realistic tactile materials and subtle 35mm film grain. Extra-wide 2:1 landscape composition for a dark mobile interface. Keep the primary subject and visual detail on the right; leave the left half dark, calm and low-detail for white UI text. Dark-to-mid tonal values, refined and quiet rather than spectacular. The image must remain recognizable in a 96 px-high row crop. No text, letters, numbers, logo, watermark, UI, people, faces, brain imagery, neon, purple-pink AI gradient, HDR, oversaturation or clutter.
+
+## Shared light-theme edit prompt
+
+Each dark source was edited, not re-conceived, with this direction so switching themes changes illumination without changing the sound's visual identity:
+
+> Preserve the exact subject, camera, materials, acoustic pattern, 2:1 crop, right-side focal point and quiet left copy zone. Change only the lighting and color grade to soft cool daylight: pale silver, ivory gray, restrained natural color, airy shadows and calm editorial contrast. Keep the scene recognizable at 96 px row height. Do not add objects, people, text, logos, watermarks, brown/sepia/orange cast, neon, oversaturation or HDR effects.
+
+At runtime the registry selects the dark or light member of each pair from the resolved Light/Dark/Auto theme. Theme-specific scrims and foreground colors are applied in code; no runtime image filter is used.
 
 ## Intent assets
 
@@ -16,6 +24,12 @@ Append the asset-specific scene below to this prompt:
 | `intents/focus.jpg` | Dark architectural study planes with one exact amber beam, ordered particles converging on a single point. |
 | `intents/relax.jpg` | Sheltered mossy forest pool at blue hour, fern, wet stone, mist and one slow ripple. |
 | `intents/meditate.jpg` | High mountain basin before dawn, layered ridges above cloud and a solitary still stone. |
+
+## State assets
+
+| File | Asset-specific scene |
+|---|---|
+| `states/favorites-empty.jpg` | Quiet listening alcove with an intentionally empty sculptural niche on the right and a calm copy zone on the left; inviting rather than error-like. |
 
 ## Binaural assets
 
@@ -64,4 +78,3 @@ Append the asset-specific scene below to this prompt:
 | `solfeggio-852.jpg` | Translucent indigo mineral layers unfolding around an ivory center. |
 | `solfeggio-888.jpg` | Overlapping patinated brass rings casting a dense harmonious shadow. |
 | `solfeggio-963.jpg` | Open pre-dawn sky above cloud with a narrow ivory column dissolving into mist. |
-

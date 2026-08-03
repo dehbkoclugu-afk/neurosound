@@ -1,15 +1,12 @@
 /**
  * NeuroSound Theme Configuration — "Night Deck"
  *
- * Direction: the app is already a mixer and a nighttime instrument; this
- * redesign leans into that instead of dressing it as a meditation app. The
- * world is analog hi-fi and record-label print — warm paper neutrals, a
- * single deep ink-blue accent (record-label ink, not amber), tabular
- * "tape-counter" numerals for frequencies and the timer, and a rotary dial
- * as the Player's one authored moment (see components/ui/Dial.tsx).
+ * Direction: a cinematic sound atlas inside a neutral near-black instrument
+ * shell. Imagery carries discovery and the Player; cool graphite surfaces and
+ * one ink-blue accent keep operational controls quiet and legible.
  *
- * Variants: light, dark (default), night (OLED, dimmed for bedtime),
- * lowContrastLight / lowContrastDark (visual sensitivity — accent stays a
+ * Variants: light, dark (default), lowContrastLight / lowContrastDark
+ * (visual sensitivity — accent stays a
  * legible ink blue so selected states remain readable, never plain gray).
  */
 
@@ -26,7 +23,7 @@ const inkBlueDark = '#1F3F5E';
  * Computed against each theme's own primary fill (see constants/__contrast
  * notes in PRODUCT.md/DESIGN.md); every pairing below clears 6:1.
  */
-export const onPrimary = '#F7F2E7';
+export const onPrimary = '#F7F9FC';
 
 /**
  * Text/icon colour for anything sitting ON a photograph — the Intent hero,
@@ -36,9 +33,6 @@ export const onPrimary = '#F7F2E7';
  * legible because the hero lays a dark scrim under it.
  */
 export const onImage = '#FFFFFF';
-const onPrimaryDark = '#0F1A24';
-const onPrimaryNight = '#0A1520';
-
 /**
  * Overlay a colour at a given alpha.
  *
@@ -103,7 +97,7 @@ export const SolfeggioIcon = { name: 'musical-note', library: 'ionicon' as const
  *
  * Both sets below are solved so every colour clears **3.6:1 against its
  * own 16%-alpha badge** and **4.8:1 as text** on every surface its palette
- * group uses. Light palettes take the darkened set, dark/night the
+ * group uses. Light palettes take the darkened set, dark palettes the
  * lightened one; resolve them through `useCategoryColors()` /
  * `useIntentColors()` rather than importing directly.
  */
@@ -171,52 +165,27 @@ export const Colors = {
     miniPlayer: '#FBF8F1',
   },
   dark: {
-    text: '#F2EBDD',
-    textSecondary: '#A79C87',
-    background: '#15130F',
-    backgroundSecondary: '#1D1A14',
-    card: '#1D1A14',
-    cardBorder: '#2E2A21',
-    cardElevated: '#26221A',
+    text: '#F2F5F8',
+    textSecondary: '#A6B0BD',
+    background: '#080B10',
+    backgroundSecondary: '#10151D',
+    card: '#10151D',
+    cardBorder: '#26303C',
+    cardElevated: '#171E28',
     tint: inkBlueLight,
     primary: inkBlueLight,
     primaryLight: inkBlueLighter,
     accent: inkBlueLight, // 7.40:1 on both surface levels
-    icon: '#A79C87',
-    tabIconDefault: '#5C5548',
+    icon: '#9AA6B5',
+    tabIconDefault: '#657181',
     tabIconSelected: inkBlueLight,
     success: '#8FB27A',
     warning: '#D9A253',
     error: '#D98267',
-    slider: '#332D22',
-    sliderThumb: '#F2EBDD',
+    slider: '#273140',
+    sliderThumb: '#F2F5F8',
     overlay: 'rgba(0, 0, 0, 0.7)',
-    miniPlayer: '#1D1A14',
-  },
-  // Night mode — OLED true-dark, everything dimmed for bedtime use. Low
-  // contrast setting is intentionally ignored here.
-  night: {
-    text: '#C7BCA5',
-    textSecondary: '#847A69', // AA on both surface levels
-    background: '#050403',
-    backgroundSecondary: '#0E0C09',
-    card: '#0E0C09',
-    cardBorder: '#191510',
-    cardElevated: '#14100B',
-    tint: '#6F98BE',
-    primary: '#6F98BE',
-    primaryLight: '#8FB0CE',
-    accent: '#6F98BE', // 6.74:1 on both surface levels
-    icon: '#786F5E',
-    tabIconDefault: '#3E382E',
-    tabIconSelected: '#6F98BE',
-    success: '#7DA06C',
-    warning: '#C1954F',
-    error: '#B56A54',
-    slider: '#1E1A14',
-    sliderThumb: '#C7BCA5',
-    overlay: 'rgba(0, 0, 0, 0.8)',
-    miniPlayer: '#0A0806',
+    miniPlayer: '#0D1219',
   },
   // Low contrast mode for visual sensitivity — accent stays a legible ink
   // blue so selected/active states remain distinguishable (never plain
@@ -249,27 +218,27 @@ export const Colors = {
     miniPlayer: '#F8F4EA',
   },
   lowContrastDark: {
-    text: '#D6CDB9',
-    textSecondary: '#A89C87', // AA on both surface levels
-    background: '#1C1914',
-    backgroundSecondary: '#27231B',
-    card: '#27231B',
-    cardBorder: '#352F24',
-    cardElevated: '#352F24',
+    text: '#D9E0E8',
+    textSecondary: '#9EA9B6',
+    background: '#10151B',
+    backgroundSecondary: '#18212B',
+    card: '#18212B',
+    cardBorder: '#303B49',
+    cardElevated: '#202A35',
     tint: '#7FA8CC',
     primary: '#7FA8CC',
     primaryLight: '#A0BFDA',
     accent: '#7FA8CC',
-    icon: '#8D8270',
-    tabIconDefault: '#4E4738',
+    icon: '#8C98A6',
+    tabIconDefault: '#596574',
     tabIconSelected: '#A0BFDA',
     success: '#8CA97D',
     warning: '#C7A166',
     error: '#BD826C',
-    slider: '#352F24',
-    sliderThumb: '#D6CDB9',
+    slider: '#303B49',
+    sliderThumb: '#D9E0E8',
     overlay: 'rgba(0, 0, 0, 0.5)',
-    miniPlayer: '#27231B',
+    miniPlayer: '#18212B',
   },
 };
 

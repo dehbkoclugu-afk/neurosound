@@ -49,7 +49,7 @@ function composite(fg: string, bg: string, alpha: number): string {
 }
 
 // Which palettes take which solved colour set (mirrors use-theme-colors.ts).
-const DARK_PALETTES = ['dark', 'night', 'lowContrastDark'] as const;
+const DARK_PALETTES = ['dark', 'lowContrastDark'] as const;
 const LIGHT_PALETTES = ['light', 'lowContrastLight'] as const;
 
 /** Every surface a marker badge can be drawn on, per palette. */
@@ -184,7 +184,7 @@ describe('slider thumb', () => {
   it('its ring separates from every colour that can fill the bar', () => {
     const failures: string[] = [];
     for (const [name, c] of Object.entries(Colors)) {
-      const isDark = name === 'dark' || name === 'night' || name === 'lowContrastDark';
+      const isDark = name === 'dark' || name === 'lowContrastDark';
       const fills = [c.accent, ...Object.values(CategoryColorSets[isDark ? 'dark' : 'light'])];
       for (const fill of fills) {
         // The ring is drawn in the empty-track colour.

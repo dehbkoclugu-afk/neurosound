@@ -7,6 +7,9 @@ import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import i18n, { deviceLanguageOrDefault } from '@/i18n';
+import { normalizeThemeMode, type ThemeMode } from '@/lib/themeMode';
+
+export type { ThemeMode } from '@/lib/themeMode';
 
 const isClient = typeof window !== 'undefined';
 
@@ -39,7 +42,6 @@ const safeStorage: StateStorage = {
   },
 };
 
-export type ThemeMode = 'light' | 'dark' | 'night' | 'auto';
 /** Any code in `locales/index.ts`. Kept as a plain string rather than a
  *  union so adding a language is one row in that file and nothing else. */
 export type Language = string;
@@ -127,6 +129,14 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'neurosound-settings',
       storage: createJSONStorage(() => safeStorage),
+      version: 1,
+      migrate: (persistedState) => {
+        const restored = persistedState as Partial<SettingsState> | undefined;
+        return {
+          ...restored,
+          theme: normalizeThemeMode(restored?.theme),
+        } as SettingsState;
+      },
       // Storage is async, so the restored language lands after i18n has already
       // initialised from the device locale. Re-apply it or the user's choice is
       // silently dropped on every cold start.

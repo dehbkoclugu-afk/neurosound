@@ -24,6 +24,7 @@ import { Icon, getPresetIcon, IconConfig } from './Icon';
 import { EqualizerBars } from './EqualizerBars';
 import { ArtBackground } from './ArtBackground';
 import { presetArt } from '@/lib/artAssets';
+import { useArtwork } from '@/hooks/use-artwork';
 
 export function presetIcon(preset: FrequencyPreset): IconConfig {
   if (preset.type === 'binaural' && preset.binauralType) {
@@ -68,7 +69,15 @@ function getSubline(preset: FrequencyPreset, t: (k: string) => string): string {
 // monospace space glyph is much wider, so wrapping "2 Hz" as one run
 // rendered a visible double gap ("2␣␣Hz"), and monospacing the category
 // word alongside it read as a font glitch rather than a choice.
-function Subline({ preset, color, t }: { preset: FrequencyPreset; color: string; t: (k: string) => string }) {
+function Subline({
+  preset,
+  color,
+  t,
+}: {
+  preset: FrequencyPreset;
+  color: string;
+  t: (k: string) => string;
+}) {
   if (preset.type === 'binaural' && preset.beatFrequency) {
     return (
       <Text style={[styles.subline, { color }]} numberOfLines={1}>
@@ -102,8 +111,16 @@ const BINAURAL_BANDS = ['delta', 'theta', 'alpha', 'beta', 'gamma'] as const;
  * scale: you can see at a glance that Theta is near the bottom and Beta near
  * the top without knowing what 6 Hz means.
  */
-function BandScale({ preset, color }: { preset: FrequencyPreset; color: string }) {
-  const index = BINAURAL_BANDS.indexOf(preset.binauralType as (typeof BINAURAL_BANDS)[number]);
+function BandScale({
+  preset,
+  color,
+}: {
+  preset: FrequencyPreset;
+  color: string;
+}) {
+  const index = BINAURAL_BANDS.indexOf(
+    preset.binauralType as (typeof BINAURAL_BANDS)[number],
+  );
   if (index < 0) return null;
   return (
     <View
@@ -126,11 +143,18 @@ function BandScale({ preset, color }: { preset: FrequencyPreset; color: string }
 }
 
 /** Splits `text` on the first case-insensitive occurrence of `term`. */
-function splitOnMatch(text: string, term: string): [string, string, string] | null {
+function splitOnMatch(
+  text: string,
+  term: string,
+): [string, string, string] | null {
   if (!term) return null;
   const at = text.toLowerCase().indexOf(term);
   if (at < 0) return null;
-  return [text.slice(0, at), text.slice(at, at + term.length), text.slice(at + term.length)];
+  return [
+    text.slice(0, at),
+    text.slice(at, at + term.length),
+    text.slice(at + term.length),
+  ];
 }
 
 export function PresetRow({
@@ -145,6 +169,7 @@ export function PresetRow({
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
   const categoryColors = useCategoryColors();
+  const artwork = useArtwork();
   const name = t(preset.nameKey);
   const match = highlight ? splitOnMatch(name, highlight) : null;
 
@@ -173,25 +198,40 @@ export function PresetRow({
         .filter(Boolean)
         .join(', ')}
     >
-      <ArtBackground source={presetArt(preset.id)} style={styles.row} variant="row">
+      <ArtBackground
+        source={artwork.source(presetArt(preset.id))}
+        style={styles.row}
+        variant="row"
+      >
         <View
           style={[
             styles.iconBadge,
             { backgroundColor: withAlpha(categoryColors[preset.type], 0.28) },
           ]}
         >
-          <Icon icon={presetIcon(preset)} size={19} color="#FFFFFF" />
+          <Icon
+            icon={presetIcon(preset)}
+            size={19}
+            color={artwork.foreground.primary}
+          />
         </View>
         <View style={styles.rowText}>
           <View style={styles.nameRow}>
             <Text
-              style={[styles.name, { color: '#FFFFFF' }]}
+              style={[styles.name, { color: artwork.foreground.primary }]}
               numberOfLines={1}
             >
               {match ? (
                 <>
                   {match[0]}
-                  <Text style={[styles.nameMatch, { color: '#FFFFFF' }]}>{match[1]}</Text>
+                  <Text
+                    style={[
+                      styles.nameMatch,
+                      { color: artwork.foreground.primary },
+                    ]}
+                  >
+                    {match[1]}
+                  </Text>
                   {match[2]}
                 </>
               ) : (
@@ -202,22 +242,26 @@ export function PresetRow({
               <Ionicons
                 name="heart"
                 size={14}
-                color="#FFFFFF"
+                color={artwork.foreground.primary}
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               />
             )}
           </View>
           <View style={styles.sublineRow}>
-            <Subline preset={preset} color="rgba(255,255,255,0.74)" t={t} />
-            <BandScale preset={preset} color="rgba(255,255,255,0.82)" />
+            <Subline
+              preset={preset}
+              color={artwork.foreground.secondary}
+              t={t}
+            />
+            <BandScale preset={preset} color={artwork.foreground.secondary} />
           </View>
         </View>
-        {isPlaying && <EqualizerBars color="#FFFFFF" />}
+        {isPlaying && <EqualizerBars color={artwork.foreground.primary} />}
         <Ionicons
           name="chevron-forward"
           size={17}
-          color="rgba(255,255,255,0.82)"
+          color={artwork.foreground.secondary}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         />
@@ -251,6 +295,7 @@ const styles = StyleSheet.create({
   },
   rowText: {
     flex: 1,
+    minWidth: 0,
     gap: 2,
   },
   nameRow: {
@@ -269,6 +314,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
+    minWidth: 0,
   },
   bandScale: {
     flexDirection: 'row',
@@ -286,6 +332,7 @@ const styles = StyleSheet.create({
   },
   subline: {
     ...Typography.footnote,
+    flexShrink: 1,
   },
   sublineFreq: {
     ...Typography.numeral,
