@@ -5,6 +5,8 @@
  */
 
 import { IconConfig } from '@/components/ui/Icon';
+import { intentArt } from '@/lib/artAssets';
+import type { ImageSourcePropType } from 'react-native';
 
 export type IntentId = 'sleep' | 'focus' | 'relax' | 'meditate';
 
@@ -13,12 +15,9 @@ export interface Intent {
   nameKey: string;
   descKey: string;
   icon: IconConfig;
-  /** Atmospheric background for the Intent detail hero only — a single
-   *  full-bleed moment earns the photo; the repeated Home card grid does
-   *  not (see DESIGN.md). */
-  image: number;
-  /** Cosmetic catalog code for the Home label cards — a record-label
-   *  numbering convention, not a real product SKU. */
+  /** Shared cinematic artwork for the Home card and Intent detail hero. */
+  image: ImageSourcePropType;
+  /** Cosmetic catalogue code retained as compact secondary metadata. */
   catalogCode: string;
   presetIds: string[];
   /** One-tap "start session" duration, in minutes — preset + timer + a
@@ -33,7 +32,7 @@ export const intents: Intent[] = [
     nameKey: 'intents.sleep',
     descKey: 'intents.sleepDesc',
     icon: { name: 'moon', library: 'ionicon' },
-    image: require('@/assets/images/intents/sleep.jpg'),
+    image: intentArt('sleep'),
     catalogCode: 'ND-01',
     presetIds: [
       'binaural-delta',
@@ -50,7 +49,7 @@ export const intents: Intent[] = [
     nameKey: 'intents.focus',
     descKey: 'intents.focusDesc',
     icon: { name: 'flash', library: 'ionicon' },
-    image: require('@/assets/images/intents/focus.jpg'),
+    image: intentArt('focus'),
     catalogCode: 'ND-02',
     presetIds: [
       'binaural-beta',
@@ -66,7 +65,7 @@ export const intents: Intent[] = [
     nameKey: 'intents.relax',
     descKey: 'intents.relaxDesc',
     icon: { name: 'leaf', library: 'ionicon' },
-    image: require('@/assets/images/intents/relax.jpg'),
+    image: intentArt('relax'),
     catalogCode: 'ND-03',
     presetIds: [
       'binaural-alpha',
@@ -83,7 +82,7 @@ export const intents: Intent[] = [
     nameKey: 'intents.meditate',
     descKey: 'intents.meditateDesc',
     icon: { name: 'meditation', library: 'material' },
-    image: require('@/assets/images/intents/meditate.jpg'),
+    image: intentArt('meditate'),
     catalogCode: 'ND-04',
     presetIds: [
       'binaural-theta',

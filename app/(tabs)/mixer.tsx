@@ -41,6 +41,8 @@ import {
   FrequencyPreset,
 } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
+import { ArtBackground } from '@/components/ui/ArtBackground';
+import { presetArt } from '@/lib/artAssets';
 
 // Preset picker groups — 33 flat items is unusable; group by category
 const pickerGroups = [
@@ -350,27 +352,29 @@ export default function MixerScreen() {
           )}
 
           {channels.map(channel => (
-            <View
+            <ArtBackground
               key={channel.id}
-              style={[styles.channelRow, { borderBottomColor: colors.cardBorder }]}
+              source={presetArt(channel.preset.id)}
+              style={styles.channelRow}
+              variant="channel"
             >
               <View
                 style={[
                   styles.channelIcon,
                   {
-                    backgroundColor: withAlpha(categoryColors[channel.preset.type], BADGE_ALPHA),
+                    backgroundColor: 'rgba(255,255,255,0.16)',
                     opacity: channel.muted ? 0.5 : 1,
                   },
                 ]}
               >
-                <Icon icon={presetIcon(channel.preset)} size={18} color={categoryColors[channel.preset.type]} />
+                <Icon icon={presetIcon(channel.preset)} size={18} color="#FFFFFF" />
               </View>
               <View style={styles.channelBody}>
                 <View style={styles.channelHeader}>
                   <Text
                     style={[
                       styles.channelName,
-                      { color: channel.muted ? colors.textSecondary : colors.text },
+                      { color: channel.muted ? 'rgba(255,255,255,0.58)' : '#FFFFFF' },
                     ]}
                     numberOfLines={1}
                   >
@@ -387,7 +391,7 @@ export default function MixerScreen() {
                       <Ionicons
                         name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
                         size={20}
-                        color={channel.muted ? colors.accent : colors.textSecondary}
+                        color={channel.muted ? 'rgba(255,255,255,0.62)' : '#FFFFFF'}
                       />
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -396,7 +400,7 @@ export default function MixerScreen() {
                       accessibilityRole="button"
                       accessibilityLabel={`${t('common.delete')} ${t(channel.preset.nameKey)}`}
                     >
-                      <Ionicons name="close" size={20} color={colors.textSecondary} />
+                      <Ionicons name="close" size={20} color="rgba(255,255,255,0.76)" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -414,7 +418,7 @@ export default function MixerScreen() {
                   />
                 </View>
               </View>
-            </View>
+            </ArtBackground>
           ))}
 
           {/* Add Channel — rendered whenever there is at least one channel,
@@ -748,9 +752,11 @@ const styles = StyleSheet.create({
   },
   channelRow: {
     flexDirection: 'row',
-    paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    padding: Spacing.md,
     gap: Spacing.md,
+    borderRadius: Radius.card,
+    marginBottom: Spacing.sm,
+    overflow: 'hidden',
   },
   channelIcon: {
     width: 36,

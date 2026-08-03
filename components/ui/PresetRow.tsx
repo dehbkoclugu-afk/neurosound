@@ -1,17 +1,7 @@
 /**
- * The one way a preset is presented outside the player: a typographic list
- * row, no cards, no gradients.
- *
- * It was called `PresetCard` while its own header said "no cards", which is
- * how the app came to have two things named card that shared no visual
- * language. The rule the name now follows: a **card** is a bordered box you
- * choose between (Home's intent cards); a **row** is an item in a list,
- * separated by a hairline and nothing else. See DESIGN.md.
- *
- * Name carries the hierarchy; a quiet subline gives type and frequency.
- * The icon sits in a tinted circle rather than floating bare: a run of a
- * dozen identical rows read as one grey paragraph without something for the
- * eye to land on between them.
+ * The shared image-led sound row used by Home, Explore and Intent screens.
+ * Artwork is semantic content, while the deterministic scrim keeps names,
+ * frequency, state and navigation readable in every theme.
  */
 
 import React from 'react';
@@ -27,11 +17,13 @@ import { useTranslation } from 'react-i18next';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { useSettingsStore } from '@/stores/settingsStore';
-import { Spacing, Typography, FontFamily, BADGE_ALPHA, withAlpha } from '@/constants/theme';
-import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, FontFamily, withAlpha } from '@/constants/theme';
+import { useCategoryColors } from '@/hooks/use-theme-colors';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { Icon, getPresetIcon, IconConfig } from './Icon';
 import { EqualizerBars } from './EqualizerBars';
+import { ArtBackground } from './ArtBackground';
+import { presetArt } from '@/lib/artAssets';
 
 export function presetIcon(preset: FrequencyPreset): IconConfig {
   if (preset.type === 'binaural' && preset.binauralType) {
@@ -152,7 +144,6 @@ export function PresetRow({
 }: PresetRowProps) {
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
-  const colors = useThemeColors();
   const categoryColors = useCategoryColors();
   const name = t(preset.nameKey);
   const match = highlight ? splitOnMatch(name, highlight) : null;
@@ -166,7 +157,7 @@ export function PresetRow({
       }
       onPress={onPress}
       activeOpacity={0.6}
-      style={[styles.row, { borderBottomColor: colors.cardBorder }, style]}
+      style={[styles.rowShell, style]}
       accessibilityRole="button"
       // The subline carries the category and the frequency, and the heart
       // carries favourite state. Announcing the name alone dropped both, so a
@@ -182,70 +173,74 @@ export function PresetRow({
         .filter(Boolean)
         .join(', ')}
     >
-      <View
-        style={[
-          styles.iconBadge,
-          { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
-        ]}
-      >
-        <Icon icon={presetIcon(preset)} size={19} color={categoryColors[preset.type]} />
-      </View>
-      <View style={styles.rowText}>
-        <View style={styles.nameRow}>
-          <Text
-            style={[styles.name, { color: isPlaying ? colors.accent : colors.text }]}
-            numberOfLines={1}
-          >
-            {match ? (
-              <>
-                {match[0]}
-                <Text style={[styles.nameMatch, { color: colors.accent }]}>{match[1]}</Text>
-                {match[2]}
-              </>
-            ) : (
-              name
+      <ArtBackground source={presetArt(preset.id)} style={styles.row} variant="row">
+        <View
+          style={[
+            styles.iconBadge,
+            { backgroundColor: withAlpha(categoryColors[preset.type], 0.28) },
+          ]}
+        >
+          <Icon icon={presetIcon(preset)} size={19} color="#FFFFFF" />
+        </View>
+        <View style={styles.rowText}>
+          <View style={styles.nameRow}>
+            <Text
+              style={[styles.name, { color: '#FFFFFF' }]}
+              numberOfLines={1}
+            >
+              {match ? (
+                <>
+                  {match[0]}
+                  <Text style={[styles.nameMatch, { color: '#FFFFFF' }]}>{match[1]}</Text>
+                  {match[2]}
+                </>
+              ) : (
+                name
+              )}
+            </Text>
+            {isFavorite && (
+              <Ionicons
+                name="heart"
+                size={14}
+                color="#FFFFFF"
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
             )}
-          </Text>
-          {/* The heart used to sit at the far right margin at 16px, where it
-              was the easiest thing on the row to miss while scanning. It
-              belongs with the entry it marks, not out in the gutter. */}
-          {isFavorite && (
-            <Ionicons
-              name="heart"
-              size={14}
-              color={colors.accent}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
-          )}
+          </View>
+          <View style={styles.sublineRow}>
+            <Subline preset={preset} color="rgba(255,255,255,0.74)" t={t} />
+            <BandScale preset={preset} color="rgba(255,255,255,0.82)" />
+          </View>
         </View>
-        <View style={styles.sublineRow}>
-          <Subline preset={preset} color={colors.textSecondary} t={t} />
-          <BandScale preset={preset} color={categoryColors[preset.type]} />
-        </View>
-      </View>
-      {isPlaying && <EqualizerBars color={colors.accent} />}
-      {/* The rows navigate; nothing said so. */}
-      <Ionicons
-        name="chevron-forward"
-        size={16}
-        color={colors.tabIconDefault}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      />
+        {isPlaying && <EqualizerBars color="#FFFFFF" />}
+        <Ionicons
+          name="chevron-forward"
+          size={17}
+          color="rgba(255,255,255,0.82)"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
+      </ArtBackground>
     </AnimatedTouchable>
   );
 }
 
 const styles = StyleSheet.create({
+  rowShell: {
+    width: '100%',
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginBottom: Spacing.sm,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
     gap: Spacing.md,
-    minHeight: 56,
+    minHeight: 92,
   },
   iconBadge: {
     width: 36,

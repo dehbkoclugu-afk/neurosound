@@ -1,20 +1,20 @@
-# Design — "Night Deck"
+# Design — "Cinematic Sound Atlas"
 
 <!-- impeccable:design-doc -->
 
-Recorded at finish, from the built world (see `git log` around this change for the exact commits). This replaces the app's prior "quiet instrument" identity — a single-amber, typographic, card-free system — after the user rejected it outright ("looks like an elementary-school project, the worst UI I've seen").
+The image-led system supersedes Night Deck's typographic record-label presentation after device review showed that its empty cards and rows still read as unfinished. Product behavior and the nighttime operating context remain unchanged.
 
 ## Direction contract
 
-**THESIS.** NeuroSound is already a mixer and a nighttime instrument; the UI should read like one — an analog dial and record-label print system, not another pastel meditation app.
+**THESIS.** Every sound should be recognizable before it is read. NeuroSound is a cinematic atlas of acoustic environments, not a text catalogue with decorative icons.
 
-**OWN-WORLD.** Warm paper neutrals (cream in light mode, warm near-black in dark/night) with a single deep ink-blue accent (`#2F5C8A` light / `#7FA8CC` dark, replacing the old amber). Flat printed "record label" cards with a coloured spine bar and a cosmetic catalog code (`ND-01`…`ND-04`) instead of photo-gradient blocks. Tabular "tape-counter" monospace numerals reserved for Hz/frequency and timer readouts only — never for prose. A rotary analog dial (tick marks, needle, hub) is the Player's one authored moment.
+**OWN-WORLD.** Dark, tactile, cinematic landscapes and material studies: midnight navy, graphite, forest green, smoked violet and restrained amber/ivory light. Every composition concentrates detail on the right and preserves a calm dark field beneath left-aligned copy. The Player's rotary dial remains the authored control moment; imagery carries discovery and selection surfaces.
 
-**STORY.** The visitor picks a sound like choosing a record, drops the needle to play, mixes multiple sounds like layering tracks, and reads the interface's numerals like a tape counter, not app chrome.
+**STORY.** The user scans environments and resonant materials, recognizes the state or sound they need, then enters the existing player or layers those scenes in the mixer.
 
-**FIRST VIEWPORT.** Home's intent list is four flat catalog-card rows (Sleep/Focus/Relax/Meditate), each a coloured spine + catalog code + title + description + icon tag — no full-bleed photography repeated four times down the page.
+**FIRST VIEWPORT.** Home opens with one large time-aware cinematic intent card, followed by three shorter scene cards. Copy stays readable through a deterministic dark scrim; artwork remains visible on the right.
 
-**FORM.** Directions considered: analog hi-fi/mixing-console dial language, planetarium/observatory, aviation night-vision cockpit mode, vinyl/tape-deck ritual (**assigned and built**, `concept-seed.mjs --scope direction --mode operate`, seed key `35b67484`, index 4), apothecary/pharmacy labels, onsen/ryokan paper signage, lighthouse beacon rhythm.
+**FORM.** Operate mode with authored cinematic content. Full-bleed art is reserved for destinations and sound choices; settings, privacy, forms and destructive controls stay on stable operational surfaces.
 
 ## Tokens
 
@@ -32,12 +32,12 @@ Source of truth: `constants/theme.ts`.
 
 - **`components/ui/Dial.tsx`** (new) — the Player's signature instrument. Tapping the dial plays/pauses; a needle sweeps like a VU meter while playing and rests at a calm-but-visible angle (never fading toward invisible) while paused. Reanimated-driven; respects `reduceMotion` by jumping between two fixed positions instead of sweeping.
 - **`components/player/WaveVisualizer.tsx`** — removed. Fully superseded by `Dial`.
-- **Card vs. row** — the one containment rule, and the two are not variants of each other. A **card** is a bordered box (`borderWidth: 1` + `Radius.card`) for a destination you *choose between*: Home's intent cards. A **row** is an item in a list, separated by a hairline and nothing else, with no box: preset lists, mixer channels, settings, saved mixes. Anything called a card must be a box; anything in a list must not be. `PresetCard` was renamed `PresetRow` because it was a row wearing the other name, which is how "card" came to mean two unrelated things.
-- **`PresetRow` / Mixer picker & channel rows** — icon sits in a tinted circular tag (category color at 16% alpha) rather than floating bare, giving list rows a visual anchor. Shared `presetIcon()` helper (exported from `PresetRow.tsx`) keeps the type→icon mapping in one place.
+- **`ArtBackground`** — the single image surface for cards, preset rows and active mixer channels. It owns local-image cropping and the left-to-right scrim, so contrast does not depend on a particular source image.
+- **`PresetRow` / Mixer picker & channel rows** — every one of the 33 presets resolves to distinct bundled art through `lib/artAssets.ts`. Rows are 92px-tall image surfaces with a stable left text zone; existing search highlighting, category/frequency text, favourite state, band scale, equalizer and accessibility labels remain.
 - **`components/ui/Toast.tsx`** — three variants (`success` / `error` / `info`), each with its own icon and live-region politeness. Info is the default; most confirmations are neither good news nor bad.
 - **`components/ui/EqualizerBars.tsx`** — three animated bars marking the row whose sound is currently playing, shared by Home, Explore and the Intent screen via `PresetRow`'s `isPlaying`. Holds at three unequal heights under `reduceMotion`; decorative to a screen reader, so the state is spoken in the row's own label instead.
 - **`components/ui/Sheet.tsx`** — the one modal grammar. Everything that comes forward arrives from the bottom edge with a grabber, a left-aligned title and a close button; `tall` (85% height) is for content that scrolls. There is no centred dialog and no full-screen modal.
-- **Home intent cards** — flat card, coloured left spine, catalog code in tracked mono caps, icon tag, title, description. No photography in the repeated grid; the Intent *detail* screen keeps its real photographic hero (a single full-bleed moment earns it; the repeated list does not).
+- **Home intent cards** — four full-bleed scenes, with the time-suggested intent given more height. Catalogue metadata remains secondary; the scene and intent name lead.
 - **`CategoryHeader`** — section titles now render in the tracked-uppercase `label` style system-wide.
 
 ## Languages
@@ -55,7 +55,8 @@ The app tracks total listening time and session count (`presetsStore`), shown in
 ## Assets
 
 - `assets/images/icon.png`, `android-icon-{foreground,background,monochrome}.png`, `splash-icon.png`, `favicon.png` — generated by `scripts/generate-icons.py` from the Dial's own constants (21 ticks across a 270° sweep, dead zone at the bottom, needle at rest). Re-run the script after changing the dial's geometry; the constants are duplicated into the script deliberately, with a note, since Python cannot import the TSX. Replaces a generic "glowing brain silhouette with soundwave rings" stock-feeling icon, and before that a full-circle clock face that was a different drawing from the in-app dial. `app.json` splash/adaptive-icon background colors updated to match the new palette.
-- `assets/images/intents/*.jpg` — unchanged; still real locally-generated atmospheric art, used only on the Intent detail hero.
+- `assets/images/art/intents/*.jpg` — four original ChatGPT-generated scenes used by Home and Intent heroes.
+- `assets/images/art/presets/*.jpg` — 33 original ChatGPT-generated scenes/material studies, one per preset. Production prompts live in `docs/ART-ASSET-BRIEFS.md`; all are compressed local JPEGs and add roughly 2.7 MB to the bundle.
 
 ## What did not change
 
