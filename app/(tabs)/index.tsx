@@ -32,8 +32,8 @@ import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import { ArtBackground } from '@/components/ui/ArtBackground';
-import { intentArt } from '@/lib/artAssets';
-
+import { intentArt, stateArt } from '@/lib/artAssets';
+import { useArtwork } from '@/hooks/use-artwork';
 
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
@@ -55,6 +55,7 @@ export default function HomeScreen() {
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
+  const artwork = useArtwork();
   const miniPlayerInset = useMiniPlayerInset();
   const isPresetPlaying = useIsPresetPlaying();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
@@ -64,11 +65,11 @@ export default function HomeScreen() {
   // scroll for a change nobody is waiting to see.
   const { intent: suggestedIntent, band } = useMemo(
     () => getSuggestedIntent(new Date().getHours()),
-    []
+    [],
   );
   const otherIntents = useMemo(
     () => intents.filter((i) => i.id !== suggestedIntent.id),
-    [suggestedIntent.id]
+    [suggestedIntent.id],
   );
 
   // The first id in an intent's list is its recommended sound. Naming it on
@@ -79,13 +80,15 @@ export default function HomeScreen() {
   // sound it was meant to help you choose.
   const suggestedSound = useMemo(
     () => getPresetById(suggestedIntent.presetIds[0]),
-    [suggestedIntent.presetIds]
+    [suggestedIntent.presetIds],
   );
 
   // AsyncStorage hydration must finish before the onboarding default is used.
   if (!hasHydrated) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <View style={styles.hydrationLoading}>
           <ActivityIndicator size="small" color={colors.tint} />
         </View>
@@ -103,30 +106,26 @@ export default function HomeScreen() {
   const handlePresetPress = (presetId: string) => {
     const preset = getPresetById(presetId);
     if (preset?.type === 'binaural' && !hasSeenHeadphoneWarning) {
-      Alert.alert(
-        t('home.headphoneWarning'),
-        t('home.headphoneWarningDesc'),
-        [
-          {
-            text: t('common.ok'),
-            onPress: () => {
-              setHasSeenHeadphoneWarning(true);
-              router.push(`/player/${presetId}`);
-            },
+      Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
+        {
+          text: t('common.ok'),
+          onPress: () => {
+            setHasSeenHeadphoneWarning(true);
+            router.push(`/player/${presetId}`);
           },
-        ]
-      );
+        },
+      ]);
     } else {
       router.push(`/player/${presetId}`);
     }
   };
 
   const favoritePresets = favoriteIds
-    .map(id => getPresetById(id))
+    .map((id) => getPresetById(id))
     .filter((p): p is FrequencyPreset => p !== undefined);
 
   const recentPresets = recentlyPlayed
-    .map(r => getPresetById(r.presetId))
+    .map((r) => getPresetById(r.presetId))
     .filter((p): p is FrequencyPreset => p !== undefined)
     .slice(0, RECENT_PREVIEW);
 
@@ -139,11 +138,13 @@ export default function HomeScreen() {
   // nothing in particular, which is the fastest way to teach someone not to
   // read warnings — and the first binaural play already raises a dialog.
   const showsBinaural = [...recentPresets, ...visibleFavorites].some(
-    (preset) => preset.type === 'binaural'
+    (preset) => preset.type === 'binaural',
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -175,53 +176,92 @@ export default function HomeScreen() {
               t(`home.suggestedFor.${band}`),
               t(suggestedIntent.nameKey),
               t(suggestedIntent.descKey),
-              t('home.recommendedMinutes', { minutes: suggestedIntent.recommendedMinutes }),
+              t('home.recommendedMinutes', {
+                minutes: suggestedIntent.recommendedMinutes,
+              }),
               suggestedSound ? t(suggestedSound.nameKey) : null,
             ]
               .filter(Boolean)
               .join('. ')}
           >
             <ArtBackground
-              source={intentArt(suggestedIntent.id)}
+              source={artwork.source(intentArt(suggestedIntent.id))}
               style={[styles.intentSurface, styles.featuredBody]}
               variant="card"
             >
               <View style={styles.intentTopRow}>
                 {/* A word, not a catalogue code — so it takes the printed-label
                     style without the tape-counter monospace the codes use. */}
-                <Text style={[styles.featuredKicker, styles.artPrimaryText]}>
+                <Text
+                  style={[
+                    styles.featuredKicker,
+                    { color: artwork.foreground.primary },
+                  ]}
+                >
                   {t(`home.suggestedFor.${band}`)}
                 </Text>
                 <View
                   style={[
                     styles.intentIconTag,
                     styles.featuredIconTag,
-                    styles.artIconTag,
+                    { backgroundColor: artwork.foreground.badge },
                   ]}
                 >
-                  <Icon icon={suggestedIntent.icon} size={22} color="#FFFFFF" />
+                  <Icon
+                    icon={suggestedIntent.icon}
+                    size={22}
+                    color={artwork.foreground.primary}
+                  />
                 </View>
               </View>
-              <Text style={[styles.featuredName, styles.artPrimaryText]}>
+              <Text
+                style={[
+                  styles.featuredName,
+                  { color: artwork.foreground.primary },
+                ]}
+              >
                 {t(suggestedIntent.nameKey)}
               </Text>
-              <Text style={[styles.intentDesc, styles.artSecondaryText]}>
+              <Text
+                style={[
+                  styles.intentDesc,
+                  { color: artwork.foreground.secondary },
+                ]}
+              >
                 {t(suggestedIntent.descKey)}
               </Text>
               {/* The curated session length was buried on the detail screen;
                   it is the most useful thing to know before tapping in. */}
               <View style={styles.featuredMeta}>
-                <Ionicons name="time-outline" size={14} color="rgba(255,255,255,0.76)" />
+                <View style={styles.featuredMetaLine}>
+                  <Ionicons
+                    name="time-outline"
+                    size={14}
+                    color={artwork.foreground.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.featuredMetaText,
+                      { color: artwork.foreground.secondary },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    <Text style={styles.featuredMetaNumber}>
+                      {suggestedIntent.recommendedMinutes}
+                    </Text>
+                    {t('home.recommendedMinutesSuffix')}
+                    {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
+                  </Text>
+                </View>
                 <Text
-                  style={[styles.featuredMetaText, styles.artSecondaryText]}
-                  numberOfLines={1}
+                  style={[
+                    styles.intentCatalog,
+                    { color: artwork.foreground.secondary },
+                  ]}
                 >
-                  <Text style={styles.featuredMetaNumber}>{suggestedIntent.recommendedMinutes}</Text>
-                  {t('home.recommendedMinutesSuffix')}
-                  {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
-                </Text>
-                <Text style={[styles.intentCatalog, styles.featuredMetaCode, styles.artSecondaryText]}>
-                  <Text style={styles.intentCatalogCode}>{suggestedIntent.catalogCode}</Text>
+                  <Text style={styles.intentCatalogCode}>
+                    {suggestedIntent.catalogCode}
+                  </Text>
                   {` · ${t('home.soundCount', { n: suggestedIntent.presetIds.length })}`}
                 </Text>
               </View>
@@ -249,7 +289,9 @@ export default function HomeScreen() {
             </View>
           )}
 
-          <Text style={[styles.otherIntentsLabel, { color: colors.textSecondary }]}>
+          <Text
+            style={[styles.otherIntentsLabel, { color: colors.textSecondary }]}
+          >
             {t('home.otherIntents')}
           </Text>
 
@@ -265,7 +307,7 @@ export default function HomeScreen() {
                 accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
                 <ArtBackground
-                  source={intentArt(intent.id)}
+                  source={artwork.source(intentArt(intent.id))}
                   style={styles.intentSurface}
                   variant="card"
                 >
@@ -274,21 +316,43 @@ export default function HomeScreen() {
                         Pairing it with the size of what it points at makes it
                         a real index entry — and the code keeps the mono face
                         while the words around it stay in Nunito. */}
-                    <Text style={[styles.intentCatalog, styles.artSecondaryText]}>
-                      <Text style={styles.intentCatalogCode}>{intent.catalogCode}</Text>
+                    <Text
+                      style={[
+                        styles.intentCatalog,
+                        { color: artwork.foreground.secondary },
+                      ]}
+                    >
+                      <Text style={styles.intentCatalogCode}>
+                        {intent.catalogCode}
+                      </Text>
                       {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
                     </Text>
                     <View
-                      style={[styles.intentIconTag, styles.artIconTag]}
+                      style={[
+                        styles.intentIconTag,
+                        { backgroundColor: artwork.foreground.badge },
+                      ]}
                     >
-                      <Icon icon={intent.icon} size={18} color="#FFFFFF" />
+                      <Icon
+                        icon={intent.icon}
+                        size={18}
+                        color={artwork.foreground.primary}
+                      />
                     </View>
                   </View>
-                  <Text style={[styles.intentName, styles.artPrimaryText]}>
+                  <Text
+                    style={[
+                      styles.intentName,
+                      { color: artwork.foreground.primary },
+                    ]}
+                  >
                     {t(intent.nameKey)}
                   </Text>
                   <Text
-                    style={[styles.intentDesc, styles.artSecondaryText]}
+                    style={[
+                      styles.intentDesc,
+                      { color: artwork.foreground.secondary },
+                    ]}
                     numberOfLines={2}
                   >
                     {t(intent.descKey)}
@@ -309,7 +373,9 @@ export default function HomeScreen() {
                 ? () => setShowAllFavorites((v) => !v)
                 : undefined
             }
-            seeAllText={showAllFavorites ? t('common.showLess') : t('common.seeAll')}
+            seeAllText={
+              showAllFavorites ? t('common.showLess') : t('common.seeAll')
+            }
           />
           {favoritePresets.length > 0 ? (
             <View>
@@ -324,9 +390,32 @@ export default function HomeScreen() {
               ))}
             </View>
           ) : (
-            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-              {t('home.favoritesEmpty')}
-            </Text>
+            <ArtBackground
+              source={artwork.source(stateArt('favorites-empty'))}
+              style={styles.emptyState}
+              variant="card"
+            >
+              <View
+                style={[
+                  styles.emptyStateIcon,
+                  { backgroundColor: artwork.foreground.badge },
+                ]}
+              >
+                <Ionicons
+                  name="heart-outline"
+                  size={20}
+                  color={artwork.foreground.primary}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.emptyStateText,
+                  { color: artwork.foreground.secondary },
+                ]}
+              >
+                {t('home.favoritesEmpty')}
+              </Text>
+            </ArtBackground>
           )}
         </View>
 
@@ -335,7 +424,6 @@ export default function HomeScreen() {
             {t('home.headphoneNote')}
           </Text>
         )}
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -397,10 +485,15 @@ const styles = StyleSheet.create({
     lineHeight: 34,
   },
   featuredMeta: {
+    alignItems: 'flex-start',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  featuredMetaLine: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
-    marginTop: Spacing.xs,
+    maxWidth: '100%',
   },
   featuredMetaText: {
     ...Typography.footnote,
@@ -408,9 +501,6 @@ const styles = StyleSheet.create({
   },
   featuredMetaNumber: {
     ...Typography.numeral,
-  },
-  featuredMetaCode: {
-    marginLeft: 'auto',
   },
   recentSection: {
     marginTop: Spacing.xl,
@@ -448,19 +538,24 @@ const styles = StyleSheet.create({
   intentDesc: {
     ...Typography.footnote,
   },
-  artPrimaryText: {
-    color: '#FFFFFF',
+  emptyState: {
+    minHeight: 142,
+    borderRadius: Radius.card,
+    justifyContent: 'center',
+    padding: Spacing.md,
+    gap: Spacing.sm,
   },
-  artSecondaryText: {
-    color: 'rgba(255,255,255,0.76)',
-  },
-  artIconTag: {
-    backgroundColor: 'rgba(255,255,255,0.16)',
+  emptyStateIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyStateText: {
     ...Typography.body,
     lineHeight: 21,
-    paddingVertical: Spacing.sm,
+    maxWidth: '72%',
   },
   headphoneNote: {
     ...Typography.footnote,

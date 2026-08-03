@@ -19,7 +19,17 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, onPrimary, Radius, ControlSize, Colors, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import {
+  Spacing,
+  Typography,
+  FontFamily,
+  onPrimary,
+  Radius,
+  ControlSize,
+  Colors,
+  BADGE_ALPHA,
+  withAlpha,
+} from '@/constants/theme';
 import { useSettingsStore, ThemeMode } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -31,10 +41,8 @@ import { contentColumn } from '@/constants/layout';
 import i18n from '@/i18n';
 import * as playerController from '@/lib/audio/playerController';
 
-/** Each theme shows what it looks like: paper colour on the left half, ink
- *  on the right. Four names in four identical pills told the user nothing
- *  about the difference between "dark" and "night", which is the entire
- *  reason both exist. `auto` shows both, because that is what it does. */
+/** Each theme shows what it looks like: surface colour on the left half,
+ *  accent on the right. `auto` shows both light and dark surfaces. */
 /** "6h 20m" / "48m" — hours only once there are any, and the tape-counter
  *  face makes the digits line up between the two rows. */
 function formatListened(totalSeconds: number): string {
@@ -48,10 +56,21 @@ const THEME_OPTIONS: {
   labelKey: string;
   swatch: [string, string];
 }[] = [
-  { value: 'light', labelKey: 'settings.themes.light', swatch: [Colors.light.background, Colors.light.accent] },
-  { value: 'dark', labelKey: 'settings.themes.dark', swatch: [Colors.dark.background, Colors.dark.accent] },
-  { value: 'night', labelKey: 'settings.themes.night', swatch: [Colors.night.background, Colors.night.accent] },
-  { value: 'auto', labelKey: 'settings.themes.auto', swatch: [Colors.light.background, Colors.dark.background] },
+  {
+    value: 'light',
+    labelKey: 'settings.themes.light',
+    swatch: [Colors.light.background, Colors.light.accent],
+  },
+  {
+    value: 'dark',
+    labelKey: 'settings.themes.dark',
+    swatch: [Colors.dark.background, Colors.dark.accent],
+  },
+  {
+    value: 'auto',
+    labelKey: 'settings.themes.auto',
+    swatch: [Colors.light.background, Colors.dark.background],
+  },
 ];
 
 export default function SettingsScreen() {
@@ -106,7 +125,6 @@ export default function SettingsScreen() {
     ]);
   }, [t, resetPresets, resetSettings, showToast]);
 
-
   // The cap is a hearing-safety control — it has to apply to audio that's
   // already playing, not just the next time a player screen happens to
   // mount and re-run its own volume sync.
@@ -116,7 +134,9 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -138,282 +158,433 @@ export default function SettingsScreen() {
 
         {/* Appearance Section */}
         <View style={styles.section}>
-          <CategoryHeader title={t('settings.appearance')} style={styles.sectionHeader} />
+          <CategoryHeader
+            title={t('settings.appearance')}
+            style={styles.sectionHeader}
+          />
 
-          {/* Theme */}
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <Text style={[styles.cardTitle, styles.cardTitleSpaced, { color: colors.text }]}>
-              {t('settings.theme')}
-            </Text>
-            <View style={styles.optionGroup}>
-              {THEME_OPTIONS.map(option => (
-                <TouchableOpacity
-                  key={option.value}
-                  onPress={() => setTheme(option.value)}
-                  style={[
-                    styles.optionButton,
-                    styles.optionButtonHalf,
-                    {
-                      backgroundColor: theme === option.value ? colors.primary : colors.backgroundSecondary,
-                      borderColor: theme === option.value ? colors.primary : colors.cardBorder,
-                    },
-                  ]}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: theme === option.value }}
-                >
-                  <View
-                    style={[styles.swatch, { borderColor: colors.cardBorder }]}
-                    accessibilityElementsHidden
-                    importantForAccessibility="no-hide-descendants"
-                  >
-                    <View style={[styles.swatchHalf, { backgroundColor: option.swatch[0] }]} />
-                    <View style={[styles.swatchHalf, { backgroundColor: option.swatch[1] }]} />
-                  </View>
-                  <Text
-                    style={[
-                      styles.optionText,
-                      { color: theme === option.value ? onPrimary : colors.text },
-                    ]}
-                  >
-                    {t(option.labelKey)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Reduce Motion */}
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <View style={styles.switchRow}>
-              <View style={styles.switchLabel}>
-                <Ionicons
-                  name="sparkles-outline"
-                  size={24}
-                  color={colors.icon}
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                />
-                <View style={styles.switchText}>
-                  <Text style={[styles.cardTitle, { color: colors.text }]}>
-                    {t('settings.reduceMotion')}
-                  </Text>
-                  <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
-                    {t('settings.reduceMotionHint')}
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={reduceMotion}
-                onValueChange={setReduceMotion}
-                trackColor={{ false: colors.slider, true: colors.accent }}
-                thumbColor="#fff"
-                // react-native-web's Switch reads *active*ThumbColor/TrackColor
-                // for the ON state instead of thumbColor/trackColor.true — not
-                // in RN's official type defs (web-only extension, harmless
-                // no-op on native), so it needs a cast rather than a prop.
-                // Left unset, web falls back to its hardcoded Material teal.
-                {...({ activeThumbColor: '#fff', activeTrackColor: colors.accent } as any)}
-              />
-            </View>
-          </View>
-
-          {/* Sits with Reduce Motion because that is the control that
-              answers it — the warning is about the breathing ring. */}
           <View
             style={[
-              styles.warningCard,
+              styles.group,
               {
-                borderColor: withAlpha(colors.warning, 0.35),
-                backgroundColor: withAlpha(colors.warning, 0.07),
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
               },
             ]}
           >
-            <View style={styles.warningHeading}>
-              <Ionicons
-                name="warning-outline"
-                size={16}
-                color={colors.warning}
-                accessibilityElementsHidden
-                importantForAccessibility="no-hide-descendants"
-              />
-              <Text style={[styles.warningTitle, { color: colors.warning }]}>
-                {t('settings.epilepsyWarning')}
+            {/* Theme */}
+            <View
+              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
+            >
+              <Text
+                style={[
+                  styles.cardTitle,
+                  styles.cardTitleSpaced,
+                  { color: colors.text },
+                ]}
+              >
+                {t('settings.theme')}
+              </Text>
+              <View style={styles.optionGroup}>
+                {THEME_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    onPress={() => setTheme(option.value)}
+                    style={[
+                      styles.optionButton,
+                      styles.optionButtonHalf,
+                      {
+                        backgroundColor:
+                          theme === option.value
+                            ? colors.primary
+                            : colors.backgroundSecondary,
+                        borderColor:
+                          theme === option.value
+                            ? colors.primary
+                            : colors.cardBorder,
+                      },
+                    ]}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: theme === option.value }}
+                  >
+                    <View
+                      style={[
+                        styles.swatch,
+                        { borderColor: colors.cardBorder },
+                      ]}
+                      accessibilityElementsHidden
+                      importantForAccessibility="no-hide-descendants"
+                    >
+                      <View
+                        style={[
+                          styles.swatchHalf,
+                          { backgroundColor: option.swatch[0] },
+                        ]}
+                      />
+                      <View
+                        style={[
+                          styles.swatchHalf,
+                          { backgroundColor: option.swatch[1] },
+                        ]}
+                      />
+                    </View>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        {
+                          color:
+                            theme === option.value ? onPrimary : colors.text,
+                        },
+                      ]}
+                    >
+                      {t(option.labelKey)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Reduce Motion */}
+            <View
+              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
+            >
+              <View style={styles.switchRow}>
+                <View style={styles.switchLabel}>
+                  <Ionicons
+                    name="sparkles-outline"
+                    size={24}
+                    color={colors.icon}
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                  />
+                  <View style={styles.switchText}>
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>
+                      {t('settings.reduceMotion')}
+                    </Text>
+                    <Text
+                      style={[styles.cardHint, { color: colors.textSecondary }]}
+                    >
+                      {t('settings.reduceMotionHint')}
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={reduceMotion}
+                  onValueChange={setReduceMotion}
+                  trackColor={{ false: colors.slider, true: colors.accent }}
+                  thumbColor="#fff"
+                  // react-native-web's Switch reads *active*ThumbColor/TrackColor
+                  // for the ON state instead of thumbColor/trackColor.true — not
+                  // in RN's official type defs (web-only extension, harmless
+                  // no-op on native), so it needs a cast rather than a prop.
+                  // Left unset, web falls back to its hardcoded Material teal.
+                  {...({
+                    activeThumbColor: '#fff',
+                    activeTrackColor: colors.accent,
+                  } as any)}
+                />
+              </View>
+            </View>
+
+            {/* Sits with Reduce Motion because that is the control that
+              answers it — the warning is about the breathing ring. */}
+            <View
+              style={[
+                styles.warningCard,
+                {
+                  borderColor: withAlpha(colors.warning, 0.35),
+                  backgroundColor: withAlpha(colors.warning, 0.07),
+                },
+              ]}
+            >
+              <View style={styles.warningHeading}>
+                <Ionicons
+                  name="warning-outline"
+                  size={16}
+                  color={colors.warning}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                />
+                <Text style={[styles.warningTitle, { color: colors.warning }]}>
+                  {t('settings.epilepsyWarning')}
+                </Text>
+              </View>
+              <Text
+                style={[styles.warningText, { color: colors.textSecondary }]}
+              >
+                {t('settings.epilepsyText')}
               </Text>
             </View>
-            <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-              {t('settings.epilepsyText')}
-            </Text>
-          </View>
 
-          {/* Low Contrast */}
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <View style={styles.switchRow}>
-              <View style={styles.switchLabel}>
-                <Ionicons
-                  name="contrast-outline"
-                  size={24}
-                  color={colors.icon}
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                />
-                <View style={styles.switchText}>
-                  <Text style={[styles.cardTitle, { color: colors.text }]}>
-                    {t('settings.lowContrast')}
-                  </Text>
-                  <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
-                    {t('settings.lowContrastHint')}
-                  </Text>
+            {/* Low Contrast */}
+            <View
+              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
+            >
+              <View style={styles.switchRow}>
+                <View style={styles.switchLabel}>
+                  <Ionicons
+                    name="contrast-outline"
+                    size={24}
+                    color={colors.icon}
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                  />
+                  <View style={styles.switchText}>
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>
+                      {t('settings.lowContrast')}
+                    </Text>
+                    <Text
+                      style={[styles.cardHint, { color: colors.textSecondary }]}
+                    >
+                      {t('settings.lowContrastHint')}
+                    </Text>
+                  </View>
                 </View>
+                <Switch
+                  value={lowContrast}
+                  onValueChange={setLowContrast}
+                  trackColor={{ false: colors.slider, true: colors.accent }}
+                  thumbColor="#fff"
+                  {...({
+                    activeThumbColor: '#fff',
+                    activeTrackColor: colors.accent,
+                  } as any)}
+                />
               </View>
-              <Switch
-                value={lowContrast}
-                onValueChange={setLowContrast}
-                trackColor={{ false: colors.slider, true: colors.accent }}
-                thumbColor="#fff"
-                {...({ activeThumbColor: '#fff', activeTrackColor: colors.accent } as any)}
-              />
             </View>
-          </View>
 
-          {/* Haptics */}
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <View style={styles.switchRow}>
-              <View style={styles.switchLabel}>
-                <Ionicons
-                  name="phone-portrait-outline"
-                  size={24}
-                  color={colors.icon}
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                />
-                <View style={styles.switchText}>
-                  <Text style={[styles.cardTitle, { color: colors.text }]}>
-                    {t('settings.haptics')}
-                  </Text>
-                  <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
-                    {t('settings.hapticsHint')}
-                  </Text>
+            {/* Haptics */}
+            <View
+              style={[
+                styles.card,
+                styles.lastCard,
+                { borderBottomColor: colors.cardBorder },
+              ]}
+            >
+              <View style={styles.switchRow}>
+                <View style={styles.switchLabel}>
+                  <Ionicons
+                    name="phone-portrait-outline"
+                    size={24}
+                    color={colors.icon}
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                  />
+                  <View style={styles.switchText}>
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>
+                      {t('settings.haptics')}
+                    </Text>
+                    <Text
+                      style={[styles.cardHint, { color: colors.textSecondary }]}
+                    >
+                      {t('settings.hapticsHint')}
+                    </Text>
+                  </View>
                 </View>
+                <Switch
+                  value={haptics}
+                  onValueChange={setHaptics}
+                  trackColor={{ false: colors.slider, true: colors.accent }}
+                  thumbColor="#fff"
+                  {...({
+                    activeThumbColor: '#fff',
+                    activeTrackColor: colors.accent,
+                  } as any)}
+                />
               </View>
-              <Switch
-                value={haptics}
-                onValueChange={setHaptics}
-                trackColor={{ false: colors.slider, true: colors.accent }}
-                thumbColor="#fff"
-                {...({ activeThumbColor: '#fff', activeTrackColor: colors.accent } as any)}
-              />
             </View>
           </View>
         </View>
 
         {/* Language Section */}
         <View style={styles.section}>
-          <CategoryHeader title={t('settings.language')} style={styles.sectionHeader} />
+          <CategoryHeader
+            title={t('settings.language')}
+            style={styles.sectionHeader}
+          />
 
           {/* Eleven languages do not fit in a row of pills, and a settings
               screen should not change shape because of what is in the list. */}
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <LanguageRow onPress={() => setShowLanguageSheet(true)} />
+          <View
+            style={[
+              styles.group,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.card,
+                styles.lastCard,
+                { borderBottomColor: colors.cardBorder },
+              ]}
+            >
+              <LanguageRow onPress={() => setShowLanguageSheet(true)} />
+            </View>
           </View>
         </View>
 
         {/* Audio Section */}
         <View style={styles.section}>
-          <CategoryHeader title={t('settings.audio')} style={styles.sectionHeader} />
+          <CategoryHeader
+            title={t('settings.audio')}
+            style={styles.sectionHeader}
+          />
 
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <Slider
-              value={maxVolume}
-              onValueChange={handleMaxVolumeChange}
-              min={0.1}
-              max={1}
-              step={0.1}
-              label={t('settings.maxVolume')}
-              formatValue={(v) => `${Math.round(v * 100)}%`}
-            />
+          <View
+            style={[
+              styles.group,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.card,
+                styles.lastCard,
+                { borderBottomColor: colors.cardBorder },
+              ]}
+            >
+              <Slider
+                value={maxVolume}
+                onValueChange={handleMaxVolumeChange}
+                min={0.1}
+                max={1}
+                step={0.1}
+                label={t('settings.maxVolume')}
+                formatValue={(v) => `${Math.round(v * 100)}%`}
+              />
+            </View>
           </View>
         </View>
 
         {/* About Section */}
         <View style={styles.section}>
-          <CategoryHeader title={t('settings.about')} style={styles.sectionHeader} />
+          <CategoryHeader
+            title={t('settings.about')}
+            style={styles.sectionHeader}
+          />
 
-          {/* The one irreversible control in Settings, and the only thing
+          <View
+            style={[
+              styles.group,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+          >
+            {/* The one irreversible control in Settings, and the only thing
               separating it from "Privacy policy" was the colour of four
               words. It carries the destructive icon in a tinted badge, the
               same language the mixer's delete uses. */}
-          <TouchableOpacity
-            onPress={handleReset}
-            style={[styles.card, styles.resetRow, { borderBottomColor: colors.cardBorder }]}
-            accessibilityRole="button"
-            accessibilityLabel={t('settings.reset')}
-          >
-            <View
-              style={[styles.resetBadge, { backgroundColor: withAlpha(colors.error, BADGE_ALPHA) }]}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
+            <TouchableOpacity
+              onPress={handleReset}
+              style={[
+                styles.card,
+                styles.resetRow,
+                { borderBottomColor: colors.cardBorder },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={t('settings.reset')}
             >
-              <Ionicons name="trash-outline" size={18} color={colors.error} />
-            </View>
-            <View style={styles.switchText}>
-              <Text style={[styles.cardTitle, { color: colors.error }]}>
-                {t('settings.reset')}
-              </Text>
-              <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
-                {t('settings.resetHint', {
-                  favorites: favoriteIds.length,
-                  mixes: customMixes.length,
-                })}
-              </Text>
-            </View>
-          </TouchableOpacity>
+              <View
+                style={[
+                  styles.resetBadge,
+                  { backgroundColor: withAlpha(colors.error, BADGE_ALPHA) },
+                ]}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
+                <Ionicons name="trash-outline" size={18} color={colors.error} />
+              </View>
+              <View style={styles.switchText}>
+                <Text style={[styles.cardTitle, { color: colors.error }]}>
+                  {t('settings.reset')}
+                </Text>
+                <Text
+                  style={[styles.cardHint, { color: colors.textSecondary }]}
+                >
+                  {t('settings.resetHint', {
+                    favorites: favoriteIds.length,
+                    mixes: customMixes.length,
+                  })}
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => router.push('/privacy')}
-            style={[styles.card, styles.aboutRow, { borderBottomColor: colors.cardBorder }]}
-            accessibilityRole="button"
-            accessibilityLabel={t('settings.privacyPolicy')}
-          >
-            <Text style={[styles.aboutLabel, { color: colors.text }]}>
-              {t('settings.privacyPolicy')}
-            </Text>
-            <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push('/privacy')}
+              style={[
+                styles.card,
+                styles.aboutRow,
+                { borderBottomColor: colors.cardBorder },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={t('settings.privacyPolicy')}
+            >
+              <Text style={[styles.aboutLabel, { color: colors.text }]}>
+                {t('settings.privacyPolicy')}
+              </Text>
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color={colors.textSecondary}
+              />
+            </TouchableOpacity>
 
-          {/* The deck's own counter. The app kept a ten-item history and
+            {/* The deck's own counter. The app kept a ten-item history and
               otherwise had no idea how much it had been used — in a
               catalogue-and-tape world that is the one number the metaphor was
               already promising. */}
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
-                {t('settings.totalListening')}
-              </Text>
-              <Text style={[styles.aboutValue, { color: colors.text }]}>
-                {formatListened(listenedSeconds)}
-              </Text>
+            <View
+              style={[
+                styles.card,
+                styles.lastCard,
+                { borderBottomColor: colors.cardBorder },
+              ]}
+            >
+              <View style={styles.aboutRow}>
+                <Text
+                  style={[styles.aboutLabel, { color: colors.textSecondary }]}
+                >
+                  {t('settings.totalListening')}
+                </Text>
+                <Text style={[styles.aboutValue, { color: colors.text }]}>
+                  {formatListened(listenedSeconds)}
+                </Text>
+              </View>
+              <View style={styles.aboutRow}>
+                <Text
+                  style={[styles.aboutLabel, { color: colors.textSecondary }]}
+                >
+                  {t('settings.sessions')}
+                </Text>
+                <Text style={[styles.aboutValue, { color: colors.text }]}>
+                  {sessionCount}
+                </Text>
+              </View>
             </View>
-            <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
-                {t('settings.sessions')}
-              </Text>
-              <Text style={[styles.aboutValue, { color: colors.text }]}>
-                {sessionCount}
-              </Text>
+
+            <View
+              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
+            >
+              <View style={styles.aboutRow}>
+                <Text
+                  style={[styles.aboutLabel, { color: colors.textSecondary }]}
+                >
+                  {t('settings.version')}
+                </Text>
+                <Text style={[styles.aboutValue, { color: colors.text }]}>
+                  {Constants.expoConfig?.version ?? '—'}
+                </Text>
+              </View>
             </View>
           </View>
-
-          <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
-            <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
-                {t('settings.version')}
-              </Text>
-              <Text style={[styles.aboutValue, { color: colors.text }]}>
-                {Constants.expoConfig?.version ?? '—'}
-              </Text>
-            </View>
-          </View>
-
         </View>
       </ScrollView>
 
@@ -450,6 +621,11 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Spacing.lg,
   },
+  group: {
+    borderWidth: 1,
+    borderRadius: Radius.card,
+    overflow: 'hidden',
+  },
   // CategoryHeader already carries the shared label styling and its own
   // vertical rhythm; this only trims its top margin, since a Settings
   // section sits directly under the previous card's divider.
@@ -457,8 +633,12 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   card: {
+    paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  lastCard: {
+    borderBottomWidth: 0,
   },
   cardTitle: {
     ...Typography.body,
@@ -469,17 +649,15 @@ const styles = StyleSheet.create({
   },
   optionGroup: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: Spacing.sm,
   },
   // Two per row, equal width: four pills wrapping on their own put three on
   // one line and one orphan below in English and two-and-two in Turkish, so
   // the same control had a different shape per language.
   optionButtonHalf: {
-    flexBasis: '47%',
-    flexGrow: 1,
-    flexDirection: 'row',
+    flex: 1,
     alignItems: 'center',
+    minWidth: 0,
     gap: Spacing.sm,
   },
   swatch: {
@@ -507,16 +685,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   optionButton: {
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.sm,
-    borderRadius: Radius.pill,
+    borderRadius: 12,
     borderWidth: 1,
-    minHeight: ControlSize.row,
+    minHeight: 72,
     justifyContent: 'center',
   },
   optionText: {
     ...Typography.footnote,
     fontFamily: FontFamily.semibold,
+    textAlign: 'center',
   },
   switchRow: {
     flexDirection: 'row',
@@ -561,7 +740,8 @@ const styles = StyleSheet.create({
     borderRadius: Radius.card,
     borderWidth: 1,
     padding: Spacing.md,
-    marginBottom: Spacing.md,
+    marginHorizontal: Spacing.md,
+    marginVertical: Spacing.sm,
     gap: Spacing.xs,
   },
   warningHeading: {

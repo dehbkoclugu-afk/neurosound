@@ -4,12 +4,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
@@ -109,14 +104,20 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
       style={[
         styles.container,
         {
-          backgroundColor: colors.background,
+          backgroundColor: colors.miniPlayer,
           borderTopColor: colors.cardBorder,
         },
       ]}
     >
       {timerFraction !== null && (
         <View
-          style={[styles.timerTrace, { width: `${timerFraction * 100}%`, backgroundColor: colors.accent }]}
+          style={[
+            styles.timerTrace,
+            {
+              width: `${timerFraction * 100}%`,
+              backgroundColor: colors.accent,
+            },
+          ]}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         />
@@ -136,7 +137,10 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
           accessibilityLabel={`${t('player.nowPlaying')}: ${title}`}
           accessibilityHint={t('accessibility.expandPlayer')}
         >
-          <Text style={[styles.presetName, { color: colors.text }]} numberOfLines={1}>
+          <Text
+            style={[styles.presetName, { color: colors.text }]}
+            numberOfLines={1}
+          >
             {title}
           </Text>
           <Text
@@ -159,7 +163,11 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             onPress={handlePlayPause}
             loading={isLoading}
             size={36}
-            accessibilityLabel={playing ? t('accessibility.pauseButton') : t('accessibility.playButton')}
+            accessibilityLabel={
+              playing
+                ? t('accessibility.pauseButton')
+                : t('accessibility.playButton')
+            }
           />
           {/* Same circular footprint as play, so the two read as one pair of
               transport controls — but a quiet outline rather than a filled
@@ -169,7 +177,10 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
             activeOpacity={0.7}
             style={[
               styles.stopButton,
-              { borderColor: colors.cardBorder, backgroundColor: withAlpha(colors.text, 0.04) },
+              {
+                borderColor: colors.cardBorder,
+                backgroundColor: withAlpha(colors.text, 0.04),
+              },
             ]}
             accessibilityRole="button"
             accessibilityLabel={t('common.stop')}
@@ -201,6 +212,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
+    minWidth: 0,
     marginRight: Spacing.md,
     gap: 1,
   },

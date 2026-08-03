@@ -18,7 +18,16 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, BADGE_ALPHA, withAlpha, Radius, ControlSize } from '@/constants/theme';
+import {
+  Spacing,
+  Typography,
+  AccessibilitySize,
+  FontFamily,
+  BADGE_ALPHA,
+  withAlpha,
+  Radius,
+  ControlSize,
+} from '@/constants/theme';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -43,6 +52,7 @@ import {
 import * as playerController from '@/lib/audio/playerController';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { presetArt } from '@/lib/artAssets';
+import { useArtwork } from '@/hooks/use-artwork';
 
 // Preset picker groups — 33 flat items is unusable; group by category
 const pickerGroups = [
@@ -55,19 +65,24 @@ const pickerGroups = [
 // available channel, so the empty screen states the capacity by shape.
 const EMPTY_SLOTS = Array.from(
   { length: playerController.MAX_MIXER_CHANNELS },
-  (_, i) => i
+  (_, i) => i,
 );
 
 /** "ND-M03" — the saved-mix half of Home's catalogue codes. Falls back to
  *  list position for mixes saved before catalogue numbers existed. */
-function mixCatalogCode(mix: { catalogNumber?: number }, index: number): string {
+function mixCatalogCode(
+  mix: { catalogNumber?: number },
+  index: number,
+): string {
   return `ND-M${String(mix.catalogNumber ?? index + 1).padStart(2, '0')}`;
 }
 
 // A saved mix stores preset ids; the row needs the presets themselves to show
 // what it is made of. An id that no longer resolves — a preset removed in a
 // later version — is dropped rather than drawn as an empty badge.
-function mixPresets(mix: { channels: { presetId: string }[] }): FrequencyPreset[] {
+function mixPresets(mix: {
+  channels: { presetId: string }[];
+}): FrequencyPreset[] {
   return mix.channels
     .map((c) => getPresetById(c.presetId))
     .filter((p): p is FrequencyPreset => p !== undefined);
@@ -82,7 +97,8 @@ const SAMPLE_MIX = [
 
 export default function MixerScreen() {
   const { t } = useTranslation();
-  const { addCustomMix, updateCustomMix, customMixes, deleteCustomMix } = usePresetsStore();
+  const { addCustomMix, updateCustomMix, customMixes, deleteCustomMix } =
+    usePresetsStore();
   const {
     mixerChannels: channels,
     isMixerPlaying: isPlaying,
@@ -102,6 +118,7 @@ export default function MixerScreen() {
 
   const colors = useThemeColors();
   const categoryColors = useCategoryColors();
+  const artwork = useArtwork();
   const miniPlayerInset = useMiniPlayerInset();
 
   const isEmpty = channels.length === 0;
@@ -115,7 +132,7 @@ export default function MixerScreen() {
       .map((group) => ({
         ...group,
         presets: group.presets.filter((preset) =>
-          t(preset.nameKey).toLowerCase().includes(query)
+          t(preset.nameKey).toLowerCase().includes(query),
         ),
       }))
       .filter((group) => group.presets.length > 0);
@@ -130,23 +147,29 @@ export default function MixerScreen() {
     }
   }, [isPlaying]);
 
-  const handleAddChannel = useCallback(async (preset: FrequencyPreset) => {
-    const added = await playerController.mixerAddChannel(preset);
-    if (!added) {
-      Alert.alert(t('mixer.maxChannels'), t('mixer.maxChannelsDesc'));
-      return;
-    }
-    setPickerQuery('');
-    setShowPresetPicker(false);
-  }, [t]);
+  const handleAddChannel = useCallback(
+    async (preset: FrequencyPreset) => {
+      const added = await playerController.mixerAddChannel(preset);
+      if (!added) {
+        Alert.alert(t('mixer.maxChannels'), t('mixer.maxChannelsDesc'));
+        return;
+      }
+      setPickerQuery('');
+      setShowPresetPicker(false);
+    },
+    [t],
+  );
 
   const handleRemoveChannel = useCallback((channelId: string) => {
     playerController.mixerRemoveChannel(channelId);
   }, []);
 
-  const handleVolumeChange = useCallback((channelId: string, volume: number) => {
-    playerController.mixerSetChannelVolume(channelId, volume);
-  }, []);
+  const handleVolumeChange = useCallback(
+    (channelId: string, volume: number) => {
+      playerController.mixerSetChannelVolume(channelId, volume);
+    },
+    [],
+  );
 
   const handleMasterVolume = useCallback((volume: number) => {
     playerController.mixerSetMasterVolume(volume);
@@ -183,7 +206,7 @@ export default function MixerScreen() {
         // Long enough to name three sounds, short enough that the saved-mix
         // row is not permanently truncated.
         .slice(0, 40),
-    [channels, t]
+    [channels, t],
   );
 
   const openSaveDialog = useCallback(() => {
@@ -191,7 +214,7 @@ export default function MixerScreen() {
     setShowSaveDialog(true);
   }, [suggestedMixName]);
 
-  const handleRenameMix = useCallback((mix: typeof customMixes[0]) => {
+  const handleRenameMix = useCallback((mix: (typeof customMixes)[0]) => {
     setEditingMixId(mix.id);
     setMixName(mix.name);
     setShowSaveDialog(true);
@@ -220,7 +243,7 @@ export default function MixerScreen() {
 
     addCustomMix({
       name: mixName.trim(),
-      channels: channels.map(c => ({
+      channels: channels.map((c) => ({
         presetId: c.preset.id,
         volume: c.volume,
       })),
@@ -230,9 +253,17 @@ export default function MixerScreen() {
     setMixName('');
     setShowSaveDialog(false);
     showToast(t('mixer.mixSaved'), 'success');
-  }, [mixName, channels, addCustomMix, updateCustomMix, editingMixId, showToast, t]);
+  }, [
+    mixName,
+    channels,
+    addCustomMix,
+    updateCustomMix,
+    editingMixId,
+    showToast,
+    t,
+  ]);
 
-  const handleLoadMix = useCallback(async (mix: typeof customMixes[0]) => {
+  const handleLoadMix = useCallback(async (mix: (typeof customMixes)[0]) => {
     haptics.commit();
     await playerController.mixerLoadChannels(mix.channels, mix.id);
   }, []);
@@ -248,11 +279,13 @@ export default function MixerScreen() {
         },
       ]);
     },
-    [t, deleteCustomMix]
+    [t, deleteCustomMix],
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -301,38 +334,58 @@ export default function MixerScreen() {
                   style={[
                     styles.channelRow,
                     styles.slotRow,
-                    { borderBottomColor: colors.cardBorder, opacity: 1 - slot * 0.18 },
+                    {
+                      borderBottomColor: colors.cardBorder,
+                      opacity: 1 - slot * 0.18,
+                    },
                   ]}
                   accessibilityRole="button"
                   accessibilityLabel={t('mixer.addSound')}
                   // Four identical "add sound" targets would be read out four
                   // times over; only the first is exposed.
                   accessibilityElementsHidden={slot > 0}
-                  importantForAccessibility={slot > 0 ? 'no-hide-descendants' : 'yes'}
+                  importantForAccessibility={
+                    slot > 0 ? 'no-hide-descendants' : 'yes'
+                  }
                 >
                   <View
                     style={[
                       styles.channelIcon,
                       styles.slotIcon,
-                      { borderColor: slot === 0 ? colors.accent : colors.cardBorder },
+                      {
+                        borderColor:
+                          slot === 0 ? colors.accent : colors.cardBorder,
+                      },
                     ]}
                   >
-                    {slot === 0 && <Ionicons name="add" size={18} color={colors.accent} />}
+                    {slot === 0 && (
+                      <Ionicons name="add" size={18} color={colors.accent} />
+                    )}
                   </View>
                   <View style={styles.channelBody}>
                     <View style={styles.channelHeader}>
                       <Text
                         style={[
                           styles.channelName,
-                          { color: slot === 0 ? colors.accent : colors.textSecondary },
+                          {
+                            color:
+                              slot === 0 ? colors.accent : colors.textSecondary,
+                          },
                         ]}
                       >
-                        {slot === 0 ? t('mixer.addSound') : t('mixer.emptySlot')}
+                        {slot === 0
+                          ? t('mixer.addSound')
+                          : t('mixer.emptySlot')}
                       </Text>
                     </View>
                     {/* A flat, empty track at zero — the same bar the live
                         channel uses, just with nothing in it. */}
-                    <View style={[styles.slotTrack, { backgroundColor: colors.slider }]} />
+                    <View
+                      style={[
+                        styles.slotTrack,
+                        { backgroundColor: colors.slider },
+                      ]}
+                    />
                   </View>
                 </TouchableOpacity>
               ))}
@@ -343,7 +396,9 @@ export default function MixerScreen() {
                   style={styles.sampleButton}
                   accessibilityRole="button"
                 >
-                  <Text style={[styles.sampleButtonText, { color: colors.accent }]}>
+                  <Text
+                    style={[styles.sampleButtonText, { color: colors.accent }]}
+                  >
                     {t('mixer.trySample')}
                   </Text>
                 </TouchableOpacity>
@@ -351,10 +406,10 @@ export default function MixerScreen() {
             </View>
           )}
 
-          {channels.map(channel => (
+          {channels.map((channel) => (
             <ArtBackground
               key={channel.id}
-              source={presetArt(channel.preset.id)}
+              source={artwork.source(presetArt(channel.preset.id))}
               style={styles.channelRow}
               variant="channel"
             >
@@ -362,19 +417,27 @@ export default function MixerScreen() {
                 style={[
                   styles.channelIcon,
                   {
-                    backgroundColor: 'rgba(255,255,255,0.16)',
+                    backgroundColor: artwork.foreground.badge,
                     opacity: channel.muted ? 0.5 : 1,
                   },
                 ]}
               >
-                <Icon icon={presetIcon(channel.preset)} size={18} color="#FFFFFF" />
+                <Icon
+                  icon={presetIcon(channel.preset)}
+                  size={18}
+                  color={artwork.foreground.primary}
+                />
               </View>
               <View style={styles.channelBody}>
                 <View style={styles.channelHeader}>
                   <Text
                     style={[
                       styles.channelName,
-                      { color: channel.muted ? 'rgba(255,255,255,0.58)' : '#FFFFFF' },
+                      {
+                        color: channel.muted
+                          ? artwork.foreground.tertiary
+                          : artwork.foreground.primary,
+                      },
                     ]}
                     numberOfLines={1}
                   >
@@ -382,16 +445,26 @@ export default function MixerScreen() {
                   </Text>
                   <View style={styles.channelActions}>
                     <TouchableOpacity
-                      onPress={() => handleToggleMute(channel.id, !channel.muted)}
+                      onPress={() =>
+                        handleToggleMute(channel.id, !channel.muted)
+                      }
                       style={styles.channelActionButton}
                       accessibilityRole="button"
                       accessibilityState={{ selected: channel.muted }}
                       accessibilityLabel={`${t('mixer.mute')} ${t(channel.preset.nameKey)}`}
                     >
                       <Ionicons
-                        name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
+                        name={
+                          channel.muted
+                            ? 'volume-mute'
+                            : 'volume-medium-outline'
+                        }
                         size={20}
-                        color={channel.muted ? 'rgba(255,255,255,0.62)' : '#FFFFFF'}
+                        color={
+                          channel.muted
+                            ? artwork.foreground.tertiary
+                            : artwork.foreground.primary
+                        }
                       />
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -400,7 +473,11 @@ export default function MixerScreen() {
                       accessibilityRole="button"
                       accessibilityLabel={`${t('common.delete')} ${t(channel.preset.nameKey)}`}
                     >
-                      <Ionicons name="close" size={20} color="rgba(255,255,255,0.76)" />
+                      <Ionicons
+                        name="close"
+                        size={20}
+                        color={artwork.foreground.secondary}
+                      />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -427,29 +504,31 @@ export default function MixerScreen() {
               silently removed itself. It is skipped only in the empty state,
               where the first ghost slot above already is this button. */}
           {!isEmpty && (
-          <TouchableOpacity
-            onPress={() => setShowPresetPicker(true)}
-            activeOpacity={0.6}
-            disabled={isFull}
-            style={styles.addRow}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: isFull }}
-            accessibilityLabel={isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
-          >
-            <Ionicons
-              name={isFull ? 'information-circle-outline' : 'add'}
-              size={20}
-              color={isFull ? colors.textSecondary : colors.accent}
-            />
-            <Text
-              style={[
-                styles.addRowText,
-                { color: isFull ? colors.textSecondary : colors.accent },
-              ]}
+            <TouchableOpacity
+              onPress={() => setShowPresetPicker(true)}
+              activeOpacity={0.6}
+              disabled={isFull}
+              style={styles.addRow}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isFull }}
+              accessibilityLabel={
+                isFull ? t('mixer.channelsFull') : t('mixer.addSound')
+              }
             >
-              {isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
-            </Text>
-          </TouchableOpacity>
+              <Ionicons
+                name={isFull ? 'information-circle-outline' : 'add'}
+                size={20}
+                color={isFull ? colors.textSecondary : colors.accent}
+              />
+              <Text
+                style={[
+                  styles.addRowText,
+                  { color: isFull ? colors.textSecondary : colors.accent },
+                ]}
+              >
+                {isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
+              </Text>
+            </TouchableOpacity>
           )}
         </View>
 
@@ -514,8 +593,12 @@ export default function MixerScreen() {
               onPress={handlePlayPause}
               disabled={isEmpty}
               size={72}
-              accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
-              accessibilityHint={isEmpty ? t('mixer.transportDisabled') : undefined}
+              accessibilityLabel={
+                isPlaying ? t('common.pause') : t('common.play')
+              }
+              accessibilityHint={
+                isEmpty ? t('mixer.transportDisabled') : undefined
+              }
             />
 
             {/* Balances the timer slot so play stays centred. */}
@@ -527,14 +610,18 @@ export default function MixerScreen() {
             onPress={openSaveDialog}
             disabled={isEmpty}
             variant="secondary"
-            accessibilityHint={isEmpty ? t('mixer.transportDisabled') : undefined}
+            accessibilityHint={
+              isEmpty ? t('mixer.transportDisabled') : undefined
+            }
           />
 
           {/* A greyed circle says "not now" and nothing else. Two dead
               controls next to each other without a reason is the point at
               which an interface stops explaining itself. */}
           {isEmpty && (
-            <Text style={[styles.transportHint, { color: colors.textSecondary }]}>
+            <Text
+              style={[styles.transportHint, { color: colors.textSecondary }]}
+            >
               {t('mixer.transportDisabled')}
             </Text>
           )}
@@ -552,7 +639,10 @@ export default function MixerScreen() {
                    so the two targets overlapped. */
                 <View
                   key={mix.id}
-                  style={[styles.mixRow, { borderBottomColor: colors.cardBorder }]}
+                  style={[
+                    styles.mixRow,
+                    { borderBottomColor: colors.cardBorder },
+                  ]}
                 >
                   <TouchableOpacity
                     onPress={() => handleLoadMix(mix)}
@@ -562,7 +652,9 @@ export default function MixerScreen() {
                     accessibilityState={{ selected: isActive }}
                     accessibilityLabel={[
                       mix.name,
-                      mixPresets(mix).map((p) => t(p.nameKey)).join(', '),
+                      mixPresets(mix)
+                        .map((p) => t(p.nameKey))
+                        .join(', '),
                       isActive ? t('mixer.loaded') : null,
                     ]
                       .filter(Boolean)
@@ -583,8 +675,18 @@ export default function MixerScreen() {
                             loaded mix was marked only by a colour shift and
                             the word "Loaded" in caption grey. */}
                         {isActive && (
-                          <View style={[styles.mixStamp, { borderColor: colors.accent }]}>
-                            <Text style={[styles.mixStampText, { color: colors.accent }]}>
+                          <View
+                            style={[
+                              styles.mixStamp,
+                              { borderColor: colors.accent },
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.mixStampText,
+                                { color: colors.accent },
+                              ]}
+                            >
                               {t('mixer.loaded')}
                             </Text>
                           </View>
@@ -594,7 +696,12 @@ export default function MixerScreen() {
                           category badges do both, in the same alphabet the
                           channel rows above use. */}
                       <View style={styles.mixIcons}>
-                        <Text style={[styles.mixCatalog, { color: colors.textSecondary }]}>
+                        <Text
+                          style={[
+                            styles.mixCatalog,
+                            { color: colors.textSecondary },
+                          ]}
+                        >
                           {mixCatalogCode(mix, mixIndex)}
                         </Text>
                         {mixPresets(mix).map((preset, i) => (
@@ -602,7 +709,12 @@ export default function MixerScreen() {
                             key={`${preset.id}-${i}`}
                             style={[
                               styles.mixIcon,
-                              { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
+                              {
+                                backgroundColor: withAlpha(
+                                  categoryColors[preset.type],
+                                  BADGE_ALPHA,
+                                ),
+                              },
                             ]}
                           >
                             <Icon
@@ -621,7 +733,11 @@ export default function MixerScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={`${t('mixer.renameMix')} ${mix.name}`}
                   >
-                    <Ionicons name="pencil-outline" size={20} color={colors.textSecondary} />
+                    <Ionicons
+                      name="pencil-outline"
+                      size={20}
+                      color={colors.textSecondary}
+                    />
                   </TouchableOpacity>
                   {/* Deleting a mix is the only irreversible thing on this
                       screen, and it looked exactly like renaming it: same
@@ -632,14 +748,17 @@ export default function MixerScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={`${t('common.delete')} ${mix.name}`}
                   >
-                    <Ionicons name="trash-outline" size={20} color={colors.error} />
+                    <Ionicons
+                      name="trash-outline"
+                      size={20}
+                      color={colors.error}
+                    />
                   </TouchableOpacity>
                 </View>
               );
             })}
           </View>
         )}
-
       </ScrollView>
 
       <TimerModal
@@ -656,7 +775,9 @@ export default function MixerScreen() {
         title={t('mixer.addSound')}
         tall
       >
-        <View style={[styles.searchBar, { backgroundColor: colors.background }]}>
+        <View
+          style={[styles.searchBar, { backgroundColor: colors.background }]}
+        >
           <Ionicons name="search" size={18} color={colors.textSecondary} />
           <TextInput
             value={pickerQuery}
@@ -666,26 +787,46 @@ export default function MixerScreen() {
             style={[styles.searchInput, { color: colors.text }]}
           />
         </View>
-        <ScrollView style={styles.presetList} keyboardShouldPersistTaps="handled">
-          {filteredPickerGroups.map(group => (
+        <ScrollView
+          style={styles.presetList}
+          keyboardShouldPersistTaps="handled"
+        >
+          {filteredPickerGroups.map((group) => (
             <View key={group.titleKey}>
-              <Text style={[styles.pickerGroupTitle, { color: colors.textSecondary }]}>
+              <Text
+                style={[
+                  styles.pickerGroupTitle,
+                  { color: colors.textSecondary },
+                ]}
+              >
                 {t(group.titleKey)}
               </Text>
-              {group.presets.map(preset => (
+              {group.presets.map((preset) => (
                 <TouchableOpacity
                   key={preset.id}
                   onPress={() => handleAddChannel(preset)}
                   activeOpacity={0.6}
-                  style={[styles.presetItem, { borderBottomColor: colors.cardBorder }]}
+                  style={[
+                    styles.presetItem,
+                    { borderBottomColor: colors.cardBorder },
+                  ]}
                 >
                   <View
                     style={[
                       styles.presetItemIcon,
-                      { backgroundColor: withAlpha(categoryColors[preset.type], BADGE_ALPHA) },
+                      {
+                        backgroundColor: withAlpha(
+                          categoryColors[preset.type],
+                          BADGE_ALPHA,
+                        ),
+                      },
                     ]}
                   >
-                    <Icon icon={presetIcon(preset)} size={17} color={categoryColors[preset.type]} />
+                    <Icon
+                      icon={presetIcon(preset)}
+                      size={17}
+                      color={categoryColors[preset.type]}
+                    />
                   </View>
                   <Text style={[styles.presetItemName, { color: colors.text }]}>
                     {t(preset.nameKey)}

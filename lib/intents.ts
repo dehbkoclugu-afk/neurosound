@@ -6,7 +6,7 @@
 
 import { IconConfig } from '@/components/ui/Icon';
 import { intentArt } from '@/lib/artAssets';
-import type { ImageSourcePropType } from 'react-native';
+import type { ArtworkPair } from '@/lib/artAssets';
 
 export type IntentId = 'sleep' | 'focus' | 'relax' | 'meditate';
 
@@ -16,7 +16,7 @@ export interface Intent {
   descKey: string;
   icon: IconConfig;
   /** Shared cinematic artwork for the Home card and Intent detail hero. */
-  image: ImageSourcePropType;
+  image: ArtworkPair;
   /** Cosmetic catalogue code retained as compact secondary metadata. */
   catalogCode: string;
   presetIds: string[];
@@ -128,7 +128,10 @@ export function getTimeBand(hour: number): TimeBand {
 
 /** The intent to surface first, given the hour. Never throws: every band maps
  *  to an intent that exists in `intents`. */
-export function getSuggestedIntent(hour: number): { intent: Intent; band: TimeBand } {
+export function getSuggestedIntent(hour: number): {
+  intent: Intent;
+  band: TimeBand;
+} {
   const band = getTimeBand(hour);
   const id = BAND_INTENT[band];
   // `intents` is a static list containing all four ids, so this cannot miss.

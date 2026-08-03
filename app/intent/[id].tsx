@@ -16,11 +16,23 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { useThemeColors, useIntentColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, withAlpha, onPrimary, Radius, ControlSize, onImage, FontFamily } from '@/constants/theme';
+import {
+  Spacing,
+  Typography,
+  AccessibilitySize,
+  withAlpha,
+  onPrimary,
+  Radius,
+  ControlSize,
+  FontFamily,
+} from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetRow } from '@/components/ui/PresetRow';
@@ -32,6 +44,7 @@ import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
 import * as haptics from '@/lib/haptics';
 import { PressableScale } from '@/components/ui/PressableScale';
+import { useArtwork } from '@/hooks/use-artwork';
 
 export default function IntentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -40,9 +53,11 @@ export default function IntentScreen() {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const intentColors = useIntentColors();
+  const artwork = useArtwork();
   const miniPlayerInset = useMiniPlayerInset();
   const isPresetPlaying = useIsPresetPlaying();
-  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, reduceMotion } = useSettingsStore();
+  const { hasSeenHeadphoneWarning, setHasSeenHeadphoneWarning, reduceMotion } =
+    useSettingsStore();
   const { isFavorite } = usePresetsStore();
 
   const intent = id ? getIntentById(id) : undefined;
@@ -86,10 +101,13 @@ export default function IntentScreen() {
 
     if (preset.type === 'binaural' && !hasSeenHeadphoneWarning) {
       Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
-        { text: t('common.ok'), onPress: () => {
-          setHasSeenHeadphoneWarning(true);
-          start();
-        } },
+        {
+          text: t('common.ok'),
+          onPress: () => {
+            setHasSeenHeadphoneWarning(true);
+            start();
+          },
+        },
       ]);
     } else {
       start();
@@ -98,8 +116,12 @@ export default function IntentScreen() {
 
   if (!intent) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.emptyText, { color: colors.text }]}>{t('common.error')}</Text>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <Text style={[styles.emptyText, { color: colors.text }]}>
+          {t('common.error')}
+        </Text>
       </SafeAreaView>
     );
   }
@@ -108,7 +130,10 @@ export default function IntentScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, { paddingBottom: miniPlayerInset + Spacing.lg }]}
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: miniPlayerInset + Spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Full-bleed hero — image, scrim, title overlaid. Fades in as one
@@ -119,7 +144,7 @@ export default function IntentScreen() {
           style={styles.hero}
         >
           <Image
-            source={intent.image}
+            source={artwork.source(intent.image)}
             style={StyleSheet.absoluteFill}
             contentFit="cover"
             transition={300}
@@ -132,7 +157,11 @@ export default function IntentScreen() {
             style={StyleSheet.absoluteFill}
           />
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.45)', colors.background]}
+            colors={
+              artwork.scheme === 'light'
+                ? ['transparent', 'rgba(247,249,252,0.48)', colors.background]
+                : ['transparent', 'rgba(0,0,0,0.45)', colors.background]
+            }
             locations={[0.3, 0.72, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -143,22 +172,43 @@ export default function IntentScreen() {
             style={[styles.backButton, { top: insets.top + Spacing.sm }]}
             accessibilityLabel={t('common.back')}
           >
-            <View style={styles.backScrim}>
-              <Ionicons name="arrow-back" size={22} color={onImage} />
+            <View
+              style={[
+                styles.backScrim,
+                { backgroundColor: artwork.foreground.badge },
+              ]}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={22}
+                color={artwork.foreground.primary}
+              />
             </View>
           </TouchableOpacity>
           <View style={styles.heroText}>
             {/* The photo screen now speaks the same catalogue language as
                 the cards that lead to it, so it reads as this app's one
                 full-bleed moment rather than a stray image. */}
-            <Text style={styles.heroCatalog}>
+            <Text
+              style={[
+                styles.heroCatalog,
+                { color: artwork.foreground.secondary },
+              ]}
+            >
               <Text style={styles.heroCatalogCode}>{intent.catalogCode}</Text>
               {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
             </Text>
-            <Text style={styles.heroTitle} accessibilityRole="header">
+            <Text
+              style={[styles.heroTitle, { color: artwork.foreground.primary }]}
+              accessibilityRole="header"
+            >
               {t(intent.nameKey)}
             </Text>
-            <Text style={styles.heroDesc}>{t(intent.descKey)}</Text>
+            <Text
+              style={[styles.heroDesc, { color: artwork.foreground.secondary }]}
+            >
+              {t(intent.descKey)}
+            </Text>
           </View>
         </Animated.View>
 
@@ -169,14 +219,23 @@ export default function IntentScreen() {
             accessibilityRole="button"
             accessibilityLabel={[
               t('intents.startSession', { minutes: intent.recommendedMinutes }),
-              presets[0] ? t('intents.startsWith', { name: t(presets[0].nameKey) }) : null,
+              presets[0]
+                ? t('intents.startsWith', { name: t(presets[0].nameKey) })
+                : null,
             ]
               .filter(Boolean)
               .join('. ')}
           >
-            <Ionicons name="play" size={18} color={onPrimary} style={styles.startButtonIcon} />
+            <Ionicons
+              name="play"
+              size={18}
+              color={onPrimary}
+              style={styles.startButtonIcon}
+            />
             <Text style={[styles.startButtonText, { color: onPrimary }]}>
-              {t('intents.startSession', { minutes: intent.recommendedMinutes })}
+              {t('intents.startSession', {
+                minutes: intent.recommendedMinutes,
+              })}
             </Text>
           </PressableScale>
           {/* "Start a 30 minute session" never said what would come out of
@@ -235,7 +294,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   heroText: {
     paddingHorizontal: Spacing.md,
@@ -245,7 +303,6 @@ const styles = StyleSheet.create({
   heroCatalog: {
     ...Typography.label,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.8)',
   },
   heroCatalogCode: {
     fontFamily: FontFamily.mono,
@@ -253,11 +310,9 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     ...Typography.largeTitle,
-    color: onImage,
   },
   heroDesc: {
     ...Typography.body,
-    color: 'rgba(255,255,255,0.85)',
     maxWidth: 320,
   },
   startSection: {

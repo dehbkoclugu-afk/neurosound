@@ -1,5 +1,6 @@
 /**
- * Resolved theme palette: colour scheme + night mode + low-contrast setting.
+ * Resolved theme palette: explicit preference or system scheme, plus the
+ * low-contrast setting.
  */
 
 import { useColorScheme } from './use-color-scheme';
@@ -11,8 +12,7 @@ import {
   CategoryKey,
   IntentKey,
 } from '@/constants/theme';
-
-type PaletteKey = keyof typeof Colors;
+import { resolvePaletteKey, type PaletteKey } from '@/lib/themeMode';
 
 /** The one place the theme + colour-scheme + low-contrast rules are applied.
  *  Every hook below reads from this, so a palette can never be resolved two
@@ -20,21 +20,13 @@ type PaletteKey = keyof typeof Colors;
 function usePaletteKey(): PaletteKey {
   const colorScheme = useColorScheme() ?? 'dark';
   const { theme, lowContrast } = useSettingsStore();
-
-  // Night mode is its own dimmed palette; low-contrast is ignored there
-  if (theme === 'night') return 'night';
-
-  return lowContrast
-    ? colorScheme === 'dark'
-      ? 'lowContrastDark'
-      : 'lowContrastLight'
-    : colorScheme;
+  return resolvePaletteKey(theme, colorScheme, lowContrast);
 }
 
 /** Whether the resolved palette sits on dark surfaces — the axis the
  *  category/intent colour sets are solved against. */
 function isDarkPalette(key: PaletteKey): boolean {
-  return key === 'dark' || key === 'night' || key === 'lowContrastDark';
+  return key === 'dark' || key === 'lowContrastDark';
 }
 
 export function useThemeColors() {
