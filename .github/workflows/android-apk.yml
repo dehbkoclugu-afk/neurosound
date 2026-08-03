@@ -6,10 +6,6 @@ name: Android APK
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [master]
-    paths:
-      - .github/apk-trigger
 
 jobs:
   apk:
@@ -93,14 +89,8 @@ jobs:
             adb shell am start -W -n com.neurosound.app/.MainActivity
             sleep 30
             adb logcat -d > logcat.txt
-            if ! adb shell pidof com.neurosound.app; then
-              echo "Uygulama süreci çalışmıyor"
-              exit 1
-            fi
-            if grep -E "FATAL EXCEPTION|Fatal signal|tombstoned" logcat.txt; then
-              echo "Fatal Android çökmesi bulundu"
-              exit 1
-            fi
+            adb shell pidof com.neurosound.app
+            ! grep -Eq "FATAL EXCEPTION|Fatal signal|tombstoned" logcat.txt
 
       - name: Logcat'i yükle
         if: always()
