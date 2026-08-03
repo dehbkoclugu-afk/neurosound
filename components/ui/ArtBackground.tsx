@@ -100,7 +100,6 @@ export function ArtBackground({
       source={source}
       resizeMode="cover"
       style={[styles.surface, style]}
-      imageStyle={[styles.image, variant === 'hero' && styles.heroImage]}
     >
       {content}
     </ImageBackground>
@@ -111,14 +110,6 @@ const styles = StyleSheet.create({
   surface: {
     overflow: 'hidden',
     backgroundColor: '#0B1018',
-  },
-  image: {
-    left: '18%',
-    width: '82%',
-  },
-  heroImage: {
-    left: 0,
-    width: '100%',
   },
   fallback: {
     backgroundColor: '#0B1018',

@@ -20,7 +20,7 @@ The image-led system supersedes Night Deck's typographic record-label presentati
 
 Source of truth: `constants/theme.ts`.
 
-- **Color** — Restrained strategy (Operate default): warm paper in Light, neutral near-black/cool graphite in Dark, and one ink-blue accent. Four palettes (`light`, `dark`, `lowContrastLight`, `lowContrastDark`) are contrast-verified (≥4.5:1 for text/accent, ≥3:1 for category markers). User-facing choices are Light, Dark and System; persisted legacy `night` values migrate to Dark.
+- **Color** — Restrained strategy (Operate default): cool fog-gray in Light, neutral near-black/cool graphite in Dark, and one ink-blue accent. Four palettes (`light`, `dark`, `lowContrastLight`, `lowContrastDark`) are contrast-verified (≥4.5:1 for text/accent, ≥3:1 for category markers). User-facing choices are Light, Dark and System; persisted legacy `night` values migrate to Dark.
 - **Category markers** (`CategoryColors`) — binaural `#5D7A9E` (cool ink blue-gray), solfeggio `#9A5A6B` (dusty maroon), noise `#6B7F55` (moss). Decorative only: icon tint and a small tag/spine swatch, never carrying meaning alone.
 - **Intent colors** (`lib/intents.ts`) — one muted ink tone per intent (sleep `#5A7FA2`, focus `#9A733A`, relax `#6E8C61`, meditate `#8F6C8C`), used only as the Home card's spine bar and icon-tag tint.
 - **Depth** (`Elevation`) — one token, `Elevation.control`, and one rule: a control the finger *drags along a surface* reads as sitting on that surface. Nothing else in the app is raised. Removing it entirely was tried and reverted — see DESIGN-REVIEW-2 #12.
@@ -31,7 +31,7 @@ Source of truth: `constants/theme.ts`.
 ## Components
 
 - **Player** — an immersive scrolling destination. Preset artwork owns the upper half, Back/Favorite/status sit on a deterministic scrim, and one large `TransportButton` bridges into a continuous identity block. Error, volume and secondary actions remain in normal flow, so a short Android screen cannot overlap them.
-- **`ArtBackground`** — the single image surface for cards, preset rows, active mixer channels and the Player hero. It owns local-image cropping and theme-specific directional scrims, so contrast does not depend on a particular source image.
+- **`ArtBackground`** — the single image surface for cards, preset rows, active mixer channels and the Player hero. Artwork always covers the full clipped bounds; theme-specific directional scrims create the quiet copy zone, so contrast does not depend on a particular source image or platform percentage layout.
 - **Paired artwork** — every semantic scene has a composition-matched Dark/Light pair. `lib/artAssets.ts` stores the pairs and `useArtwork` selects the source plus foreground tokens from the resolved Light/Dark/System theme; no runtime filter muddies the photography.
 - **`PresetRow` / Mixer picker & channel rows** — every one of the 33 presets resolves to distinct bundled art through `lib/artAssets.ts`. Rows are 92px-tall image surfaces with a stable left text zone; existing search highlighting, category/frequency text, favourite state, band scale, equalizer and accessibility labels remain.
 - **`components/ui/Toast.tsx`** — three variants (`success` / `error` / `info`), each with its own icon and live-region politeness. Info is the default; most confirmations are neither good news nor bad.

@@ -1,7 +1,7 @@
 # NeuroSound Visual Shell and Player Overhaul
 
 **Date:** 2026-08-03  
-**Status:** Approved direction, pending implementation plan  
+**Status:** Approved and implemented; cool-light refinement approved after device review  
 **Mode:** Operate  
 **Design read:** A nighttime audio utility with a cinematic sound atlas, using a neutral near-black shell, restrained motion, and clear native controls.
 
@@ -56,7 +56,15 @@ The dark shell must be neutral and cool without becoming visibly blue:
 - Secondary text: cool gray
 - Existing ink-blue accent remains the single interaction color
 
-The old brown paper/charcoal values are removed from dark and low-contrast-dark palettes. The Light palette may retain its warm paper character because the complaint is specifically about Dark mode.
+The old brown paper/charcoal values are removed from every palette. Device review of the paired Light artwork showed that the former warm paper shell reads yellow beside cool silver imagery, so Light moves to a neutral **cool fog** family:
+
+- App background: `#F1F4F7`
+- Secondary surface: a slightly deeper cool gray around `#E8EDF2`
+- Cards/elevated surfaces: near-white with a cool rather than cream undertone
+- Borders and inactive controls: quiet blue-gray
+- Text: neutral graphite rather than brown-black
+
+The shell must remain visibly light and calm; it must not become saturated blue or clinical white.
 
 ### Theme-aware artwork
 
@@ -125,6 +133,15 @@ Rows keep the existing artwork but enforce:
 - A right-anchored artwork field.
 - A flexible name/subline that may shrink without pushing navigation affordances off-screen.
 - Stable row height across playback, favorite, and equalizer states.
+
+### Android artwork fit correction
+
+Device screenshots exposed a shared `ImageBackground` crop defect: applying both percentage `left` and percentage `width` to the image layer leaves an uncovered dark strip at the right edge on Android. All non-hero artwork must fill the complete clipped card bounds. The directional scrim—not a shifted/narrowed image layer—owns the quiet left copy zone.
+
+- Remove percentage positioning from the shared image style.
+- Keep `resizeMode="cover"` and full-surface clipping.
+- Preserve existing card heights, radii, content padding, and semantic crops.
+- No per-screen compensation or negative margins.
 
 ### Mini-player and tab shell
 
