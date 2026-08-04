@@ -36,29 +36,6 @@ const DARK_SCRIMS = {
   ],
 } as const;
 
-const LIGHT_SCRIMS = {
-  card: [
-    'rgba(231,236,241,0.88)',
-    'rgba(231,236,241,0.62)',
-    'rgba(231,236,241,0.08)',
-  ],
-  row: [
-    'rgba(231,236,241,0.90)',
-    'rgba(231,236,241,0.68)',
-    'rgba(231,236,241,0.12)',
-  ],
-  channel: [
-    'rgba(231,236,241,0.92)',
-    'rgba(231,236,241,0.74)',
-    'rgba(231,236,241,0.22)',
-  ],
-  hero: [
-    'rgba(247,249,252,0.18)',
-    'rgba(247,249,252,0.28)',
-    'rgba(247,249,252,0.94)',
-  ],
-} as const;
-
 export function ArtBackground({
   source,
   children,
@@ -66,17 +43,18 @@ export function ArtBackground({
   variant = 'row',
 }: ArtBackgroundProps) {
   const scheme = useColorScheme();
-  const scrims = scheme === 'light' ? LIGHT_SCRIMS : DARK_SCRIMS;
   const content = (
     <>
-      <LinearGradient
-        colors={scrims[variant]}
-        locations={[0, 0.56, 1]}
-        start={variant === 'hero' ? { x: 0.5, y: 0 } : { x: 0, y: 0.5 }}
-        end={variant === 'hero' ? { x: 0.5, y: 1 } : { x: 1, y: 0.5 }}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
+      {scheme === 'dark' && (
+        <LinearGradient
+          colors={DARK_SCRIMS[variant]}
+          locations={[0, 0.56, 1]}
+          start={variant === 'hero' ? { x: 0.5, y: 0 } : { x: 0, y: 0.5 }}
+          end={variant === 'hero' ? { x: 0.5, y: 1 } : { x: 1, y: 0.5 }}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
+      )}
       {children}
     </>
   );

@@ -267,8 +267,8 @@ export function PresetRow({
             {
               backgroundColor:
                 artwork.scheme === 'light'
-                  ? 'rgba(31, 48, 68, 0.72)'
-                  : 'rgba(25, 38, 54, 0.66)',
+                  ? '#2E4155'
+                  : '#26384C',
             },
           ]}
           accessibilityElementsHidden

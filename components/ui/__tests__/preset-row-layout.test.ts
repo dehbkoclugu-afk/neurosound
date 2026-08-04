@@ -17,5 +17,7 @@ describe('PresetRow layout invariants', () => {
     expect(source).toMatch(/chevronRail:\s*\{[\s\S]*?width: 48,/);
     expect(source).toMatch(/chevronRail:\s*\{[\s\S]*?alignItems: 'center',/);
     expect(source).toMatch(/chevronRail:\s*\{[\s\S]*?justifyContent: 'center',/);
+    expect(source).toContain("? '#2E4155'");
+    expect(source).not.toMatch(/chevronRail[\s\S]{0,500}rgba\(/);
   });
 });
