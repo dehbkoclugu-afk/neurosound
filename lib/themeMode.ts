@@ -5,6 +5,15 @@ export function normalizeThemeMode(value: unknown): ThemeMode {
   return value === 'light' || value === 'auto' ? value : 'dark';
 }
 
+/** Home's compact switch always lands on an explicit theme. */
+export function nextExplicitTheme(
+  theme: ThemeMode,
+  resolvedScheme: 'light' | 'dark',
+): 'light' | 'dark' {
+  const current = theme === 'auto' ? resolvedScheme : theme;
+  return current === 'light' ? 'dark' : 'light';
+}
+
 export function resolvePaletteKey(
   theme: ThemeMode,
   systemScheme: 'light' | 'dark' | null | undefined,

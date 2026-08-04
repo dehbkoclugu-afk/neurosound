@@ -140,10 +140,10 @@ export const Colors = {
   light: {
     text: '#18212B',
     textSecondary: '#566575',
-    background: '#F1F4F7',
-    backgroundSecondary: '#E8EDF2',
-    card: '#F8FAFC',
-    cardBorder: '#D5DDE6',
+    background: '#E7ECF1',
+    backgroundSecondary: '#DDE4EB',
+    card: '#F0F4F7',
+    cardBorder: '#C8D2DC',
     cardElevated: '#FFFFFF',
     tint: inkBlue,
     primary: inkBlue,
@@ -155,14 +155,14 @@ export const Colors = {
     success: '#4C7A4C',
     warning: '#8A5A1E', // AA on both surface levels
     error: '#A34B37', // AA on both surface levels
-    slider: '#D5DDE6',
+    slider: '#C8D2DC',
     // Foreground on track: the thumb used to be the accent colour
     // in every palette — in three of them literally the same hex — so at full
     // value it sat invisible on its own fill. Matching `text` gives it
     // contrast against both the empty track and every fill by construction.
     sliderThumb: '#18212B',
     overlay: 'rgba(16, 24, 32, 0.42)',
-    miniPlayer: '#F8FAFC',
+    miniPlayer: '#F0F4F7',
   },
   dark: {
     text: '#F2F5F8',
@@ -194,10 +194,10 @@ export const Colors = {
   lowContrastLight: {
     text: '#3F4A56',
     textSecondary: '#596775',
-    background: '#EEF2F5',
-    backgroundSecondary: '#E3E9EF',
-    card: '#F4F7F9',
-    cardBorder: '#D2DAE3',
+    background: '#E9EEF2',
+    backgroundSecondary: '#DFE6EC',
+    card: '#F0F4F7',
+    cardBorder: '#CBD5DE',
     cardElevated: '#FFFFFF',
     tint: '#3F6690',
     primary: '#3F6690',
@@ -209,10 +209,10 @@ export const Colors = {
     success: '#6D946D',
     warning: '#82591F', // AA on both surface levels
     error: '#96513C', // AA on both surface levels
-    slider: '#D2DAE3',
+    slider: '#CBD5DE',
     sliderThumb: '#3F4A56',
     overlay: 'rgba(20, 30, 40, 0.3)',
-    miniPlayer: '#F4F7F9',
+    miniPlayer: '#F0F4F7',
   },
   lowContrastDark: {
     text: '#D9E0E8',
