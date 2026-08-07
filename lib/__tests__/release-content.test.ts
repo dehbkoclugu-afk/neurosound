@@ -17,7 +17,11 @@ describe('Google Play release content', () => {
   it('has no unsupported healing wording in locale delta descriptions', () => {
     for (const language of LANGUAGES) {
       const description = String((language.translation as any).explore.binauralTypes.deltaDesc);
-      expect(description).not.toMatch(/healing|iyileş|regeneration|recupera|récup|回復|회복|恢复|восстанов/i);
+      // One healing word per locale — the guard is only as wide as this list,
+      // so every language added has to bring its own term with it.
+      expect(description).not.toMatch(
+        /healing|iyileş|heilung|regeneration|recupera|récup|回復|회복|恢复|восстанов|genezing|uzdrawia|зцілен|penyembuhan|chữa lành|รักษา|उपचार|নিরাময়|läkning|vindecare/i
+      );
     }
   });
 

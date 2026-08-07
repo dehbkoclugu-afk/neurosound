@@ -24,7 +24,17 @@
           "ko",
           "pt",
           "ru",
-          "zh-Hans"
+          "zh-Hans",
+          "hi",
+          "bn",
+          "id",
+          "vi",
+          "th",
+          "pl",
+          "uk",
+          "nl",
+          "sv",
+          "ro"
         ],
         "UIBackgroundModes": [
           "audio"
