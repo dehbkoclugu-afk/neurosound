@@ -136,8 +136,33 @@ async function main() {
   }
   if (invalid) throw new Error('listing content failed validation; nothing was sent');
 
-  const token = await accessToken(serviceAccount());
-  const edit = await call(token, 'POST', `${API}/applications/${PACKAGE}/edits`, { json: {} });
+  const key = serviceAccount();
+  // Printed because a 403 here is always about which account was granted what,
+  // and the answer is otherwise locked inside a write-only secret.
+  console.log(`service account ${key.client_email}`);
+  console.log(`project ${key.project_id ?? '(unknown)'}\n`);
+
+  const token = await accessToken(key);
+  let edit;
+  try {
+    edit = await call(token, 'POST', `${API}/applications/${PACKAGE}/edits`, { json: {} });
+  } catch (e) {
+    if (e.status === 403 || e.status === 401) {
+      console.error(`\nAuthentication worked — a token was issued and the API answered.
+What is missing is authorisation for this service account on this app. Check,
+in order:
+
+  1. Play Console → Users and permissions → invite ${key.client_email}
+     and grant it access to ${PACKAGE}. "Edit store listing" is enough for
+     this script; it never touches releases.
+  2. The app exists in Play Console under exactly ${PACKAGE}.
+  3. The Google Play Android Developer API is enabled on project
+     ${key.project_id ?? '(the service account project)'}.
+
+A grant can take a few minutes to take effect.`);
+    }
+    throw e;
+  }
   console.log(`edit ${edit.id} opened\n`);
 
   const failures = [];
