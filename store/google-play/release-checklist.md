@@ -28,23 +28,33 @@ Yerel doğrulama zinciri (`docs/RELEASE.md`) yeşil: `tsc`, `lint`, 218 test,
 
 ---
 
-## Aşama 1 — Yayından önce dışarıda olması gerekenler
+## Aşama 1 — Gizlilik sayfası (tamamlandı)
 
-Play Console formları bu ikisini istiyor, elinde yokken forma başlama.
+- [x] **Yayında:** https://dehbkoclugu-afk.github.io/neurosound/privacy.html
+      HTTP 200, girişsiz açılıyor, geliştirici kimliği ve iletişim içinde.
+      Play Console'da ve uygulama içi bağlantıda bu URL geçmeli.
 
-- [ ] `docs/privacy.html`'i herkese açık bir HTTPS adresinde yayınla.
-      Depoda GitHub Pages zaten kurulu (`dehbkoclugu-afk.github.io`); URL'yi
-      not et, Console'da ve uygulama içi gizlilik bağlantısında aynısı geçmeli.
-- [ ] Yayınlanan URL'nin gizli pencerede, girişsiz açıldığını doğrula.
+`privacy-pages.yml` workflow'u baştan beri vardı ama hiç başarılı olmamıştı:
+`configure-pages` `enablement: true` ile siteyi kendisi kurmaya çalışıyor,
+ama workflow'un `GITHUB_TOKEN`'ında o yetki yok —
+`Create Pages site failed: Resource not accessible by integration`.
+Site bir kez repo sahibinin yetkisiyle oluşturulmalı:
 
-## Aşama 2 — Derleme kimlik bilgileri
+```
+gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow
+```
 
-- [ ] GitHub deposuna korumalı secret olarak `EXPO_TOKEN` ekle.
-- [ ] GitHub deposuna korumalı secret olarak `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`
-      ekle. Anahtar dosyası depoya **girmez**; iş akışı onu yalnız submit
-      sırasında geçici dosyaya yazar, doğrular, izinlerini kısar ve her
-      durumda siler.
-- [ ] Play Console'da servis hesabına yalnız gereken yetkileri ver.
+Ondan sonra workflow her `docs/privacy.html` değişikliğinde kendi kendine
+yayınlıyor. Bu bir kereye mahsus adım yapıldı.
+
+## Aşama 2 — Derleme kimlik bilgileri (tamamlandı)
+
+- [x] `EXPO_TOKEN` repo secret'ı mevcut.
+- [x] `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` repo secret'ı mevcut. Anahtar dosyası
+      depoda **yok**; iş akışı onu yalnız submit sırasında geçici dosyaya
+      yazar, `jq` ile doğrular, izinlerini kısar ve her durumda siler.
+- [ ] Play Console'da servis hesabına yalnız gereken yetkilerin verildiğini
+      teyit et. Secret'ın varlığı yetkilerinin doğru olduğunu göstermez.
 
 ## Aşama 3 — İlk üretim derlemesi (submit yok)
 
@@ -136,6 +146,15 @@ Ses yolu — bu sürümde düzeltilen bug tam olarak burada görünür:
       uygulamanın üç AudioTrack'i de `started`.
 - [x] Ses dil değişimleri ve gezinme boyunca ~6 dakika kesintisiz çaldı.
 - [x] Ekran kilitlendikten sonra çalmaya devam etti.
+- [x] **Player sızıntısı yok.** 12 ardışık preset geçişi yapıldı; aktif track
+      sayısı her turda tam olarak **1** kaldı — ne çift çalma ne birikme.
+      Toplam track 3-6 arasında salındı ve 12. turda 1. turdaki değere döndü,
+      tekdüze artış yok. 30 saniye bekledikten sonra da aynı aralıkta.
+      Emeklilikteki player'lar serbest bırakılıyor, sadece gecikmeli.
+
+      Ölçüm 12 geçiş; 8 saatlik bir gece değil. Aktif sayının hep 1 kalması
+      ve toplamın tavana oturması sızıntı olmadığını gösteriyor, ama uzun
+      süreli davranış için Aşama 7'deki Android vitals'a bakmak gerek.
 - [ ] **Kulaklıkla dinle.** Emülatörde yapılamaz. 40 Hz ve 111 Hz tonlar ile
       binaural presetler telefon hoparlöründe duyulmaz; bu bir hata değil,
       Player ekranındaki kulaklık uyarısı bunun için var.
@@ -159,11 +178,10 @@ Oturum ve arayüz:
 - [x] Kilit ekranı kontrolleri çalışıyor — aşağıdaki bölüme bak, orada
       gerçek bir bug bulundu ve düzeltildi.
 - [x] Mikser tek bir medya oturumu gösteriyor.
-- [ ] Uyku zamanlayıcısı kilitliyken doluyor, son 30 saniyede kısılıyor ve
-      sesi durduruyor. Emülatörde saat ileri alınamadığı için denenmedi;
-      dolma ve kısılma mantığı birim testlerinde kapsanıyor
-      (`lib/audio/__tests__/playerController.test.ts`), ama cihazda bir kez
-      gerçek süreyle görülmeli.
+- [x] Uyku zamanlayıcısı gerçek süreyle doldu ve sesi kesti. Mikserde üç
+      kanal çalarken 15 dakikaya kuruldu; AudioFlinger 60 saniyede bir
+      örneklendi ve **t+903s'de aktif track sayısı 0'a düştü**, üç kanal
+      birden sustu. Saati ileri almadan, tam süre beklenerek yapıldı.
 - [ ] Ses kesintisi (arama, bildirim) ve kulaklık çıkarma davranışı.
       Emülatörde anlamlı şekilde denenemedi.
 
