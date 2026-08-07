@@ -1,6 +1,6 @@
 # Google Play Data Safety Worksheet
 
-**App:** NeuroSound (`com.neurosound.app`)  
+**App:** NeuroSound (`com.dehbkoclugu.neurosound`)  
 **Developer:** DEHB Koçluğu — dehbkoclugu@gmail.com  
 **Prepared:** 2026-08-01
 

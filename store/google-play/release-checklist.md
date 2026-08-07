@@ -1,7 +1,7 @@
 # NeuroSound — Google Play yayın yol haritası
 
 **Sahip / iletişim:** DEHB Koçluğu — dehbkoclugu@gmail.com
-**Paket:** `com.neurosound.app`
+**Paket:** `com.dehbkoclugu.neurosound`
 
 Aşamalar sırayla yapılır. Her aşama bir sonrakinin ön koşulu; sıra atlanırsa
 sonraki adım ya reddedilir ya da yanlış şeyi doğrular. Bir aşama tamamlanınca
@@ -11,7 +11,7 @@ kutuları işaretle.
 
 ## Aşama 0 — Depo hazır (tamamlandı)
 
-- [x] Paket `com.neurosound.app`, production çıktısı AAB.
+- [x] Paket `com.dehbkoclugu.neurosound`, production çıktısı AAB.
 - [x] Android bulut yedeklemesi kapalı.
 - [x] Kayıt, mikrofon, eski depolama ve overlay izinleri engellendi.
 - [x] Gizlilik metinleri geliştiriciyi ve iletişimi tanımlıyor.
@@ -65,7 +65,7 @@ Release APK yerelde derlendi (`gradlew assembleRelease`, 14 dk, başarılı) ve
 `aapt2 dump badging` ile okundu — sürüm bilgisi şu:
 
 ```
-package  com.neurosound.app   versionCode 1   versionName 1.0.0
+package  com.dehbkoclugu.neurosound   versionCode 1   versionName 1.0.0
 minSdk 24   targetSdk 36   compileSdk 36
 ABI: arm64-v8a, armeabi-v7a, x86, x86_64
 ```
@@ -91,7 +91,7 @@ FOREGROUND_SERVICE_MEDIA_PLAYBACK
 INTERNET
 MODIFY_AUDIO_SETTINGS
 VIBRATE
-com.neurosound.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+com.dehbkoclugu.neurosound.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ```
 
 - [x] `RECORD_AUDIO`, `READ/WRITE_EXTERNAL_STORAGE` ve `SYSTEM_ALERT_WINDOW`
@@ -230,11 +230,33 @@ edit açılır, her şey gönderilir, sonra atılır — kimlik doğrulama, dil 
 ve her yükleme denenmiş olur ama Play'de hiçbir şey değişmez.
 `dry_run=false` yayınlar.
 
+### Paket adı neden değişti
+
+İlk paket adı `com.neurosound.app` idi ve **Play'de başka bir geliştirici
+tarafından zaten yayınlanmıştı.** Console yüklemede iki hata verdi: paket
+adının alınmış olması, ve `FileSystemFileProvider` ile `androidx-startup`
+içerik sağlayıcı yetkililerinin başkalarınca kullanılıyor olması. İkincisi
+birincinin sonucu — o yetkililer paket adından türüyor.
+
+Aynı sebep, listeleme API'sinin haftalarca çözemediğimiz 403'ünü de
+açıklıyor. Servis hesabı geliştirici hesabında Etkin'di, uygulamaya izin
+verilmişti, yine de `reviews` bile okuyamıyordu: paket vardı ama bizim
+değildi. Play bu durumu da **403 PERMISSION_DENIED** olarak döndürüyor, yani
+"başkasının uygulaması" ile "yetkin yok" ayırt edilemiyor.
+
+Ders: bir paket adına bağlanmadan önce Play'de alınmış mı diye bakmak
+gerekiyor. `https://play.google.com/store/apps/details?id=<paket>` açılıyorsa
+o ad kullanılamaz.
+
+Yeni ad: `com.dehbkoclugu.neurosound`. Yayınlandıktan sonra bir daha
+değiştirilemez.
+
 **Şu an 403 PERMISSION_DENIED veriyor.** Kimlik doğrulama çalışıyor (token
-alınıyor, API cevap veriyor); eksik olan yetki. Sırayla:
+alınıyor, API cevap veriyor). Paket adı değiştiği ve AAB henüz yüklenmediği
+için bu beklenen durum; yükleme sonrası tekrar denenmeli. Hâlâ 403 gelirse:
 
 - [ ] Play Console → Users and permissions → şu hesabı davet et ve
-      `com.neurosound.app` için **Edit store listing, pricing & distribution**
+      `com.dehbkoclugu.neurosound` için **Edit store listing, pricing & distribution**
       ver (release yetkisi gerekmiyor, script sürüme dokunmuyor):
       `neurosound-play@dehbdestek-768da.iam.gserviceaccount.com`
 - [ ] `dehbdestek-768da` projesinde Google Play Android Developer API açık mı:

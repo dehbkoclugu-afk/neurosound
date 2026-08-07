@@ -24,7 +24,7 @@ import { join } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
 const STORE = join(ROOT, 'store/google-play');
-const PACKAGE = process.env.PACKAGE_NAME || 'com.neurosound.app';
+const PACKAGE = process.env.PACKAGE_NAME || 'com.dehbkoclugu.neurosound';
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const API = 'https://androidpublisher.googleapis.com/androidpublisher/v3';
 const UPLOAD = 'https://androidpublisher.googleapis.com/upload/androidpublisher/v3';
