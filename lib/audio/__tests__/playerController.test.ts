@@ -44,8 +44,16 @@ jest.mock('expo-audio', () => ({
   }),
 }));
 
+/** Mirrors a release build, where `localUri` is not populated yet and `uri`
+ *  is the bare bundled-resource name rather than anything URL-shaped. */
+const mockAsset = {
+  localUri: null as string | null,
+  uri: 'assets_images_icon',
+  downloadAsync: jest.fn(async () => {}),
+};
+
 jest.mock('expo-asset', () => ({
-  Asset: { fromModule: () => ({ localUri: 'file://icon.png', uri: 'icon.png' }) },
+  Asset: { fromModule: () => mockAsset },
 }));
 
 import * as playerController from '../playerController';
@@ -256,6 +264,48 @@ describe('mixer', () => {
  * playing — and on the mixer it went through startMixerChannels' catch, which
  * tore down every channel that had just started.
  */
+/**
+ * expo-audio parses artworkUrl into a java.net.URL. A release build's
+ * `Asset.fromModule().uri` is the bundled-resource name, not a URL, and
+ * handing that over threw MalformedURLException out of the native call — on
+ * a device, every single time, so lock screen controls never worked.
+ */
+describe('lock screen artwork', () => {
+  const metadataFor = (player: any) =>
+    player.setActiveForLockScreen.mock.calls[0]?.[1];
+
+  it('never passes a value the platform cannot parse as a URL', async () => {
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+
+    const player = live()[0];
+    expect(player.setActiveForLockScreen).toHaveBeenCalled();
+    const artwork = metadataFor(player)?.artworkUrl;
+    if (artwork !== undefined) expect(artwork).toMatch(/^[a-z][a-z0-9+.-]*:/i);
+  });
+
+  it('asks for the asset to be resolved so a later session can show it', async () => {
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+    expect(mockAsset.downloadAsync).toHaveBeenCalled();
+  });
+
+  it('uses the real path once the asset resolves', async () => {
+    mockAsset.localUri = 'file:///data/user/0/com.neurosound.app/files/icon.png';
+    playerController.loadPreset(preset('noise-ocean'));
+    await playerController.play();
+
+    expect(metadataFor(live()[0])?.artworkUrl).toBe(mockAsset.localUri);
+    mockAsset.localUri = null;
+  });
+
+  it('still sets the title even when there is no usable artwork', async () => {
+    playerController.loadPreset(preset('binaural-alpha'));
+    await playerController.play();
+    expect(metadataFor(live()[0])?.title).toBeTruthy();
+  });
+});
+
 describe('when the OS refuses lock screen controls', () => {
   beforeEach(() => {
     lockScreen.refuse = true;
