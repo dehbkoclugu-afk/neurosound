@@ -96,6 +96,12 @@ function watchLockScreenPlayer(player: AudioPlayer, owner: 'single' | 'mixer'): 
  * returns nothing; a later call picks up the real `file://` path. Nothing is
  * cached until it is usable, since caching the unusable value was what made
  * this permanent.
+ *
+ * On a release build that copy does not appear to land: checked on a device,
+ * the media control shows title and artist and the transport works, but the
+ * artwork square stays empty across sessions. That is cosmetic and the same
+ * as before — the point of this function now is that it can no longer take
+ * the whole lock screen down with it.
  */
 let artworkUri: string | null = null;
 function ensureArtwork(): string | undefined {
