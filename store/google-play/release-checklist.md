@@ -204,6 +204,43 @@ Yani `POST_NOTIFICATIONS` eklemeye gerek yok. İzin listesi olduğu gibi kalır.
 
 ## Aşama 5 — Mağaza listelemeleri
 
+### Otomatik yükleme — `play-listings.yml`
+
+21 dilin metni, 84 yerelleştirilmiş ekran görüntüsü ve feature graphic tek
+komutla gidiyor: Actions → **Play listings**. Varsayılan `dry_run=true`, yani
+edit açılır, her şey gönderilir, sonra atılır — kimlik doğrulama, dil kodları
+ve her yükleme denenmiş olur ama Play'de hiçbir şey değişmez.
+`dry_run=false` yayınlar.
+
+**Şu an 403 PERMISSION_DENIED veriyor.** Kimlik doğrulama çalışıyor (token
+alınıyor, API cevap veriyor); eksik olan yetki. Sırayla:
+
+- [ ] Play Console → Users and permissions → şu hesabı davet et ve
+      `com.neurosound.app` için **Edit store listing, pricing & distribution**
+      ver (release yetkisi gerekmiyor, script sürüme dokunmuyor):
+      `neurosound-play@dehbdestek-768da.iam.gserviceaccount.com`
+- [ ] `dehbdestek-768da` projesinde Google Play Android Developer API açık mı:
+      https://console.cloud.google.com/apis/library/androidpublisher.googleapis.com?project=dehbdestek-768da
+
+### Sıra uyarısı — ilk binary API ile yüklenemez
+
+Google, bir uygulamanın **ilk** sürümünün API ile yayınlanmasına izin
+vermiyor; ilk AAB Console arayüzünden geçmek zorunda. Uygulama Console'da
+taslak olarak var, ama hiç binary yüklenmediyse `edits.insert` yetki
+verilmiş olsa bile 403 dönebilir.
+
+Yani yetkiyi verdikten sonra dry-run hâlâ 403 diyorsa sebep izin değildir.
+O durumda sıra şöyle olur:
+
+1. Aşama 3'teki AAB'yi Console'dan Internal testing'e **elle** yükle.
+2. Sonra bu workflow'u tekrar çalıştır — listeleme API'si o noktadan sonra
+   açılıyor.
+
+Yani Aşama 5, ilk yüklemede Aşama 4'ten **sonra** gelir; ikinci sürümden
+itibaren istediğin sırada çalışır.
+
+### Elle giriş (otomatik yol açılmazsa)
+
 Uygulama 21 dilde, mağaza sayfası iki dilde. Play listelemesi çevrilmemiş bir
 dilde `en-US`'e düşer — kullanıcı uygulamayı kendi dilinde görmeden önce
 sayfayı yabancı dilde görür, kurulum oranı orada düşer.
