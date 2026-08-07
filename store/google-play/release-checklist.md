@@ -61,8 +61,15 @@ ABI: arm64-v8a, armeabi-v7a, x86, x86_64
 ```
 
 - [x] Release derlemesi geçiyor; hedef SDK 36, Play'in asgarisinin üstünde.
-- [ ] `versionCode` 1 — ilk yükleme için doğru. Her yeni yüklemede artması
-      gerektiğini unutma, Play aynı değeri ikinci kez kabul etmez.
+- [x] `versionCode` elle yönetilmiyor ve yönetilmemeli. `eas.json` içinde
+      `cli.appVersionSource: "remote"` ve production profilinde
+      `autoIncrement: true` var — EAS numarayı sunucuda tutup her production
+      derlemesinde artırıyor, `app.json`'daki değeri yok sayıyor. Yukarıdaki
+      yerel APK'da görünen `versionCode 1` yalnız Expo'nun yerel varsayılanı,
+      Play'e giden AAB'de geçerli değil.
+      `verify:android-config` bu iki ayarın yerinde kaldığını kontrol ediyor;
+      biri silinirse ilk yüklemeden sonraki her yükleme "duplicate
+      versionCode" ile reddedilir ve hata mesajından sebebi anlaşılmaz.
 
 İzin listesi yerelde zaten doğrulandı — merge sonrası release manifest'te
 tam olarak şunlar var, başka hiçbir şey yok:

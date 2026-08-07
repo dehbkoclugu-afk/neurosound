@@ -27,6 +27,23 @@ if (!audio || audio[1]?.recordAudioAndroid !== false || audio[1]?.microphonePerm
 if (!(expo.plugins ?? []).includes('./plugins/withoutMicrophoneService')) {
   errors.push('withoutMicrophoneService plugin must stay registered');
 }
+
+// Play rejects a versionCode it has already seen, and the rejection lands
+// after the build. EAS holds the number server-side and bumps it per
+// production build, so nothing here or in app.json has to be edited by hand —
+// but only while both of these stay set. Losing either turns every upload
+// after the first into a duplicate-versionCode failure, and the fix is not
+// obvious from the error.
+const eas = JSON.parse(readFileSync(new URL('../eas.json', import.meta.url), 'utf8'));
+if (eas.cli?.appVersionSource !== 'remote') {
+  errors.push('eas.json cli.appVersionSource must be "remote"');
+}
+if (eas.build?.production?.autoIncrement !== true) {
+  errors.push('eas.json production.autoIncrement must be true');
+}
+if ('versionCode' in android) {
+  errors.push('android.versionCode is ignored under remote versioning; remove it');
+}
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
