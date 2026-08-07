@@ -97,11 +97,13 @@ function watchLockScreenPlayer(player: AudioPlayer, owner: 'single' | 'mixer'): 
  * cached until it is usable, since caching the unusable value was what made
  * this permanent.
  *
- * On a release build that copy does not appear to land: checked on a device,
- * the media control shows title and artist and the transport works, but the
- * artwork square stays empty across sessions. That is cosmetic and the same
- * as before — the point of this function now is that it can no longer take
- * the whole lock screen down with it.
+ * On a release build nothing usable ever arrives, so the artwork square stays
+ * empty — checked on a device, across sessions. expo-asset only rewrites an
+ * Android embedded asset to `file:///android_res/…` when it is running with
+ * local assets (expo-updates), and updates are disabled here, so `uri` stays
+ * the bare drawable name. Constructing that path by hand is possible but it
+ * is not established that Media3's artwork loader resolves it, and the payoff
+ * is one small square. Title, artist and the transport all work.
  */
 let artworkUri: string | null = null;
 function ensureArtwork(): string | undefined {
