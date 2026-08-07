@@ -26,6 +26,9 @@ import { ArtBackground } from './ArtBackground';
 import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 
+export const PRESET_ROW_HEIGHT = 92;
+export const PRESET_ROW_GAP = Spacing.sm;
+
 export function presetIcon(preset: FrequencyPreset): IconConfig {
   if (preset.type === 'binaural' && preset.binauralType) {
     return getPresetIcon('binaural', preset.binauralType);
@@ -258,13 +261,21 @@ export function PresetRow({
           </View>
         </View>
         {isPlaying && <EqualizerBars color={artwork.foreground.primary} />}
-        <Ionicons
-          name="chevron-forward"
-          size={17}
-          color={artwork.foreground.secondary}
+        <View
+          style={[
+            styles.chevronRail,
+            {
+              backgroundColor:
+                artwork.scheme === 'light'
+                  ? '#2E4155'
+                  : '#26384C',
+            },
+          ]}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
-        />
+        >
+          <Ionicons name="chevron-forward" size={19} color="#FFFFFF" />
+        </View>
       </ArtBackground>
     </AnimatedTouchable>
   );
@@ -275,16 +286,16 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 14,
     overflow: 'hidden',
-    marginBottom: Spacing.sm,
+    marginBottom: PRESET_ROW_GAP,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: Spacing.md,
+    paddingLeft: Spacing.md,
     paddingVertical: Spacing.md,
     gap: Spacing.md,
-    minHeight: 92,
+    minHeight: PRESET_ROW_HEIGHT,
   },
   iconBadge: {
     width: 36,
@@ -297,6 +308,13 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     gap: 2,
+  },
+  chevronRail: {
+    width: 48,
+    alignSelf: 'stretch',
+    marginVertical: -Spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   nameRow: {
     flexDirection: 'row',

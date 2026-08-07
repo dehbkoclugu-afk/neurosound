@@ -194,7 +194,9 @@ export default function PlayerScreen() {
   }
 
   const frequencyParts = getFrequencyParts(preset);
-  const heroHeight = Math.max(360, Math.min(500, height * 0.54));
+  // Keep the artwork cinematic without pushing the controls below the first
+  // viewport. On a typical phone this is ~26% shorter than the old 54vh hero.
+  const heroHeight = Math.max(300, Math.min(400, height * 0.4));
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

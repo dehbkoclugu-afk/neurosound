@@ -66,21 +66,21 @@ describe('approved light shell tokens', () => {
     expect(Colors.light).toMatchObject({
       text: '#18212B',
       textSecondary: '#566575',
-      background: '#F1F4F7',
-      backgroundSecondary: '#E8EDF2',
-      card: '#F8FAFC',
-      cardBorder: '#D5DDE6',
-      slider: '#D5DDE6',
-      miniPlayer: '#F8FAFC',
+      background: '#E7ECF1',
+      backgroundSecondary: '#DDE4EB',
+      card: '#F0F4F7',
+      cardBorder: '#C8D2DC',
+      slider: '#C8D2DC',
+      miniPlayer: '#F0F4F7',
     });
 
     expect(Colors.lowContrastLight).toMatchObject({
       text: '#3F4A56',
       textSecondary: '#596775',
-      background: '#EEF2F5',
-      backgroundSecondary: '#E3E9EF',
-      card: '#F4F7F9',
-      cardBorder: '#D2DAE3',
+      background: '#E9EEF2',
+      backgroundSecondary: '#DFE6EC',
+      card: '#F0F4F7',
+      cardBorder: '#CBD5DE',
     });
   });
 });
