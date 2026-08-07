@@ -1,0 +1,39 @@
+# Push store listings and graphics from the repo to Google Play.
+#
+# store/google-play/ is the source of truth; the Console becomes a rendering
+# of it. Entering 21 languages by hand is 21 forms, and every later wording
+# fix is 21 forms again.
+#
+# Defaults to a dry run: the edit is opened, every listing and image is sent,
+# then the edit is discarded. That exercises auth, locale validation and each
+# upload without changing anything live. Set dry_run to false to publish.
+name: Play listings
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Discard the edit instead of committing it'
+        required: true
+        default: true
+        type: boolean
+
+concurrency:
+  group: play-listings
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Push listings
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+        run: node scripts/play-publish.mjs

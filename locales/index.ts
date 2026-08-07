@@ -25,8 +25,14 @@
  * `flag` is a flag of *a* country where the language is spoken, not a claim
  * about who owns it: one flag cannot stand for Spanish or Portuguese or
  * English, so the picker leans on the name and uses the flag only as a
- * colour cue for finding your row quickly. Portuguese takes Brazil and
- * English takes the UK because those are the larger stores for each.
+ * colour cue for finding your row quickly. English takes the UK because that
+ * is the larger store.
+ *
+ * Where a language really does ship as one specific variant, the label says
+ * so rather than leaving the flag to imply it: Portuguese here is Brazilian
+ * (pt-BR, "celular" not "telemóvel") and Chinese is Simplified (zh-Hans,
+ * listed as zh-CN). Someone from Portugal or Taiwan should be able to see
+ * that before switching, not discover it afterwards.
  *
  * The flags are regional-indicator pairs, which most Android system fonts do
  * not have a glyph for — there they fall back to rendering the two letters,
@@ -73,9 +79,14 @@ export const LANGUAGES: LanguageDef[] = [
   { code: 'it', label: 'Italiano', flag: '🇮🇹', translation: it },
   { code: 'ja', label: '日本語', flag: '🇯🇵', translation: ja },
   { code: 'ko', label: '한국어', flag: '🇰🇷', translation: ko },
-  { code: 'pt', label: 'Português', flag: '🇧🇷', translation: pt },
+  // Brazilian, not European: the translation uses Brazilian vocabulary
+  // ("celular"), the store listing is pt-BR, and the flag says so too. Naming
+  // the variant in the label means a reader from Portugal knows what they are
+  // getting before they switch, instead of after.
+  { code: 'pt', label: 'Português (Brasil)', flag: '🇧🇷', translation: pt },
   { code: 'ru', label: 'Русский', flag: '🇷🇺', translation: ru },
-  { code: 'zh', label: '中文', flag: '🇨🇳', translation: zh },
+  // Simplified, matching the zh-Hans bundle and the zh-CN store listing.
+  { code: 'zh', label: '中文（简体）', flag: '🇨🇳', translation: zh },
   { code: 'hi', label: 'हिन्दी', flag: '🇮🇳', translation: hi },
   { code: 'bn', label: 'বাংলা', flag: '🇧🇩', translation: bn },
   { code: 'id', label: 'Bahasa Indonesia', flag: '🇮🇩', translation: id },
