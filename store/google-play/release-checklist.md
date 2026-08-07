@@ -112,65 +112,88 @@ AAB'yi Internal testing'e yükle ve uygulamayı **Google Play üzerinden** kur.
 Sideload edilmiş APK ile test etme; foreground service ve bildirim davranışı
 kurulum kaynağına göre değişebiliyor.
 
+Aşağıda `[x]` işaretli maddeler **emülatörde, Android 15, release APK ile**
+doğrulandı. Yine de gerçek cihazda tekrarlanmalı — emülatörün hoparlörü yok,
+Play üzerinden kurulum farkı da orada sınanamaz.
+
 Ses yolu — bu sürümde düzeltilen bug tam olarak burada görünür:
 
-- [ ] Her kategoriden en az bir preset çal: binaural, solfeggio, ve hem
-      üretilen (white/pink/brown) hem dosyadan gelen (yağmur, okyanus) gürültü.
-- [ ] Hiçbirinde "Ses başlatılamadı. Tekrar deneyin." çıkmamalı.
-- [ ] Mikserde 3-4 kanal aynı anda çalmalı ve kanallardan biri hata verdiğinde
-      diğerleri susmamalı.
-- [ ] **Kulaklıkla dinle.** 40 Hz ve 111 Hz tonlar ile binaural presetler
-      telefon hoparlöründe duyulmaz; bu bir hata değil, Player ekranındaki
-      kulaklık uyarısı bunun için var.
-- [ ] Uygulamayı arka plana al, kilitle, birkaç dakika sonra tekrar aç —
-      ses kesilmemeli, hata görünmemeli.
+- [x] Sekiz preset üç kategoriden de çalındı: `binaural-alpha`,
+      `solfeggio-40`, `solfeggio-528`, `noise-white`, `noise-brown`,
+      `noise-rain`, `noise-airplane`, `noise-train`. Her birinde
+      `dumpsys media.audio_flinger` **1 aktif AudioTrack** gösterdi; ton mono
+      (0x1), gürültü ve binaural stereo (0x3), hepsi 44100 Hz.
+- [x] Hiçbirinde "Ses başlatılamadı" çıkmadı. `ForegroundServiceStartNotAllowed`
+      sayısı her koşuda **0** — yani o hiç sebep değildi.
+- [x] Mikser: örnek mix üç kanalı birden çaldı, **3 aktif AudioTrack**,
+      uygulamanın üç AudioTrack'i de `started`.
+- [x] Ses dil değişimleri ve gezinme boyunca ~6 dakika kesintisiz çaldı.
+- [x] Ekran kilitlendikten sonra çalmaya devam etti.
+- [ ] **Kulaklıkla dinle.** Emülatörde yapılamaz. 40 Hz ve 111 Hz tonlar ile
+      binaural presetler telefon hoparlöründe duyulmaz; bu bir hata değil,
+      Player ekranındaki kulaklık uyarısı bunun için var.
 
-Diller — uygulama 21 dilde, hepsi cihazda hiç görülmedi:
+Diller:
 
-- [ ] Cihaz dilini **हिन्दी**, **বাংলা** ve **ไทย** yap ve uygulamayı aç.
-      Uygulama Nunito Sans kullanıyor; bu font Devanagari, Bengali ve Thai
-      gliflerini içermiyor. Beklenen davranış sistem fontuna düşmesi, yani
-      metin okunur ama tipografi diğer dillerden farklı görünür.
-      **Kutucuk (tofu) görürsen** o dile font eklemek gerekir — o hâlde ya
-      `@expo-google-fonts` üzerinden Noto Sans Devanagari/Bengali/Thai ekle,
-      ya da o üç dili bu sürümden çıkar.
-- [ ] Ayarlar → Dil listesinde 21 satırın hepsi kayıyor ve seçilebiliyor.
-- [ ] Uzun çevirilerin taşmadığını gör: Almanca ve Felemenkçe en uzun
-      metinleri üretiyor, mikser kanal adlarına ve onboarding başlıklarına bak.
+- [x] **हिन्दी**, **বাংলা** ve **ไทย** cihazda açıldı ve ekran görüntüsü alındı.
+      **Tofu yok.** Devanagari bileşik harfleri (ध्यान, ध्वनियाँ), Bengalce
+      যুক্তাক্ষর (মুহূর্তে, বৃষ্টি) ve Tayca ton işaretleri (ตอนนี้, คลื่นทะเล)
+      doğru çiziliyor. Nunito Sans bu yazıları içermiyor, sistem fontuna
+      düşüyor ve sonuç okunur. Font eklemeye gerek yok.
+- [x] Dil listesinde 21 satırın hepsi görünüyor, kayıyor ve seçilebiliyor;
+      bayraklar gerçek bayrak olarak çiziliyor.
+- [x] Uzun çeviri taşması yok: Almanca mikserde "Braunes Rauschen" ve
+      "Einstellungen" kırpılmadan sığıyor.
 
 Oturum ve arayüz:
 
-- [ ] Geri dönen kullanıcının soğuk açılışı onboarding'e yönlendirmiyor.
-- [ ] Tekli çalma kilit ekranını atlatıyor; kilit ekranından play/pause
-      doğru çalışıyor. **Aşağıdaki bilinen sorunu oku.**
-- [ ] Mikser tek bir medya oturumu gösteriyor ve tüm kanalları birlikte
-      yönetiyor.
+- [x] Geri dönen kullanıcının soğuk açılışı doğrudan ana ekrana geliyor,
+      onboarding'e sapmıyor.
+- [x] Kilit ekranı kontrolleri çalışıyor — aşağıdaki bölüme bak, orada
+      gerçek bir bug bulundu ve düzeltildi.
+- [x] Mikser tek bir medya oturumu gösteriyor.
 - [ ] Uyku zamanlayıcısı kilitliyken doluyor, son 30 saniyede kısılıyor ve
-      sesi durduruyor.
-- [ ] Ses kesintisi (arama, bildirim), kulaklık çıkarma ve bildirim davranışı
-      kabul edilebilir.
+      sesi durduruyor. Emülatörde saat ileri alınamadığı için denenmedi;
+      dolma ve kısılma mantığı birim testlerinde kapsanıyor
+      (`lib/audio/__tests__/playerController.test.ts`), ama cihazda bir kez
+      gerçek süreyle görülmeli.
+- [ ] Ses kesintisi (arama, bildirim) ve kulaklık çıkarma davranışı.
+      Emülatörde anlamlı şekilde denenemedi.
 
-### Bilinen sorun — kilit ekranı kontrolleri Android 13+
+### Çözüldü — kilit ekranı kontrolleri
 
-`POST_NOTIFICATIONS` izni merge sonrası release manifest'te **yok** —
-tahmin değil, yukarıdaki izin listesinden okundu.
-Android 13 ve üstünde medya foreground service'i çalışmaya devam eder ama
-bildirimi — ki kilit ekranı kontrolü **odur** — kullanıcı bu izni çalışma
-anında vermeden gösterilmez. Yani kilit ekranı kontrolleri modern Android'de
-büyük ihtimalle hiç görünmeyecek.
+Bu daha önce "Android 13+'ta muhtemelen hiç görünmeyecek" diye açık bir soru
+olarak duruyordu. Emülatörde Android 15 üzerinde denendi; **iki varsayım da
+yanlıştı ve altında gerçek bir bug vardı.**
 
-Karar senin, üç seçenek var:
+Gerçek sebep `POST_NOTIFICATIONS` değildi. Release derlemesinde her
+`setActiveForLockScreen` çağrısı reddediliyordu:
 
-1. Bu sürümde kabul et, kilit ekranı kontrollerini özellik olarak duyurma.
-   Ses arka planda çalmaya devam ediyor; sadece kontroller yok.
-2. İzni `app.json`'a ekle ve çalışma anında iste. Doğru yapmak için bir izin
-   modülü gerekir (yeni bağımlılık), ve ilk açılışta bir izin sorusu daha
-   çıkar.
-3. Yalnız izni tanımla, istemeden bırak. **Bunu yapma** — bildirim yine
-   görünmez, karşılığında Play'e açıkladığın izin listesi uzar.
+```
+Cannot cast 'String' for field 'artworkUrl' ('java.net.URL?')
+java.net.MalformedURLException: no protocol: assets_images_icon
+```
 
-Seçtiğini `docs/RELEASE.md`'ye not et; Aşama 6'daki foreground service
-beyanı buna göre doldurulur.
+`ensureArtwork()` şemasız bir kaynak adı veriyordu, `expo-audio` ise bunu
+`java.net.URL`'e çevirmeye çalışıyordu. Düzeltildi — artık yalnız şeması olan
+bir değer geçiliyor.
+
+Düzeltme sonrası cihazda doğrulandı:
+
+- Medya oturumu `active=true`, `state=PLAYING(3)`, uygulama sistemin medya
+  düğmesi sahibi.
+- Bildirim gölgesindeki medya kartı tam çalışıyor: başlık, "NeuroSound",
+  duraklat, çıkış seçici.
+- Bunların hepsi `POST_NOTIFICATION: ignore` iken, yani izin **verilmemişken**.
+  Medya kontrolleri MediaSession'dan geliyor, bildirim izninden bağımsız.
+
+Yani `POST_NOTIFICATIONS` eklemeye gerek yok. İzin listesi olduğu gibi kalır.
+
+- [ ] Kalan tek kozmetik eksik: medya kartındaki **artwork karesi boş**.
+      `Asset.downloadAsync()` release derlemesinde kullanılabilir bir
+      `localUri` üretmiyor; başlık ve kontroller çalıştığı için yayını
+      engellemez. Düzeltmek istersen ikonu çalışma anında bir dosyaya
+      kopyalamak gerekir.
 
 ## Aşama 5 — Mağaza listelemeleri
 

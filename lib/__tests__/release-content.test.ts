@@ -36,8 +36,20 @@ describe('Google Play release content', () => {
     expect(full.length).toBeLessThanOrEqual(4000);
   });
 
+  /** Bengali and Devanagari have their own digits, and the locales that use
+   *  those scripts use them throughout — bn.json counts channels in Bengali
+   *  numerals, so its listing does too. Fold them back to ASCII rather than
+   *  forcing Western digits into copy that reads wrong with them. */
+  const DIGIT_ZEROS = [0x09e6 /* Bengali ০ */, 0x0966 /* Devanagari ० */];
+  const asciiDigits = (text: string) =>
+    text.replace(/[০-৯०-९]/g, (d) => {
+      const code = d.codePointAt(0) as number;
+      const zero = DIGIT_ZEROS.find((base) => code >= base && code <= base + 9);
+      return zero === undefined ? d : String(code - zero);
+    });
+
   it.each(listingLocales)('%s listing states the current language count', (locale) => {
-    const listing = read(`store/google-play/${locale}/listing.md`);
+    const listing = asciiDigits(read(`store/google-play/${locale}/listing.md`));
     expect(listing).toContain(String(LANGUAGES.length));
   });
 

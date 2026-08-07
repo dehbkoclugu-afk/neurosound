@@ -82,22 +82,42 @@ function watchLockScreenPlayer(player: AudioPlayer, owner: 'single' | 'mixer'): 
  * The lock screen's artwork slot was left empty, so the one place the app
  * appears while the phone is face-down showed a blank square.
  *
- * Resolved once and cached: `Asset.fromModule` is synchronous for a bundled
- * image but its `localUri` only exists after a download on Android, so the
- * first call kicks that off and later calls get the real path. A missing
- * artwork is not worth failing playback over, hence the catch.
+ * Only ever returns something with a URI scheme. expo-audio parses this field
+ * into a `java.net.URL`, and in a release build `Asset.fromModule().uri` is
+ * the bare bundled-resource name — "assets_images_icon" — which is not a URL.
+ * Handing that over threw MalformedURLException out of
+ * `setActiveForLockScreen`, taking the whole call with it, so lock screen
+ * controls never appeared on a release build at all. Worse, before that call
+ * was wrapped the throw surfaced as "could not start audio" over sound that
+ * was already playing.
+ *
+ * `Asset.fromModule` is synchronous but its `localUri` only exists after the
+ * asset has been copied out on Android, so an unresolved call starts that and
+ * returns nothing; a later call picks up the real `file://` path. Nothing is
+ * cached until it is usable, since caching the unusable value was what made
+ * this permanent.
+ *
+ * On a release build that copy does not appear to land: checked on a device,
+ * the media control shows title and artist and the transport works, but the
+ * artwork square stays empty across sessions. That is cosmetic and the same
+ * as before — the point of this function now is that it can no longer take
+ * the whole lock screen down with it.
  */
 let artworkUri: string | null = null;
 function ensureArtwork(): string | undefined {
   if (artworkUri) return artworkUri;
   try {
     const asset = Asset.fromModule(require('@/assets/images/icon.png'));
-    artworkUri = asset.localUri ?? asset.uri ?? null;
-    if (!asset.localUri) void asset.downloadAsync().catch(() => {});
+    const candidate = asset.localUri ?? asset.uri ?? null;
+    if (candidate && /^[a-z][a-z0-9+.-]*:/i.test(candidate)) {
+      artworkUri = candidate;
+      return artworkUri;
+    }
+    void asset.downloadAsync().catch(() => {});
   } catch {
     return undefined;
   }
-  return artworkUri ?? undefined;
+  return undefined;
 }
 
 /**
