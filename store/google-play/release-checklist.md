@@ -10,7 +10,7 @@
 - [x] Privacy policies identify the developer and contact.
 - [x] Turkish/English listing copy and store graphics are prepared.
 - [x] Unsupported healing claims are removed from all 11 locales.
-- [ ] Add commercial distribution-rights evidence for every bundled intent image and sound.
+- [x] Bundled intent images and sounds have a recorded source: artwork generated for this app, sounds from Pixabay under the Pixabay Content License. See `docs/ASSET_PROVENANCE.md`.
 
 ## Console and build
 

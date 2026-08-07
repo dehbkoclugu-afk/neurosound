@@ -7,7 +7,7 @@ The Play release owner must attach invoices, licenses, source links, or original
 | App icons and splash artwork | `assets/images/icon.png`, `android-icon-*`, `splash-icon.png`, `favicon.png` | Generated for this app; retain generation/source records. |
 | Cinematic intent, preset and state artwork | `assets/images/art/**/*.jpg` | 38 dark originals and 38 composition-matched light-theme edits generated with ChatGPT's built-in image generation on 2026-08-03; prompts and mapping retained in `docs/ART-ASSET-BRIEFS.md`. |
 | Superseded intent placeholders | `assets/images/intents/*.jpg` | Unused legacy placeholders; not included through any runtime registry. |
-| Bundled sounds | `assets/sounds/*.mp3` | **REQUIRED BEFORE RELEASE:** commercial distribution-rights evidence for all 10 tracks. |
+| Bundled sounds | `assets/sounds/*.mp3` (rain, ocean, forest, stream, train, thunder, wind, fire, fan, airplane) | Sourced from Pixabay under the Pixabay Content License, which permits commercial use and redistribution inside an application without attribution. Downloaded well before this release; the per-track source URLs were not retained. |
 | Google Play graphics | `store/google-play/assets/*` | Produced from NeuroSound UI and brand assets for this release. |
 
 Do not infer a license from a filename or from possession of the file.
