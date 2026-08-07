@@ -86,7 +86,8 @@
       ],
       "expo-asset",
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      "./plugins/withoutMicrophoneService"
     ],
     "experiments": {
       "typedRoutes": true,

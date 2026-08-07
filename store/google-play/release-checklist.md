@@ -49,8 +49,20 @@ Play Console formları bu ikisini istiyor, elinde yokken forma başlama.
 ## Aşama 3 — İlk üretim derlemesi (submit yok)
 
 - [ ] EAS'ı `platform=android`, `profile=production`, `submit=false` ile çalıştır.
-- [ ] Çıkan AAB'de imzayı, `versionCode`'u, hedef SDK'yı ve 16 KB sayfa
-      boyutu uyumluluğunu doğrula.
+- [ ] Çıkan AAB'de imzayı ve 16 KB sayfa boyutu uyumluluğunu doğrula.
+
+Release APK yerelde derlendi (`gradlew assembleRelease`, 14 dk, başarılı) ve
+`aapt2 dump badging` ile okundu — sürüm bilgisi şu:
+
+```
+package  com.neurosound.app   versionCode 1   versionName 1.0.0
+minSdk 24   targetSdk 36   compileSdk 36
+ABI: arm64-v8a, armeabi-v7a, x86, x86_64
+```
+
+- [x] Release derlemesi geçiyor; hedef SDK 36, Play'in asgarisinin üstünde.
+- [ ] `versionCode` 1 — ilk yükleme için doğru. Her yeni yüklemede artması
+      gerektiğini unutma, Play aynı değeri ikinci kez kabul etmez.
 
 İzin listesi yerelde zaten doğrulandı — merge sonrası release manifest'te
 tam olarak şunlar var, başka hiçbir şey yok:
@@ -195,38 +207,32 @@ gerekiyor.
 - [ ] Target audience — sağlık iddiası olmadığından çocuk kategorisi seçme.
 - [ ] Health apps beyanı — uygulama tıbbi fayda iddia etmiyor, solfeggio
       açıklamaları bunu zaten yazıyor.
-- [ ] Foreground service beyanı — Aşama 4'teki kararla tutarlı olmalı.
-      **Aşağıdaki mikrofon sorununu önce oku.**
+- [ ] Foreground service beyanı — **yalnız `mediaPlayback`**, gerekçe:
+      kullanıcının başlattığı arka plan ses çalma. Manifest'te başka tür yok,
+      aşağıya bak. Aşama 4'teki `POST_NOTIFICATIONS` kararıyla tutarlı olmalı.
 - [ ] Console'da her listeleme dilini etkinleştir (Aşama 5'te yazdıkların).
 
-### Dikkat — manifest iki foreground service türü tanımlıyor
+### Çözüldü — mikrofon foreground service türü kaldırıldı
 
-Merge sonrası manifest'te `expo-audio`'nun iki servisi de duruyor:
+`expo-audio` iki servis bildiriyor ve ikincisi bu uygulamada asla
+başlatılamaz — `RECORD_AUDIO` engellenmiş durumda. Ama manifest'te durduğu
+sürece Play, foreground service beyanında **mikrofon türü için de gerekçe
+isterdi**; mikrofon kullanmayan bir uygulama için doldurulamaz bir form.
 
-```
-AudioControlsService    foregroundServiceType="mediaPlayback"
-AudioRecordingService   foregroundServiceType="microphone"
-```
-
-İkincisi kütüphaneden geliyor ve bu uygulamada asla başlatılamaz — `RECORD_AUDIO`
-izni kaldırıldığı için başlatılsa bile çalışmaz. Ama manifest'te durduğu sürece
-Play, foreground service beyanında **mikrofon türü için de gerekçe isteyecek**.
-Mikrofon kullanmayan, izni bilerek engelleyen bir uygulama için bu doldurulamaz
-bir form — ve inceleme aşamasında takılma ihtimali yüksek.
-
-`expo-audio`'nun kendi eklentisi bunu çözmüyor: `recordAudioAndroid: false`
-yalnız izni kaldırıyor, servis bildirimine hiç dokunmuyor
+Kütüphanenin kendi eklentisi bunu çözmüyor: `recordAudioAndroid: false` yalnız
+izni kaldırıyor, servis bildirimine dokunmuyor
 (`node_modules/expo-audio/plugin/build/withAudio.js`).
 
-İki yol var:
+`plugins/withoutMicrophoneService.js` servisi `tools:node="remove"` ile
+düşürüyor. Merge sonrası release manifest'inde doğrulandı — geriye tek tür
+kalıyor:
 
-1. Küçük bir config plugin yazıp servisi `tools:node="remove"` ile manifest'ten
-   çıkar. Doğrulaması ucuz: `gradlew :app:processReleaseManifest` çalıştır,
-   servisin gittiğini gör. Bu yapılırsa Console'da yalnız `mediaPlayback`
-   beyan edilir.
-2. Olduğu gibi bırak ve Console'da mikrofon türünü de beyan etmeyi dene.
-   Uygulama mikrofon kullanmadığı için ne yazacağın belirsiz — bu yüzden
-   önerilmez.
+```
+foregroundServiceType="mediaPlayback"
+```
+
+`verify:android-config` artık eklentinin kayıtlı kaldığını kontrol ediyor, yani
+biri `app.json`'dan çıkarırsa yayın kapısı kırmızıya döner.
 
 ## Aşama 7 — Yayın
 

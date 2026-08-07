@@ -19,6 +19,14 @@ for (const permission of blocked) {
 if (!audio || audio[1]?.recordAudioAndroid !== false || audio[1]?.microphonePermission !== false) {
   errors.push('expo-audio recording and microphone must be disabled');
 }
+// Blocking RECORD_AUDIO is not enough: expo-audio's plugin leaves its
+// AudioRecordingService in the manifest, declared foregroundServiceType
+// "microphone", and Play asks for a written justification of every declared
+// type. Drop this plugin and submission stalls on a form this app cannot
+// honestly fill in — long after the config change that caused it.
+if (!(expo.plugins ?? []).includes('./plugins/withoutMicrophoneService')) {
+  errors.push('withoutMicrophoneService plugin must stay registered');
+}
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
