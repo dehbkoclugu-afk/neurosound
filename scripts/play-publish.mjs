@@ -148,18 +148,37 @@ async function main() {
     edit = await call(token, 'POST', `${API}/applications/${PACKAGE}/edits`, { json: {} });
   } catch (e) {
     if (e.status === 403 || e.status === 401) {
-      console.error(`\nAuthentication worked — a token was issued and the API answered.
-What is missing is authorisation for this service account on this app. Check,
-in order:
+      // "The caller does not have permission" covers two very different
+      // problems with the same words. A read that needs app access but no
+      // edit separates them: if it succeeds the grant is fine and only edits
+      // are barred, which is Play refusing an app that has never had a binary
+      // uploaded through the Console.
+      let canRead = false;
+      try {
+        await call(token, 'GET', `${API}/applications/${PACKAGE}/reviews?maxResults=1`);
+        canRead = true;
+      } catch { /* stays false */ }
+
+      console.error(`\nAuthentication worked — a token was issued and the API answered.`);
+      if (canRead) {
+        console.error(`This account CAN read ${PACKAGE}, so the grant is in place. Play is
+refusing to open an edit, which is what it does for an app that has never had
+a binary uploaded through the Console: the first release cannot go through the
+API.
+
+  → Upload the AAB to Internal testing in the Play Console once, then run
+    this workflow again. Every release after that can use the API.`);
+      } else {
+        console.error(`This account cannot read ${PACKAGE} either, so it has no access to the app.
 
   1. Play Console → Users and permissions → invite ${key.client_email}
-     and grant it access to ${PACKAGE}. "Edit store listing" is enough for
-     this script; it never touches releases.
-  2. The app exists in Play Console under exactly ${PACKAGE}.
-  3. The Google Play Android Developer API is enabled on project
-     ${key.project_id ?? '(the service account project)'}.
+     and grant it access to ${PACKAGE}. "Edit store listing" is enough;
+     this script never touches releases.
+  2. Check the invitation was accepted and applies to this app, not only to
+     the developer account.
 
 A grant can take a few minutes to take effect.`);
+      }
     }
     throw e;
   }
