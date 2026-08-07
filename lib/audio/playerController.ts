@@ -100,6 +100,21 @@ function ensureArtwork(): string | undefined {
   return artworkUri ?? undefined;
 }
 
+/**
+ * Lock screen controls are a convenience, never a precondition for sound.
+ *
+ * expo-audio starts them with a bare `context.startForegroundService()`
+ * (AudioControlsService.setActivePlayer) and Android 12+ answers with
+ * ForegroundServiceStartNotAllowedException whenever the process is not in a
+ * state permitted to start one. That exception came straight back across the
+ * bridge into `play()`'s try block — which had already set isPlaying — so the
+ * app announced "could not start audio" over a sound that was playing fine.
+ * Through `startMixerChannels` it was worse: its catch stopped and disposed
+ * every channel that had just started successfully.
+ *
+ * So both directions are contained here rather than at each call site: losing
+ * the lock screen costs the lock screen and nothing else.
+ */
 function setNowPlaying(
   player: AudioPlayer | null,
   title: string,
@@ -108,12 +123,16 @@ function setNowPlaying(
   if (Platform.OS === 'web') return;
   if (!player) return;
   if (lockScreenPlayer && lockScreenPlayer !== player) clearNowPlaying();
-  player.setActiveForLockScreen(true, {
-    title,
-    artist: 'NeuroSound',
-    artworkUrl: ensureArtwork(),
-  }, { showSeekBackward: false, showSeekForward: false });
-  watchLockScreenPlayer(player, owner);
+  try {
+    player.setActiveForLockScreen(true, {
+      title,
+      artist: 'NeuroSound',
+      artworkUrl: ensureArtwork(),
+    }, { showSeekBackward: false, showSeekForward: false });
+    watchLockScreenPlayer(player, owner);
+  } catch (e) {
+    console.log('Lock screen controls unavailable:', e);
+  }
 }
 
 function clearNowPlaying(): void {
@@ -123,7 +142,11 @@ function clearNowPlaying(): void {
   lockScreenSubscription = null;
   lockScreenPlayer = null;
   lockScreenOwner = null;
-  player?.clearLockScreenControls();
+  try {
+    player?.clearLockScreenControls();
+  } catch (e) {
+    console.log('Lock screen teardown failed:', e);
+  }
 }
 
 function createGenerator(preset: FrequencyPreset): Generator | null {
@@ -573,7 +596,12 @@ export async function mixerAddChannel(preset: FrequencyPreset): Promise<boolean>
     const gen = createGenerator(preset);
     if (gen) {
       mixerGenerators.set(id, gen);
-      gen.setVolume(0.5 * useSettingsStore.getState().maxVolume);
+      // Same gain chain as every other channel — a channel added into a mix
+      // whose master is turned down used to arrive at full level and blast
+      // over the balance the user had just set.
+      gen.setVolume(
+        channelVolume({ volume: 0.5, muted: false }, useSettingsStore.getState().maxVolume)
+      );
       await gen.play();
     }
   }

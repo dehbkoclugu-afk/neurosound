@@ -16,8 +16,10 @@ Hazır sesleri tek başına dinleyebilir veya mikserde dört sesi bir araya geti
 • Dört kanallı özel ses mikseri
 • Uyku zamanlayıcısı
 • Favoriler ve kayıtlı karışımlar
-• 11 uygulama dili
+• 21 uygulama dili
 • Hesap, reklam ve analiz SDK'sı yok
 • Tamamen çevrimdışı çalışma
+
+Binaural sesler ve düşük frekanslı tonlar kulaklık ister; telefon hoparlörü bu frekansları üretemez.
 
 NeuroSound tıbbi tanı, tedavi veya sağlık sonucu vaat etmez. Ses seviyesini rahat bir düzeyde tutun.

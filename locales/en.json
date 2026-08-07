@@ -171,6 +171,7 @@
     "baseFrequency": "Base Frequency",
     "beatFrequency": "Beat Frequency",
     "playbackError": "Could not start audio. Please try again.",
+    "headphonesRequired": "Headphones needed — a phone speaker cannot reproduce these frequencies.",
     "volumeCapped": "Volume capped at {{percent}}%"
   },
   "settings": {

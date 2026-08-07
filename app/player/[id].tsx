@@ -51,6 +51,19 @@ import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
 
+/**
+ * Presets a phone speaker cannot deliver: every binaural beat (the effect only
+ * exists when each ear gets its own channel) and any tone low enough that a
+ * built-in speaker simply does not move air at it. 200 Hz is the generous end
+ * of where small speakers give up, and it is also the binaural carrier.
+ */
+const SPEAKER_FLOOR_HZ = 200;
+
+function needsHeadphones(preset: FrequencyPreset): boolean {
+  if (preset.type === 'binaural') return true;
+  return preset.type === 'solfeggio' && (preset.frequency ?? Infinity) < SPEAKER_FLOOR_HZ;
+}
+
 const getFrequencyParts = (preset: FrequencyPreset): number[] | null => {
   if (
     preset.type === 'binaural' &&
@@ -343,6 +356,22 @@ export default function PlayerScreen() {
                   style={[styles.mechanism, { color: colors.textSecondary }]}
                 >
                   {t('explore.binauralDescription')}
+                </Text>
+              </View>
+            )}
+
+            {/* The one preset failure that looks identical to a bug: a phone
+                speaker rolls off long before 40 Hz, and a binaural pair needs
+                two ears fed separately. Both play perfectly and are heard as
+                nothing, so the app gets blamed for "this sound doesn't work".
+                Stated here rather than at the entry points because Explore —
+                where all five binaural presets actually live — pushes straight
+                to this screen and warned about none of it. */}
+            {needsHeadphones(preset) && (
+              <View style={styles.mechanismRow}>
+                <Ionicons name="warning-outline" size={16} color={colors.warning} />
+                <Text style={[styles.mechanism, { color: colors.warning }]}>
+                  {t('player.headphonesRequired')}
                 </Text>
               </View>
             )}

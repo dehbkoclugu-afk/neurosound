@@ -6,7 +6,7 @@
 
 **Paket:** `com.neurosound.app`
 
-Kaynak kontrolleri ve Türkçe/İngilizce mağaza paketi hazırdır. Ana kontrol listesi `store/google-play/release-checklist.md` dosyasındadır.
+Kaynak kontrolleri hazırdır ve mağaza paketi dokuz dilde yazılmıştır. Yayın sırası, her adımın ön koşuluyla birlikte `store/google-play/release-checklist.md` dosyasındadır — yedi aşama, sırayla yapılır.
 
 ## Yerel doğrulama
 
@@ -23,13 +23,13 @@ npx expo-doctor
 
 ## Mağaza paketi
 
-- Listelemeler: `store/google-play/tr-TR/` ve `store/google-play/en-US/`
+- Listelemeler: `tr-TR`, `en-US`, `hi-IN`, `id-ID`, `vi-VN`, `pt-BR`, `es-ES`, `de-DE`, `ru-RU` — hepsi `store/google-play/` altında. Uygulama 21 dilde; kalan diller sonraki sürüme kalabilir.
 - Veri Güvenliği taslağı: `store/google-play/data-safety.md`
 - Grafikler: `store/google-play/assets/`
 - Yayınlanacak gizlilik sayfası: `docs/privacy.html`
 - Hak envanteri: `docs/ASSET_PROVENANCE.md`
 
-Gizlilik sayfası herkese açık HTTPS adresinde yayınlanmalı. Bundled sesler ve intent görselleri için ticari hak kanıtı tamamlanmadan üretime çıkılmamalıdır.
+Gizlilik sayfası herkese açık HTTPS adresinde yayınlanmalı. Paketlenen ses ve görsellerin kaynağı `docs/ASSET_PROVENANCE.md` dosyasında kayıtlıdır.
 
 ## GitHub/EAS
 

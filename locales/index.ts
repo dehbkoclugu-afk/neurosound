@@ -9,6 +9,14 @@
  * Japanese, Spanish, German, French, Korean, Portuguese, Italian, Russian),
  * plus Turkish, which the app started in and which is not going anywhere.
  *
+ * Then ten more picked for Play install volume rather than store convention:
+ * Hindi, Indonesian, Vietnamese, Thai, Bengali, Polish, Ukrainian, Dutch,
+ * Swedish, Romanian. Deliberately absent: Arabic and the other RTL languages,
+ * which need the layouts checked in both directions before they are worth
+ * shipping; Malay, which overlaps Indonesian closely enough that two entries
+ * would split the same audience; and Filipino, whose tag is three letters and
+ * would break the two-letter assumption below.
+ *
  * `code` is the two-letter tag `expo-localization` reports as `languageCode`,
  * so device detection is a plain lookup rather than a locale-matching
  * exercise. `label` is the language's name *in that language* — a picker that
@@ -26,16 +34,26 @@
  * it replaced rather than into a blank or a tofu box.
  */
 
+import bn from './bn.json';
 import de from './de.json';
 import en from './en.json';
 import es from './es.json';
 import fr from './fr.json';
+import hi from './hi.json';
+import id from './id.json';
 import it from './it.json';
 import ja from './ja.json';
 import ko from './ko.json';
+import nl from './nl.json';
+import pl from './pl.json';
 import pt from './pt.json';
+import ro from './ro.json';
 import ru from './ru.json';
+import sv from './sv.json';
+import th from './th.json';
 import tr from './tr.json';
+import uk from './uk.json';
+import vi from './vi.json';
 import zh from './zh.json';
 
 export interface LanguageDef {
@@ -58,6 +76,16 @@ export const LANGUAGES: LanguageDef[] = [
   { code: 'pt', label: 'Português', flag: '🇧🇷', translation: pt },
   { code: 'ru', label: 'Русский', flag: '🇷🇺', translation: ru },
   { code: 'zh', label: '中文', flag: '🇨🇳', translation: zh },
+  { code: 'hi', label: 'हिन्दी', flag: '🇮🇳', translation: hi },
+  { code: 'bn', label: 'বাংলা', flag: '🇧🇩', translation: bn },
+  { code: 'id', label: 'Bahasa Indonesia', flag: '🇮🇩', translation: id },
+  { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳', translation: vi },
+  { code: 'th', label: 'ไทย', flag: '🇹🇭', translation: th },
+  { code: 'pl', label: 'Polski', flag: '🇵🇱', translation: pl },
+  { code: 'uk', label: 'Українська', flag: '🇺🇦', translation: uk },
+  { code: 'nl', label: 'Nederlands', flag: '🇳🇱', translation: nl },
+  { code: 'sv', label: 'Svenska', flag: '🇸🇪', translation: sv },
+  { code: 'ro', label: 'Română', flag: '🇷🇴', translation: ro },
 ];
 
 export const LANGUAGE_CODES = LANGUAGES.map((l) => l.code);

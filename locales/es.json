@@ -171,6 +171,7 @@
     "baseFrequency": "Frecuencia base",
     "beatFrequency": "Frecuencia del pulso",
     "playbackError": "No se pudo iniciar el audio. Inténtalo de nuevo.",
+    "headphonesRequired": "Se necesitan auriculares: el altavoz del teléfono no reproduce estas frecuencias.",
     "volumeCapped": "Volumen limitado al {{percent}} %"
   },
   "settings": {

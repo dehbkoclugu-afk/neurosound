@@ -171,6 +171,7 @@
     "baseFrequency": "Grundfrequenz",
     "beatFrequency": "Beat-Frequenz",
     "playbackError": "Audio konnte nicht gestartet werden. Bitte versuche es erneut.",
+    "headphonesRequired": "Kopfhörer nötig — ein Handylautsprecher kann diese Frequenzen nicht wiedergeben.",
     "volumeCapped": "Lautstärke auf {{percent}} % begrenzt"
   },
   "settings": {
