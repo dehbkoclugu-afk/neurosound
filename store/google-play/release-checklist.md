@@ -20,8 +20,11 @@ kutuları işaretle.
       `lib/__tests__/release-content.test.ts` içinde, dil başına bir terimle.
 - [x] Paketlenen görsel ve seslerin kaynağı kayıtlı — `docs/ASSET_PROVENANCE.md`.
 
-Yerel doğrulama zinciri (`docs/RELEASE.md`) yeşil: `tsc`, `lint`, 201 test,
+Yerel doğrulama zinciri (`docs/RELEASE.md`) yeşil: `tsc`, `lint`, 218 test,
 üç `verify:*` script'i, `expo-doctor` 18/18.
+
+- [x] Merge sonrası release manifest'i yerelde üretildi ve izin listesi
+      doğrulandı (`gradlew :app:processReleaseManifest`). Sonuç aşağıda.
 
 ---
 
@@ -46,11 +49,50 @@ Play Console formları bu ikisini istiyor, elinde yokken forma başlama.
 ## Aşama 3 — İlk üretim derlemesi (submit yok)
 
 - [ ] EAS'ı `platform=android`, `profile=production`, `submit=false` ile çalıştır.
-- [ ] Çıkan AAB'de imzayı, `versionCode`'u, hedef SDK'yı, 16 KB sayfa boyutu
-      uyumluluğunu ve nihai izin listesini doğrula.
-- [ ] İzin listesinde `RECORD_AUDIO`, `READ/WRITE_EXTERNAL_STORAGE` ve
-      `SYSTEM_ALERT_WINDOW` **bulunmadığını** teyit et — `app.json` bunları
-      kaldırıyor, merge sonrası manifest'te gerçekten yok olmalı.
+- [ ] Çıkan AAB'de imzayı, `versionCode`'u, hedef SDK'yı ve 16 KB sayfa
+      boyutu uyumluluğunu doğrula.
+
+İzin listesi yerelde zaten doğrulandı — merge sonrası release manifest'te
+tam olarak şunlar var, başka hiçbir şey yok:
+
+```
+ACCESS_NETWORK_STATE
+FOREGROUND_SERVICE
+FOREGROUND_SERVICE_MEDIA_PLAYBACK
+INTERNET
+MODIFY_AUDIO_SETTINGS
+VIBRATE
+com.neurosound.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+```
+
+- [x] `RECORD_AUDIO`, `READ/WRITE_EXTERNAL_STORAGE` ve `SYSTEM_ALERT_WINDOW`
+      merge sonrası manifest'te **yok**. `app.json`'daki engelleme çalışıyor.
+- [x] `allowBackup="false"` merge sonrası manifest'te korunuyor.
+- [ ] AAB'nin izin listesinin bununla aynı olduğunu Play Console'da teyit et.
+      Yukarıdaki APK derlemesinden alındı; AAB farklı çıkmamalı ama bakması
+      bedava.
+
+### Karar gerektiren — INTERNET izni
+
+Manifest `INTERNET` ve `ACCESS_NETWORK_STATE` içeriyor; bunları React Native
+ve Expo varsayılan olarak ekliyor. Ama gizlilik metni 21 dilde "hiçbir ağ
+isteği yapmaz, tamamen çevrimdışı çalışır" diyor ve Data safety formunda da
+bunu beyan edeceksin.
+
+İzin sahibi olmak kullanmak demek değil, yani teknik bir çelişki yok. Yine de
+izin listesine bakan kullanıcı ile metnin arasında görünür bir uyuşmazlık var.
+`expo-updates` kapalı, analiz SDK'sı yok, fontlar ve sesler pakete gömülü —
+görünürde ağa çıkan bir şey yok.
+
+Seçenekler:
+
+1. Bırak. Beyanla teknik olarak çelişmiyor, en düşük riskli yol.
+2. `app.json` → `android.blockedPermissions` listesine `INTERNET` ve
+   `ACCESS_NETWORK_STATE` ekle. Gizlilik iddiasını izin listesiyle
+   kanıtlanabilir hâle getirir. **Ama önce cihazda dene** — release
+   derlemesinde ağ kullanan bir şey kalmışsa sessizce bozulur, ve bunu
+   emülatörsüz doğrulayamadım. Aşama 4'te denenecek bir değişiklik, körlemesine
+   yapılacak değil.
 
 ## Aşama 4 — Internal testing ve fiziksel cihaz kabulü
 
@@ -98,7 +140,8 @@ Oturum ve arayüz:
 
 ### Bilinen sorun — kilit ekranı kontrolleri Android 13+
 
-`POST_NOTIFICATIONS` izni ne projede ne de bağımlılıklarında tanımlı.
+`POST_NOTIFICATIONS` izni merge sonrası release manifest'te **yok** —
+tahmin değil, yukarıdaki izin listesinden okundu.
 Android 13 ve üstünde medya foreground service'i çalışmaya devam eder ama
 bildirimi — ki kilit ekranı kontrolü **odur** — kullanıcı bu izni çalışma
 anında vermeden gösterilmez. Yani kilit ekranı kontrolleri modern Android'de
@@ -152,9 +195,38 @@ gerekiyor.
 - [ ] Target audience — sağlık iddiası olmadığından çocuk kategorisi seçme.
 - [ ] Health apps beyanı — uygulama tıbbi fayda iddia etmiyor, solfeggio
       açıklamaları bunu zaten yazıyor.
-- [ ] Foreground service beyanı — `mediaPlayback` türü, gerekçe: kullanıcının
-      başlattığı arka plan ses çalma. Aşama 4'teki kararla tutarlı olmalı.
+- [ ] Foreground service beyanı — Aşama 4'teki kararla tutarlı olmalı.
+      **Aşağıdaki mikrofon sorununu önce oku.**
 - [ ] Console'da her listeleme dilini etkinleştir (Aşama 5'te yazdıkların).
+
+### Dikkat — manifest iki foreground service türü tanımlıyor
+
+Merge sonrası manifest'te `expo-audio`'nun iki servisi de duruyor:
+
+```
+AudioControlsService    foregroundServiceType="mediaPlayback"
+AudioRecordingService   foregroundServiceType="microphone"
+```
+
+İkincisi kütüphaneden geliyor ve bu uygulamada asla başlatılamaz — `RECORD_AUDIO`
+izni kaldırıldığı için başlatılsa bile çalışmaz. Ama manifest'te durduğu sürece
+Play, foreground service beyanında **mikrofon türü için de gerekçe isteyecek**.
+Mikrofon kullanmayan, izni bilerek engelleyen bir uygulama için bu doldurulamaz
+bir form — ve inceleme aşamasında takılma ihtimali yüksek.
+
+`expo-audio`'nun kendi eklentisi bunu çözmüyor: `recordAudioAndroid: false`
+yalnız izni kaldırıyor, servis bildirimine hiç dokunmuyor
+(`node_modules/expo-audio/plugin/build/withAudio.js`).
+
+İki yol var:
+
+1. Küçük bir config plugin yazıp servisi `tools:node="remove"` ile manifest'ten
+   çıkar. Doğrulaması ucuz: `gradlew :app:processReleaseManifest` çalıştır,
+   servisin gittiğini gör. Bu yapılırsa Console'da yalnız `mediaPlayback`
+   beyan edilir.
+2. Olduğu gibi bırak ve Console'da mikrofon türünü de beyan etmeyi dene.
+   Uygulama mikrofon kullanmadığı için ne yazacağın belirsiz — bu yüzden
+   önerilmez.
 
 ## Aşama 7 — Yayın
 
