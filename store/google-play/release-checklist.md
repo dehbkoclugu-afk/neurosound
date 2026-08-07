@@ -16,10 +16,11 @@ kutuları işaretle.
 - [x] Kayıt, mikrofon, eski depolama ve overlay izinleri engellendi.
 - [x] Gizlilik metinleri geliştiriciyi ve iletişimi tanımlıyor.
 - [x] Türkçe/İngilizce listeleme metni ve mağaza grafikleri hazır.
-- [x] Desteklenmeyen şifa iddiaları 11 dilin hepsinden çıkarıldı.
+- [x] Desteklenmeyen şifa iddiaları 21 dilin hepsinden çıkarıldı; kontrol
+      `lib/__tests__/release-content.test.ts` içinde, dil başına bir terimle.
 - [x] Paketlenen görsel ve seslerin kaynağı kayıtlı — `docs/ASSET_PROVENANCE.md`.
 
-Yerel doğrulama zinciri (`docs/RELEASE.md`) yeşil: `tsc`, `lint`, 161 test,
+Yerel doğrulama zinciri (`docs/RELEASE.md`) yeşil: `tsc`, `lint`, 201 test,
 üç `verify:*` script'i, `expo-doctor` 18/18.
 
 ---
@@ -70,6 +71,19 @@ Ses yolu — bu sürümde düzeltilen bug tam olarak burada görünür:
 - [ ] Uygulamayı arka plana al, kilitle, birkaç dakika sonra tekrar aç —
       ses kesilmemeli, hata görünmemeli.
 
+Diller — uygulama 21 dilde, hepsi cihazda hiç görülmedi:
+
+- [ ] Cihaz dilini **हिन्दी**, **বাংলা** ve **ไทย** yap ve uygulamayı aç.
+      Uygulama Nunito Sans kullanıyor; bu font Devanagari, Bengali ve Thai
+      gliflerini içermiyor. Beklenen davranış sistem fontuna düşmesi, yani
+      metin okunur ama tipografi diğer dillerden farklı görünür.
+      **Kutucuk (tofu) görürsen** o dile font eklemek gerekir — o hâlde ya
+      `@expo-google-fonts` üzerinden Noto Sans Devanagari/Bengali/Thai ekle,
+      ya da o üç dili bu sürümden çıkar.
+- [ ] Ayarlar → Dil listesinde 21 satırın hepsi kayıyor ve seçilebiliyor.
+- [ ] Uzun çevirilerin taşmadığını gör: Almanca ve Felemenkçe en uzun
+      metinleri üretiyor, mikser kanal adlarına ve onboarding başlıklarına bak.
+
 Oturum ve arayüz:
 
 - [ ] Geri dönen kullanıcının soğuk açılışı onboarding'e yönlendirmiyor.
@@ -100,10 +114,33 @@ Karar senin, üç seçenek var:
 3. Yalnız izni tanımla, istemeden bırak. **Bunu yapma** — bildirim yine
    görünmez, karşılığında Play'e açıkladığın izin listesi uzar.
 
-Seçtiğini `docs/RELEASE.md`'ye not et; Aşama 5'teki foreground service
+Seçtiğini `docs/RELEASE.md`'ye not et; Aşama 6'daki foreground service
 beyanı buna göre doldurulur.
 
-## Aşama 5 — Play Console beyanları
+## Aşama 5 — Mağaza listelemeleri
+
+Uygulama 21 dilde, mağaza sayfası iki dilde. Play listelemesi çevrilmemiş bir
+dilde `en-US`'e düşer — kullanıcı uygulamayı kendi dilinde görmeden önce
+sayfayı yabancı dilde görür, kurulum oranı orada düşer.
+
+- [ ] `store/google-play/{locale}/listing.md` dosyalarını yaz. Mevcut iki
+      dosya (`tr-TR`, `en-US`) şablon; aynı `## Kısa açıklama` /
+      `## Tam açıklama` başlıklarını koru — `release-content.test.ts` uzunluk
+      sınırlarını o başlıklardan okuyor.
+- [ ] Play alan sınırları: kısa açıklama **80 karakter**, tam açıklama
+      **4000 karakter**. Test bunu yalnız `tr-TR` ve `en-US` için kontrol
+      ediyor; yeni dil eklersen o listeye de ekle, yoksa denetlenmez.
+- [ ] Öncelik sırası, kurulum hacmine göre: `hi-IN`, `id-ID`, `vi-VN`,
+      `pt-BR`, `es-ES`, `de-DE`, `ru-RU`. Kalanlar sonraki sürüme kalabilir —
+      hepsini beklemek yayını geciktirmeye değmez.
+- [ ] Metinlerde sağlık iddiası olmadığını doğrula. Play her dili ayrı
+      değerlendiriyor; bir dilde geçen "tedavi eder" ifadesi tüm listelemeyi
+      reddettirir.
+- [ ] Ekran görüntüleri: `store/google-play/assets/` içindekiler İngilizce.
+      Yerelleştirilmiş görüntü zorunlu değil, ama eklersen Aşama 3'teki
+      derlemeden al, tasarım değişmeden önce değil.
+
+## Aşama 6 — Play Console beyanları
 
 Aşama 4 bittikten sonra doldur; beyanların gözlemlenen davranışla uyuşması
 gerekiyor.
@@ -117,8 +154,9 @@ gerekiyor.
       açıklamaları bunu zaten yazıyor.
 - [ ] Foreground service beyanı — `mediaPlayback` türü, gerekçe: kullanıcının
       başlattığı arka plan ses çalma. Aşama 4'teki kararla tutarlı olmalı.
+- [ ] Console'da her listeleme dilini etkinleştir (Aşama 5'te yazdıkların).
 
-## Aşama 6 — Yayın
+## Aşama 7 — Yayın
 
 - [ ] Pre-launch report'u incele.
 - [ ] Android vitals'ta çökme ve ANR oranlarına bak.
