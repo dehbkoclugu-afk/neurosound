@@ -86,10 +86,10 @@ jobs:
             set -eu
             adb install app-release.apk
             adb logcat -c
-            adb shell am start -W -n com.neurosound.app/.MainActivity
+            adb shell am start -W -n com.dehbkoclugu.neurosound/.MainActivity
             sleep 30
             adb logcat -d > logcat.txt
-            adb shell pidof com.neurosound.app
+            adb shell pidof com.dehbkoclugu.neurosound
             ! grep -Eq "FATAL EXCEPTION|Fatal signal|tombstoned" logcat.txt
 
       - name: Logcat'i yükle

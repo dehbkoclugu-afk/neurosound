@@ -4,7 +4,7 @@
 
 **İletişim:** dehbkoclugu@gmail.com
 
-**Paket:** `com.neurosound.app`
+**Paket:** `com.dehbkoclugu.neurosound`
 
 Kaynak kontrolleri hazırdır ve mağaza paketi dokuz dilde yazılmıştır. Yayın sırası, her adımın ön koşuluyla birlikte `store/google-play/release-checklist.md` dosyasındadır — yedi aşama, sırayla yapılır.
 

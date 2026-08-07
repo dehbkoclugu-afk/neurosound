@@ -291,7 +291,7 @@ describe('lock screen artwork', () => {
   });
 
   it('uses the real path once the asset resolves', async () => {
-    mockAsset.localUri = 'file:///data/user/0/com.neurosound.app/files/icon.png';
+    mockAsset.localUri = 'file:///data/user/0/com.dehbkoclugu.neurosound/files/icon.png';
     playerController.loadPreset(preset('noise-ocean'));
     await playerController.play();
 

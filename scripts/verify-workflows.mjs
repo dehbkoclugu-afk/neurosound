@@ -9,7 +9,7 @@ const need = (source, text, message) => { if (!source.includes(text)) errors.pus
 // so the smoke step uses plain `set -eu`. Requiring pipefail here failed the
 // release gate for a workflow that was already correct.
 need(apk, 'set -eu', 'APK smoke must use strict shell');
-need(apk, 'adb shell pidof com.neurosound.app', 'APK smoke must check process');
+need(apk, 'adb shell pidof com.dehbkoclugu.neurosound', 'APK smoke must check process');
 need(apk, 'FATAL EXCEPTION', 'APK smoke must inspect Java crashes');
 need(apk, 'Fatal signal', 'APK smoke must inspect native crashes');
 need(eas, 'GOOGLE_PLAY_SERVICE_ACCOUNT_JSON', 'missing Play service-account secret');

@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.neurosound.app",
+      "bundleIdentifier": "com.dehbkoclugu.neurosound",
       "infoPlist": {
         "_localizationsNote": "Without CFBundleLocalizations iOS reports the app as English-only: the App Store listing shows no other languages and the system picks en for a device set to, say, Japanese even though ja.json exists. Keep in sync with locales/index.ts.",
         "CFBundleLocalizations": [
@@ -42,7 +42,7 @@
       }
     },
     "android": {
-      "package": "com.neurosound.app",
+      "package": "com.dehbkoclugu.neurosound",
       "allowBackup": false,
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO",
