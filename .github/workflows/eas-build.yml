@@ -35,7 +35,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # `eas build --wait` sits in EAS's queue before its own build even starts,
+    # and on the free tier that wait alone can pass an hour. At 60 the runner
+    # killed the step while the build was still queued — the build carried on
+    # at EAS, but the job reported "cancelled" and nothing said why.
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 
@@ -72,6 +76,16 @@ jobs:
             --profile ${{ inputs.profile }} \
             --non-interactive \
             --wait
+
+      # A cancelled or timed-out job leaves no trace of what EAS actually did,
+      # and the build usually finished there regardless. This prints the last
+      # few builds with their status and artifact URLs, so the outcome is
+      # recoverable from the log either way.
+      - name: EAS build durumu
+        if: always()
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli build:list --platform ${{ inputs.platform }} --limit 3 --non-interactive || true
 
       - name: Android mağazaya gönder
         if: ${{ inputs.submit && (inputs.platform == 'android' || inputs.platform == 'all') }}
