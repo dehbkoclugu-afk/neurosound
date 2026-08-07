@@ -16,8 +16,10 @@ Play a sound on its own or combine up to four sounds in the mixer. The sleep tim
 • Four-channel custom sound mixer
 • Sleep timer
 • Favourites and saved mixes
-• 11 app languages
+• 21 app languages
 • No account, ads, or analytics SDK
 • Fully offline operation
+
+Binaural sounds and low-frequency tones need headphones; a phone speaker cannot reproduce them.
 
 NeuroSound does not provide diagnosis, treatment, or medical outcome claims. Keep volume at a comfortable level.
