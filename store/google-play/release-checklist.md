@@ -221,9 +221,16 @@ sayfayı yabancı dilde görür, kurulum oranı orada düşer.
 - [ ] Metinlerde sağlık iddiası olmadığını doğrula. Play her dili ayrı
       değerlendiriyor; bir dilde geçen "tedavi eder" ifadesi tüm listelemeyi
       reddettirir.
-- [ ] Ekran görüntüleri: `store/google-play/assets/` içindekiler İngilizce.
-      Yerelleştirilmiş görüntü zorunlu değil, ama eklersen Aşama 3'teki
-      derlemeden al, tasarım değişmeden önce değil.
+- [x] **Ekran görüntüleri 21 dilin hepsinde var** — `assets/phone/{locale}/`
+      altında dörder tane (ana ekran, keşfet, oynatıcı, mikser). Release
+      APK'sından emülatörde çekildi, her biri kendi dilinde, durum çubuğu
+      demo moduyla temizlendi (sabit saat, tam batarya, bildirim yok).
+      JPEG q88; PNG olarak 95 MB tutuyorlardı, şimdi 16 MB.
+
+      Yeniden çekmek gerekirse dikkat: dil değişimini doğrulamadan ilerleyen
+      bir script, değişim sessizce başarısız olduğunda sonraki bütün dilleri
+      yanlış dilde çeker ve hiçbir şey itiraz etmez. Doğrulama açık seçicideki
+      satıra değil, sekme çubuğu etiketine bakmalı.
 
 ## Aşama 6 — Play Console beyanları
 
