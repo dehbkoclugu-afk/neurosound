@@ -212,32 +212,39 @@ edit açılır, her şey gönderilir, sonra atılır — kimlik doğrulama, dil 
 ve her yükleme denenmiş olur ama Play'de hiçbir şey değişmez.
 `dry_run=false` yayınlar.
 
-**Şu an 403 PERMISSION_DENIED veriyor.** Kimlik doğrulama çalışıyor (token
-alınıyor, API cevap veriyor); eksik olan yetki. Sırayla:
+### Sıra zorunluluğu — paket adı ilk yüklemede doğar
 
-- [ ] Play Console → Users and permissions → şu hesabı davet et ve
-      `com.neurosound.app` için **Edit store listing, pricing & distribution**
-      ver (release yetkisi gerekmiyor, script sürüme dokunmuyor):
-      `neurosound-play@dehbdestek-768da.iam.gserviceaccount.com`
+**Bu aşama, ilk sürümde Aşama 4'ten sonra gelir.** Sebebi izin değil, kimlik.
+
+Play'de paket adı uygulama oluşturulurken değil, **ilk AAB yüklendiğinde**
+sabitlenir. Console'da bir taslağın durması `com.neurosound.app` diye bir
+uygulama var demek değil; o kimlik henüz yok. API o paketi sorduğunda
+bulamıyor ve bunu **403 PERMISSION_DENIED** olarak döndürüyor — "yetkin yok"
+değil, "öyle bir uygulama yok" demek istiyor. İki durum aynı hata koduyla
+geliyor, ayırt etmesi bu yüzden zor.
+
+Gözlenen kanıt: servis hesabı geliştirici hesabında Etkin, uygulamaya izin
+verilmiş, buna rağmen `reviews` bile okuyamıyor. Yetki eksikliği bunu
+açıklamıyor; henüz o pakette bir uygulama olmaması açıklıyor.
+
+Yani sıra şöyle:
+
+1. Aşama 3'teki AAB'yi Console'dan Internal testing'e **elle** yükle. Paket
+   adı orada sabitlenir.
+2. Sonra `play-listings.yml`'i çalıştır. İkinci sürümden itibaren sıra
+   serbest.
+
+Yükleme sonrası hâlâ 403 gelirse, o zaman gerçekten yetkiye bak:
+
+- [ ] Users and permissions → `neurosound-play@dehbdestek-768da.iam.gserviceaccount.com`
+      → Uygulama izinleri → NeuroSound → **Edit store listing, pricing &
+      distribution**. (Hesap zaten geliştirici hesabında Etkin.)
 - [ ] `dehbdestek-768da` projesinde Google Play Android Developer API açık mı:
       https://console.cloud.google.com/apis/library/androidpublisher.googleapis.com?project=dehbdestek-768da
 
-### Sıra uyarısı — ilk binary API ile yüklenemez
-
-Google, bir uygulamanın **ilk** sürümünün API ile yayınlanmasına izin
-vermiyor; ilk AAB Console arayüzünden geçmek zorunda. Uygulama Console'da
-taslak olarak var, ama hiç binary yüklenmediyse `edits.insert` yetki
-verilmiş olsa bile 403 dönebilir.
-
-Yani yetkiyi verdikten sonra dry-run hâlâ 403 diyorsa sebep izin değildir.
-O durumda sıra şöyle olur:
-
-1. Aşama 3'teki AAB'yi Console'dan Internal testing'e **elle** yükle.
-2. Sonra bu workflow'u tekrar çalıştır — listeleme API'si o noktadan sonra
-   açılıyor.
-
-Yani Aşama 5, ilk yüklemede Aşama 4'ten **sonra** gelir; ikinci sürümden
-itibaren istediğin sırada çalışır.
+      Not: API kapalı olsaydı Play bambaşka bir mesaj dönerdi ("has not been
+      used in project ... or it is disabled" + aktivasyon linki). Gelen mesaj
+      o değil, yani API açık.
 
 ### Elle giriş (otomatik yol açılmazsa)
 
