@@ -8,6 +8,9 @@
  */
 
 const createdPlayers: any[] = [];
+/** Set by the lock-screen tests: makes the OS refuse foreground controls for
+ *  every player, including ones created after the switch is flipped. */
+const lockScreen = { refuse: false };
 
 jest.mock('expo-audio', () => ({
   setAudioModeAsync: jest.fn(async () => {}),
@@ -29,8 +32,12 @@ jest.mock('expo-audio', () => ({
       },
       seekTo: jest.fn(async () => {}),
       addListener: jest.fn(() => ({ remove: () => {} })),
-      setActiveForLockScreen: jest.fn(),
-      clearLockScreenControls: jest.fn(),
+      setActiveForLockScreen: jest.fn(() => {
+        if (lockScreen.refuse) throw new Error('ForegroundServiceStartNotAllowedException');
+      }),
+      clearLockScreenControls: jest.fn(() => {
+        if (lockScreen.refuse) throw new Error('service already gone');
+      }),
     };
     createdPlayers.push(player);
     return player;
@@ -237,6 +244,57 @@ describe('mixer', () => {
 
     expect(useAudioStore.getState().mixerChannels).toHaveLength(1);
     expect(useAudioStore.getState().isMixerPlaying).toBe(true);
+  });
+});
+
+/**
+ * Lock screen controls are decoration. expo-audio starts them with an
+ * uncaught `context.startForegroundService()` (AudioControlsService.kt), and
+ * Android 12+ rejects that call with ForegroundServiceStartNotAllowedException
+ * whenever the process is not in a state allowed to start one. The rejection
+ * used to surface as "could not start audio" over sound that was already
+ * playing — and on the mixer it went through startMixerChannels' catch, which
+ * tore down every channel that had just started.
+ */
+describe('when the OS refuses lock screen controls', () => {
+  beforeEach(() => {
+    lockScreen.refuse = true;
+  });
+  afterEach(() => {
+    lockScreen.refuse = false;
+  });
+
+  it('single playback still plays and reports no error', async () => {
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+    await settle();
+
+    expect(useAudioStore.getState().isPlaying).toBe(true);
+    expect(useAudioStore.getState().playbackError).toBe(false);
+    expect(live().some((p) => p.playing)).toBe(true);
+  });
+
+  it('the mixer keeps every channel it started', async () => {
+    await playerController.mixerAddChannel(preset('noise-rain'));
+    await playerController.mixerAddChannel(preset('noise-wind'));
+    await playerController.mixerStart();
+
+    expect(useAudioStore.getState().isMixerPlaying).toBe(true);
+    expect(useAudioStore.getState().playbackError).toBe(false);
+    expect(live().filter((p) => p.playing)).toHaveLength(2);
+  });
+
+  it('tearing the controls down again cannot break switching presets', async () => {
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+
+    playerController.loadPreset(preset('binaural-alpha'));
+    await playerController.play();
+    await settle();
+
+    expect(useAudioStore.getState().isPlaying).toBe(true);
+    expect(useAudioStore.getState().playbackError).toBe(false);
+    expect(live()).toHaveLength(1);
   });
 });
 
