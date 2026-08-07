@@ -5,7 +5,10 @@ const apk = read('.github/workflows/android-apk.yml');
 const eas = read('.github/workflows/eas-build.yml');
 const errors = [];
 const need = (source, text, message) => { if (!source.includes(text)) errors.push(message); };
-need(apk, 'set -euo pipefail', 'APK smoke must use strict shell');
+// `pipefail` is not POSIX and the emulator action runs the script under dash,
+// so the smoke step uses plain `set -eu`. Requiring pipefail here failed the
+// release gate for a workflow that was already correct.
+need(apk, 'set -eu', 'APK smoke must use strict shell');
 need(apk, 'adb shell pidof com.neurosound.app', 'APK smoke must check process');
 need(apk, 'FATAL EXCEPTION', 'APK smoke must inspect Java crashes');
 need(apk, 'Fatal signal', 'APK smoke must inspect native crashes');

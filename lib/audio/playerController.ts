@@ -573,7 +573,12 @@ export async function mixerAddChannel(preset: FrequencyPreset): Promise<boolean>
     const gen = createGenerator(preset);
     if (gen) {
       mixerGenerators.set(id, gen);
-      gen.setVolume(0.5 * useSettingsStore.getState().maxVolume);
+      // Same gain chain as every other channel — a channel added into a mix
+      // whose master is turned down used to arrive at full level and blast
+      // over the balance the user had just set.
+      gen.setVolume(
+        channelVolume({ volume: 0.5, muted: false }, useSettingsStore.getState().maxVolume)
+      );
       await gen.play();
     }
   }

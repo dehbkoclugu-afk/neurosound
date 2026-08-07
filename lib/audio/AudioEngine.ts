@@ -411,7 +411,16 @@ export class BinauralPlayer {
 
   private async playNative(): Promise<void> {
     try {
-      const dataUrl = createBinauralDataUrl(this.baseFrequency, this.beatFrequency, 10);
+      // 2 seconds, not 10. The buffer is built in JS and handed over as a
+      // base64 data URL, so ten seconds of 44.1 kHz stereo means a ~3.5 MB
+      // array, a ~3.5M-character binary string and a ~4.7 MB base64 string
+      // alive at once — on a mid-range phone that is a real allocation spike
+      // for a tone that repeats every cycle anyway.
+      //
+      // Seamless because both channels complete a whole number of cycles in
+      // the window: frequencies are clamped to 0.5 Hz steps, and 2 s of any
+      // multiple of 0.5 Hz is an integer cycle count. Asserted in the tests.
+      const dataUrl = createBinauralDataUrl(this.baseFrequency, this.beatFrequency, 2);
 
       const player = createAudioPlayer({ uri: dataUrl });
       player.loop = true;

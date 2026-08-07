@@ -171,6 +171,7 @@
     "baseFrequency": "기준 주파수",
     "beatFrequency": "비트 주파수",
     "playbackError": "소리를 재생할 수 없습니다. 다시 시도해 주세요.",
+    "headphonesRequired": "이어폰이 필요합니다. 휴대폰 스피커로는 이 주파수를 재생할 수 없습니다.",
     "volumeCapped": "음량이 {{percent}}%로 제한됨"
   },
   "settings": {

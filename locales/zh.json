@@ -171,6 +171,7 @@
     "baseFrequency": "基础频率",
     "beatFrequency": "节拍频率",
     "playbackError": "无法开始播放，请重试。",
+    "headphonesRequired": "需要耳机——手机扬声器无法播放这些频率。",
     "volumeCapped": "音量已限制为 {{percent}}%"
   },
   "settings": {

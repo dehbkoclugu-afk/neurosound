@@ -75,7 +75,8 @@
         }
       ],
       "expo-asset",
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,

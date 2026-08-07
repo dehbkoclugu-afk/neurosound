@@ -171,6 +171,7 @@
     "baseFrequency": "Taban Frekans",
     "beatFrequency": "Beat Frekansı",
     "playbackError": "Ses başlatılamadı. Tekrar deneyin.",
+    "headphonesRequired": "Kulaklık gerekli — telefon hoparlörü bu frekansları üretemez.",
     "volumeCapped": "Maksimum ses %{{percent}} ile sınırlı"
   },
   "settings": {

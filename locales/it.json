@@ -171,6 +171,7 @@
     "baseFrequency": "Frequenza base",
     "beatFrequency": "Frequenza del battito",
     "playbackError": "Impossibile avviare l'audio. Riprova.",
+    "headphonesRequired": "Servono le cuffie: l’altoparlante del telefono non riproduce queste frequenze.",
     "volumeCapped": "Volume limitato al {{percent}} %"
   },
   "settings": {
