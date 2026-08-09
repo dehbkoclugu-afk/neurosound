@@ -123,6 +123,46 @@ Seçenekler:
    emülatörsüz doğrulayamadım. Aşama 4'te denenecek bir değişiklik, körlemesine
    yapılacak değil.
 
+### Tuzak — paket adı değişince imzalama anahtarı da değişiyor
+
+Paket adı `com.dehbkoclugu.neurosound` olarak değiştirildikten sonra Play
+yüklemeyi reddetti:
+
+```
+App Bundle'ınızın şu parmak izine sahip sertifikayla imzalanması bekleniyor:
+  SHA1: 2F:F9:F9:90:83:97:07:25:2B:B7:7C:A2:C0:A6:56:47:AB:1A:8A:22
+Sizin yüklediğiniz App Bundle'ı imzalamak için kullanılan sertifika ise:
+  SHA1: 64:CC:6A:08:EE:80:D8:C2:66:BB:7C:40:B8:BB:98:22:2B:F6:74:64
+```
+
+İki AAB'nin imza bloğu açılıp karşılaştırıldı:
+
+| AAB | Paket | Sertifika SHA1 | Sertifika tarihi |
+|---|---|---|---|
+| eski | `com.neurosound.app` | `2F:F9:F9:90…` | 2026-02-09 |
+| yeni | `com.dehbkoclugu.neurosound` | `64:CC:6A:08…` | değişim günü |
+
+Yani **EAS, paket adı değişince yeni bir keystore üretti.** Play ise ilk
+yüklemede kaydettiği eski anahtarı bekliyordu. Kod tarafında hiçbir şey
+bozuk değil; iki taraf farklı anahtar biliyor.
+
+Çözüm, uygulama hiç yayınlanmadığı için basit: Console'da **yeni bir
+uygulama oluştur**. Kayıtlı yükleme anahtarı olmayan bir uygulamaya ilk
+yüklenen AAB'nin anahtarı yükleme anahtarı olarak kaydolur.
+
+Mevcut uygulama kaydı korunmak istenirse `eas credentials` ile eski keystore
+seçilip yeniden derlenmesi gerekir — komut etkileşimli olduğu için
+otomatikleştirilemiyor.
+
+**Bundan sonra paket adı değiştirilmemeli.** Her değişiklik anahtarı da
+değiştiriyor ve yayınlanmış bir uygulamada bunun tek çaresi Play'den yükleme
+anahtarı sıfırlaması istemek, ki günler sürebiliyor.
+
+Bir AAB'nin hangi sertifikayla imzalandığını görmek için imza bloğu
+okunabilir: `META-INF/*.RSA` çıkarılıp PKCS#7 olarak çözülür, sertifikanın
+SHA1'i alınır. Play'in beklediğiyle karşılaştırmak saniyeler sürüyor ve
+tahmin etmeye gerek bırakmıyor.
+
 ## Aşama 4 — Internal testing ve fiziksel cihaz kabulü
 
 AAB'yi Internal testing'e yükle ve uygulamayı **Google Play üzerinden** kur.
