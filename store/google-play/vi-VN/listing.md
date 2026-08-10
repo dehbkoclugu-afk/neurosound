@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Âm Thanh Vũ Trụ
 
 ## Short description
 Bàn trộn âm ngoại tuyến, hẹn giờ ngủ và âm thanh tập trung.

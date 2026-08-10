@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Голос Вселенной
 
 ## Short description
 Офлайн-микшер звуков, таймер сна и звуки для концентрации.

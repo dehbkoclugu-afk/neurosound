@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: เสียงแห่งจักรวาล
 
 ## Short description
 มิกเซอร์เสียงออฟไลน์ ตั้งเวลานอน และเสียงช่วยจดจ่อ

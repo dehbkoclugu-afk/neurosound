@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: মহাবিশ্বের সুর
 
 ## Short description
 অফলাইন সাউন্ড মিক্সার, ঘুমের টাইমার আর মনোযোগের শব্দ।

@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Stimme des Alls
 
 ## Short description
 Offline-Klangmixer, Einschlaftimer und Klänge zum Fokus.

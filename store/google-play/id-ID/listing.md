@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Suara Semesta
 
 ## Short description
 Mixer suara luring, timer tidur, dan suara untuk fokus.

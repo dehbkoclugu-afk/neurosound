@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Voce del Cosmo
 
 ## Short description
 Mixer di suoni offline, timer per dormire e concentrazione.

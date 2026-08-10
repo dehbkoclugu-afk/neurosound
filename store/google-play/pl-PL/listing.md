@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Głos Wszechświata
 
 ## Short description
 Offline'owy mikser dźwięków, minutnik snu i dźwięki skupienia.

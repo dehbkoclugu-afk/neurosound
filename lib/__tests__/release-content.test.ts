@@ -21,6 +21,16 @@ describe('Google Play release content', () => {
     expect(listingLocales).toContain('en-US');
   });
 
+  /** Play caps the app name at 30 characters and rejects an overrun at upload,
+   *  after every image in the edit has already gone up. The name is localized
+   *  per store, so the cap has to hold in twenty-one languages. */
+  it.each(listingLocales)('%s app name fits Play\'s 30-character cap', (locale) => {
+    const listing = read(`store/google-play/${locale}/listing.md`);
+    const title = listing.match(/## (?:Uygulama adı|App name)\r?\n([^\r\n]+)/)?.[1]?.trim() ?? '';
+    expect(title.length).toBeGreaterThan(0);
+    expect(title.length).toBeLessThanOrEqual(30);
+  });
+
   it.each(listingLocales)('%s listing stays inside Play field limits', (locale) => {
     const listing = read(`store/google-play/${locale}/listing.md`);
     // `\r?\n`, not `\n`: on a Windows checkout git hands these files back with

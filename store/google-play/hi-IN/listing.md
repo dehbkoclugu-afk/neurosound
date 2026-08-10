@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: ब्रह्मांड ध्वनि
 
 ## Short description
 ऑफ़लाइन साउंड मिक्सर, स्लीप टाइमर और एकाग्रता की ध्वनियाँ।

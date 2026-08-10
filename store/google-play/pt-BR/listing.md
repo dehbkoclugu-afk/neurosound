@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Voz do Universo
 
 ## Short description
 Mixer de sons offline, timer de sono e sons para foco.
