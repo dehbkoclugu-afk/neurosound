@@ -19,6 +19,7 @@
  */
 
 import { createSign } from 'node:crypto';
+import { request as httpsRequest } from 'node:https';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -131,19 +132,55 @@ function screenshotsFor(locale) {
 /**
  * Upload one image.
  *
- * No `?uploadType=media`, which is the whole trick. Google's media-upload
- * convention says to add it, and with it this endpoint answers 404 "Could not
- * find handler for this request" — indistinguishable from a wrong path, which
- * is what it looked like for several rounds. Without it the same URL routes
- * fine and takes the raw bytes as the body.
+ * Two things this endpoint insists on, and getting either wrong returns 404
+ * "Could not find handler for this request" — which reads as a wrong path and
+ * sent several rounds looking for the wrong host.
+ *
+ * No `?uploadType=media`, despite Google's general media-upload convention
+ * saying to add it.
+ *
+ * And an explicit Content-Length. Through fetch, a real image body goes out
+ * chunked and draws that same 404, while an empty body — which fetch sends
+ * with a length — reaches the handler and is properly rejected as "No file
+ * found in request". That contradiction is what gave it away: the path was
+ * never wrong, only the framing. node:https is here purely to set the length.
  */
-async function uploadImage(token, editId, locale, type, path) {
-  return call(token, 'POST',
-    `${UPLOAD}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`,
-    {
-      body: readFileSync(path),
-      contentType: path.endsWith('.png') ? 'image/png' : 'image/jpeg',
-    });
+function uploadImage(token, editId, locale, type, path) {
+  const body = readFileSync(path);
+  const url = new URL(
+    `${UPLOAD}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`
+  );
+  return new Promise((resolve, reject) => {
+    const req = httpsRequest(
+      {
+        method: 'POST',
+        hostname: url.hostname,
+        path: url.pathname,
+        headers: {
+          authorization: `Bearer ${token}`,
+          'content-type': path.endsWith('.png') ? 'image/png' : 'image/jpeg',
+          'content-length': body.length,
+        },
+      },
+      (res) => {
+        let text = '';
+        res.on('data', (c) => (text += c));
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(text ? JSON.parse(text) : {});
+            return;
+          }
+          const err = new Error(
+            `POST images/${locale}/${type} → ${res.statusCode}: ${text.slice(0, 200).replace(/\s+/g, ' ')}`
+          );
+          err.status = res.statusCode;
+          reject(err);
+        });
+      }
+    );
+    req.on('error', reject);
+    req.end(body);
+  });
 }
 
 async function clearImages(token, editId, locale, type) {
