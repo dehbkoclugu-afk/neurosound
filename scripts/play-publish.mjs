@@ -306,15 +306,21 @@ A grant can take a few minutes to take effect.`);
 
     // The feature graphic is per-locale but Play falls back to the default
     // listing, so one upload covers every language.
-    const feature = join(STORE, 'assets/feature-graphic.png');
-    if (existsSync(feature) && locales.includes('en-US')) {
+    // The store icon is not taken from the bundle — Play wants its own 512x512
+    // upload, and without it the listing shows no icon at all.
+    for (const [type, file] of [
+      ['featureGraphic', 'assets/feature-graphic.png'],
+      ['icon', 'assets/icon-512.png'],
+    ]) {
+      const path = join(STORE, file);
+      if (!existsSync(path) || !locales.includes('en-US')) continue;
       try {
-        await clearImages(token, edit.id, 'en-US', 'featureGraphic');
-        await uploadImage(key, edit.id, 'en-US', 'featureGraphic', feature);
-        console.log(`  en-US  feature graphic ok (${(statSync(feature).size / 1024).toFixed(0)}KB)`);
+        await clearImages(token, edit.id, 'en-US', type);
+        await uploadImage(key, edit.id, 'en-US', type, path);
+        console.log(`  en-US  ${type} ok (${(statSync(path).size / 1024).toFixed(0)}KB)`);
       } catch (e) {
-        imageFailures.push(`featureGraphic: ${e.message.split('\n')[0]}`);
-        console.error('  en-US  feature graphic SKIPPED');
+        imageFailures.push(`${type}: ${e.message.split('\n')[0]}`);
+        console.error(`  en-US  ${type} SKIPPED`);
       }
     }
 

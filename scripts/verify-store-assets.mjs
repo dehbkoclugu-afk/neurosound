@@ -59,6 +59,16 @@ try {
   errors.push(e.message);
 }
 
+const icon = join(ROOT, "store/google-play/assets/icon-512.png");
+try {
+  const { width, height } = dimensions(icon);
+  if (width !== 512 || height !== 512) {
+    errors.push(`icon-512.png is ${width}x${height}, Play requires exactly 512x512`);
+  }
+} catch (e) {
+  errors.push(e.message);
+}
+
 if (!existsSync(PHONE)) {
   errors.push('store/google-play/assets/phone is missing');
 } else {
