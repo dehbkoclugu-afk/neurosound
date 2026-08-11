@@ -35,6 +35,14 @@ const UPLOAD = 'https://androidpublisher.googleapis.com/upload/androidpublisher/
 // every upload has already run, so they are checked up front instead.
 const LIMITS = { title: 30, shortDescription: 80, fullDescription: 4000 };
 
+// Shown on the store page and used by Play to reach the developer. The site
+// has to resolve — the Pages root 404'd until docs/index.html existed, and a
+// dead support link is the kind of thing review notices.
+const CONTACT = {
+  email: 'dehbkoclugu@gmail.com',
+  website: 'https://dehbkoclugu-afk.github.io/neurosound/',
+};
+
 function serviceAccount() {
   const raw = process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON;
   if (!raw) throw new Error('GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is not set');
@@ -242,6 +250,19 @@ A grant can take a few minutes to take effect.`);
     throw e;
   }
   console.log(`edit ${edit.id} opened\n`);
+
+  // App-level contact details, so the Console stops being the place these
+  // live. defaultLanguage is deliberately not sent: it changes which listing
+  // every untranslated market falls back to, and that is a decision, not a
+  // detail to be synced.
+  try {
+    await call(token, 'PUT', `${API}/applications/${PACKAGE}/edits/${edit.id}/details`, {
+      json: { contactEmail: CONTACT.email, contactWebsite: CONTACT.website },
+    });
+    console.log(`  details ok (${CONTACT.email})`);
+  } catch (e) {
+    console.error(`  details FAILED: ${e.message.split('\n')[0]}`);
+  }
 
   const failures = [];
   const imageFailures = [];

@@ -1,0 +1,56 @@
+# Move a build between Play tracks and turn a staged rollout up.
+#
+# Defaults to a dry run that prints the current tracks and the intended change,
+# then discards the edit. Set dry_run to false to apply it.
+#
+# The first release still has to go through the Console — Play does not accept
+# an app's first binary over the API. From the second on, this is the whole
+# rollout: internal, then production at 1, 10, 50, 100.
+name: Play release
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Track'
+        required: true
+        default: 'internal'
+        type: choice
+        options: [internal, alpha, beta, production]
+      rollout:
+        description: 'Percentage of users (100 = full release)'
+        required: true
+        default: '100'
+        type: string
+      version_code:
+        description: 'Version code (blank = highest Play knows)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Print the change and discard the edit'
+        required: true
+        default: true
+        type: boolean
+
+concurrency:
+  group: play-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set track
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          TRACK: ${{ inputs.track }}
+          ROLLOUT: ${{ inputs.rollout }}
+          VERSION_CODE: ${{ inputs.version_code }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+        run: node scripts/play-release.mjs
