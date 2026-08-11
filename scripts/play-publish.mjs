@@ -233,6 +233,7 @@ A grant can take a few minutes to take effect.`);
   console.log(`edit ${edit.id} opened\n`);
 
   const failures = [];
+  const imageFailures = [];
   try {
     for (const locale of locales) {
       try {
@@ -248,21 +249,44 @@ A grant can take a few minutes to take effect.`);
 
       const shots = screenshotsFor(locale);
       if (!shots.length) continue;
-      // Replace rather than append: re-running must not stack duplicates.
-      await clearImages(token, edit.id, locale, 'phoneScreenshots');
-      for (const path of shots) {
-        await uploadImage(token, edit.id, locale, 'phoneScreenshots', path);
+      // Images are worth having but not worth losing the text over: the
+      // listings are the part that cannot be pasted into the Console in any
+      // reasonable time, and an image endpoint that will not answer should not
+      // take twenty-one translations down with it.
+      try {
+        // Replace rather than append: re-running must not stack duplicates.
+        await clearImages(token, edit.id, locale, 'phoneScreenshots');
+        for (const path of shots) {
+          await uploadImage(token, edit.id, locale, 'phoneScreenshots', path);
+        }
+        console.log(`  ${locale.padEnd(6)} ${shots.length} screenshots ok`);
+      } catch (e) {
+        imageFailures.push(`${locale}: ${e.message.split('\n')[0]}`);
+        console.error(`  ${locale.padEnd(6)} screenshots SKIPPED`);
       }
-      console.log(`  ${locale.padEnd(6)} ${shots.length} screenshots ok`);
     }
 
     // The feature graphic is per-locale but Play falls back to the default
     // listing, so one upload covers every language.
     const feature = join(STORE, 'assets/feature-graphic.png');
     if (existsSync(feature) && locales.includes('en-US')) {
-      await clearImages(token, edit.id, 'en-US', 'featureGraphic');
-      await uploadImage(token, edit.id, 'en-US', 'featureGraphic', feature);
-      console.log(`  en-US  feature graphic ok (${(statSync(feature).size / 1024).toFixed(0)}KB)`);
+      try {
+        await clearImages(token, edit.id, 'en-US', 'featureGraphic');
+        await uploadImage(token, edit.id, 'en-US', 'featureGraphic', feature);
+        console.log(`  en-US  feature graphic ok (${(statSync(feature).size / 1024).toFixed(0)}KB)`);
+      } catch (e) {
+        imageFailures.push(`featureGraphic: ${e.message.split('\n')[0]}`);
+        console.error('  en-US  feature graphic SKIPPED');
+      }
+    }
+
+    if (imageFailures.length) {
+      console.error(`
+${imageFailures.length} image upload(s) skipped:`);
+      for (const f of imageFailures) console.error(`  - ${f}`);
+      console.error(`Listings still go up. Screenshots and the feature graphic
+have to be added in the Console for now; they live in
+store/google-play/assets/.`);
     }
 
     if (failures.length) throw new Error(`${failures.length} listing(s) failed`);
