@@ -19,7 +19,8 @@
  */
 
 import { createSign } from 'node:crypto';
-import { request as httpsRequest } from 'node:https';
+import { createReadStream } from 'node:fs';
+import { google } from 'googleapis';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -122,77 +123,41 @@ function screenshotsFor(locale) {
  * treating that as a failure stopped the very first upload before it started.
  */
 /**
- * Upload one image.
+ * Image upload, through the official client.
  *
- * Google documents media uploads on the `/upload/` host, but that path answers
- * "Could not find handler for this request" here, so the plain API host is
- * tried as well. Whichever answers is remembered for the rest of the run —
- * eighty-four images should not each pay for the same discovery.
+ * Six hand-rolled attempts all returned 404 "Could not find handler for this
+ * request": both hosts, with and without `?uploadType=media`, over fetch and
+ * node:https, as simple media and as multipart/related. Only an empty body
+ * ever reached a handler, which made it look like a path problem it never was.
+ *
+ * googleapis is a devDependency used by this script alone — it never reaches
+ * the app — and it gets the upload framing right where six guesses did not.
+ * The listings still go over plain fetch; only the images needed this.
  */
-/**
- * Upload one image.
- *
- * Needs `?uploadType=media` *and* an explicit Content-Length together. Getting
- * either wrong returns 404 "Could not find handler for this request", which
- * reads as a wrong path and cost several rounds hunting the wrong host.
- *
- * The two were never tested apart until late: `uploadType` was first tried
- * through fetch, which streams a real image body chunked, so that attempt was
- * failing on the framing rather than the query. Dropping the query then made
- * an empty body reach the handler — it answered "No file found in request",
- * which looked like progress but was really the metadata route accepting a
- * request with no file in it.
- *
- * node:https is used purely so Content-Length can be set; fetch will not send
- * a length for a body this size.
- */
-function uploadImage(token, editId, locale, type, path) {
-  const image = readFileSync(path);
-  const mime = path.endsWith('.png') ? 'image/png' : 'image/jpeg';
-  const boundary = `nsx${Date.now().toString(36)}`;
-  // multipart/related: a metadata part Play ignores, then the bytes. Plain
-  // media upload never routed here regardless of query or framing.
-  const body = Buffer.concat([
-    Buffer.from(
-      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{}\r\n` +
-      `--${boundary}\r\nContent-Type: ${mime}\r\n\r\n`
-    ),
-    image,
-    Buffer.from(`\r\n--${boundary}--\r\n`),
-  ]);
-  const url = new URL(
-    `${UPLOAD}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`
-  );
-  return new Promise((resolve, reject) => {
-    const req = httpsRequest(
-      {
-        method: 'POST',
-        hostname: url.hostname,
-        path: `${url.pathname}?uploadType=multipart`,
-        headers: {
-          authorization: `Bearer ${token}`,
-          'content-type': `multipart/related; boundary=${boundary}`,
-          'content-length': body.length,
-        },
-      },
-      (res) => {
-        let text = '';
-        res.on('data', (c) => (text += c));
-        res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(text ? JSON.parse(text) : {});
-            return;
-          }
-          const err = new Error(
-            `POST images/${locale}/${type} → ${res.statusCode}: ${text.slice(0, 200).replace(/\s+/g, ' ')}`
-          );
-          err.status = res.statusCode;
-          reject(err);
-        });
-      }
-    );
-    req.on('error', reject);
-    req.end(body);
+let publisher = null;
+async function playClient(key) {
+  if (publisher) return publisher;
+  const auth = new google.auth.JWT({
+    email: key.client_email,
+    key: key.private_key,
+    scopes: ['https://www.googleapis.com/auth/androidpublisher'],
+  });
+  await auth.authorize();
+  publisher = google.androidpublisher({ version: 'v3', auth });
+  return publisher;
+}
+
+async function uploadImage(key, editId, locale, type, path) {
+  const client = await playClient(key);
+  await client.edits.images.upload({
+    packageName: PACKAGE,
+    editId,
+    language: locale,
+    imageType: type,
+    media: {
+      mimeType: path.endsWith('.png') ? 'image/png' : 'image/jpeg',
+      body: createReadStream(path),
+    },
   });
 }
 
@@ -303,7 +268,7 @@ A grant can take a few minutes to take effect.`);
         // Replace rather than append: re-running must not stack duplicates.
         await clearImages(token, edit.id, locale, 'phoneScreenshots');
         for (const path of shots) {
-          await uploadImage(token, edit.id, locale, 'phoneScreenshots', path);
+          await uploadImage(key, edit.id, locale, 'phoneScreenshots', path);
         }
         console.log(`  ${locale.padEnd(6)} ${shots.length} screenshots ok`);
       } catch (e) {
@@ -318,7 +283,7 @@ A grant can take a few minutes to take effect.`);
     if (existsSync(feature) && locales.includes('en-US')) {
       try {
         await clearImages(token, edit.id, 'en-US', 'featureGraphic');
-        await uploadImage(token, edit.id, 'en-US', 'featureGraphic', feature);
+        await uploadImage(key, edit.id, 'en-US', 'featureGraphic', feature);
         console.log(`  en-US  feature graphic ok (${(statSync(feature).size / 1024).toFixed(0)}KB)`);
       } catch (e) {
         imageFailures.push(`featureGraphic: ${e.message.split('\n')[0]}`);
