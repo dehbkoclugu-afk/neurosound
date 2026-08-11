@@ -132,18 +132,19 @@ function screenshotsFor(locale) {
 /**
  * Upload one image.
  *
- * Two things this endpoint insists on, and getting either wrong returns 404
- * "Could not find handler for this request" — which reads as a wrong path and
- * sent several rounds looking for the wrong host.
+ * Needs `?uploadType=media` *and* an explicit Content-Length together. Getting
+ * either wrong returns 404 "Could not find handler for this request", which
+ * reads as a wrong path and cost several rounds hunting the wrong host.
  *
- * No `?uploadType=media`, despite Google's general media-upload convention
- * saying to add it.
+ * The two were never tested apart until late: `uploadType` was first tried
+ * through fetch, which streams a real image body chunked, so that attempt was
+ * failing on the framing rather than the query. Dropping the query then made
+ * an empty body reach the handler — it answered "No file found in request",
+ * which looked like progress but was really the metadata route accepting a
+ * request with no file in it.
  *
- * And an explicit Content-Length. Through fetch, a real image body goes out
- * chunked and draws that same 404, while an empty body — which fetch sends
- * with a length — reaches the handler and is properly rejected as "No file
- * found in request". That contradiction is what gave it away: the path was
- * never wrong, only the framing. node:https is here purely to set the length.
+ * node:https is used purely so Content-Length can be set; fetch will not send
+ * a length for a body this size.
  */
 function uploadImage(token, editId, locale, type, path) {
   const body = readFileSync(path);
@@ -155,7 +156,7 @@ function uploadImage(token, editId, locale, type, path) {
       {
         method: 'POST',
         hostname: url.hostname,
-        path: url.pathname,
+        path: `${url.pathname}?uploadType=media`,
         headers: {
           authorization: `Bearer ${token}`,
           'content-type': path.endsWith('.png') ? 'image/png' : 'image/jpeg',
