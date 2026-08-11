@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Stem van Heelal
 
 ## Short description
 Offline geluidsmixer, slaaptimer en geluiden om te focussen.

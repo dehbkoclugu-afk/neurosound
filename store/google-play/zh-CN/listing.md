@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: 宇宙之声
 
 ## Short description
 离线声音混音器、睡眠定时器和助你专注的声音。

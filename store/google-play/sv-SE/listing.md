@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Universums Röst
 
 ## Short description
 Offline ljudmixer, insomningstimer och ljud för fokus.

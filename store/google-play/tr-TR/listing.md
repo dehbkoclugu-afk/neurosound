@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## Uygulama adı
-NeuroSound
+Neurosound: Evrenin Sesi
 
 ## Kısa açıklama
 Çevrimdışı ses mikseri, uyku zamanlayıcısı ve odak sesleri.

@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Voix de l'Univers
 
 ## Short description
 Mixeur de sons hors ligne, minuteur de sommeil et focus.

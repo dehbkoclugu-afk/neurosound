@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Vocea Universului
 
 ## Short description
 Mixer de sunete offline, cronometru de somn și concentrare.

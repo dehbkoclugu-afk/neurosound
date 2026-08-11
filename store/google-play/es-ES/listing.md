@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: Voz del Universo
 
 ## Short description
 Mezclador de sonidos sin conexión, temporizador y foco.

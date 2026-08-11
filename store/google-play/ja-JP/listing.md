@@ -1,7 +1,7 @@
 # NeuroSound
 
 ## App name
-NeuroSound
+Neurosound: 宇宙の音
 
 ## Short description
 オフラインの音ミキサー、スリープタイマー、集中のための音。
