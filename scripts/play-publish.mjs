@@ -120,6 +120,36 @@ function screenshotsFor(locale) {
  * that on the third. But a listing that has never had images answers 404, and
  * treating that as a failure stopped the very first upload before it started.
  */
+/**
+ * Upload one image.
+ *
+ * Google documents media uploads on the `/upload/` host, but that path answers
+ * "Could not find handler for this request" here, so the plain API host is
+ * tried as well. Whichever answers is remembered for the rest of the run —
+ * eighty-four images should not each pay for the same discovery.
+ */
+let uploadBase = null;
+async function uploadImage(token, editId, locale, type, path) {
+  const body = readFileSync(path);
+  const contentType = path.endsWith('.png') ? 'image/png' : 'image/jpeg';
+  const suffix = `/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}?uploadType=media`;
+  const bases = uploadBase ? [uploadBase] : [UPLOAD, API];
+
+  let lastError;
+  for (const base of bases) {
+    try {
+      const result = await call(token, 'POST', `${base}${suffix}`, { body, contentType });
+      if (!uploadBase) console.log(`  (image uploads go to ${base})`);
+      uploadBase = base;
+      return result;
+    } catch (e) {
+      lastError = e;
+      if (e.status !== 404) throw e;
+    }
+  }
+  throw lastError;
+}
+
 async function clearImages(token, editId, locale, type) {
   try {
     await call(token, 'DELETE',
@@ -221,9 +251,7 @@ A grant can take a few minutes to take effect.`);
       // Replace rather than append: re-running must not stack duplicates.
       await clearImages(token, edit.id, locale, 'phoneScreenshots');
       for (const path of shots) {
-        await call(token, 'POST',
-          `${UPLOAD}/applications/${PACKAGE}/edits/${edit.id}/images/${locale}/phoneScreenshots?uploadType=media`,
-          { body: readFileSync(path), contentType: path.endsWith('.png') ? 'image/png' : 'image/jpeg' });
+        await uploadImage(token, edit.id, locale, 'phoneScreenshots', path);
       }
       console.log(`  ${locale.padEnd(6)} ${shots.length} screenshots ok`);
     }
@@ -233,9 +261,7 @@ A grant can take a few minutes to take effect.`);
     const feature = join(STORE, 'assets/feature-graphic.png');
     if (existsSync(feature) && locales.includes('en-US')) {
       await clearImages(token, edit.id, 'en-US', 'featureGraphic');
-      await call(token, 'POST',
-        `${UPLOAD}/applications/${PACKAGE}/edits/${edit.id}/images/en-US/featureGraphic?uploadType=media`,
-        { body: readFileSync(feature), contentType: 'image/png' });
+      await uploadImage(token, edit.id, 'en-US', 'featureGraphic', feature);
       console.log(`  en-US  feature graphic ok (${(statSync(feature).size / 1024).toFixed(0)}KB)`);
     }
 
