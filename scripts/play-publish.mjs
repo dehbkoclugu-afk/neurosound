@@ -147,7 +147,19 @@ function screenshotsFor(locale) {
  * a length for a body this size.
  */
 function uploadImage(token, editId, locale, type, path) {
-  const body = readFileSync(path);
+  const image = readFileSync(path);
+  const mime = path.endsWith('.png') ? 'image/png' : 'image/jpeg';
+  const boundary = `nsx${Date.now().toString(36)}`;
+  // multipart/related: a metadata part Play ignores, then the bytes. Plain
+  // media upload never routed here regardless of query or framing.
+  const body = Buffer.concat([
+    Buffer.from(
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{}\r\n` +
+      `--${boundary}\r\nContent-Type: ${mime}\r\n\r\n`
+    ),
+    image,
+    Buffer.from(`\r\n--${boundary}--\r\n`),
+  ]);
   const url = new URL(
     `${UPLOAD}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`
   );
@@ -156,10 +168,10 @@ function uploadImage(token, editId, locale, type, path) {
       {
         method: 'POST',
         hostname: url.hostname,
-        path: `${url.pathname}?uploadType=media`,
+        path: `${url.pathname}?uploadType=multipart`,
         headers: {
           authorization: `Bearer ${token}`,
-          'content-type': path.endsWith('.png') ? 'image/png' : 'image/jpeg',
+          'content-type': `multipart/related; boundary=${boundary}`,
           'content-length': body.length,
         },
       },
