@@ -111,6 +111,24 @@ function screenshotsFor(locale) {
     .map((f) => join(dir, f));
 }
 
+/**
+ * Clear an image set before re-uploading it, tolerating the 404 Play returns
+ * when the set does not exist yet.
+ *
+ * The delete exists so a second run replaces the screenshots instead of
+ * appending to them — Play caps a locale at eight, and four per run would hit
+ * that on the third. But a listing that has never had images answers 404, and
+ * treating that as a failure stopped the very first upload before it started.
+ */
+async function clearImages(token, editId, locale, type) {
+  try {
+    await call(token, 'DELETE',
+      `${API}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`);
+  } catch (e) {
+    if (e.status !== 404) throw e;
+  }
+}
+
 async function main() {
   const locales = collectLocales();
   console.log(`package ${PACKAGE}`);
@@ -201,8 +219,7 @@ A grant can take a few minutes to take effect.`);
       const shots = screenshotsFor(locale);
       if (!shots.length) continue;
       // Replace rather than append: re-running must not stack duplicates.
-      await call(token, 'DELETE',
-        `${API}/applications/${PACKAGE}/edits/${edit.id}/images/${locale}/phoneScreenshots`);
+      await clearImages(token, edit.id, locale, 'phoneScreenshots');
       for (const path of shots) {
         await call(token, 'POST',
           `${UPLOAD}/applications/${PACKAGE}/edits/${edit.id}/images/${locale}/phoneScreenshots?uploadType=media`,
@@ -215,8 +232,7 @@ A grant can take a few minutes to take effect.`);
     // listing, so one upload covers every language.
     const feature = join(STORE, 'assets/feature-graphic.png');
     if (existsSync(feature) && locales.includes('en-US')) {
-      await call(token, 'DELETE',
-        `${API}/applications/${PACKAGE}/edits/${edit.id}/images/en-US/featureGraphic`);
+      await clearImages(token, edit.id, 'en-US', 'featureGraphic');
       await call(token, 'POST',
         `${UPLOAD}/applications/${PACKAGE}/edits/${edit.id}/images/en-US/featureGraphic?uploadType=media`,
         { body: readFileSync(feature), contentType: 'image/png' });
