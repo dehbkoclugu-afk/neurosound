@@ -129,51 +129,21 @@ function screenshotsFor(locale) {
  * eighty-four images should not each pay for the same discovery.
  */
 /**
- * One-time probe: does the images path exist at all?
+ * Upload one image.
  *
- * Both upload hosts answer 404 for POST, which reads the same whether the path
- * is wrong or only the upload is. A GET on the same path settles it — if the
- * list works, the shape is right and the problem is upload-specific.
+ * No `?uploadType=media`, which is the whole trick. Google's media-upload
+ * convention says to add it, and with it this endpoint answers 404 "Could not
+ * find handler for this request" — indistinguishable from a wrong path, which
+ * is what it looked like for several rounds. Without it the same URL routes
+ * fine and takes the raw bytes as the body.
  */
-let probed = false;
-async function probeImages(token, editId, locale, type) {
-  if (probed) return;
-  probed = true;
-  for (const [label, url] of [
-    ['GET list (api host)', `${API}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`],
-    ['POST (upload host, no query)', `${UPLOAD}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`],
-  ]) {
-    try {
-      const r = await call(token, label.startsWith('GET') ? 'GET' : 'POST', url,
-        label.startsWith('GET') ? {} : { body: Buffer.alloc(0), contentType: 'image/jpeg' });
-      console.log(`  probe ${label}: ok ${JSON.stringify(r).slice(0, 120)}`);
-    } catch (e) {
-      console.log(`  probe ${label}: ${e.status} ${e.message.slice(-120).replace(/\s+/g, ' ')}`);
-    }
-  }
-}
-
-let uploadBase = null;
 async function uploadImage(token, editId, locale, type, path) {
-  await probeImages(token, editId, locale, type);
-  const body = readFileSync(path);
-  const contentType = path.endsWith('.png') ? 'image/png' : 'image/jpeg';
-  const suffix = `/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}?uploadType=media`;
-  const bases = uploadBase ? [uploadBase] : [UPLOAD, API];
-
-  let lastError;
-  for (const base of bases) {
-    try {
-      const result = await call(token, 'POST', `${base}${suffix}`, { body, contentType });
-      if (!uploadBase) console.log(`  (image uploads go to ${base})`);
-      uploadBase = base;
-      return result;
-    } catch (e) {
-      lastError = e;
-      if (e.status !== 404) throw e;
-    }
-  }
-  throw lastError;
+  return call(token, 'POST',
+    `${UPLOAD}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`,
+    {
+      body: readFileSync(path),
+      contentType: path.endsWith('.png') ? 'image/png' : 'image/jpeg',
+    });
 }
 
 async function clearImages(token, editId, locale, type) {
