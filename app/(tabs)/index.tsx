@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
@@ -34,6 +35,10 @@ import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { intentArt, stateArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
+import { LanguageSheet } from '@/components/ui/LanguageSheet';
+import { languageFlag } from '@/locales';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { nextExplicitTheme } from '@/lib/themeMode';
 
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
@@ -51,14 +56,19 @@ export default function HomeScreen() {
     hasSeenHeadphoneWarning,
     setHasSeenHeadphoneWarning,
     hasSeenOnboarding,
+    language,
+    theme,
+    setTheme,
   } = useSettingsStore();
   const { favoriteIds, recentlyPlayed } = usePresetsStore();
 
   const colors = useThemeColors();
   const artwork = useArtwork();
+  const colorScheme = useColorScheme();
   const miniPlayerInset = useMiniPlayerInset();
   const isPresetPlaying = useIsPresetPlaying();
   const [showAllFavorites, setShowAllFavorites] = useState(false);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
 
   // Read once per mount, not on a ticking timer: this is a launcher, not a
   // clock, and re-rendering the list every minute would fight the user's
@@ -156,12 +166,36 @@ export default function HomeScreen() {
       >
         {/* Intent Section — primary entry, led by cinematic local artwork. */}
         <View style={styles.section}>
-          <Text
-            style={[styles.intentsTitle, { color: colors.text }]}
-            accessibilityRole="header"
-          >
-            {t('home.intentsTitle')}
-          </Text>
+          <View style={styles.homeHeader}>
+            <Text
+              style={[styles.intentsTitle, { color: colors.text }]}
+              accessibilityRole="header"
+            >
+              {t('home.intentsTitle')}
+            </Text>
+            <View style={styles.quickControls}>
+              <TouchableOpacity
+                onPress={() => setShowLanguageSheet(true)}
+                style={[styles.quickControl, { backgroundColor: colors.backgroundSecondary }]}
+                accessibilityRole="button"
+                accessibilityLabel={t('settings.language')}
+              >
+                <Text style={styles.languageFlag}>{languageFlag(language)}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setTheme(nextExplicitTheme(theme, colorScheme))}
+                style={[styles.quickControl, { backgroundColor: colors.backgroundSecondary }]}
+                accessibilityRole="button"
+                accessibilityLabel={t('settings.theme')}
+              >
+                <Ionicons
+                  name={colorScheme === 'dark' ? 'moon' : 'sunny'}
+                  size={19}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
           {/* The clock's answer, given room. Four identical cards asked the
               question and then refused to help answer it; at 2am the app can
               reasonably lead with Sleep. The other three stay one tap away
@@ -425,6 +459,7 @@ export default function HomeScreen() {
           </Text>
         )}
       </ScrollView>
+      <LanguageSheet visible={showLanguageSheet} onClose={() => setShowLanguageSheet(false)} />
     </SafeAreaView>
   );
 }
@@ -450,7 +485,27 @@ const styles = StyleSheet.create({
   },
   intentsTitle: {
     ...Typography.largeTitle,
+    flex: 1,
+  },
+  homeHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
     marginBottom: Spacing.lg,
+  },
+  quickControls: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+  },
+  quickControl: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  languageFlag: {
+    fontSize: 18,
   },
   intentStack: {
     gap: Spacing.sm,

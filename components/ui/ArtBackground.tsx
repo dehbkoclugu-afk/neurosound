@@ -19,43 +19,20 @@ type ArtBackgroundProps = {
 
 const DARK_SCRIMS = {
   card: [
-    'rgba(5, 8, 13, 0.94)',
-    'rgba(5, 8, 13, 0.72)',
-    'rgba(5, 8, 13, 0.16)',
+    'rgba(10, 18, 28, 0.84)',
+    'rgba(10, 18, 28, 0.60)',
+    'rgba(10, 18, 28, 0.10)',
   ],
-  row: ['rgba(5, 8, 13, 0.97)', 'rgba(5, 8, 13, 0.82)', 'rgba(5, 8, 13, 0.22)'],
+  row: ['rgba(10, 18, 28, 0.88)', 'rgba(10, 18, 28, 0.68)', 'rgba(10, 18, 28, 0.14)'],
   channel: [
-    'rgba(5, 8, 13, 0.97)',
-    'rgba(5, 8, 13, 0.88)',
-    'rgba(5, 8, 13, 0.38)',
+    'rgba(10, 18, 28, 0.90)',
+    'rgba(10, 18, 28, 0.74)',
+    'rgba(10, 18, 28, 0.24)',
   ],
   hero: [
     'rgba(5, 8, 13, 0.16)',
     'rgba(5, 8, 13, 0.28)',
     'rgba(5, 8, 13, 0.92)',
-  ],
-} as const;
-
-const LIGHT_SCRIMS = {
-  card: [
-    'rgba(247,249,252,0.96)',
-    'rgba(247,249,252,0.76)',
-    'rgba(247,249,252,0.14)',
-  ],
-  row: [
-    'rgba(247,249,252,0.98)',
-    'rgba(247,249,252,0.86)',
-    'rgba(247,249,252,0.22)',
-  ],
-  channel: [
-    'rgba(247,249,252,0.98)',
-    'rgba(247,249,252,0.90)',
-    'rgba(247,249,252,0.42)',
-  ],
-  hero: [
-    'rgba(247,249,252,0.18)',
-    'rgba(247,249,252,0.28)',
-    'rgba(247,249,252,0.94)',
   ],
 } as const;
 
@@ -66,17 +43,18 @@ export function ArtBackground({
   variant = 'row',
 }: ArtBackgroundProps) {
   const scheme = useColorScheme();
-  const scrims = scheme === 'light' ? LIGHT_SCRIMS : DARK_SCRIMS;
   const content = (
     <>
-      <LinearGradient
-        colors={scrims[variant]}
-        locations={[0, 0.56, 1]}
-        start={variant === 'hero' ? { x: 0.5, y: 0 } : { x: 0, y: 0.5 }}
-        end={variant === 'hero' ? { x: 0.5, y: 1 } : { x: 1, y: 0.5 }}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
+      {scheme === 'dark' && (
+        <LinearGradient
+          colors={DARK_SCRIMS[variant]}
+          locations={[0, 0.56, 1]}
+          start={variant === 'hero' ? { x: 0.5, y: 0 } : { x: 0, y: 0.5 }}
+          end={variant === 'hero' ? { x: 0.5, y: 1 } : { x: 1, y: 0.5 }}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
+      )}
       {children}
     </>
   );
@@ -115,6 +93,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#0B1018',
   },
   lightFallback: {
-    backgroundColor: '#F1F4F8',
+    backgroundColor: '#E7ECF1',
   },
 });

@@ -1,15 +1,13 @@
-import { normalizeThemeMode, resolvePaletteKey } from '../themeMode';
+import { nextExplicitTheme } from '../themeMode';
 
-describe('theme mode', () => {
-  it('migrates the removed night mode to dark', () => {
-    expect(normalizeThemeMode('night')).toBe('dark');
-    expect(normalizeThemeMode('unknown')).toBe('dark');
+describe('nextExplicitTheme', () => {
+  it('toggles explicit themes', () => {
+    expect(nextExplicitTheme('light', 'light')).toBe('dark');
+    expect(nextExplicitTheme('dark', 'dark')).toBe('light');
   });
 
-  it('honors explicit themes and uses the OS only for auto', () => {
-    expect(resolvePaletteKey('light', 'dark', false)).toBe('light');
-    expect(resolvePaletteKey('dark', 'light', false)).toBe('dark');
-    expect(resolvePaletteKey('auto', 'light', false)).toBe('light');
-    expect(resolvePaletteKey('auto', 'dark', true)).toBe('lowContrastDark');
+  it('toggles away from the resolved system appearance', () => {
+    expect(nextExplicitTheme('auto', 'light')).toBe('dark');
+    expect(nextExplicitTheme('auto', 'dark')).toBe('light');
   });
 });

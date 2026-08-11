@@ -61,13 +61,6 @@ const pickerGroups = [
   { titleKey: 'explore.categories.noise', presets: noisePresets },
 ];
 
-// Ghost channel strips shown before the first sound is added — one per
-// available channel, so the empty screen states the capacity by shape.
-const EMPTY_SLOTS = Array.from(
-  { length: playerController.MAX_MIXER_CHANNELS },
-  (_, i) => i,
-);
-
 /** "ND-M03" — the saved-mix half of Home's catalogue codes. Falls back to
  *  list position for mixes saved before catalogue numbers existed. */
 function mixCatalogCode(
@@ -104,7 +97,6 @@ export default function MixerScreen() {
     isMixerPlaying: isPlaying,
     activeMixId,
     mixerMasterVolume,
-    timerDuration,
     timerRemaining,
   } = useAudioStore();
 
@@ -305,106 +297,105 @@ export default function MixerScreen() {
           </Text>
         </View>
 
+        {/* The session deck makes the transport, timer and master level read
+            as one instrument. The first channel supplies the session art. */}
+        <ArtBackground
+          source={channels[0] ? artwork.source(presetArt(channels[0].preset.id)) : undefined}
+          style={styles.sessionDeck}
+          variant="channel"
+        >
+          <View style={styles.deckTopRow}>
+            <View>
+              <Text style={[styles.deckKicker, { color: artwork.foreground.secondary }]}>
+                {t('mixer.activeChannels')}
+              </Text>
+              <Text style={[styles.deckCount, { color: artwork.foreground.primary }]}>
+                {channels.length}/{playerController.MAX_MIXER_CHANNELS}
+              </Text>
+            </View>
+            <View style={styles.deckDots}>
+              {channels.map((channel) => (
+                <View
+                  key={channel.id}
+                  style={[styles.deckDot, { backgroundColor: categoryColors[channel.preset.type] }]}
+                />
+              ))}
+            </View>
+          </View>
+
+          {isEmpty ? (
+            <View style={styles.deckEmpty}>
+              <TouchableOpacity
+                onPress={() => setShowPresetPicker(true)}
+                style={[styles.deckAdd, { borderColor: artwork.foreground.secondary }]}
+                accessibilityRole="button"
+                accessibilityLabel={t('mixer.addSound')}
+              >
+                <Ionicons name="add" size={24} color={artwork.foreground.primary} />
+                <Text style={[styles.deckAddText, { color: artwork.foreground.primary }]}>
+                  {t('mixer.addSound')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
+                style={styles.sampleButton}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.sampleButtonText, { color: artwork.foreground.secondary }]}>
+                  {t('mixer.trySample')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <View style={styles.transportRow}>
+                <TouchableOpacity
+                  onPress={() => setShowTimerModal(true)}
+                  style={styles.timerButton}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('player.timer')}
+                >
+                  <Ionicons name="timer-outline" size={24} color={artwork.foreground.primary} />
+                  {timerRemaining !== null && timerRemaining > 0 && (
+                    <Text style={[styles.timerBadge, { color: artwork.foreground.primary }]}>
+                      {formatTimerValue(timerRemaining)}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                <TransportButton
+                  playing={isPlaying}
+                  onPress={handlePlayPause}
+                  size={72}
+                  accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
+                />
+                <TouchableOpacity
+                  onPress={openSaveDialog}
+                  style={styles.timerButton}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('mixer.savePreset')}
+                >
+                  <Ionicons name="bookmark-outline" size={24} color={artwork.foreground.primary} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.deckMaster}>
+                <Slider
+                  value={mixerMasterVolume}
+                  onValueChange={handleMasterVolume}
+                  max={1}
+                  label={t('mixer.master')}
+                  accessibilityLabel={t('mixer.master')}
+                />
+              </View>
+            </>
+          )}
+        </ArtBackground>
+
         {/* Active Channels */}
         <View style={styles.section}>
           <CategoryHeader
             title={t('mixer.activeChannels')}
             counter={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
           />
-
-          {/* Empty state is the mixer itself, not a poster about the mixer:
-              four unfilled channel strips where the real ones will land. It
-              states the capacity by shape, shows what a channel is made of,
-              and fills the page instead of leaving the lower half blank —
-              without the centred-icon-and-headline pattern every other app
-              reaches for.
-
-              The ghost track is deliberately thinner than the live slider's
-              48pt touch target: at full height the four slots push the
-              transport row off the first screen, which trades one layout
-              problem for a worse one. So the strip previews the arrangement,
-              not the exact metrics. */}
-          {channels.length === 0 && (
-            <View>
-              {EMPTY_SLOTS.map((slot) => (
-                <TouchableOpacity
-                  key={slot}
-                  onPress={() => setShowPresetPicker(true)}
-                  activeOpacity={0.6}
-                  style={[
-                    styles.channelRow,
-                    styles.slotRow,
-                    {
-                      borderBottomColor: colors.cardBorder,
-                      opacity: 1 - slot * 0.18,
-                    },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('mixer.addSound')}
-                  // Four identical "add sound" targets would be read out four
-                  // times over; only the first is exposed.
-                  accessibilityElementsHidden={slot > 0}
-                  importantForAccessibility={
-                    slot > 0 ? 'no-hide-descendants' : 'yes'
-                  }
-                >
-                  <View
-                    style={[
-                      styles.channelIcon,
-                      styles.slotIcon,
-                      {
-                        borderColor:
-                          slot === 0 ? colors.accent : colors.cardBorder,
-                      },
-                    ]}
-                  >
-                    {slot === 0 && (
-                      <Ionicons name="add" size={18} color={colors.accent} />
-                    )}
-                  </View>
-                  <View style={styles.channelBody}>
-                    <View style={styles.channelHeader}>
-                      <Text
-                        style={[
-                          styles.channelName,
-                          {
-                            color:
-                              slot === 0 ? colors.accent : colors.textSecondary,
-                          },
-                        ]}
-                      >
-                        {slot === 0
-                          ? t('mixer.addSound')
-                          : t('mixer.emptySlot')}
-                      </Text>
-                    </View>
-                    {/* A flat, empty track at zero — the same bar the live
-                        channel uses, just with nothing in it. */}
-                    <View
-                      style={[
-                        styles.slotTrack,
-                        { backgroundColor: colors.slider },
-                      ]}
-                    />
-                  </View>
-                </TouchableOpacity>
-              ))}
-
-              <View style={styles.emptyFooter}>
-                <TouchableOpacity
-                  onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
-                  style={styles.sampleButton}
-                  accessibilityRole="button"
-                >
-                  <Text
-                    style={[styles.sampleButtonText, { color: colors.accent }]}
-                  >
-                    {t('mixer.trySample')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
 
           {channels.map((channel) => (
             <ArtBackground
@@ -529,101 +520,6 @@ export default function MixerScreen() {
                 {isFull ? t('mixer.channelsFull') : t('mixer.addSound')}
               </Text>
             </TouchableOpacity>
-          )}
-        </View>
-
-        {/* One fader over the whole mix. Without it, turning a balanced mix
-            down meant dragging four sliders and losing the balance; the
-            channel levels are the part the user actually authored. Hidden
-            while empty — there is nothing to scale. */}
-        {!isEmpty && (
-          <View style={[styles.master, { borderTopColor: colors.cardBorder }]}>
-            <Slider
-              value={mixerMasterVolume}
-              onValueChange={handleMasterVolume}
-              max={1}
-              label={t('mixer.master')}
-              accessibilityLabel={t('mixer.master')}
-            />
-          </View>
-        )}
-
-        {/* Transport — always present. Showing and hiding play/save as the
-            first channel arrived made the whole page jump under the finger. */}
-        <View style={styles.transport}>
-          <View style={styles.transportRow}>
-            {/* A mix is what people actually fall asleep to, and it had no
-                timer at all — it played until the battery died. */}
-            <TouchableOpacity
-              onPress={() => setShowTimerModal(true)}
-              disabled={isEmpty}
-              style={styles.timerButton}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: isEmpty }}
-              accessibilityLabel={
-                timerRemaining !== null && timerRemaining > 0
-                  ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
-                  : t('player.timer')
-              }
-            >
-              <Ionicons
-                name="timer-outline"
-                size={24}
-                color={
-                  isEmpty
-                    ? colors.tabIconDefault
-                    : timerDuration
-                      ? colors.primary
-                      : colors.textSecondary
-                }
-              />
-              {timerRemaining !== null && timerRemaining > 0 && (
-                <Text
-                  style={[styles.timerBadge, { color: colors.accent }]}
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                >
-                  {formatTimerValue(timerRemaining)}
-                </Text>
-              )}
-            </TouchableOpacity>
-
-            <TransportButton
-              playing={isPlaying}
-              onPress={handlePlayPause}
-              disabled={isEmpty}
-              size={72}
-              accessibilityLabel={
-                isPlaying ? t('common.pause') : t('common.play')
-              }
-              accessibilityHint={
-                isEmpty ? t('mixer.transportDisabled') : undefined
-              }
-            />
-
-            {/* Balances the timer slot so play stays centred. */}
-            <View style={styles.timerButton} />
-          </View>
-
-          <Button
-            title={t('mixer.savePreset')}
-            onPress={openSaveDialog}
-            disabled={isEmpty}
-            variant="secondary"
-            accessibilityHint={
-              isEmpty ? t('mixer.transportDisabled') : undefined
-            }
-          />
-
-          {/* A greyed circle says "not now" and nothing else. Two dead
-              controls next to each other without a reason is the point at
-              which an interface stops explaining itself. */}
-          {isEmpty && (
-            <Text
-              style={[styles.transportHint, { color: colors.textSecondary }]}
-            >
-              {t('mixer.transportDisabled')}
-            </Text>
           )}
         </View>
 
@@ -887,6 +783,61 @@ const styles = StyleSheet.create({
   },
   title: {
     ...Typography.largeTitle,
+  },
+  sessionDeck: {
+    minHeight: 250,
+    borderRadius: Radius.card,
+    padding: Spacing.lg,
+    marginBottom: Spacing.xl,
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  deckTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  deckKicker: {
+    ...Typography.label,
+    textTransform: 'uppercase',
+  },
+  deckCount: {
+    ...Typography.largeTitle,
+    ...Typography.numeral,
+    marginTop: 2,
+  },
+  deckDots: {
+    flexDirection: 'row',
+    gap: 6,
+    paddingTop: 6,
+  },
+  deckDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  deckEmpty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  deckAdd: {
+    minWidth: 180,
+    minHeight: 58,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderRadius: Radius.card,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  deckAddText: {
+    ...Typography.headline,
+  },
+  deckMaster: {
+    paddingTop: Spacing.xs,
   },
   section: {
     marginBottom: Spacing.lg,

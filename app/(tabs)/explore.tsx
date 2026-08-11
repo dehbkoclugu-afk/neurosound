@@ -3,11 +3,12 @@
  * 2-column preset grid with category filtering
  */
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
+  FlatList,
   StyleSheet,
   TouchableOpacity,
   TextInput,
@@ -24,7 +25,7 @@ import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, FontFamily, Radius, ControlSize, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { PresetRow } from '@/components/ui/PresetRow';
+import { PresetRow, PRESET_ROW_GAP, PRESET_ROW_HEIGHT } from '@/components/ui/PresetRow';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
@@ -70,6 +71,13 @@ const categories: CategoryTab[] = [
   },
 ];
 
+const PRESET_ITEM_LENGTH = PRESET_ROW_HEIGHT + PRESET_ROW_GAP;
+const getPresetItemLayout = (_: ArrayLike<FrequencyPreset> | null | undefined, index: number) => ({
+  length: PRESET_ITEM_LENGTH,
+  offset: PRESET_ITEM_LENGTH * index,
+  index,
+});
+
 export default function ExploreScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -95,7 +103,7 @@ export default function ExploreScreen() {
   const categoryColors = useCategoryColors();
   const miniPlayerInset = useMiniPlayerInset();
   const isPresetPlaying = useIsPresetPlaying();
-  const pagerRef = useRef<ScrollView>(null);
+  const pagerRef = useRef<FlatList<CategoryTab>>(null);
 
   // Deep link / param changes (and the initial layout pass) move the pager
   // without animating — this isn't the user's own swipe finishing, so it
@@ -110,7 +118,7 @@ export default function ExploreScreen() {
     }
     if (pagerWidth) {
       const index = categories.findIndex((c) => c.key === target);
-      pagerRef.current?.scrollTo({ x: index * pagerWidth, animated: false });
+      pagerRef.current?.scrollToIndex({ index, animated: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.category, pagerWidth]);
@@ -132,7 +140,7 @@ export default function ExploreScreen() {
 
   const handleTabPress = (index: number) => {
     setActiveCategory(categories[index].key);
-    pagerRef.current?.scrollTo({ x: index * pagerWidth, animated: true });
+    pagerRef.current?.scrollToIndex({ index, animated: true });
   };
 
   const handlePagerLayout = (e: LayoutChangeEvent) => {
@@ -148,18 +156,18 @@ export default function ExploreScreen() {
     }
   };
 
-  const handlePresetPress = (presetId: string) => {
+  const handlePresetPress = useCallback((presetId: string) => {
     router.push(`/player/${presetId}`);
-  };
+  }, [router]);
 
   const toggleDescription = (key: CategoryType) => {
     setExpandedDescriptions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setQuery('');
     setFavoritesOnly(false);
-  };
+  }, []);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -333,24 +341,37 @@ export default function ExploreScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Preset pages — one per category, swipeable like any tab strip */}
-      <ScrollView
+      {/* Only the visible category and a small list window are mounted. */}
+      <FlatList
         ref={pagerRef}
+        data={categories}
         horizontal
         pagingEnabled
+        style={styles.pager}
         showsHorizontalScrollIndicator={false}
         onLayout={handlePagerLayout}
         onMomentumScrollEnd={handleMomentumScrollEnd}
-        scrollEventThrottle={16}
-      >
-        {categories.map((category) => {
+        keyExtractor={(category) => category.key}
+        initialNumToRender={1}
+        maxToRenderPerBatch={1}
+        windowSize={3}
+        removeClippedSubviews
+        getItemLayout={(_, index) => ({
+          length: pagerWidth,
+          offset: pagerWidth * index,
+          index,
+        })}
+        onScrollToIndexFailed={({ index }) => {
+          requestAnimationFrame(() => pagerRef.current?.scrollToIndex({ index, animated: false }));
+        }}
+        renderItem={({ item: category }) => {
           const presets = filteredPresetsByCategory[category.key];
           const showDescription =
             !seenCategoryDescriptions[category.key] || expandedDescriptions[category.key];
 
           return (
-            <ScrollView
-              key={category.key}
+            <FlatList
+              data={presets}
               style={{ width: pagerWidth || undefined }}
               contentContainerStyle={[
                 styles.content,
@@ -358,79 +379,78 @@ export default function ExploreScreen() {
                 { paddingBottom: miniPlayerInset + Spacing.lg },
               ]}
               showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.descriptionRow}>
-                <View style={styles.descriptionMain}>
-                  {showDescription ? (
-                    <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
-                      {t(category.descriptionKey)}
-                    </Text>
-                  ) : (
-                    <TouchableOpacity
-                      onPress={() => toggleDescription(category.key)}
-                      style={styles.aboutButton}
-                      accessibilityRole="button"
-                      accessibilityLabel={t('explore.aboutCategory')}
-                    >
-                      <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
-                      <Text style={[styles.aboutButtonText, { color: colors.textSecondary }]}>
-                        {t('explore.aboutCategory')}
+              keyExtractor={(preset) => preset.id}
+              initialNumToRender={6}
+              maxToRenderPerBatch={6}
+              windowSize={5}
+              removeClippedSubviews
+              getItemLayout={getPresetItemLayout}
+              ListHeaderComponent={
+                <View style={styles.descriptionRow}>
+                  <View style={styles.descriptionMain}>
+                    {showDescription ? (
+                      <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
+                        {t(category.descriptionKey)}
                       </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                {/* 33 sounds behind a search box and a filter, and the list
-                    never said how many survived either one. */}
-                <Text style={[styles.resultCount, { color: colors.textSecondary }]}>
-                  <Text style={styles.resultCountNumber}>{presets.length}</Text>
-                  {presets.length === category.presets.length
-                    ? ''
-                    : `/${category.presets.length}`}
-                </Text>
-              </View>
-
-              <View>
-                {presets.length > 0 ? (
-                  presets.map((preset, i) => (
-                    <PresetRow
-                      key={preset.id}
-                      preset={preset}
-                      onPress={() => handlePresetPress(preset.id)}
-                      isFavorite={isFavorite(preset.id)}
-                      isPlaying={isPresetPlaying(preset.id)}
-                      highlight={normalizedQuery}
-                      index={i}
-                    />
-                  ))
-                ) : (
-                  <View style={styles.emptyState}>
-                    <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-                      {t('explore.noResults')}
-                    </Text>
-                    {/* A dead end told the user what happened and gave them no
-                        way out of it. */}
-                    <TouchableOpacity
-                      onPress={clearFilters}
-                      style={styles.clearFilters}
-                      accessibilityRole="button"
-                    >
-                      <Text style={[styles.clearFiltersText, { color: colors.accent }]}>
-                        {t('explore.clearFilters')}
-                      </Text>
-                    </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() => toggleDescription(category.key)}
+                        style={styles.aboutButton}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('explore.aboutCategory')}
+                      >
+                        <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
+                        <Text style={[styles.aboutButtonText, { color: colors.textSecondary }]}>
+                          {t('explore.aboutCategory')}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
-                )}
-              </View>
-            </ScrollView>
+                  <Text style={[styles.resultCount, { color: colors.textSecondary }]}>
+                    <Text style={styles.resultCountNumber}>{presets.length}</Text>
+                    {presets.length === category.presets.length ? '' : `/${category.presets.length}`}
+                  </Text>
+                </View>
+              }
+              ListEmptyComponent={
+                <View style={styles.emptyState}>
+                  <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+                    {t('explore.noResults')}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={clearFilters}
+                    style={styles.clearFilters}
+                    accessibilityRole="button"
+                  >
+                    <Text style={[styles.clearFiltersText, { color: colors.accent }]}>
+                      {t('explore.clearFilters')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              }
+              renderItem={({ item: preset, index }) => (
+                <PresetRow
+                  preset={preset}
+                  onPress={() => handlePresetPress(preset.id)}
+                  isFavorite={isFavorite(preset.id)}
+                  isPlaying={isPresetPlaying(preset.id)}
+                  highlight={normalizedQuery}
+                  index={index < 6 ? index : undefined}
+                />
+              )}
+            />
           );
-        })}
-      </ScrollView>
+        }}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  pager: {
     flex: 1,
   },
   header: {
