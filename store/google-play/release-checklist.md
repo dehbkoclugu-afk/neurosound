@@ -291,16 +291,15 @@ o ad kullanılamaz.
 Yeni ad: `com.dehbkoclugu.neurosound`. Yayınlandıktan sonra bir daha
 değiştirilemez.
 
-**Şu an 403 PERMISSION_DENIED veriyor.** Kimlik doğrulama çalışıyor (token
-alınıyor, API cevap veriyor). Paket adı değiştiği ve AAB henüz yüklenmediği
-için bu beklenen durum; yükleme sonrası tekrar denenmeli. Hâlâ 403 gelirse:
+- [x] **Yayınlandı.** 21 dilin metni, 84 ekran görüntüsü, feature graphic,
+      512×512 simge ve iletişim bilgileri API üzerinden gitti.
 
-- [ ] Play Console → Users and permissions → şu hesabı davet et ve
-      `com.dehbkoclugu.neurosound` için **Edit store listing, pricing & distribution**
-      ver (release yetkisi gerekmiyor, script sürüme dokunmuyor):
-      `neurosound-play@dehbdestek-768da.iam.gserviceaccount.com`
-- [ ] `dehbdestek-768da` projesinde Google Play Android Developer API açık mı:
-      https://console.cloud.google.com/apis/library/androidpublisher.googleapis.com?project=dehbdestek-768da
+Bir metni değiştirmek için `store/google-play/<dil>/listing.md` dosyasını
+düzelt ve workflow'u çalıştır. Console'a elle girmeye gerek yok; kaynak repo,
+Console çıktı.
+
+Yetki bir kez kurulmuştu ve duruyor:
+`neurosound-play@dehbdestek-768da.iam.gserviceaccount.com`
 
 ### Sıra uyarısı — ilk binary API ile yüklenemez
 
@@ -387,6 +386,29 @@ foregroundServiceType="mediaPlayback"
 
 `verify:android-config` artık eklentinin kayıtlı kaldığını kontrol ediyor, yani
 biri `app.json`'dan çıkarırsa yayın kapısı kırmızıya döner.
+
+## Aşama 6.5 — Kapalı test kapısı (kişisel hesaplar)
+
+Kasım 2023 sonrası açılmış **kişisel** geliştirici hesapları production
+erişimini doğrudan alamıyor. Google önce en az **12 test kullanıcısıyla,
+kesintisiz 14 gün** kapalı test istiyor.
+
+Bu bir ayar değil, bekleme kapısı — API de açamıyor. Production track'e
+yazmaya çalışmak `400 FAILED_PRECONDITION` döndürüyor ve sebebini söylemiyor.
+Internal çalışırken production'ın çalışmaması bu kapının imzası; ülke seçimi
+ya da eksik beyan gibi görünen her tahmin de aynı derecede makul durduğu için
+yazıya geçiriliyor.
+
+- [ ] Kapalı test track'ine (`test`) 12+ Gmail adresi ekle.
+- [ ] Hepsinin katılım bağlantısından **gerçekten katılıp kurduğunu** doğrula.
+      Listede görünmek saymıyor.
+- [ ] 14 gün boyunca sayı 12'nin altına düşmemeli; sayaç on ikinci kişi
+      katıldığında başlıyor.
+- [ ] Süre dolunca Console'da açılan production erişimi başvurusunu gönder.
+- [ ] Onay geldikten sonra `play-release.yml`, %1'den başlayarak.
+
+Kurumsal hesaplarda bu kural yok; orada aynı hata başka bir eksiği işaret
+eder ve Yayın özeti sayfası neyin engellediğini listeler.
 
 ## Aşama 7 — Yayın
 
