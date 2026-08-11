@@ -31,6 +31,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+
+      # The script was dependency-free until image uploads needed googleapis.
+      - run: npm ci
 
       - name: Push listings
         env:
