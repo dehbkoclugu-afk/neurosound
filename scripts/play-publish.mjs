@@ -252,11 +252,17 @@ A grant can take a few minutes to take effect.`);
   console.log(`edit ${edit.id} opened\n`);
 
   // App-level contact details, so the Console stops being the place these
-  // live. defaultLanguage is deliberately not sent: it changes which listing
-  // every untranslated market falls back to, and that is a decision, not a
-  // detail to be synced.
+  // live. defaultLanguage is deliberately not sent: it decides which listing
+  // every untranslated market falls back to, which is a decision rather than a
+  // detail to sync.
+  //
+  // PATCH, not PUT. PUT replaces the whole resource, so omitting
+  // defaultLanguage cleared it and the commit came back "The default language
+  // for your application is not currently supported" — after every listing and
+  // image in the edit had already uploaded. Nothing was applied, because the
+  // edit is a transaction, which is the whole reason for working inside one.
   try {
-    await call(token, 'PUT', `${API}/applications/${PACKAGE}/edits/${edit.id}/details`, {
+    await call(token, 'PATCH', `${API}/applications/${PACKAGE}/edits/${edit.id}/details`, {
       json: { contactEmail: CONTACT.email, contactWebsite: CONTACT.website },
     });
     console.log(`  details ok (${CONTACT.email})`);
