@@ -38,12 +38,14 @@ const FADE_MS = 200;
 interface ToastProps {
   message: string;
   visible: boolean;
+  /** Changes on every show, so a repeat or replacement restarts the timer. */
+  showId?: number;
   onHide: () => void;
   variant?: ToastVariant;
   style?: ViewStyle;
 }
 
-export function Toast({ message, visible, onHide, variant = 'info', style }: ToastProps) {
+export function Toast({ message, visible, showId, onHide, variant = 'info', style }: ToastProps) {
   const colors = useThemeColors();
   const { reduceMotion } = useSettingsStore();
   const progress = useSharedValue(0);
@@ -63,7 +65,7 @@ export function Toast({ message, visible, onHide, variant = 'info', style }: Toa
       )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+  }, [visible, showId]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: progress.value,

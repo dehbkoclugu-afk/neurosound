@@ -10,8 +10,10 @@ const resources = Object.fromEntries(
 
 export type SupportedLanguage = string;
 
-// Get device language safely, default to Turkish
-let deviceLanguage = 'tr';
+// Device language, read defensively. Unsupported or unreadable falls back to
+// English: the old Turkish default greeted every Arabic, Persian or Malay
+// phone in Turkish, a language most of those users cannot read.
+let deviceLanguage = 'en';
 try {
   const locales = Localization.getLocales();
   if (locales && locales.length > 0 && locales[0]?.languageCode) {
@@ -32,7 +34,7 @@ try {
  */
 export const deviceLanguageOrDefault: SupportedLanguage = LANGUAGE_CODES.includes(deviceLanguage)
   ? deviceLanguage
-  : 'tr';
+  : 'en';
 
 const supportedLanguage = deviceLanguageOrDefault;
 

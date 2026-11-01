@@ -18,14 +18,24 @@ interface ToastState {
   visible: boolean;
   message: string;
   variant: ToastVariant;
+  /** Bumped on every show(). `visible` alone could not restart the timer: a
+   *  second toast while one was up kept the first one's countdown and was
+   *  cut short, and the same toast twice in a row never re-appeared. */
+  id: number;
   show: (message: string, variant?: ToastVariant) => void;
-  hide: () => void;
+  hide: (id?: number) => void;
 }
 
-export const useToastStore = create<ToastState>((set) => ({
+export const useToastStore = create<ToastState>((set, get) => ({
   visible: false,
   message: '',
   variant: 'info',
-  show: (message, variant = 'info') => set({ visible: true, message, variant }),
-  hide: () => set({ visible: false }),
+  id: 0,
+  show: (message, variant = 'info') =>
+    set((s) => ({ visible: true, message, variant, id: s.id + 1 })),
+  // A stale fade-out finishing must not hide the toast that replaced it.
+  hide: (id) => {
+    if (id !== undefined && id !== get().id) return;
+    set({ visible: false });
+  },
 }));

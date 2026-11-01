@@ -206,7 +206,9 @@
     "privacyPolicy": "Chính sách bảo mật",
     "resetDone": "Mọi thứ đã được đặt lại.",
     "totalListening": "Tổng thời gian nghe",
-    "sessions": "Phiên"
+    "sessions": "Phiên",
+    "listenedHours": "{{h}} giờ {{m}} phút",
+    "listenedMinutes": "{{m}} phút"
   },
   "privacy": {
     "title": "Chính sách bảo mật",

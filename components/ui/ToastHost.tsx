@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Toast } from './Toast';
 import { useToastStore } from '@/stores/toastStore';
-import { MINI_PLAYER_HEIGHT } from '@/hooks/use-mini-player';
+import { MINI_PLAYER_HEIGHT, TAB_BAR_HEIGHT } from '@/hooks/use-mini-player';
 import { Spacing } from '@/constants/theme';
 
 // The tab screens share a bottom tab bar, so clearing just above it is
@@ -20,11 +20,13 @@ import { Spacing } from '@/constants/theme';
 // this can only aim for "clears the known bottom chrome", not "never
 // overlaps a variable-length scrolling list" — the toast simply doesn't know
 // what a given screen scrolls underneath it.
-const TAB_SCREEN_CLEARANCE = MINI_PLAYER_HEIGHT + Spacing.sm;
+// The mini player sits *on top of* the tab bar, so clearing both takes their
+// sum; clearing only the mini player's height put toasts over it.
+const TAB_SCREEN_CLEARANCE = TAB_BAR_HEIGHT + MINI_PLAYER_HEIGHT + Spacing.sm;
 const PLAYER_CLEARANCE = 110;
 
 export function ToastHost() {
-  const { visible, message, variant, hide } = useToastStore();
+  const { visible, message, variant, id, hide } = useToastStore();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const clearance = pathname.startsWith('/player') ? PLAYER_CLEARANCE : TAB_SCREEN_CLEARANCE;
@@ -34,7 +36,8 @@ export function ToastHost() {
       message={message}
       variant={variant}
       visible={visible}
-      onHide={hide}
+      showId={id}
+      onHide={() => hide(id)}
       style={{
         bottom: insets.bottom + clearance,
         zIndex: 1000,

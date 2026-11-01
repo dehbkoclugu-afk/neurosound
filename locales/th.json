@@ -206,7 +206,9 @@
     "privacyPolicy": "นโยบายความเป็นส่วนตัว",
     "resetDone": "รีเซ็ตทุกอย่างเรียบร้อยแล้ว",
     "totalListening": "เวลาฟังทั้งหมด",
-    "sessions": "ครั้ง"
+    "sessions": "ครั้ง",
+    "listenedHours": "{{h}} ชม. {{m}} นาที",
+    "listenedMinutes": "{{m}} นาที"
   },
   "privacy": {
     "title": "นโยบายความเป็นส่วนตัว",

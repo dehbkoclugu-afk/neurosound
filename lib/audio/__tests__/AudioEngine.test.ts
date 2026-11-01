@@ -306,4 +306,12 @@ describe('NoisePlayer', () => {
     noise.dispose();
     expect(createdPlayers.every((p) => p.removed)).toBe(true);
   });
+
+  it('releases the preloaded player when disposed without ever playing', async () => {
+    const noise = getNoisePlayer();
+    await noise.setNoiseType('rain');
+    expect(createdPlayers.length).toBeGreaterThan(0);
+    noise.dispose();
+    expect(createdPlayers.every((p) => p.removed)).toBe(true);
+  });
 });

@@ -206,7 +206,9 @@
     "privacyPolicy": "Политика конфиденциальности",
     "resetDone": "Все данные сброшены.",
     "totalListening": "Всего прослушано",
-    "sessions": "Сеансов"
+    "sessions": "Сеансов",
+    "listenedHours": "{{h}} ч {{m}} мин",
+    "listenedMinutes": "{{m}} мин"
   },
   "privacy": {
     "title": "Политика конфиденциальности",

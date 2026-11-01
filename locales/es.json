@@ -206,7 +206,9 @@
     "privacyPolicy": "Política de privacidad",
     "resetDone": "Todo se ha restablecido.",
     "totalListening": "Escucha total",
-    "sessions": "Sesiones"
+    "sessions": "Sesiones",
+    "listenedHours": "{{h}} h {{m}} min",
+    "listenedMinutes": "{{m}} min"
   },
   "privacy": {
     "title": "Política de privacidad",

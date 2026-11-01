@@ -206,7 +206,9 @@
     "privacyPolicy": "গোপনীয়তা নীতি",
     "resetDone": "সবকিছু রিসেট করা হয়েছে।",
     "totalListening": "মোট শ্রবণ",
-    "sessions": "সেশন"
+    "sessions": "সেশন",
+    "listenedHours": "{{h}} ঘ {{m}} মি",
+    "listenedMinutes": "{{m}} মি"
   },
   "privacy": {
     "title": "গোপনীয়তা নীতি",

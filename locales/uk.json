@@ -206,7 +206,9 @@
     "privacyPolicy": "Політика конфіденційності",
     "resetDone": "Усе було скинуто.",
     "totalListening": "Загальний час прослуховування",
-    "sessions": "Сеанси"
+    "sessions": "Сеанси",
+    "listenedHours": "{{h}} год {{m}} хв",
+    "listenedMinutes": "{{m}} хв"
   },
   "privacy": {
     "title": "Політика конфіденційності",

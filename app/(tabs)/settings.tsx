@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
@@ -42,12 +43,14 @@ import * as playerController from '@/lib/audio/playerController';
 
 /** Each theme shows what it looks like: surface colour on the left half,
  *  accent on the right. `auto` shows both light and dark surfaces. */
-/** "6h 20m" / "48m" — hours only once there are any, and the tape-counter
- *  face makes the digits line up between the two rows. */
-function formatListened(totalSeconds: number): string {
+/** "6 sa 20 dk" / "48 dk" — hours only once there are any. The units were
+ *  hard-coded English ("6h 20m") in every language. */
+function formatListened(totalSeconds: number, t: TFunction): string {
   const minutes = Math.floor(totalSeconds / 60);
   const hours = Math.floor(minutes / 60);
-  return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
+  return hours > 0
+    ? t('settings.listenedHours', { h: hours, m: minutes % 60 })
+    : t('settings.listenedMinutes', { m: minutes });
 }
 
 const THEME_OPTIONS: {
@@ -115,6 +118,9 @@ export default function SettingsScreen() {
           resetPresets();
           resetSettings();
           i18n.changeLanguage(useSettingsStore.getState().language);
+          // The reset restores the 80% safety cap; apply it to sound that is
+          // already playing, as the slider itself does.
+          playerController.syncVolume();
           // Every other control on this screen confirms itself by moving —
           // a switch flips, a theme repaints the app. Reset is the one that
           // does its work off-screen and left nothing behind to see.
@@ -535,11 +541,7 @@ export default function SettingsScreen() {
               catalogue-and-tape world that is the one number the metaphor was
               already promising. */}
             <View
-              style={[
-                styles.card,
-                styles.lastCard,
-                { borderBottomColor: colors.cardBorder },
-              ]}
+              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
             >
               <View style={styles.aboutRow}>
                 <Text
@@ -548,7 +550,7 @@ export default function SettingsScreen() {
                   {t('settings.totalListening')}
                 </Text>
                 <Text style={[styles.aboutValue, { color: colors.text }]}>
-                  {formatListened(listenedSeconds)}
+                  {formatListened(listenedSeconds, t)}
                 </Text>
               </View>
               <View style={styles.aboutRow}>
@@ -564,7 +566,11 @@ export default function SettingsScreen() {
             </View>
 
             <View
-              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
+              style={[
+                styles.card,
+                styles.lastCard,
+                { borderBottomColor: colors.cardBorder },
+              ]}
             >
               <View style={styles.aboutRow}>
                 <Text

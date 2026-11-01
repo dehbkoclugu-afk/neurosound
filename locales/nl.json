@@ -206,7 +206,9 @@
     "privacyPolicy": "Privacybeleid",
     "resetDone": "Alles is gewist.",
     "totalListening": "Totale luistertijd",
-    "sessions": "Sessies"
+    "sessions": "Sessies",
+    "listenedHours": "{{h}} u {{m}} min",
+    "listenedMinutes": "{{m}} min"
   },
   "privacy": {
     "title": "Privacybeleid",

@@ -206,7 +206,9 @@
     "privacyPolicy": "プライバシーポリシー",
     "resetDone": "すべて消去しました。",
     "totalListening": "総再生時間",
-    "sessions": "セッション数"
+    "sessions": "セッション数",
+    "listenedHours": "{{h}}時間{{m}}分",
+    "listenedMinutes": "{{m}}分"
   },
   "privacy": {
     "title": "プライバシーポリシー",

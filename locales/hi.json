@@ -206,7 +206,9 @@
     "privacyPolicy": "गोपनीयता नीति",
     "resetDone": "सब कुछ रीसेट कर दिया गया।",
     "totalListening": "कुल श्रवण",
-    "sessions": "सत्र"
+    "sessions": "सत्र",
+    "listenedHours": "{{h}} घं {{m}} मि",
+    "listenedMinutes": "{{m}} मि"
   },
   "privacy": {
     "title": "गोपनीयता नीति",

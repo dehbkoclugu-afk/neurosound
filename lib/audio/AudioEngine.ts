@@ -839,6 +839,18 @@ export class NoisePlayer {
 
   dispose(): void {
     this.stop();
+    // stop() is a no-op before the first play, but setNoiseType() has already
+    // created a preloaded native player by then. Opening a noise preset and
+    // backing out without pressing play leaked one native player per visit.
+    if (this.player) {
+      try {
+        this.player.remove();
+      } catch (e) {
+        console.log('Noise dispose error:', e);
+      }
+      this.player = null;
+      this.isLoaded = false;
+    }
     if (this.audioContext) {
       this.audioContext.close().catch(console.log);
       this.audioContext = null;

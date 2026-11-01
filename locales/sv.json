@@ -206,7 +206,9 @@
     "privacyPolicy": "Integritetspolicy",
     "resetDone": "Allt har nollställts.",
     "totalListening": "Total lyssningstid",
-    "sessions": "Sessioner"
+    "sessions": "Sessioner",
+    "listenedHours": "{{h}} tim {{m}} min",
+    "listenedMinutes": "{{m}} min"
   },
   "privacy": {
     "title": "Integritetspolicy",

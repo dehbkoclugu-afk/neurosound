@@ -206,7 +206,9 @@
     "privacyPolicy": "Datenschutzerklärung",
     "resetDone": "Alles wurde zurückgesetzt.",
     "totalListening": "Gesamte Hörzeit",
-    "sessions": "Sitzungen"
+    "sessions": "Sitzungen",
+    "listenedHours": "{{h}} Std. {{m}} Min.",
+    "listenedMinutes": "{{m}} Min."
   },
   "privacy": {
     "title": "Datenschutzerklärung",

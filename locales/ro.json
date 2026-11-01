@@ -206,7 +206,9 @@
     "privacyPolicy": "Politica de confidențialitate",
     "resetDone": "Totul a fost resetat.",
     "totalListening": "Timp total de ascultare",
-    "sessions": "Sesiuni"
+    "sessions": "Sesiuni",
+    "listenedHours": "{{h}} h {{m}} min",
+    "listenedMinutes": "{{m}} min"
   },
   "privacy": {
     "title": "Politica de confidențialitate",

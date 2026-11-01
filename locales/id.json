@@ -206,7 +206,9 @@
     "privacyPolicy": "Kebijakan Privasi",
     "resetDone": "Semuanya telah diatur ulang.",
     "totalListening": "Total mendengarkan",
-    "sessions": "Sesi"
+    "sessions": "Sesi",
+    "listenedHours": "{{h}} j {{m}} mnt",
+    "listenedMinutes": "{{m}} mnt"
   },
   "privacy": {
     "title": "Kebijakan Privasi",

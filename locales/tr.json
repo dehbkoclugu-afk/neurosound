@@ -206,7 +206,9 @@
     "privacyPolicy": "Gizlilik Politikası",
     "resetDone": "Her şey sıfırlandı.",
     "totalListening": "Toplam dinleme",
-    "sessions": "Oturum"
+    "sessions": "Oturum",
+    "listenedHours": "{{h}} sa {{m}} dk",
+    "listenedMinutes": "{{m}} dk"
   },
   "privacy": {
     "title": "Gizlilik Politikası",

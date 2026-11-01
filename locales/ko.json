@@ -206,7 +206,9 @@
     "privacyPolicy": "개인정보 처리방침",
     "resetDone": "모두 초기화했습니다.",
     "totalListening": "총 청취 시간",
-    "sessions": "세션"
+    "sessions": "세션",
+    "listenedHours": "{{h}}시간 {{m}}분",
+    "listenedMinutes": "{{m}}분"
   },
   "privacy": {
     "title": "개인정보 처리방침",

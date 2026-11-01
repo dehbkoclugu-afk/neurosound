@@ -206,7 +206,9 @@
     "privacyPolicy": "隐私政策",
     "resetDone": "所有数据已清除。",
     "totalListening": "累计收听",
-    "sessions": "次数"
+    "sessions": "次数",
+    "listenedHours": "{{h}}小时{{m}}分钟",
+    "listenedMinutes": "{{m}}分钟"
   },
   "privacy": {
     "title": "隐私政策",
