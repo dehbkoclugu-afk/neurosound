@@ -1,0 +1,32 @@
+# Same as .gitignore (an .easignore replaces it for EAS uploads)...
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+*.pem
+.env*.local
+google-services.json
+play-service-account.json
+*.tsbuildinfo
+app-example
+/ios
+/android
+/output/
+
+# ...plus store-listing material the app binary never uses, which made up
+# most of a 216 MB upload.
+/store/
+/docs/
