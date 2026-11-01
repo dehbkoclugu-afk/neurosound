@@ -214,7 +214,7 @@
     "dataTitle": "Uygulama neyi saklıyor",
     "dataBody": "Favorileriniz, kaydettiğiniz karışımlar ve tercihleriniz cihazınızda yerel olarak saklanır. Android bulut yedeklemesi kapalıdır. Bu veriler bize veya üçüncü taraflara gönderilmez; uygulamayı kaldırdığınızda ya da Verileri sıfırla seçeneğini kullandığınızda silinir.",
     "networkTitle": "Ağ erişimi",
-    "networkBody": "NeuroSound hiçbir ağ isteği yapmaz. Tamamen çevrimdışı çalışır; hiçbir sunucu, analiz servisi ya da üçüncü tarafla iletişim kurmaz.",
+    "networkBody": "Sesler tamamen çevrimdışı çalar. Tek ağ erişimi, Premium ekranını açtığında, satın aldığında veya satın alımı geri yüklediğinde kullanılan Google Play faturalandırma hizmetidir. NeuroSound kendisi hiçbir sunucuya, analiz hizmetine veya üçüncü tarafa veri göndermez.",
     "accountsTitle": "Hesaplar ve kimlikler",
     "accountsBody": "Kullanıcı hesabı, giriş ya da takip kimliği yoktur. Sizi tanımlamamızın ya da kullanımınızı size bağlamamızın hiçbir yolu yoktur.",
     "childrenTitle": "Çocuklar",
@@ -255,5 +255,33 @@
     "next": "İleri",
     "start": "Başla",
     "skip": "Atla"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Tüm frekansların kilidini aç",
+    "subtitle": "Premium tüm frekans kütüphanesini açar.",
+    "benefitLibrary": "Tüm Solfeggio tonları ve binaural ritimler",
+    "benefitMix": "Hepsini mikserde katman olarak kullan",
+    "benefitOffline": "Çevrimdışı çalışır, reklam yok, hesap yok",
+    "plan": {
+      "yearly": "Yıllık",
+      "monthly": "Aylık",
+      "lifetime": "Ömür boyu"
+    },
+    "price": {
+      "yearly": "{{price}} / yıl",
+      "monthly": "{{price}} / ay",
+      "lifetime": "Tek seferlik {{price}}"
+    },
+    "trialBadge": "Ücretsiz deneme dahil",
+    "cta": "Devam et",
+    "ctaTrial": "Ücretsiz denemeyi başlat",
+    "ctaLifetime": "Bir kez satın al",
+    "restore": "Satın alımları geri yükle",
+    "restoreNone": "Önceki bir satın alım bulunamadı.",
+    "welcome": "Premium açıldı. Keyfini çıkar!",
+    "error": "Satın alma tamamlanamadı. Lütfen tekrar dene.",
+    "unavailable": "Premium şu anda kullanılamıyor. Bağlantını kontrol edip tekrar dene.",
+    "legal": "Abonelikler iptal edilene kadar otomatik yenilenir. Google Play › Abonelikler bölümünden istediğin zaman iptal edebilirsin. Ödeme Google Play hesabından alınır."
   }
 }

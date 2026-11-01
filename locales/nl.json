@@ -214,7 +214,7 @@
     "dataTitle": "Wat de app bewaart",
     "dataBody": "Je favorieten, opgeslagen mixen en voorkeuren (thema, taal, volume, toegankelijkheidsinstellingen) worden lokaal op je toestel bewaard. De cloudback-up van Android staat uit. Deze gegevens gaan nooit naar ons of naar iemand anders en verdwijnen als je de app verwijdert of Gegevens wissen gebruikt in Instellingen.",
     "networkTitle": "Netwerktoegang",
-    "networkBody": "NeuroSound doet geen enkele netwerkaanvraag. De app werkt volledig offline en heeft geen contact met servers, analysediensten of derden.",
+    "networkBody": "Geluiden spelen volledig offline. De enige netwerktoegang is de betaaldienst van Google Play, wanneer je het Premium-scherm opent, iets koopt of een aankoop herstelt. NeuroSound zelf stuurt niets naar servers, analysediensten of derden.",
     "accountsTitle": "Accounts en identificatoren",
     "accountsBody": "Er zijn geen accounts, geen inlog en geen trackingidentificatoren. We hebben geen enkele manier om je te herkennen of gebruik aan jou te koppelen.",
     "childrenTitle": "Kinderen",
@@ -255,5 +255,33 @@
     "next": "Volgende",
     "start": "Beginnen",
     "skip": "Overslaan"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Ontgrendel alle frequenties",
+    "subtitle": "Premium opent de volledige frequentiebibliotheek.",
+    "benefitLibrary": "Alle Solfeggio-tonen en binaurale beats",
+    "benefitMix": "Combineer ze als lagen in de mixer",
+    "benefitOffline": "Offline, geen reclame, geen account",
+    "plan": {
+      "yearly": "Jaarlijks",
+      "monthly": "Maandelijks",
+      "lifetime": "Levenslang"
+    },
+    "price": {
+      "yearly": "{{price}} / jaar",
+      "monthly": "{{price}} / maand",
+      "lifetime": "{{price}} eenmalig"
+    },
+    "trialBadge": "Inclusief gratis proefperiode",
+    "cta": "Doorgaan",
+    "ctaTrial": "Start gratis proefperiode",
+    "ctaLifetime": "Eenmalig kopen",
+    "restore": "Aankopen herstellen",
+    "restoreNone": "Geen eerdere aankoop gevonden.",
+    "welcome": "Premium ontgrendeld. Veel plezier!",
+    "error": "De aankoop kon niet worden voltooid. Probeer het opnieuw.",
+    "unavailable": "Premium is nu niet beschikbaar. Controleer je verbinding en probeer het opnieuw.",
+    "legal": "Abonnementen worden automatisch verlengd tot je opzegt. Opzeggen kan altijd via Google Play › Abonnementen. De betaling wordt via je Google Play-account afgerekend."
   }
 }

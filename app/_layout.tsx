@@ -14,6 +14,7 @@ import {
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ToastHost } from '@/components/ui/ToastHost';
+import { PremiumSync } from '@/components/PremiumSync';
 import i18n from '@/i18n';
 
 export const unstable_settings = {
@@ -68,7 +69,12 @@ export default function RootLayout() {
             options={{ headerShown: false, gestureEnabled: false }}
           />
           <Stack.Screen name="privacy" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="paywall"
+            options={{ presentation: 'modal', headerShown: false }}
+          />
         </Stack>
+        <PremiumSync />
         <ToastHost />
         <StatusBar style="auto" />
       </ThemeProvider>

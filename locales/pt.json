@@ -214,7 +214,7 @@
     "dataTitle": "O que o app armazena",
     "dataBody": "Favoritos, mixagens e ajustes ficam armazenados localmente. O backup em nuvem do Android está desativado. Os dados não são enviados para nós nem para terceiros e são apagados ao desinstalar ou redefinir o app.",
     "networkTitle": "Acesso à rede",
-    "networkBody": "O NeuroSound não faz nenhuma requisição de rede. Funciona totalmente offline e não se comunica com nenhum servidor, serviço de análise ou terceiro.",
+    "networkBody": "Os sons tocam totalmente offline. O único acesso à rede é o serviço de faturamento do Google Play, quando você abre a tela Premium, compra ou restaura uma compra. O NeuroSound não envia nada a nenhum servidor, serviço de análise ou terceiro.",
     "accountsTitle": "Contas e identificadores",
     "accountsBody": "Não há contas de usuário, logins nem identificadores de rastreamento. Não temos como identificar você nem vincular seu uso a você.",
     "childrenTitle": "Crianças",
@@ -255,5 +255,33 @@
     "next": "Avançar",
     "start": "Começar",
     "skip": "Pular"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Desbloqueie todas as frequências",
+    "subtitle": "O Premium abre toda a biblioteca de frequências.",
+    "benefitLibrary": "Todos os tons Solfeggio e batidas binaurais",
+    "benefitMix": "Combine qualquer um deles no mixer",
+    "benefitOffline": "Offline, sem anúncios, sem conta",
+    "plan": {
+      "yearly": "Anual",
+      "monthly": "Mensal",
+      "lifetime": "Vitalício"
+    },
+    "price": {
+      "yearly": "{{price}} / ano",
+      "monthly": "{{price}} / mês",
+      "lifetime": "{{price}} pagamento único"
+    },
+    "trialBadge": "Teste grátis incluído",
+    "cta": "Continuar",
+    "ctaTrial": "Começar teste grátis",
+    "ctaLifetime": "Comprar uma vez",
+    "restore": "Restaurar compras",
+    "restoreNone": "Nenhuma compra anterior encontrada.",
+    "welcome": "Premium desbloqueado. Aproveite!",
+    "error": "Não foi possível concluir a compra. Tente novamente.",
+    "unavailable": "O Premium não está disponível agora. Verifique sua conexão e tente novamente.",
+    "legal": "As assinaturas são renovadas automaticamente até o cancelamento. Cancele quando quiser em Google Play › Assinaturas. O pagamento é cobrado na sua conta do Google Play."
   }
 }

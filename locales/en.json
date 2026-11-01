@@ -214,7 +214,7 @@
     "dataTitle": "What the app stores",
     "dataBody": "Your favourites, saved mixes, and preferences (theme, language, volume, accessibility settings) are saved locally on your device. Android cloud backup is disabled. This data is never sent to us or anyone else and is deleted if you uninstall the app or use Reset data in Settings.",
     "networkTitle": "Network access",
-    "networkBody": "NeuroSound makes no network requests. It works fully offline and does not communicate with any server, analytics service, or third party.",
+    "networkBody": "Sounds play fully offline. The only network access is Google Play’s own billing service, used when you open the Premium screen, buy, or restore a purchase. NeuroSound itself sends nothing to any server, analytics service, or third party.",
     "accountsTitle": "Accounts and identifiers",
     "accountsBody": "There are no user accounts, sign-ins, or tracking identifiers. We have no way to identify you or link your usage to you.",
     "childrenTitle": "Children",
@@ -255,5 +255,33 @@
     "next": "Next",
     "start": "Get started",
     "skip": "Skip"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Unlock every frequency",
+    "subtitle": "Premium opens the full frequency library.",
+    "benefitLibrary": "All Solfeggio tones and binaural beats",
+    "benefitMix": "Layer any of them in the mixer",
+    "benefitOffline": "Works offline, no ads, no account",
+    "plan": {
+      "yearly": "Yearly",
+      "monthly": "Monthly",
+      "lifetime": "Lifetime"
+    },
+    "price": {
+      "yearly": "{{price}} / year",
+      "monthly": "{{price}} / month",
+      "lifetime": "{{price}} once"
+    },
+    "trialBadge": "Free trial included",
+    "cta": "Continue",
+    "ctaTrial": "Start free trial",
+    "ctaLifetime": "Buy once",
+    "restore": "Restore purchases",
+    "restoreNone": "No previous purchase found.",
+    "welcome": "Premium unlocked. Enjoy!",
+    "error": "The purchase could not be completed. Please try again.",
+    "unavailable": "Premium isn't available right now. Check your connection and try again.",
+    "legal": "Subscriptions renew automatically until cancelled. Cancel anytime in Google Play › Subscriptions. Payment is charged to your Google Play account."
   }
 }

@@ -25,6 +25,8 @@ import { EqualizerBars } from './EqualizerBars';
 import { ArtBackground } from './ArtBackground';
 import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
+import { isLockedPreset } from '@/lib/premium';
+import { useIsPremium } from '@/stores/premiumStore';
 
 export function presetIcon(preset: FrequencyPreset): IconConfig {
   if (preset.type === 'binaural' && preset.binauralType) {
@@ -172,6 +174,8 @@ export function PresetRow({
   const artwork = useArtwork();
   const name = t(preset.nameKey);
   const match = highlight ? splitOnMatch(name, highlight) : null;
+  const isPremium = useIsPremium();
+  const locked = !isPremium && isLockedPreset(preset.id);
 
   return (
     <AnimatedTouchable
@@ -194,6 +198,7 @@ export function PresetRow({
         // stands for has to be spoken here or it is simply missing.
         isPlaying ? t('common.nowPlaying') : null,
         isFavorite ? t('common.addedToFavorites') : null,
+        locked ? t('paywall.locked') : null,
       ]
         .filter(Boolean)
         .join(', ')}
@@ -259,7 +264,7 @@ export function PresetRow({
         </View>
         {isPlaying && <EqualizerBars color={artwork.foreground.primary} />}
         <Ionicons
-          name="chevron-forward"
+          name={locked ? 'lock-closed' : 'chevron-forward'}
           size={17}
           color={artwork.foreground.secondary}
           accessibilityElementsHidden

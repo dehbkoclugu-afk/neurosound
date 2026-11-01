@@ -214,7 +214,7 @@
     "dataTitle": "Co aplikacja zapisuje",
     "dataBody": "Twoje ulubione, zapisane miksy i preferencje (motyw, język, głośność, ustawienia dostępności) są zapisywane lokalnie na urządzeniu. Kopia zapasowa w chmurze Androida jest wyłączona. Te dane nigdy nie trafiają do nas ani do nikogo innego i znikają po odinstalowaniu aplikacji lub użyciu opcji Zresetuj dane w Ustawieniach.",
     "networkTitle": "Dostęp do sieci",
-    "networkBody": "NeuroSound nie wysyła żadnych zapytań sieciowych. Działa całkowicie offline i nie łączy się z żadnym serwerem, usługą analityczną ani stroną trzecią.",
+    "networkBody": "Dźwięki działają całkowicie offline. Jedyny dostęp do sieci to usługa płatności Google Play, gdy otwierasz ekran Premium, kupujesz lub przywracasz zakup. Sama aplikacja NeuroSound nie wysyła niczego na żaden serwer, do usług analitycznych ani stron trzecich.",
     "accountsTitle": "Konta i identyfikatory",
     "accountsBody": "Nie ma kont użytkowników, logowania ani identyfikatorów śledzących. Nie mamy żadnego sposobu, by Cię rozpoznać lub powiązać z Tobą korzystanie z aplikacji.",
     "childrenTitle": "Dzieci",
@@ -255,5 +255,33 @@
     "next": "Dalej",
     "start": "Zaczynajmy",
     "skip": "Pomiń"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Odblokuj wszystkie częstotliwości",
+    "subtitle": "Premium otwiera całą bibliotekę częstotliwości.",
+    "benefitLibrary": "Wszystkie tony Solfeggio i dudnienia binauralne",
+    "benefitMix": "Łącz dowolne z nich w mikserze",
+    "benefitOffline": "Offline, bez reklam, bez konta",
+    "plan": {
+      "yearly": "Rocznie",
+      "monthly": "Miesięcznie",
+      "lifetime": "Dożywotnio"
+    },
+    "price": {
+      "yearly": "{{price}} / rok",
+      "monthly": "{{price}} / miesiąc",
+      "lifetime": "{{price}} jednorazowo"
+    },
+    "trialBadge": "Bezpłatny okres próbny",
+    "cta": "Dalej",
+    "ctaTrial": "Rozpocznij bezpłatny okres próbny",
+    "ctaLifetime": "Kup jednorazowo",
+    "restore": "Przywróć zakupy",
+    "restoreNone": "Nie znaleziono wcześniejszych zakupów.",
+    "welcome": "Premium odblokowane. Miłego słuchania!",
+    "error": "Nie udało się dokończyć zakupu. Spróbuj ponownie.",
+    "unavailable": "Premium jest teraz niedostępne. Sprawdź połączenie i spróbuj ponownie.",
+    "legal": "Subskrypcje odnawiają się automatycznie do czasu anulowania. Anuluj w dowolnej chwili w Google Play › Subskrypcje. Płatność jest pobierana z Twojego konta Google Play."
   }
 }

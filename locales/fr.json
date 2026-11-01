@@ -214,7 +214,7 @@
     "dataTitle": "Ce que l'application enregistre",
     "dataBody": "Vos favoris, mix et réglages sont stockés localement. La sauvegarde cloud Android est désactivée. Les données ne nous sont pas envoyées, ni à des tiers, et sont supprimées lors de la désinstallation ou de la réinitialisation.",
     "networkTitle": "Accès au réseau",
-    "networkBody": "NeuroSound n'effectue aucune requête réseau. L'application fonctionne entièrement hors ligne et ne communique avec aucun serveur, service d'analyse ou tiers.",
+    "networkBody": "Les sons fonctionnent entièrement hors ligne. Le seul accès réseau est le service de facturation de Google Play, lorsque vous ouvrez l'écran Premium, achetez ou restaurez un achat. NeuroSound n'envoie rien à aucun serveur, service d'analyse ou tiers.",
     "accountsTitle": "Comptes et identifiants",
     "accountsBody": "Il n'y a ni compte utilisateur, ni connexion, ni identifiant de suivi. Nous n'avons aucun moyen de vous identifier ou de relier votre usage à vous.",
     "childrenTitle": "Enfants",
@@ -255,5 +255,33 @@
     "next": "Suivant",
     "start": "Commencer",
     "skip": "Passer"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Débloquez toutes les fréquences",
+    "subtitle": "Premium ouvre toute la bibliothèque de fréquences.",
+    "benefitLibrary": "Tous les tons Solfeggio et battements binauraux",
+    "benefitMix": "Superposez-les dans le mixeur",
+    "benefitOffline": "Hors ligne, sans pub, sans compte",
+    "plan": {
+      "yearly": "Annuel",
+      "monthly": "Mensuel",
+      "lifetime": "À vie"
+    },
+    "price": {
+      "yearly": "{{price}} / an",
+      "monthly": "{{price}} / mois",
+      "lifetime": "{{price}} une fois"
+    },
+    "trialBadge": "Essai gratuit inclus",
+    "cta": "Continuer",
+    "ctaTrial": "Commencer l'essai gratuit",
+    "ctaLifetime": "Acheter une fois",
+    "restore": "Restaurer les achats",
+    "restoreNone": "Aucun achat précédent trouvé.",
+    "welcome": "Premium débloqué. Profitez-en !",
+    "error": "L'achat n'a pas pu aboutir. Veuillez réessayer.",
+    "unavailable": "Premium n'est pas disponible pour le moment. Vérifiez votre connexion et réessayez.",
+    "legal": "Les abonnements se renouvellent automatiquement jusqu'à résiliation. Résiliez à tout moment dans Google Play › Abonnements. Le paiement est débité de votre compte Google Play."
   }
 }

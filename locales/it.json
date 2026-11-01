@@ -214,7 +214,7 @@
     "dataTitle": "Cosa salva l'app",
     "dataBody": "Preferiti, mix e impostazioni sono salvati localmente. Il backup cloud Android è disattivato. I dati non vengono inviati a noi o a terzi e vengono eliminati disinstallando o azzerando l'app.",
     "networkTitle": "Accesso alla rete",
-    "networkBody": "NeuroSound non effettua alcuna richiesta di rete. Funziona completamente offline e non comunica con alcun server, servizio di analisi o terza parte.",
+    "networkBody": "I suoni funzionano completamente offline. L'unico accesso alla rete è il servizio di fatturazione di Google Play, quando apri la schermata Premium, acquisti o ripristini un acquisto. NeuroSound non invia nulla a server, servizi di analisi o terze parti.",
     "accountsTitle": "Account e identificatori",
     "accountsBody": "Non esistono account, accessi o identificatori di tracciamento. Non abbiamo alcun modo di identificarti o di collegare a te il tuo utilizzo.",
     "childrenTitle": "Minori",
@@ -255,5 +255,33 @@
     "next": "Avanti",
     "start": "Inizia",
     "skip": "Salta"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Sblocca tutte le frequenze",
+    "subtitle": "Premium apre l'intera libreria di frequenze.",
+    "benefitLibrary": "Tutti i toni Solfeggio e i battiti binaurali",
+    "benefitMix": "Sovrapponili nel mixer",
+    "benefitOffline": "Offline, senza pubblicità, senza account",
+    "plan": {
+      "yearly": "Annuale",
+      "monthly": "Mensile",
+      "lifetime": "A vita"
+    },
+    "price": {
+      "yearly": "{{price}} / anno",
+      "monthly": "{{price}} / mese",
+      "lifetime": "{{price}} una tantum"
+    },
+    "trialBadge": "Prova gratuita inclusa",
+    "cta": "Continua",
+    "ctaTrial": "Inizia la prova gratuita",
+    "ctaLifetime": "Acquista una volta",
+    "restore": "Ripristina acquisti",
+    "restoreNone": "Nessun acquisto precedente trovato.",
+    "welcome": "Premium sbloccato. Buon ascolto!",
+    "error": "Impossibile completare l'acquisto. Riprova.",
+    "unavailable": "Premium non è disponibile ora. Controlla la connessione e riprova.",
+    "legal": "Gli abbonamenti si rinnovano automaticamente fino alla disdetta. Puoi disdire quando vuoi in Google Play › Abbonamenti. Il pagamento viene addebitato sul tuo account Google Play."
   }
 }

@@ -214,7 +214,7 @@
     "dataTitle": "Was die App speichert",
     "dataBody": "Deine Favoriten, Mixe und Einstellungen werden lokal auf deinem Gerät gespeichert. Android-Cloud-Backups sind deaktiviert. Die Daten werden weder an uns noch an Dritte gesendet und beim Deinstallieren oder Zurücksetzen gelöscht.",
     "networkTitle": "Netzwerkzugriff",
-    "networkBody": "NeuroSound stellt keine Netzwerkanfragen. Die App funktioniert vollständig offline und kommuniziert mit keinem Server, Analysedienst oder Dritten.",
+    "networkBody": "Klänge laufen komplett offline. Der einzige Netzwerkzugriff ist der Abrechnungsdienst von Google Play, wenn du den Premium-Bildschirm öffnest, etwas kaufst oder einen Kauf wiederherstellst. NeuroSound selbst sendet nichts an Server, Analysedienste oder Dritte.",
     "accountsTitle": "Konten und Kennungen",
     "accountsBody": "Es gibt keine Benutzerkonten, Anmeldungen oder Tracking-Kennungen. Wir haben keine Möglichkeit, dich zu identifizieren oder deine Nutzung mit dir zu verknüpfen.",
     "childrenTitle": "Kinder",
@@ -255,5 +255,33 @@
     "next": "Weiter",
     "start": "Los geht's",
     "skip": "Überspringen"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Alle Frequenzen freischalten",
+    "subtitle": "Premium öffnet die komplette Frequenzbibliothek.",
+    "benefitLibrary": "Alle Solfeggio-Töne und binauralen Beats",
+    "benefitMix": "Jeden davon im Mixer schichten",
+    "benefitOffline": "Offline, ohne Werbung, ohne Konto",
+    "plan": {
+      "yearly": "Jährlich",
+      "monthly": "Monatlich",
+      "lifetime": "Lebenslang"
+    },
+    "price": {
+      "yearly": "{{price}} / Jahr",
+      "monthly": "{{price}} / Monat",
+      "lifetime": "{{price}} einmalig"
+    },
+    "trialBadge": "Inklusive kostenlosem Test",
+    "cta": "Weiter",
+    "ctaTrial": "Kostenlos testen",
+    "ctaLifetime": "Einmal kaufen",
+    "restore": "Käufe wiederherstellen",
+    "restoreNone": "Kein früherer Kauf gefunden.",
+    "welcome": "Premium freigeschaltet. Viel Freude!",
+    "error": "Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+    "unavailable": "Premium ist gerade nicht verfügbar. Prüfe deine Verbindung und versuche es erneut.",
+    "legal": "Abos verlängern sich automatisch, bis sie gekündigt werden. Jederzeit kündbar unter Google Play › Abos. Die Zahlung erfolgt über dein Google-Play-Konto."
   }
 }

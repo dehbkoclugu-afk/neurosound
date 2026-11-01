@@ -14,7 +14,7 @@ export type { ThemeMode } from '@/lib/themeMode';
 const isClient = typeof window !== 'undefined';
 
 // Safe storage wrapper
-const safeStorage: StateStorage = {
+export const safeStorage: StateStorage = {
   getItem: async (name: string) => {
     if (!isClient) return null;
     try {
@@ -69,6 +69,8 @@ interface SettingsState {
   hasSeenEpilepsyWarning: boolean;
   /** Explore's category blurb shown once per category, not on every visit. */
   seenCategoryDescriptions: Record<string, boolean>;
+  /** Installed before the paywall: keeps every frequency they already had. */
+  legacyPremium: boolean;
 
   // Actions
   setTheme: (theme: ThemeMode) => void;
@@ -101,6 +103,7 @@ const initialState = {
   hasSeenHeadphoneWarning: false,
   hasSeenEpilepsyWarning: false,
   seenCategoryDescriptions: {},
+  legacyPremium: false,
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -124,17 +127,25 @@ export const useSettingsStore = create<SettingsState>()(
         })),
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
       resetSettings: () =>
-        set((state) => ({ ...initialState, hasHydrated: state.hasHydrated })),
+        set((state) => ({
+          ...initialState,
+          hasHydrated: state.hasHydrated,
+          legacyPremium: state.legacyPremium,
+        })),
     }),
     {
       name: 'neurosound-settings',
       storage: createJSONStorage(() => safeStorage),
-      version: 1,
-      migrate: (persistedState) => {
+      version: 2,
+      // Only runs for state saved by an older version, i.e. an existing
+      // install; a fresh install starts from initialState with no grant.
+      migrate: (persistedState, version) => {
         const restored = persistedState as Partial<SettingsState> | undefined;
         return {
           ...restored,
           theme: normalizeThemeMode(restored?.theme),
+          legacyPremium:
+            restored?.legacyPremium ?? (version < 2 && !!restored?.hasSeenOnboarding),
         } as SettingsState;
       },
       // Storage is async, so the restored language lands after i18n has already

@@ -214,7 +214,7 @@
     "dataTitle": "Apa yang disimpan aplikasi",
     "dataBody": "Favorit, mix tersimpan, dan preferensimu (tema, bahasa, volume, pengaturan aksesibilitas) disimpan secara lokal di perangkatmu. Cadangan cloud Android dinonaktifkan. Data ini tidak pernah dikirim kepada kami atau siapa pun, dan terhapus saat kamu mencopot aplikasi atau memakai Atur ulang data di Pengaturan.",
     "networkTitle": "Akses jaringan",
-    "networkBody": "NeuroSound tidak melakukan permintaan jaringan apa pun. Aplikasi bekerja sepenuhnya luring dan tidak berkomunikasi dengan server, layanan analitik, atau pihak ketiga.",
+    "networkBody": "Suara diputar sepenuhnya offline. Satu-satunya akses jaringan adalah layanan penagihan Google Play, saat kamu membuka layar Premium, membeli, atau memulihkan pembelian. NeuroSound sendiri tidak mengirim apa pun ke server, layanan analitik, atau pihak ketiga.",
     "accountsTitle": "Akun dan pengenal",
     "accountsBody": "Tidak ada akun pengguna, proses masuk, atau pengenal pelacakan. Kami tidak punya cara untuk mengenali kamu atau mengaitkan pemakaian denganmu.",
     "childrenTitle": "Anak-anak",
@@ -255,5 +255,33 @@
     "next": "Lanjut",
     "start": "Mulai",
     "skip": "Lewati"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Buka semua frekuensi",
+    "subtitle": "Premium membuka seluruh pustaka frekuensi.",
+    "benefitLibrary": "Semua nada Solfeggio dan binaural beats",
+    "benefitMix": "Tumpuk semuanya di mixer",
+    "benefitOffline": "Offline, tanpa iklan, tanpa akun",
+    "plan": {
+      "yearly": "Tahunan",
+      "monthly": "Bulanan",
+      "lifetime": "Seumur hidup"
+    },
+    "price": {
+      "yearly": "{{price}} / tahun",
+      "monthly": "{{price}} / bulan",
+      "lifetime": "{{price}} sekali bayar"
+    },
+    "trialBadge": "Termasuk uji coba gratis",
+    "cta": "Lanjutkan",
+    "ctaTrial": "Mulai uji coba gratis",
+    "ctaLifetime": "Beli sekali",
+    "restore": "Pulihkan pembelian",
+    "restoreNone": "Tidak ada pembelian sebelumnya.",
+    "welcome": "Premium aktif. Selamat menikmati!",
+    "error": "Pembelian tidak dapat diselesaikan. Coba lagi.",
+    "unavailable": "Premium sedang tidak tersedia. Periksa koneksi lalu coba lagi.",
+    "legal": "Langganan diperpanjang otomatis hingga dibatalkan. Batalkan kapan saja di Google Play › Langganan. Pembayaran ditagihkan ke akun Google Play kamu."
   }
 }

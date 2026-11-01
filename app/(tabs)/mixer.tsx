@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import {
@@ -50,6 +51,8 @@ import {
   FrequencyPreset,
 } from '@/lib/frequencies';
 import * as playerController from '@/lib/audio/playerController';
+import { isLockedPreset } from '@/lib/premium';
+import { useIsPremium } from '@/stores/premiumStore';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
@@ -115,6 +118,8 @@ export default function MixerScreen() {
   const [editingMixId, setEditingMixId] = useState<string | null>(null);
   const [pickerQuery, setPickerQuery] = useState('');
   const showToast = useToastStore((s) => s.show);
+  const router = useRouter();
+  const isPremium = useIsPremium();
 
   const colors = useThemeColors();
   const categoryColors = useCategoryColors();
@@ -149,6 +154,11 @@ export default function MixerScreen() {
 
   const handleAddChannel = useCallback(
     async (preset: FrequencyPreset) => {
+      if (isLockedPreset(preset.id) && !isPremium) {
+        setShowPresetPicker(false);
+        router.push('/paywall');
+        return;
+      }
       const added = await playerController.mixerAddChannel(preset);
       if (!added) {
         Alert.alert(t('mixer.maxChannels'), t('mixer.maxChannelsDesc'));
@@ -157,7 +167,7 @@ export default function MixerScreen() {
       setPickerQuery('');
       setShowPresetPicker(false);
     },
-    [t],
+    [t, isPremium, router],
   );
 
   const handleRemoveChannel = useCallback((channelId: string) => {
@@ -831,7 +841,14 @@ export default function MixerScreen() {
                   <Text style={[styles.presetItemName, { color: colors.text }]}>
                     {t(preset.nameKey)}
                   </Text>
-                  <Ionicons name="add" size={22} color={colors.accent} />
+                  <Ionicons
+                    name={isLockedPreset(preset.id) && !isPremium ? 'lock-closed' : 'add'}
+                    size={22}
+                    color={colors.accent}
+                    accessibilityLabel={
+                      isLockedPreset(preset.id) && !isPremium ? t('paywall.locked') : undefined
+                    }
+                  />
                 </TouchableOpacity>
               ))}
             </View>

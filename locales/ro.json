@@ -214,7 +214,7 @@
     "dataTitle": "Ce salvează aplicația",
     "dataBody": "Favoritele, mixurile salvate și preferințele tale (temă, limbă, volum, setări de accesibilitate) sunt păstrate local pe dispozitiv. Copia de rezervă în cloud a Android este dezactivată. Aceste date nu ajung niciodată la noi sau la altcineva și dispar dacă dezinstalezi aplicația sau folosești Resetează datele în Setări.",
     "networkTitle": "Acces la rețea",
-    "networkBody": "NeuroSound nu face nicio cerere de rețea. Funcționează complet offline și nu comunică cu niciun server, serviciu de analiză sau terț.",
+    "networkBody": "Sunetele rulează complet offline. Singurul acces la rețea este serviciul de facturare Google Play, când deschizi ecranul Premium, cumperi sau restabilești o achiziție. NeuroSound nu trimite nimic către vreun server, serviciu de analiză sau terț.",
     "accountsTitle": "Conturi și identificatori",
     "accountsBody": "Nu există conturi de utilizator, autentificare sau identificatori de urmărire. Nu avem nicio cale să te recunoaștem sau să legăm utilizarea de tine.",
     "childrenTitle": "Copii",
@@ -255,5 +255,33 @@
     "next": "Înainte",
     "start": "Începe",
     "skip": "Omite"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Deblochează toate frecvențele",
+    "subtitle": "Premium deschide întreaga bibliotecă de frecvențe.",
+    "benefitLibrary": "Toate tonurile Solfeggio și ritmurile binaurale",
+    "benefitMix": "Suprapune-le oricum în mixer",
+    "benefitOffline": "Offline, fără reclame, fără cont",
+    "plan": {
+      "yearly": "Anual",
+      "monthly": "Lunar",
+      "lifetime": "Pe viață"
+    },
+    "price": {
+      "yearly": "{{price}} / an",
+      "monthly": "{{price}} / lună",
+      "lifetime": "{{price}} o singură dată"
+    },
+    "trialBadge": "Perioadă de probă gratuită inclusă",
+    "cta": "Continuă",
+    "ctaTrial": "Începe perioada de probă",
+    "ctaLifetime": "Cumpără o dată",
+    "restore": "Restabilește achizițiile",
+    "restoreNone": "Nu a fost găsită nicio achiziție anterioară.",
+    "welcome": "Premium deblocat. Bucură-te!",
+    "error": "Achiziția nu a putut fi finalizată. Încearcă din nou.",
+    "unavailable": "Premium nu este disponibil acum. Verifică conexiunea și încearcă din nou.",
+    "legal": "Abonamentele se reînnoiesc automat până la anulare. Anulează oricând din Google Play › Abonamente. Plata se face din contul tău Google Play."
   }
 }

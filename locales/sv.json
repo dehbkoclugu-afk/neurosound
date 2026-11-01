@@ -214,7 +214,7 @@
     "dataTitle": "Vad appen sparar",
     "dataBody": "Dina favoriter, sparade mixar och inställningar (tema, språk, volym, tillgänglighetsval) sparas lokalt på din enhet. Androids molnsäkerhetskopiering är avstängd. Uppgifterna skickas aldrig till oss eller någon annan och försvinner om du avinstallerar appen eller använder Nollställ data i inställningarna.",
     "networkTitle": "Nätverksåtkomst",
-    "networkBody": "NeuroSound gör inga nätverksanrop. Appen fungerar helt offline och kontaktar ingen server, ingen analystjänst och ingen tredje part.",
+    "networkBody": "Ljuden spelas helt offline. Den enda nätverksåtkomsten är Google Plays betaltjänst, när du öppnar Premium-skärmen, köper eller återställer ett köp. NeuroSound skickar själv ingenting till någon server, analystjänst eller tredje part.",
     "accountsTitle": "Konton och identifierare",
     "accountsBody": "Det finns inga användarkonton, ingen inloggning och inga spårningsidentifierare. Vi har inget sätt att känna igen dig eller koppla användningen till dig.",
     "childrenTitle": "Barn",
@@ -255,5 +255,33 @@
     "next": "Nästa",
     "start": "Kom igång",
     "skip": "Hoppa över"
+  },
+  "paywall": {
+    "locked": "Premium",
+    "title": "Lås upp alla frekvenser",
+    "subtitle": "Premium öppnar hela frekvensbiblioteket.",
+    "benefitLibrary": "Alla Solfeggio-toner och binaurala beats",
+    "benefitMix": "Lägg dem i lager i mixern",
+    "benefitOffline": "Offline, ingen reklam, inget konto",
+    "plan": {
+      "yearly": "Årsvis",
+      "monthly": "Månadsvis",
+      "lifetime": "Livstid"
+    },
+    "price": {
+      "yearly": "{{price}} / år",
+      "monthly": "{{price}} / månad",
+      "lifetime": "{{price}} en gång"
+    },
+    "trialBadge": "Gratis provperiod ingår",
+    "cta": "Fortsätt",
+    "ctaTrial": "Starta gratis provperiod",
+    "ctaLifetime": "Köp en gång",
+    "restore": "Återställ köp",
+    "restoreNone": "Inget tidigare köp hittades.",
+    "welcome": "Premium upplåst. Njut!",
+    "error": "Köpet kunde inte slutföras. Försök igen.",
+    "unavailable": "Premium är inte tillgängligt just nu. Kontrollera anslutningen och försök igen.",
+    "legal": "Prenumerationer förnyas automatiskt tills de sägs upp. Säg upp när som helst i Google Play › Prenumerationer. Betalningen dras från ditt Google Play-konto."
   }
 }

@@ -49,6 +49,8 @@ import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
+import { isLockedPreset } from '@/lib/premium';
+import { useIsPremium, usePremiumReady } from '@/stores/premiumStore';
 import * as playerController from '@/lib/audio/playerController';
 
 /**
@@ -99,6 +101,8 @@ export default function PlayerScreen() {
   } = useAudioStore();
   const { favoriteIds, addFavorite, removeFavorite, addRecentlyPlayed } =
     usePresetsStore();
+  const isPremium = useIsPremium();
+  const premiumReady = usePremiumReady();
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
   const [showTimerModal, setShowTimerModal] = useState(false);
@@ -107,14 +111,20 @@ export default function PlayerScreen() {
   const heroScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    if (!id) return;
+    // Wait for the cached entitlement, or a paying user flashes the paywall.
+    if (!id || !premiumReady) return;
+    // Every route to a sound ends here, so this is the one paywall gate.
+    if (isLockedPreset(id) && !isPremium) {
+      router.replace('/paywall');
+      return;
+    }
     const loadedPreset = getPresetById(id);
     if (loadedPreset) {
       setPreset(loadedPreset);
       playerController.loadPreset(loadedPreset);
       addRecentlyPlayed(id);
     }
-  }, [id, addRecentlyPlayed]);
+  }, [id, addRecentlyPlayed, premiumReady, isPremium, router]);
 
   useEffect(() => {
     playerController.syncVolume();
