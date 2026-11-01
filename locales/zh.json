@@ -28,7 +28,7 @@
     "settings": "设置"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "专注、放松、聆听",
     "quickStart": "快速开始",
     "quickStartDesc": "适合入门的热门预设",
@@ -152,7 +152,9 @@
     "renameMix": "重命名混音",
     "mixRenamed": "混音已重命名",
     "addToMixer": "加入混音器",
-    "addedToMixer": "已加入混音器"
+    "addedToMixer": "已加入混音器",
+    "emptyTitle": "打造专属混音",
+    "emptyDesc": "最多叠加 4 种声音——雨声、噪音与频率——并保存混音。"
   },
   "player": {
     "nowPlaying": "正在播放",
@@ -210,11 +212,11 @@
     "title": "隐私政策",
     "updated": "最后更新：{{date}}",
     "summaryTitle": "简而言之",
-    "summaryBody": "NeuroSound 不收集、不存储、也不传输你的任何数据。你在这个应用里做的一切——收藏、自定义混音和设置——都留在你的设备上。",
+    "summaryBody": "852Hz 不收集、不存储、也不传输你的任何数据。你在这个应用里做的一切——收藏、自定义混音和设置——都留在你的设备上。",
     "dataTitle": "应用保存了什么",
     "dataBody": "收藏、混音和设置保存在设备本地。Android 云备份已关闭。数据不会发送给我们或第三方，并会在卸载或重置应用时删除。",
     "networkTitle": "网络访问",
-    "networkBody": "声音完全离线播放。唯一的网络访问是 Google Play 结算服务，仅在你打开高级版页面、购买或恢复购买时使用。NeuroSound 本身不会向任何服务器、分析服务或第三方发送任何数据。",
+    "networkBody": "声音完全离线播放。唯一的网络访问是 Google Play 结算服务，仅在你打开高级版页面、购买或恢复购买时使用。852Hz 本身不会向任何服务器、分析服务或第三方发送任何数据。",
     "accountsTitle": "账户与标识符",
     "accountsBody": "没有用户账户、登录，也没有追踪标识符。我们没有任何办法识别你，或把使用记录与你关联起来。",
     "childrenTitle": "儿童",
@@ -282,6 +284,7 @@
     "welcome": "高级版已解锁，尽情享受！",
     "error": "无法完成购买，请重试。",
     "unavailable": "高级版暂时不可用。请检查网络连接后重试。",
-    "legal": "订阅会自动续订，直到你取消为止。可随时在 Google Play › 订阅 中取消。费用将从你的 Google Play 账号扣除。"
+    "legal": "订阅会自动续订，直到你取消为止。可随时在 Google Play › 订阅 中取消。费用将从你的 Google Play 账号扣除。",
+    "bestValue": "最划算"
   }
 }

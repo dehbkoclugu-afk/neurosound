@@ -28,7 +28,7 @@
     "settings": "Pengaturan"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Fokus, Santai, Dengarkan",
     "quickStart": "Mulai Cepat",
     "quickStartDesc": "Preset populer untuk memulai",
@@ -152,7 +152,9 @@
     "renameMix": "Ganti nama mix",
     "mixRenamed": "Nama mix diganti",
     "addToMixer": "Tambahkan ke mixer",
-    "addedToMixer": "Ditambahkan ke mixer"
+    "addedToMixer": "Ditambahkan ke mixer",
+    "emptyTitle": "Buat campuran suaramu sendiri",
+    "emptyDesc": "Gabungkan hingga 4 suara — hujan, noise, dan frekuensi — lalu simpan."
   },
   "player": {
     "nowPlaying": "Sedang Diputar",
@@ -210,11 +212,11 @@
     "title": "Kebijakan Privasi",
     "updated": "Terakhir diperbarui: {{date}}",
     "summaryTitle": "Singkatnya",
-    "summaryBody": "NeuroSound tidak mengumpulkan, menyimpan, atau mengirim data kamu. Semua yang kamu lakukan di aplikasi ini — favorit, mix buatanmu, dan pengaturan — tetap ada di perangkatmu.",
+    "summaryBody": "852Hz tidak mengumpulkan, menyimpan, atau mengirim data kamu. Semua yang kamu lakukan di aplikasi ini — favorit, mix buatanmu, dan pengaturan — tetap ada di perangkatmu.",
     "dataTitle": "Apa yang disimpan aplikasi",
     "dataBody": "Favorit, mix tersimpan, dan preferensimu (tema, bahasa, volume, pengaturan aksesibilitas) disimpan secara lokal di perangkatmu. Cadangan cloud Android dinonaktifkan. Data ini tidak pernah dikirim kepada kami atau siapa pun, dan terhapus saat kamu mencopot aplikasi atau memakai Atur ulang data di Pengaturan.",
     "networkTitle": "Akses jaringan",
-    "networkBody": "Suara diputar sepenuhnya offline. Satu-satunya akses jaringan adalah layanan penagihan Google Play, saat kamu membuka layar Premium, membeli, atau memulihkan pembelian. NeuroSound sendiri tidak mengirim apa pun ke server, layanan analitik, atau pihak ketiga.",
+    "networkBody": "Suara diputar sepenuhnya offline. Satu-satunya akses jaringan adalah layanan penagihan Google Play, saat kamu membuka layar Premium, membeli, atau memulihkan pembelian. 852Hz sendiri tidak mengirim apa pun ke server, layanan analitik, atau pihak ketiga.",
     "accountsTitle": "Akun dan pengenal",
     "accountsBody": "Tidak ada akun pengguna, proses masuk, atau pengenal pelacakan. Kami tidak punya cara untuk mengenali kamu atau mengaitkan pemakaian denganmu.",
     "childrenTitle": "Anak-anak",
@@ -282,6 +284,7 @@
     "welcome": "Premium aktif. Selamat menikmati!",
     "error": "Pembelian tidak dapat diselesaikan. Coba lagi.",
     "unavailable": "Premium sedang tidak tersedia. Periksa koneksi lalu coba lagi.",
-    "legal": "Langganan diperpanjang otomatis hingga dibatalkan. Batalkan kapan saja di Google Play › Langganan. Pembayaran ditagihkan ke akun Google Play kamu."
+    "legal": "Langganan diperpanjang otomatis hingga dibatalkan. Batalkan kapan saja di Google Play › Langganan. Pembayaran ditagihkan ke akun Google Play kamu.",
+    "bestValue": "Paling hemat"
   }
 }

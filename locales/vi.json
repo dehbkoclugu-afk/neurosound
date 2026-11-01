@@ -28,7 +28,7 @@
     "settings": "Cài đặt"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Tập trung, Thư giãn, Lắng nghe",
     "quickStart": "Bắt đầu nhanh",
     "quickStartDesc": "Cài đặt sẵn phổ biến để bắt đầu",
@@ -152,7 +152,9 @@
     "renameMix": "Đổi tên bản trộn",
     "mixRenamed": "Đã đổi tên bản trộn",
     "addToMixer": "Thêm vào bàn trộn",
-    "addedToMixer": "Đã thêm vào bàn trộn"
+    "addedToMixer": "Đã thêm vào bàn trộn",
+    "emptyTitle": "Tự tạo bản phối âm thanh",
+    "emptyDesc": "Kết hợp tối đa 4 âm thanh — mưa, tiếng ồn và tần số — rồi lưu lại."
   },
   "player": {
     "nowPlaying": "Đang phát",
@@ -210,11 +212,11 @@
     "title": "Chính sách bảo mật",
     "updated": "Cập nhật lần cuối: {{date}}",
     "summaryTitle": "Nói ngắn gọn",
-    "summaryBody": "NeuroSound không thu thập, lưu trữ hay gửi đi bất kỳ dữ liệu nào của bạn. Mọi thứ bạn làm trong ứng dụng — mục yêu thích, bản trộn riêng và cài đặt — đều nằm lại trên thiết bị của bạn.",
+    "summaryBody": "852Hz không thu thập, lưu trữ hay gửi đi bất kỳ dữ liệu nào của bạn. Mọi thứ bạn làm trong ứng dụng — mục yêu thích, bản trộn riêng và cài đặt — đều nằm lại trên thiết bị của bạn.",
     "dataTitle": "Ứng dụng lưu những gì",
     "dataBody": "Mục yêu thích, bản trộn đã lưu và tùy chọn của bạn (chủ đề, ngôn ngữ, âm lượng, cài đặt trợ năng) được lưu ngay trên thiết bị. Sao lưu đám mây của Android đã bị tắt. Dữ liệu này không bao giờ được gửi cho chúng tôi hay bất kỳ ai, và sẽ mất khi bạn gỡ ứng dụng hoặc dùng Đặt lại dữ liệu trong Cài đặt.",
     "networkTitle": "Truy cập mạng",
-    "networkBody": "Âm thanh phát hoàn toàn ngoại tuyến. Kết nối mạng duy nhất là dịch vụ thanh toán của Google Play, khi bạn mở màn hình Premium, mua hoặc khôi phục giao dịch. Bản thân NeuroSound không gửi gì đến máy chủ, dịch vụ phân tích hay bên thứ ba nào.",
+    "networkBody": "Âm thanh phát hoàn toàn ngoại tuyến. Kết nối mạng duy nhất là dịch vụ thanh toán của Google Play, khi bạn mở màn hình Premium, mua hoặc khôi phục giao dịch. Bản thân 852Hz không gửi gì đến máy chủ, dịch vụ phân tích hay bên thứ ba nào.",
     "accountsTitle": "Tài khoản và định danh",
     "accountsBody": "Không có tài khoản người dùng, không đăng nhập, không mã định danh theo dõi. Chúng tôi không có cách nào nhận ra bạn hay gắn việc sử dụng với bạn.",
     "childrenTitle": "Trẻ em",
@@ -282,6 +284,7 @@
     "welcome": "Đã mở khóa Premium. Chúc bạn thư giãn!",
     "error": "Không thể hoàn tất giao dịch. Vui lòng thử lại.",
     "unavailable": "Premium hiện không khả dụng. Hãy kiểm tra kết nối và thử lại.",
-    "legal": "Gói đăng ký tự động gia hạn cho đến khi bạn hủy. Hủy bất cứ lúc nào trong Google Play › Gói đăng ký. Khoản thanh toán được tính vào tài khoản Google Play của bạn."
+    "legal": "Gói đăng ký tự động gia hạn cho đến khi bạn hủy. Hủy bất cứ lúc nào trong Google Play › Gói đăng ký. Khoản thanh toán được tính vào tài khoản Google Play của bạn.",
+    "bestValue": "Tiết kiệm nhất"
   }
 }

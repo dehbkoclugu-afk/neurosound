@@ -27,7 +27,9 @@ export const usePremiumStore = create<PremiumState>()(
       name: 'neurosound-premium',
       storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({ owned: state.owned }),
-      onRehydrateStorage: () => (state) => state?.setHasHydrated(true),
+      // `state` is undefined when the read fails; hydration must still be
+      // marked done, or the Player waits on premiumReady forever.
+      onRehydrateStorage: () => () => usePremiumStore.setState({ hasHydrated: true }),
     }
   )
 );

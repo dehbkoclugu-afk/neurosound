@@ -28,7 +28,7 @@
     "settings": "Ajustes"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Concéntrate, relájate, escucha",
     "quickStart": "Inicio rápido",
     "quickStartDesc": "Ajustes populares para empezar",
@@ -152,7 +152,9 @@
     "renameMix": "Renombrar mezcla",
     "mixRenamed": "Mezcla renombrada",
     "addToMixer": "Añadir al mezclador",
-    "addedToMixer": "Añadido al mezclador"
+    "addedToMixer": "Añadido al mezclador",
+    "emptyTitle": "Crea tu propia mezcla",
+    "emptyDesc": "Combina hasta 4 sonidos — lluvia, ruido y frecuencias — y guarda la mezcla."
   },
   "player": {
     "nowPlaying": "Sonando ahora",
@@ -210,11 +212,11 @@
     "title": "Política de privacidad",
     "updated": "Última actualización: {{date}}",
     "summaryTitle": "En resumen",
-    "summaryBody": "NeuroSound no recopila, almacena ni transmite ninguno de tus datos. Todo lo que haces en esta app —favoritos, mezclas personalizadas y ajustes— se queda en tu dispositivo.",
+    "summaryBody": "852Hz no recopila, almacena ni transmite ninguno de tus datos. Todo lo que haces en esta app —favoritos, mezclas personalizadas y ajustes— se queda en tu dispositivo.",
     "dataTitle": "Qué guarda la app",
     "dataBody": "Tus favoritos, mezclas y preferencias se guardan localmente. La copia de seguridad en la nube de Android está desactivada. Los datos no se envían a nosotros ni a terceros y se eliminan al desinstalar o restablecer la app.",
     "networkTitle": "Acceso a la red",
-    "networkBody": "Los sonidos se reproducen totalmente sin conexión. El único acceso a la red es el servicio de facturación de Google Play, al abrir la pantalla Premium, comprar o restaurar una compra. NeuroSound no envía nada a ningún servidor, servicio de analítica ni tercero.",
+    "networkBody": "Los sonidos se reproducen totalmente sin conexión. El único acceso a la red es el servicio de facturación de Google Play, al abrir la pantalla Premium, comprar o restaurar una compra. 852Hz no envía nada a ningún servidor, servicio de analítica ni tercero.",
     "accountsTitle": "Cuentas e identificadores",
     "accountsBody": "No hay cuentas de usuario, inicios de sesión ni identificadores de seguimiento. No tenemos forma de identificarte ni de vincular tu uso contigo.",
     "childrenTitle": "Menores",
@@ -282,6 +284,7 @@
     "welcome": "Premium desbloqueado. ¡Disfrútalo!",
     "error": "No se pudo completar la compra. Inténtalo de nuevo.",
     "unavailable": "Premium no está disponible ahora mismo. Revisa tu conexión e inténtalo de nuevo.",
-    "legal": "Las suscripciones se renuevan automáticamente hasta que las canceles. Cancela cuando quieras en Google Play › Suscripciones. El pago se carga a tu cuenta de Google Play."
+    "legal": "Las suscripciones se renuevan automáticamente hasta que las canceles. Cancela cuando quieras en Google Play › Suscripciones. El pago se carga a tu cuenta de Google Play.",
+    "bestValue": "Mejor precio"
   }
 }

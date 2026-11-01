@@ -155,7 +155,9 @@ export const useSettingsStore = create<SettingsState>()(
         if (state?.language && i18n.language !== state.language) {
           i18n.changeLanguage(state.language).catch(() => {});
         }
-        state?.setHasHydrated(true);
+        // `state` is undefined when storage throws; Home would spin forever
+        // on hasHydrated, so mark it done regardless and run on defaults.
+        useSettingsStore.setState({ hasHydrated: true });
       },
     }
   )

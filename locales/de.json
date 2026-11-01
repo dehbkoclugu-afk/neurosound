@@ -28,7 +28,7 @@
     "settings": "Einstellungen"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Fokussieren, entspannen, hören",
     "quickStart": "Schnellstart",
     "quickStartDesc": "Beliebte Presets für den Anfang",
@@ -152,7 +152,9 @@
     "renameMix": "Mix umbenennen",
     "mixRenamed": "Mix umbenannt",
     "addToMixer": "Zum Mixer",
-    "addedToMixer": "Zum Mixer hinzugefügt"
+    "addedToMixer": "Zum Mixer hinzugefügt",
+    "emptyTitle": "Gestalte deinen eigenen Klangmix",
+    "emptyDesc": "Kombiniere bis zu 4 Sounds – Regen, Rauschen, Frequenzen – und speichere den Mix."
   },
   "player": {
     "nowPlaying": "Läuft gerade",
@@ -210,11 +212,11 @@
     "title": "Datenschutzerklärung",
     "updated": "Zuletzt aktualisiert: {{date}}",
     "summaryTitle": "Kurz gesagt",
-    "summaryBody": "NeuroSound erhebt, speichert und überträgt keine deiner Daten. Alles, was du in dieser App tust — Favoriten, eigene Mixe und Einstellungen — bleibt auf deinem Gerät.",
+    "summaryBody": "852Hz erhebt, speichert und überträgt keine deiner Daten. Alles, was du in dieser App tust — Favoriten, eigene Mixe und Einstellungen — bleibt auf deinem Gerät.",
     "dataTitle": "Was die App speichert",
     "dataBody": "Deine Favoriten, Mixe und Einstellungen werden lokal auf deinem Gerät gespeichert. Android-Cloud-Backups sind deaktiviert. Die Daten werden weder an uns noch an Dritte gesendet und beim Deinstallieren oder Zurücksetzen gelöscht.",
     "networkTitle": "Netzwerkzugriff",
-    "networkBody": "Klänge laufen komplett offline. Der einzige Netzwerkzugriff ist der Abrechnungsdienst von Google Play, wenn du den Premium-Bildschirm öffnest, etwas kaufst oder einen Kauf wiederherstellst. NeuroSound selbst sendet nichts an Server, Analysedienste oder Dritte.",
+    "networkBody": "Klänge laufen komplett offline. Der einzige Netzwerkzugriff ist der Abrechnungsdienst von Google Play, wenn du den Premium-Bildschirm öffnest, etwas kaufst oder einen Kauf wiederherstellst. 852Hz selbst sendet nichts an Server, Analysedienste oder Dritte.",
     "accountsTitle": "Konten und Kennungen",
     "accountsBody": "Es gibt keine Benutzerkonten, Anmeldungen oder Tracking-Kennungen. Wir haben keine Möglichkeit, dich zu identifizieren oder deine Nutzung mit dir zu verknüpfen.",
     "childrenTitle": "Kinder",
@@ -282,6 +284,7 @@
     "welcome": "Premium freigeschaltet. Viel Freude!",
     "error": "Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
     "unavailable": "Premium ist gerade nicht verfügbar. Prüfe deine Verbindung und versuche es erneut.",
-    "legal": "Abos verlängern sich automatisch, bis sie gekündigt werden. Jederzeit kündbar unter Google Play › Abos. Die Zahlung erfolgt über dein Google-Play-Konto."
+    "legal": "Abos verlängern sich automatisch, bis sie gekündigt werden. Jederzeit kündbar unter Google Play › Abos. Die Zahlung erfolgt über dein Google-Play-Konto.",
+    "bestValue": "Bester Preis"
   }
 }

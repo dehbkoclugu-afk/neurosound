@@ -23,7 +23,6 @@ import {
   Spacing,
   Typography,
   FontFamily,
-  onPrimary,
   Radius,
   ControlSize,
   Colors,
@@ -233,7 +232,7 @@ export default function SettingsScreen() {
                         styles.optionText,
                         {
                           color:
-                            theme === option.value ? onPrimary : colors.text,
+                            theme === option.value ? colors.onPrimary : colors.text,
                         },
                       ]}
                     >
@@ -289,13 +288,7 @@ export default function SettingsScreen() {
             {/* Sits with Reduce Motion because that is the control that
               answers it — the warning is about the breathing ring. */}
             <View
-              style={[
-                styles.warningCard,
-                {
-                  borderColor: withAlpha(colors.warning, 0.35),
-                  backgroundColor: withAlpha(colors.warning, 0.07),
-                },
-              ]}
+              style={[styles.warningCard, { borderBottomColor: colors.cardBorder }]}
             >
               <View style={styles.warningHeading}>
                 <Ionicons
@@ -736,12 +729,13 @@ const styles = StyleSheet.create({
   },
   // It sat between two switch rows with nothing but whitespace around it,
   // so it read as a stray paragraph rather than a notice.
+  // A plain row in the list, indented to the switch text it qualifies — a
+  // tinted box nested in the settings group was a card inside a card.
   warningCard: {
-    borderRadius: Radius.card,
-    borderWidth: 1,
-    padding: Spacing.md,
-    marginHorizontal: Spacing.md,
-    marginVertical: Spacing.sm,
+    paddingLeft: Spacing.md + 24 + Spacing.sm,
+    paddingRight: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     gap: Spacing.xs,
   },
   warningHeading: {

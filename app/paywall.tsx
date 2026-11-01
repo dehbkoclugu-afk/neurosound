@@ -2,9 +2,13 @@
  * Premium paywall: yearly (with the free trial, if Play offers one to this
  * user), monthly, and a one-time lifetime unlock. Prices come from the store
  * so they are always localised; the entitlement itself is set by PremiumSync.
+ *
+ * Layout: a scene hero (what this app feels like), a strip of the actual
+ * locked sounds (what the money opens), plans, then a CTA pinned to the
+ * bottom edge so it never scrolls away from the plan it buys.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -14,18 +18,23 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchProducts, requestPurchase, ErrorCode } from 'expo-iap';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
+import { useArtwork } from '@/hooks/use-artwork';
 import { Spacing, Typography, FontFamily, Radius, AccessibilitySize, withAlpha } from '@/constants/theme';
 import { contentColumn } from '@/constants/layout';
 import { Button } from '@/components/ui/Button';
+import { ArtBackground } from '@/components/ui/ArtBackground';
 import { syncPremium } from '@/components/PremiumSync';
-import { PREMIUM_SKUS, SUBSCRIPTION_SKUS } from '@/lib/premium';
+import { PREMIUM_SKUS, SUBSCRIPTION_SKUS, isLockedPreset } from '@/lib/premium';
+import { allPresets } from '@/lib/frequencies';
+import { presetArt } from '@/lib/artAssets';
+import { upper } from '@/lib/upper';
 import { useIsPremium } from '@/stores/premiumStore';
 import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
@@ -42,6 +51,8 @@ interface Plan {
 
 const PLAN_ORDER: PlanKey[] = ['yearly', 'monthly', 'lifetime'];
 const BENEFITS = ['benefitLibrary', 'benefitMix', 'benefitOffline'] as const;
+const HERO_PRESET = 'solfeggio-963';
+const PREVIEW_COUNT = 6;
 
 type StoreProduct = { id: string; displayPrice: string; subscriptionOfferDetailsAndroid?: unknown };
 type Offer = {
@@ -73,13 +84,23 @@ function toPlan(product: StoreProduct): Plan | null {
 export default function PaywallScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const artwork = useArtwork();
   const isPremium = useIsPremium();
   const showToast = useToastStore((s) => s.show);
 
   const [plans, setPlans] = useState<Plan[] | null>(null);
   const [selected, setSelected] = useState<PlanKey>('yearly');
   const [busy, setBusy] = useState(false);
+
+  // The real locked sounds, with their own art — "the full library" is an
+  // abstraction; six named scenes with a lock on them are not.
+  const lockedPreview = useMemo(
+    () => allPresets.filter((p) => isLockedPreset(p.id) && presetArt(p.id)).slice(0, PREVIEW_COUNT),
+    []
+  );
+  const lockedCount = useMemo(() => allPresets.filter((p) => isLockedPreset(p.id)).length, []);
 
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
@@ -170,94 +191,178 @@ export default function PaywallScreen() {
         : t('paywall.cta');
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={close}
-          style={styles.closeButton}
-          accessibilityRole="button"
-          accessibilityLabel={t('common.close')}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: Spacing.xl }}
+        showsVerticalScrollIndicator={false}
+      >
+        <ArtBackground
+          source={artwork.source(presetArt(HERO_PRESET))}
+          variant="hero"
+          style={[styles.hero, { paddingTop: insets.top + Spacing.sm }]}
         >
-          <Ionicons name="close" size={26} color={colors.text} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView contentContainerStyle={[styles.content, contentColumn]} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.title, { color: colors.text }]} accessibilityRole="header">
-          {t('paywall.title')}
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t('paywall.subtitle')}</Text>
-
-        <View style={styles.benefits}>
-          {BENEFITS.map((key) => (
-            <View key={key} style={styles.benefit}>
-              <Ionicons name="checkmark-circle" size={20} color={colors.accent} />
-              <Text style={[styles.benefitText, { color: colors.text }]}>{t(`paywall.${key}`)}</Text>
-            </View>
-          ))}
-        </View>
-
-        {plans === null ? (
-          <ActivityIndicator color={colors.accent} style={styles.loader} />
-        ) : plans.length === 0 ? (
-          <Text style={[styles.unavailable, { color: colors.textSecondary }]}>{t('paywall.unavailable')}</Text>
-        ) : (
-          <View style={styles.plans} accessibilityRole="radiogroup">
-            {plans.map((p) => {
-              const active = p.key === selected;
-              return (
-                <TouchableOpacity
-                  key={p.key}
-                  onPress={() => {
-                    haptics.select();
-                    setSelected(p.key);
-                  }}
-                  activeOpacity={0.7}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: active }}
-                  style={[
-                    styles.plan,
-                    {
-                      borderColor: active ? colors.accent : colors.cardBorder,
-                      backgroundColor: active ? withAlpha(colors.accent, 0.08) : colors.card,
-                    },
-                  ]}
-                >
-                  <View style={styles.planText}>
-                    <Text style={[styles.planName, { color: colors.text }]}>{t(`paywall.plan.${p.key}`)}</Text>
-                    {p.hasTrial && (
-                      <Text style={[styles.planBadge, { color: colors.accent }]}>{t('paywall.trialBadge')}</Text>
-                    )}
-                  </View>
-                  <Text style={[styles.planPrice, { color: colors.text }]}>
-                    {t(`paywall.price.${p.key}`, { price: p.price })}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+          <View style={styles.heroHeader}>
+            <TouchableOpacity
+              onPress={close}
+              style={[styles.closeButton, { backgroundColor: artwork.foreground.badge }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+            >
+              <Ionicons name="close" size={24} color={artwork.foreground.primary} />
+            </TouchableOpacity>
           </View>
-        )}
+          <View style={[styles.heroText, contentColumn]}>
+            <Text style={[styles.kicker, { color: artwork.foreground.secondary }]}>
+              {/* The brand keeps its own casing; only the word is set in caps. */}
+              {`852Hz ${upper('Premium')}`}
+            </Text>
+            <Text
+              style={[styles.title, { color: artwork.foreground.primary }]}
+              accessibilityRole="header"
+            >
+              {t('paywall.title')}
+            </Text>
+            <Text style={[styles.subtitle, { color: artwork.foreground.secondary }]}>
+              {t('paywall.subtitle')}
+            </Text>
+          </View>
+        </ArtBackground>
 
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.previewStrip}
+          accessibilityLabel={t('paywall.benefitLibrary')}
+        >
+          {lockedPreview.map((preset) => (
+            <ArtBackground
+              key={preset.id}
+              source={artwork.source(presetArt(preset.id))}
+              variant="hero"
+              style={styles.previewTile}
+            >
+              <View style={[styles.previewLock, { backgroundColor: artwork.foreground.badge }]}>
+                <Ionicons name="lock-closed" size={12} color={artwork.foreground.primary} />
+              </View>
+              <Text
+                style={[styles.previewName, { color: artwork.foreground.primary }]}
+                numberOfLines={2}
+              >
+                {t(preset.nameKey)}
+              </Text>
+            </ArtBackground>
+          ))}
+          <View
+            style={[
+              styles.previewTile,
+              styles.previewMore,
+              { backgroundColor: colors.backgroundSecondary, borderColor: colors.cardBorder },
+            ]}
+          >
+            <Text style={[styles.previewMoreNumber, { color: colors.text }]}>
+              +{Math.max(0, lockedCount - lockedPreview.length)}
+            </Text>
+          </View>
+        </ScrollView>
+
+        <View style={[styles.body, contentColumn]}>
+          <View style={styles.benefits}>
+            {BENEFITS.map((key) => (
+              <View key={key} style={styles.benefit}>
+                <Ionicons name="checkmark" size={18} color={colors.accent} />
+                <Text style={[styles.benefitText, { color: colors.text }]}>{t(`paywall.${key}`)}</Text>
+              </View>
+            ))}
+          </View>
+
+          {plans === null ? (
+            <ActivityIndicator color={colors.accent} style={styles.loader} />
+          ) : plans.length === 0 ? (
+            <Text style={[styles.unavailable, { color: colors.textSecondary }]}>{t('paywall.unavailable')}</Text>
+          ) : (
+            <View style={styles.plans} accessibilityRole="radiogroup">
+              {plans.map((p) => {
+                const active = p.key === selected;
+                const featured = p.key === 'yearly';
+                return (
+                  <TouchableOpacity
+                    key={p.key}
+                    onPress={() => {
+                      haptics.select();
+                      setSelected(p.key);
+                    }}
+                    activeOpacity={0.7}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: active }}
+                    style={[
+                      styles.plan,
+                      {
+                        borderColor: active ? colors.accent : colors.cardBorder,
+                        backgroundColor: active ? withAlpha(colors.accent, 0.1) : colors.card,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name={active ? 'radio-button-on' : 'radio-button-off'}
+                      size={22}
+                      color={active ? colors.accent : colors.textSecondary}
+                    />
+                    <View style={styles.planText}>
+                      <View style={styles.planNameRow}>
+                        <Text style={[styles.planName, { color: colors.text }]}>{t(`paywall.plan.${p.key}`)}</Text>
+                        {featured && (
+                          <View style={[styles.bestValue, { backgroundColor: colors.accent }]}>
+                            <Text style={[styles.bestValueText, { color: colors.onPrimary }]}>
+                              {upper(t('paywall.bestValue'))}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      {p.hasTrial && (
+                        <Text style={[styles.planBadge, { color: colors.accent }]}>{t('paywall.trialBadge')}</Text>
+                      )}
+                    </View>
+                    <Text style={[styles.planPrice, { color: colors.text }]}>
+                      {t(`paywall.price.${p.key}`, { price: p.price })}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+
+          <TouchableOpacity
+            onPress={handleRestore}
+            disabled={busy}
+            style={styles.restore}
+            accessibilityRole="button"
+          >
+            <Text style={[styles.restoreText, { color: colors.accent }]}>{t('paywall.restore')}</Text>
+          </TouchableOpacity>
+
+          <Text style={[styles.legal, { color: colors.textSecondary }]}>{t('paywall.legal')}</Text>
+        </View>
+      </ScrollView>
+
+      <View
+        style={[
+          styles.footer,
+          {
+            paddingBottom: insets.bottom + Spacing.md,
+            backgroundColor: colors.background,
+            borderTopColor: colors.cardBorder,
+          },
+        ]}
+      >
         <Button
           title={ctaTitle}
           onPress={handleBuy}
           disabled={!plan || busy}
           size="large"
-          style={styles.cta}
+          style={contentColumn}
         />
-
-        <TouchableOpacity
-          onPress={handleRestore}
-          disabled={busy}
-          style={styles.restore}
-          accessibilityRole="button"
-        >
-          <Text style={[styles.restoreText, { color: colors.accent }]}>{t('paywall.restore')}</Text>
-        </TouchableOpacity>
-
-        <Text style={[styles.legal, { color: colors.textSecondary }]}>{t('paywall.legal')}</Text>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </View>
   );
 }
 
@@ -265,29 +370,71 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
+  hero: {
+    minHeight: 340,
+    justifyContent: 'space-between',
+  },
+  heroHeader: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.sm,
   },
   closeButton: {
     width: AccessibilitySize.minTouchTarget,
     height: AccessibilitySize.minTouchTarget,
+    borderRadius: AccessibilitySize.minTouchTarget / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  content: {
-    paddingHorizontal: Spacing.md,
-    paddingBottom: Spacing.xxl,
+  heroText: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    gap: Spacing.xs,
+  },
+  kicker: {
+    ...Typography.label,
   },
   title: {
-    ...Typography.title,
-    marginBottom: Spacing.xs,
+    ...Typography.largeTitle,
   },
   subtitle: {
     ...Typography.body,
-    marginBottom: Spacing.lg,
+  },
+  previewStrip: {
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+  },
+  previewTile: {
+    width: 104,
+    height: 132,
+    borderRadius: Radius.card,
+    padding: Spacing.sm,
+    justifyContent: 'space-between',
+  },
+  previewLock: {
+    alignSelf: 'flex-end',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  previewName: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+  },
+  previewMore: {
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  previewMoreNumber: {
+    ...Typography.title,
+    ...Typography.numeral,
+  },
+  body: {
+    paddingHorizontal: Spacing.lg,
   },
   benefits: {
     gap: Spacing.sm,
@@ -312,7 +459,7 @@ const styles = StyleSheet.create({
   },
   plans: {
     gap: Spacing.sm,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   plan: {
     flexDirection: 'row',
@@ -322,15 +469,29 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: Radius.card,
     borderWidth: 2,
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   planText: {
     flex: 1,
     gap: 2,
   },
+  planNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
   planName: {
     ...Typography.headline,
     fontFamily: FontFamily.semibold,
+  },
+  bestValue: {
+    borderRadius: Radius.tag,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  bestValueText: {
+    ...Typography.label,
   },
   planBadge: {
     ...Typography.footnote,
@@ -340,21 +501,23 @@ const styles = StyleSheet.create({
     ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
-  cta: {
-    marginBottom: Spacing.sm,
-  },
   restore: {
     minHeight: AccessibilitySize.minTouchTarget,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   restoreText: {
     ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
   legal: {
-    ...Typography.footnote,
+    ...Typography.caption,
     textAlign: 'center',
+  },
+  footer: {
+    paddingTop: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
 });

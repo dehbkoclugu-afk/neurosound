@@ -56,6 +56,7 @@ import { useIsPremium } from '@/stores/premiumStore';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
+import { upper } from '@/lib/upper';
 
 // Preset picker groups — 33 flat items is unusable; group by category
 const pickerGroups = [
@@ -63,22 +64,6 @@ const pickerGroups = [
   { titleKey: 'explore.categories.solfeggio', presets: solfeggioPresets },
   { titleKey: 'explore.categories.noise', presets: noisePresets },
 ];
-
-// Ghost channel strips shown before the first sound is added — one per
-// available channel, so the empty screen states the capacity by shape.
-const EMPTY_SLOTS = Array.from(
-  { length: playerController.MAX_MIXER_CHANNELS },
-  (_, i) => i,
-);
-
-/** "ND-M03" — the saved-mix half of Home's catalogue codes. Falls back to
- *  list position for mixes saved before catalogue numbers existed. */
-function mixCatalogCode(
-  mix: { catalogNumber?: number },
-  index: number,
-): string {
-  return `ND-M${String(mix.catalogNumber ?? index + 1).padStart(2, '0')}`;
-}
 
 // A saved mix stores preset ids; the row needs the presets themselves to show
 // what it is made of. An id that no longer resolves — a preset removed in a
@@ -274,9 +259,15 @@ export default function MixerScreen() {
   ]);
 
   const handleLoadMix = useCallback(async (mix: (typeof customMixes)[0]) => {
+    // A mix saved while subscribed must not keep playing locked sounds after
+    // the subscription lapses — the same gate the picker and Player apply.
+    if (!isPremium && mix.channels.some((c) => isLockedPreset(c.presetId))) {
+      router.push('/paywall');
+      return;
+    }
     haptics.commit();
     await playerController.mixerLoadChannels(mix.channels, mix.id);
-  }, []);
+  }, [isPremium, router]);
 
   const handleDeleteMix = useCallback(
     (mixId: string, name: string) => {
@@ -322,98 +313,40 @@ export default function MixerScreen() {
             counter={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
           />
 
-          {/* Empty state is the mixer itself, not a poster about the mixer:
-              four unfilled channel strips where the real ones will land. It
-              states the capacity by shape, shows what a channel is made of,
-              and fills the page instead of leaving the lower half blank —
-              without the centred-icon-and-headline pattern every other app
-              reaches for.
-
-              The ghost track is deliberately thinner than the live slider's
-              48pt touch target: at full height the four slots push the
-              transport row off the first screen, which trades one layout
-              problem for a worse one. So the strip previews the arrangement,
-              not the exact metrics. */}
-          {channels.length === 0 && (
-            <View>
-              {EMPTY_SLOTS.map((slot) => (
-                <TouchableOpacity
-                  key={slot}
+          {/* One invitation, not four ghost strips: "Empty channel" ×3 under
+              a greyed play button read as a broken screen. The scene is the
+              sample mix's own rain, so the card previews what one tap on
+              "try the sample" will sound like. */}
+          {isEmpty && (
+            <ArtBackground
+              source={artwork.source(presetArt(SAMPLE_MIX[0].presetId))}
+              style={styles.emptyCard}
+              variant="card"
+            >
+              <Text
+                style={[styles.emptyTitle, { color: artwork.foreground.primary }]}
+              >
+                {t('mixer.emptyTitle')}
+              </Text>
+              <Text
+                style={[styles.emptyDesc, { color: artwork.foreground.secondary }]}
+              >
+                {t('mixer.emptyDesc')}
+              </Text>
+              <View style={styles.emptyActions}>
+                <Button
+                  title={t('mixer.addSound')}
                   onPress={() => setShowPresetPicker(true)}
-                  activeOpacity={0.6}
-                  style={[
-                    styles.channelRow,
-                    styles.slotRow,
-                    {
-                      borderBottomColor: colors.cardBorder,
-                      opacity: 1 - slot * 0.18,
-                    },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('mixer.addSound')}
-                  // Four identical "add sound" targets would be read out four
-                  // times over; only the first is exposed.
-                  accessibilityElementsHidden={slot > 0}
-                  importantForAccessibility={
-                    slot > 0 ? 'no-hide-descendants' : 'yes'
-                  }
-                >
-                  <View
-                    style={[
-                      styles.channelIcon,
-                      styles.slotIcon,
-                      {
-                        borderColor:
-                          slot === 0 ? colors.accent : colors.cardBorder,
-                      },
-                    ]}
-                  >
-                    {slot === 0 && (
-                      <Ionicons name="add" size={18} color={colors.accent} />
-                    )}
-                  </View>
-                  <View style={styles.channelBody}>
-                    <View style={styles.channelHeader}>
-                      <Text
-                        style={[
-                          styles.channelName,
-                          {
-                            color:
-                              slot === 0 ? colors.accent : colors.textSecondary,
-                          },
-                        ]}
-                      >
-                        {slot === 0
-                          ? t('mixer.addSound')
-                          : t('mixer.emptySlot')}
-                      </Text>
-                    </View>
-                    {/* A flat, empty track at zero — the same bar the live
-                        channel uses, just with nothing in it. */}
-                    <View
-                      style={[
-                        styles.slotTrack,
-                        { backgroundColor: colors.slider },
-                      ]}
-                    />
-                  </View>
-                </TouchableOpacity>
-              ))}
-
-              <View style={styles.emptyFooter}>
-                <TouchableOpacity
+                  icon={<Ionicons name="add" size={18} color={colors.onPrimary} />}
+                />
+                <Button
+                  title={t('mixer.trySample')}
                   onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
-                  style={styles.sampleButton}
-                  accessibilityRole="button"
-                >
-                  <Text
-                    style={[styles.sampleButtonText, { color: colors.accent }]}
-                  >
-                    {t('mixer.trySample')}
-                  </Text>
-                </TouchableOpacity>
+                  variant="ghost"
+                  textStyle={{ color: artwork.foreground.primary }}
+                />
               </View>
-            </View>
+            </ArtBackground>
           )}
 
           {channels.map((channel) => (
@@ -558,8 +491,10 @@ export default function MixerScreen() {
           </View>
         )}
 
-        {/* Transport — always present. Showing and hiding play/save as the
-            first channel arrived made the whole page jump under the finger. */}
+        {/* Transport — hidden while empty. Three disabled controls plus a
+            sentence explaining why they were disabled was most of the empty
+            screen; the empty card above already says what to do first. */}
+        {!isEmpty && (
         <View style={styles.transport}>
           <View style={styles.transportRow}>
             {/* A mix is what people actually fall asleep to, and it had no
@@ -618,24 +553,10 @@ export default function MixerScreen() {
           <Button
             title={t('mixer.savePreset')}
             onPress={openSaveDialog}
-            disabled={isEmpty}
             variant="secondary"
-            accessibilityHint={
-              isEmpty ? t('mixer.transportDisabled') : undefined
-            }
           />
-
-          {/* A greyed circle says "not now" and nothing else. Two dead
-              controls next to each other without a reason is the point at
-              which an interface stops explaining itself. */}
-          {isEmpty && (
-            <Text
-              style={[styles.transportHint, { color: colors.textSecondary }]}
-            >
-              {t('mixer.transportDisabled')}
-            </Text>
-          )}
         </View>
+        )}
 
         {/* Saved Mixes */}
         {customMixes.length > 0 && (
@@ -697,7 +618,7 @@ export default function MixerScreen() {
                                 { color: colors.accent },
                               ]}
                             >
-                              {t('mixer.loaded')}
+                              {upper(t('mixer.loaded'))}
                             </Text>
                           </View>
                         )}
@@ -706,14 +627,6 @@ export default function MixerScreen() {
                           category badges do both, in the same alphabet the
                           channel rows above use. */}
                       <View style={styles.mixIcons}>
-                        <Text
-                          style={[
-                            styles.mixCatalog,
-                            { color: colors.textSecondary },
-                          ]}
-                        >
-                          {mixCatalogCode(mix, mixIndex)}
-                        </Text>
                         {mixPresets(mix).map((preset, i) => (
                           <View
                             key={`${preset.id}-${i}`}
@@ -957,8 +870,11 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     minHeight: ControlSize.row,
   },
+  // flex: 1 — Android measures the label in Nunito but draws Bengali/Thai
+  // with a wider fallback face, so a content-sized label wrapped mid-word.
   addRowText: {
     ...Typography.headline,
+    flex: 1,
   },
   master: {
     marginTop: Spacing.lg,
@@ -1022,7 +938,6 @@ const styles = StyleSheet.create({
   },
   mixStampText: {
     ...Typography.label,
-    textTransform: 'uppercase',
   },
   mixIcons: {
     flexDirection: 'row',
@@ -1057,37 +972,26 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
     marginBottom: Spacing.sm,
   },
-  // Ghost slot: the live channel's arrangement (badge, name, track) at a
-  // reduced height — see the note at the call site.
-  slotRow: {
-    alignItems: 'center',
+  emptyCard: {
+    minHeight: 260,
+    borderRadius: Radius.card,
+    padding: Spacing.lg,
+    justifyContent: 'flex-end',
+    gap: Spacing.sm,
   },
-  slotIcon: {
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    marginTop: 0,
+  emptyTitle: {
+    ...Typography.title,
   },
-  slotTrack: {
-    height: 6,
-    borderRadius: Radius.tag,
-  },
-  emptyFooter: {
-    alignItems: 'center',
-    paddingTop: Spacing.lg,
-    gap: Spacing.xs,
-  },
-  transportHint: {
-    ...Typography.footnote,
-    textAlign: 'center',
-  },
-  sampleButton: {
-    paddingVertical: Spacing.sm,
-    minHeight: ControlSize.field,
-    justifyContent: 'center',
-  },
-  sampleButtonText: {
+  emptyDesc: {
     ...Typography.body,
-    fontFamily: FontFamily.semibold,
+    maxWidth: '85%',
+  },
+  emptyActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
   },
   presetItem: {
     flexDirection: 'row',

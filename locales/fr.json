@@ -28,7 +28,7 @@
     "settings": "Réglages"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Se concentrer, se détendre, écouter",
     "quickStart": "Démarrage rapide",
     "quickStartDesc": "Préréglages populaires pour commencer",
@@ -152,7 +152,9 @@
     "renameMix": "Renommer le mix",
     "mixRenamed": "Mix renommé",
     "addToMixer": "Ajouter au mixeur",
-    "addedToMixer": "Ajouté au mixeur"
+    "addedToMixer": "Ajouté au mixeur",
+    "emptyTitle": "Créez votre propre ambiance",
+    "emptyDesc": "Superposez jusqu'à 4 sons — pluie, bruit, fréquences — et enregistrez le mix."
   },
   "player": {
     "nowPlaying": "En cours de lecture",
@@ -210,11 +212,11 @@
     "title": "Politique de confidentialité",
     "updated": "Dernière mise à jour : {{date}}",
     "summaryTitle": "En bref",
-    "summaryBody": "NeuroSound ne collecte, ne stocke et ne transmet aucune de vos données. Tout ce que vous faites dans cette application — favoris, mix personnalisés et réglages — reste sur votre appareil.",
+    "summaryBody": "852Hz ne collecte, ne stocke et ne transmet aucune de vos données. Tout ce que vous faites dans cette application — favoris, mix personnalisés et réglages — reste sur votre appareil.",
     "dataTitle": "Ce que l'application enregistre",
     "dataBody": "Vos favoris, mix et réglages sont stockés localement. La sauvegarde cloud Android est désactivée. Les données ne nous sont pas envoyées, ni à des tiers, et sont supprimées lors de la désinstallation ou de la réinitialisation.",
     "networkTitle": "Accès au réseau",
-    "networkBody": "Les sons fonctionnent entièrement hors ligne. Le seul accès réseau est le service de facturation de Google Play, lorsque vous ouvrez l'écran Premium, achetez ou restaurez un achat. NeuroSound n'envoie rien à aucun serveur, service d'analyse ou tiers.",
+    "networkBody": "Les sons fonctionnent entièrement hors ligne. Le seul accès réseau est le service de facturation de Google Play, lorsque vous ouvrez l'écran Premium, achetez ou restaurez un achat. 852Hz n'envoie rien à aucun serveur, service d'analyse ou tiers.",
     "accountsTitle": "Comptes et identifiants",
     "accountsBody": "Il n'y a ni compte utilisateur, ni connexion, ni identifiant de suivi. Nous n'avons aucun moyen de vous identifier ou de relier votre usage à vous.",
     "childrenTitle": "Enfants",
@@ -282,6 +284,7 @@
     "welcome": "Premium débloqué. Profitez-en !",
     "error": "L'achat n'a pas pu aboutir. Veuillez réessayer.",
     "unavailable": "Premium n'est pas disponible pour le moment. Vérifiez votre connexion et réessayez.",
-    "legal": "Les abonnements se renouvellent automatiquement jusqu'à résiliation. Résiliez à tout moment dans Google Play › Abonnements. Le paiement est débité de votre compte Google Play."
+    "legal": "Les abonnements se renouvellent automatiquement jusqu'à résiliation. Résiliez à tout moment dans Google Play › Abonnements. Le paiement est débité de votre compte Google Play.",
+    "bestValue": "Meilleur prix"
   }
 }

@@ -28,7 +28,7 @@
     "settings": "Settings"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Focus, Relax, Listen",
     "quickStart": "Quick Start",
     "quickStartDesc": "Popular presets to get started",
@@ -152,7 +152,9 @@
     "renameMix": "Rename mix",
     "mixRenamed": "Mix renamed",
     "addToMixer": "Add to mixer",
-    "addedToMixer": "Added to mixer"
+    "addedToMixer": "Added to mixer",
+    "emptyTitle": "Build your own soundscape",
+    "emptyDesc": "Layer up to 4 sounds — rain, noise and frequencies — and save the mix."
   },
   "player": {
     "nowPlaying": "Now Playing",
@@ -210,11 +212,11 @@
     "title": "Privacy Policy",
     "updated": "Last updated: {{date}}",
     "summaryTitle": "In short",
-    "summaryBody": "NeuroSound doesn't collect, store, or transmit any of your data. Everything you do in this app — favourites, custom mixes, and settings — stays on your device.",
+    "summaryBody": "852Hz doesn't collect, store, or transmit any of your data. Everything you do in this app — favourites, custom mixes, and settings — stays on your device.",
     "dataTitle": "What the app stores",
     "dataBody": "Your favourites, saved mixes, and preferences (theme, language, volume, accessibility settings) are saved locally on your device. Android cloud backup is disabled. This data is never sent to us or anyone else and is deleted if you uninstall the app or use Reset data in Settings.",
     "networkTitle": "Network access",
-    "networkBody": "Sounds play fully offline. The only network access is Google Play’s own billing service, used when you open the Premium screen, buy, or restore a purchase. NeuroSound itself sends nothing to any server, analytics service, or third party.",
+    "networkBody": "Sounds play fully offline. The only network access is Google Play’s own billing service, used when you open the Premium screen, buy, or restore a purchase. 852Hz itself sends nothing to any server, analytics service, or third party.",
     "accountsTitle": "Accounts and identifiers",
     "accountsBody": "There are no user accounts, sign-ins, or tracking identifiers. We have no way to identify you or link your usage to you.",
     "childrenTitle": "Children",
@@ -282,6 +284,7 @@
     "welcome": "Premium unlocked. Enjoy!",
     "error": "The purchase could not be completed. Please try again.",
     "unavailable": "Premium isn't available right now. Check your connection and try again.",
-    "legal": "Subscriptions renew automatically until cancelled. Cancel anytime in Google Play › Subscriptions. Payment is charged to your Google Play account."
+    "legal": "Subscriptions renew automatically until cancelled. Cancel anytime in Google Play › Subscriptions. Payment is charged to your Google Play account.",
+    "bestValue": "Best value"
   }
 }

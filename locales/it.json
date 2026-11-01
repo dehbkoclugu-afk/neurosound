@@ -28,7 +28,7 @@
     "settings": "Impostazioni"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Concentrati, rilassati, ascolta",
     "quickStart": "Avvio rapido",
     "quickStartDesc": "Preset popolari per iniziare",
@@ -152,7 +152,9 @@
     "renameMix": "Rinomina mix",
     "mixRenamed": "Mix rinominato",
     "addToMixer": "Aggiungi al mixer",
-    "addedToMixer": "Aggiunto al mixer"
+    "addedToMixer": "Aggiunto al mixer",
+    "emptyTitle": "Crea il tuo mix di suoni",
+    "emptyDesc": "Sovrapponi fino a 4 suoni — pioggia, rumore e frequenze — e salva il mix."
   },
   "player": {
     "nowPlaying": "In riproduzione",
@@ -210,11 +212,11 @@
     "title": "Informativa sulla privacy",
     "updated": "Ultimo aggiornamento: {{date}}",
     "summaryTitle": "In breve",
-    "summaryBody": "NeuroSound non raccoglie, non conserva e non trasmette alcun tuo dato. Tutto ciò che fai in questa app — preferiti, mix personalizzati e impostazioni — resta sul tuo dispositivo.",
+    "summaryBody": "852Hz non raccoglie, non conserva e non trasmette alcun tuo dato. Tutto ciò che fai in questa app — preferiti, mix personalizzati e impostazioni — resta sul tuo dispositivo.",
     "dataTitle": "Cosa salva l'app",
     "dataBody": "Preferiti, mix e impostazioni sono salvati localmente. Il backup cloud Android è disattivato. I dati non vengono inviati a noi o a terzi e vengono eliminati disinstallando o azzerando l'app.",
     "networkTitle": "Accesso alla rete",
-    "networkBody": "I suoni funzionano completamente offline. L'unico accesso alla rete è il servizio di fatturazione di Google Play, quando apri la schermata Premium, acquisti o ripristini un acquisto. NeuroSound non invia nulla a server, servizi di analisi o terze parti.",
+    "networkBody": "I suoni funzionano completamente offline. L'unico accesso alla rete è il servizio di fatturazione di Google Play, quando apri la schermata Premium, acquisti o ripristini un acquisto. 852Hz non invia nulla a server, servizi di analisi o terze parti.",
     "accountsTitle": "Account e identificatori",
     "accountsBody": "Non esistono account, accessi o identificatori di tracciamento. Non abbiamo alcun modo di identificarti o di collegare a te il tuo utilizzo.",
     "childrenTitle": "Minori",
@@ -282,6 +284,7 @@
     "welcome": "Premium sbloccato. Buon ascolto!",
     "error": "Impossibile completare l'acquisto. Riprova.",
     "unavailable": "Premium non è disponibile ora. Controlla la connessione e riprova.",
-    "legal": "Gli abbonamenti si rinnovano automaticamente fino alla disdetta. Puoi disdire quando vuoi in Google Play › Abbonamenti. Il pagamento viene addebitato sul tuo account Google Play."
+    "legal": "Gli abbonamenti si rinnovano automaticamente fino alla disdetta. Puoi disdire quando vuoi in Google Play › Abbonamenti. Il pagamento viene addebitato sul tuo account Google Play.",
+    "bestValue": "Più conveniente"
   }
 }

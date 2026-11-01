@@ -28,7 +28,7 @@
     "settings": "Setări"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Concentrare, relaxare, ascultare",
     "quickStart": "Start rapid",
     "quickStartDesc": "Presetări populare pentru început",
@@ -152,7 +152,9 @@
     "renameMix": "Redenumește mixul",
     "mixRenamed": "Mix redenumit",
     "addToMixer": "Adaugă în mixer",
-    "addedToMixer": "Adăugat în mixer"
+    "addedToMixer": "Adăugat în mixer",
+    "emptyTitle": "Creează-ți propriul mix",
+    "emptyDesc": "Combină până la 4 sunete — ploaie, zgomot și frecvențe — și salvează mixul."
   },
   "player": {
     "nowPlaying": "Se redă acum",
@@ -210,11 +212,11 @@
     "title": "Politica de confidențialitate",
     "updated": "Ultima actualizare: {{date}}",
     "summaryTitle": "Pe scurt",
-    "summaryBody": "NeuroSound nu colectează, nu stochează și nu trimite niciun fel de date despre tine. Tot ce faci în aplicație — favorite, mixuri proprii și setări — rămâne pe dispozitivul tău.",
+    "summaryBody": "852Hz nu colectează, nu stochează și nu trimite niciun fel de date despre tine. Tot ce faci în aplicație — favorite, mixuri proprii și setări — rămâne pe dispozitivul tău.",
     "dataTitle": "Ce salvează aplicația",
     "dataBody": "Favoritele, mixurile salvate și preferințele tale (temă, limbă, volum, setări de accesibilitate) sunt păstrate local pe dispozitiv. Copia de rezervă în cloud a Android este dezactivată. Aceste date nu ajung niciodată la noi sau la altcineva și dispar dacă dezinstalezi aplicația sau folosești Resetează datele în Setări.",
     "networkTitle": "Acces la rețea",
-    "networkBody": "Sunetele rulează complet offline. Singurul acces la rețea este serviciul de facturare Google Play, când deschizi ecranul Premium, cumperi sau restabilești o achiziție. NeuroSound nu trimite nimic către vreun server, serviciu de analiză sau terț.",
+    "networkBody": "Sunetele rulează complet offline. Singurul acces la rețea este serviciul de facturare Google Play, când deschizi ecranul Premium, cumperi sau restabilești o achiziție. 852Hz nu trimite nimic către vreun server, serviciu de analiză sau terț.",
     "accountsTitle": "Conturi și identificatori",
     "accountsBody": "Nu există conturi de utilizator, autentificare sau identificatori de urmărire. Nu avem nicio cale să te recunoaștem sau să legăm utilizarea de tine.",
     "childrenTitle": "Copii",
@@ -282,6 +284,7 @@
     "welcome": "Premium deblocat. Bucură-te!",
     "error": "Achiziția nu a putut fi finalizată. Încearcă din nou.",
     "unavailable": "Premium nu este disponibil acum. Verifică conexiunea și încearcă din nou.",
-    "legal": "Abonamentele se reînnoiesc automat până la anulare. Anulează oricând din Google Play › Abonamente. Plata se face din contul tău Google Play."
+    "legal": "Abonamentele se reînnoiesc automat până la anulare. Anulează oricând din Google Play › Abonamente. Plata se face din contul tău Google Play.",
+    "bestValue": "Cel mai avantajos"
   }
 }

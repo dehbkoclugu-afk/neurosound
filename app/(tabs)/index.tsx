@@ -19,7 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, FontFamily, Radius } from '@/constants/theme';
+import { Spacing, Typography, Radius } from '@/constants/theme';
+import { upper } from '@/lib/upper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
@@ -198,7 +199,7 @@ export default function HomeScreen() {
                     { color: artwork.foreground.primary },
                   ]}
                 >
-                  {t(`home.suggestedFor.${band}`)}
+                  {upper(t(`home.suggestedFor.${band}`))}
                 </Text>
                 <View
                   style={[
@@ -253,17 +254,6 @@ export default function HomeScreen() {
                     {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
                   </Text>
                 </View>
-                <Text
-                  style={[
-                    styles.intentCatalog,
-                    { color: artwork.foreground.secondary },
-                  ]}
-                >
-                  <Text style={styles.intentCatalogCode}>
-                    {suggestedIntent.catalogCode}
-                  </Text>
-                  {` · ${t('home.soundCount', { n: suggestedIntent.presetIds.length })}`}
-                </Text>
               </View>
             </ArtBackground>
           </PressableScale>
@@ -292,7 +282,7 @@ export default function HomeScreen() {
           <Text
             style={[styles.otherIntentsLabel, { color: colors.textSecondary }]}
           >
-            {t('home.otherIntents')}
+            {upper(t('home.otherIntents'))}
           </Text>
 
           <View style={styles.intentStack}>
@@ -312,20 +302,19 @@ export default function HomeScreen() {
                   variant="card"
                 >
                   <View style={styles.intentTopRow}>
-                    {/* A catalogue number that indexes nothing is decoration.
-                        Pairing it with the size of what it points at makes it
-                        a real index entry — and the code keeps the mono face
-                        while the words around it stay in Nunito. */}
+                    {/* Session length and size — what someone deciding
+                        between intents actually weighs. The old "ND-02"
+                        catalogue code indexed nothing a user could look up. */}
                     <Text
                       style={[
-                        styles.intentCatalog,
+                        styles.intentMeta,
                         { color: artwork.foreground.secondary },
                       ]}
                     >
-                      <Text style={styles.intentCatalogCode}>
-                        {intent.catalogCode}
+                      <Text style={styles.featuredMetaNumber}>
+                        {intent.recommendedMinutes}
                       </Text>
-                      {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
+                      {`${t('home.recommendedMinutesSuffix')} · ${t('home.soundCount', { n: intent.presetIds.length })}`}
                     </Text>
                     <View
                       style={[
@@ -472,7 +461,6 @@ const styles = StyleSheet.create({
   },
   featuredKicker: {
     ...Typography.label,
-    textTransform: 'uppercase',
   },
   featuredIconTag: {
     width: 40,
@@ -507,7 +495,6 @@ const styles = StyleSheet.create({
   },
   otherIntentsLabel: {
     ...Typography.label,
-    textTransform: 'uppercase',
     marginTop: Spacing.lg,
     marginBottom: Spacing.sm,
   },
@@ -517,13 +504,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 2,
   },
-  intentCatalog: {
-    ...Typography.label,
-    textTransform: 'uppercase',
-  },
-  intentCatalogCode: {
-    fontFamily: FontFamily.mono,
-    letterSpacing: 1.2,
+  intentMeta: {
+    ...Typography.footnote,
   },
   intentIconTag: {
     width: 32,

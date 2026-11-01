@@ -28,7 +28,7 @@
     "settings": "Inställningar"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Fokusera, varva ner, lyssna",
     "quickStart": "Snabbstart",
     "quickStartDesc": "Populära förval att börja med",
@@ -152,7 +152,9 @@
     "renameMix": "Byt namn på mix",
     "mixRenamed": "Mixen har bytt namn",
     "addToMixer": "Lägg till i mixern",
-    "addedToMixer": "Tillagd i mixern"
+    "addedToMixer": "Tillagd i mixern",
+    "emptyTitle": "Skapa din egen ljudmix",
+    "emptyDesc": "Blanda upp till 4 ljud — regn, brus och frekvenser — och spara mixen."
   },
   "player": {
     "nowPlaying": "Spelas nu",
@@ -210,11 +212,11 @@
     "title": "Integritetspolicy",
     "updated": "Senast uppdaterad: {{date}}",
     "summaryTitle": "Kort sagt",
-    "summaryBody": "NeuroSound samlar inte in, lagrar eller skickar några av dina uppgifter. Allt du gör i appen — favoriter, egna mixar och inställningar — stannar på din enhet.",
+    "summaryBody": "852Hz samlar inte in, lagrar eller skickar några av dina uppgifter. Allt du gör i appen — favoriter, egna mixar och inställningar — stannar på din enhet.",
     "dataTitle": "Vad appen sparar",
     "dataBody": "Dina favoriter, sparade mixar och inställningar (tema, språk, volym, tillgänglighetsval) sparas lokalt på din enhet. Androids molnsäkerhetskopiering är avstängd. Uppgifterna skickas aldrig till oss eller någon annan och försvinner om du avinstallerar appen eller använder Nollställ data i inställningarna.",
     "networkTitle": "Nätverksåtkomst",
-    "networkBody": "Ljuden spelas helt offline. Den enda nätverksåtkomsten är Google Plays betaltjänst, när du öppnar Premium-skärmen, köper eller återställer ett köp. NeuroSound skickar själv ingenting till någon server, analystjänst eller tredje part.",
+    "networkBody": "Ljuden spelas helt offline. Den enda nätverksåtkomsten är Google Plays betaltjänst, när du öppnar Premium-skärmen, köper eller återställer ett köp. 852Hz skickar själv ingenting till någon server, analystjänst eller tredje part.",
     "accountsTitle": "Konton och identifierare",
     "accountsBody": "Det finns inga användarkonton, ingen inloggning och inga spårningsidentifierare. Vi har inget sätt att känna igen dig eller koppla användningen till dig.",
     "childrenTitle": "Barn",
@@ -282,6 +284,7 @@
     "welcome": "Premium upplåst. Njut!",
     "error": "Köpet kunde inte slutföras. Försök igen.",
     "unavailable": "Premium är inte tillgängligt just nu. Kontrollera anslutningen och försök igen.",
-    "legal": "Prenumerationer förnyas automatiskt tills de sägs upp. Säg upp när som helst i Google Play › Prenumerationer. Betalningen dras från ditt Google Play-konto."
+    "legal": "Prenumerationer förnyas automatiskt tills de sägs upp. Säg upp när som helst i Google Play › Prenumerationer. Betalningen dras från ditt Google Play-konto.",
+    "bestValue": "Bästa pris"
   }
 }

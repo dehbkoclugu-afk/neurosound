@@ -10,7 +10,7 @@ import { Text, ViewStyle, TextStyle } from 'react-native';
 
 import { PressableScale } from './PressableScale';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { AccessibilitySize, Radius, Spacing, Typography, onPrimary } from '@/constants/theme';
+import { AccessibilitySize, Radius, Spacing, Typography } from '@/constants/theme';
 
 interface ButtonProps {
   title: string;
@@ -98,7 +98,7 @@ export function Button({
     };
 
     const variantStyles: Record<string, TextStyle> = {
-      primary: { color: onPrimary },
+      primary: { color: colors.onPrimary },
       secondary: { color: colors.accent },
       ghost: { color: colors.accent },
     };

@@ -18,41 +18,43 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
+import { ArtBackground } from '@/components/ui/ArtBackground';
+import { useArtwork } from '@/hooks/use-artwork';
+import { intentArt, presetArt } from '@/lib/artAssets';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Spacing, Typography, AccessibilitySize, FontFamily, onPrimary, Radius, ControlSize, BADGE_ALPHA, withAlpha } from '@/constants/theme';
+import { Spacing, Typography, AccessibilitySize, FontFamily, Radius, ControlSize, BADGE_ALPHA, withAlpha } from '@/constants/theme';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { languageFlag, languageLabel } from '@/locales';
+import { languageLabel } from '@/locales';
 import { LanguageSheet } from '@/components/ui/LanguageSheet';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { contentColumn } from '@/constants/layout';
 
+// Each step opens on one of the app's own scenes, so the first thing a new
+// user sees is the atlas they are about to browse — not a stock glyph in a
+// ring of ticks floating over two-thirds empty screen.
 const STEPS = [
   {
-    icon: 'musical-notes' as const,
+    art: intentArt('sleep'),
     titleKey: 'onboarding.step1Title',
     descKey: 'onboarding.step1Desc',
   },
   {
-    icon: 'headset' as const,
+    art: presetArt('binaural-alpha'),
     titleKey: 'onboarding.step2Title',
     descKey: 'onboarding.step2Desc',
   },
   {
-    icon: 'shield-checkmark' as const,
+    art: intentArt('relax'),
     titleKey: 'onboarding.step3Title',
     descKey: 'onboarding.step3Desc',
   },
 ];
 
-/** Ticks around the step icon — the dial's own mark, at the one moment the
- *  user has never seen the dial. A bare 40pt stock glyph was the first thing
- *  the app showed and it belonged to no design in particular. */
-const RING_TICKS = 16;
-
 export default function OnboardingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const colors = useThemeColors();
+  const artwork = useArtwork();
   const {
     setHasSeenOnboarding,
     setHasSeenEpilepsyWarning,
@@ -159,7 +161,12 @@ export default function OnboardingScreen() {
   stepRef.current = { next: handleNext, back: handleBack };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ArtBackground
+      source={artwork.source(current.art)}
+      variant="hero"
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+    <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
         {/* Language lives here because the very first screen is already text
             the user may not read — asking them to find Settings first is
@@ -174,13 +181,7 @@ export default function OnboardingScreen() {
           accessibilityRole="button"
           accessibilityLabel={`${t('settings.language')}: ${languageLabel(language)}`}
         >
-          <Text
-            style={styles.languageFlag}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          >
-            {languageFlag(language)}
-          </Text>
+          <Ionicons name="globe-outline" size={16} color={colors.accent} />
           <Text style={[styles.languageText, { color: colors.accent }]}>
             {languageLabel(language)}
           </Text>
@@ -217,30 +218,6 @@ export default function OnboardingScreen() {
           },
         ]}
       >
-        <View
-          style={styles.stepMark}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          {Array.from({ length: RING_TICKS }).map((_, i) => (
-            <View
-              key={i}
-              style={[
-                StyleSheet.absoluteFillObject,
-                styles.tickPivot,
-                { transform: [{ rotate: `${(360 / RING_TICKS) * i}deg` }] },
-              ]}
-            >
-              <View
-                style={[
-                  styles.tick,
-                  { backgroundColor: withAlpha(colors.accent, i % 4 === 0 ? 0.7 : 0.35) },
-                ]}
-              />
-            </View>
-          ))}
-          <Ionicons name={current.icon} size={36} color={colors.accent} />
-        </View>
         <Text
           style={[styles.title, { color: colors.text }]}
           accessibilityRole="header"
@@ -290,7 +267,7 @@ export default function OnboardingScreen() {
             accessibilityRole="button"
             accessibilityLabel={isLast ? t('onboarding.start') : t('onboarding.next')}
           >
-            <Text style={styles.buttonText}>
+            <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
               {isLast ? t('onboarding.start') : t('onboarding.next')}
             </Text>
           </PressableScale>
@@ -302,6 +279,7 @@ export default function OnboardingScreen() {
         onClose={() => setShowLanguageSheet(false)}
       />
     </SafeAreaView>
+    </ArtBackground>
   );
 }
 
@@ -326,9 +304,6 @@ const styles = StyleSheet.create({
     borderRadius: Radius.card,
     justifyContent: 'center',
   },
-  languageFlag: {
-    fontSize: 15,
-  },
   languageText: {
     ...Typography.footnote,
     fontFamily: FontFamily.semibold,
@@ -342,41 +317,23 @@ const styles = StyleSheet.create({
   skipText: {
     ...Typography.body,
   },
-  stepMark: {
-    width: 108,
-    height: 108,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.xl,
-  },
-  tickPivot: {
-    alignItems: 'center',
-  },
-  tick: {
-    width: 1.5,
-    height: 6,
-    borderRadius: 1,
-  },
-  // Was centred in the whole screen, which left a third of the page empty
-  // above the title and another third below it. Sitting a little high puts
-  // the words where the eye lands.
+  // The scene owns the top of the screen; copy sits on the dark end of the
+  // hero scrim, left-aligned like every other screen title in the app.
   content: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingBottom: Spacing.xxl,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-end',
+    paddingBottom: Spacing.lg,
     paddingHorizontal: Spacing.xl,
   },
   title: {
     ...Typography.largeTitle,
-    textAlign: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   description: {
     ...Typography.body,
-    textAlign: 'center',
     lineHeight: 24,
-    maxWidth: 320,
+    maxWidth: 360,
   },
   footer: {
     paddingHorizontal: Spacing.xl,
@@ -417,6 +374,5 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...Typography.headline,
-    color: onPrimary,
   },
 });

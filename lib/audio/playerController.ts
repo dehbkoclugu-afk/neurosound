@@ -148,7 +148,7 @@ function setNowPlaying(
   try {
     player.setActiveForLockScreen(true, {
       title,
-      artist: 'NeuroSound',
+      artist: '852Hz',
       artworkUrl: ensureArtwork(),
     }, { showSeekBackward: false, showSeekForward: false });
     watchLockScreenPlayer(player, owner);
@@ -547,7 +547,7 @@ async function startMixerChannels(
     useAudioStore.getState().setIsMixerPlaying(true);
     beginListening();
     const leader = mixerGenerators.values().next().value as Generator | undefined;
-    setNowPlaying(leader?.getNativePlayer() ?? null, 'NeuroSound Mixer', 'mixer');
+    setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer');
   } catch {
     mixerGenerators.forEach((gen) => {
       gen.stop();
@@ -632,6 +632,11 @@ export async function mixerAddChannel(preset: FrequencyPreset): Promise<boolean>
 
 export function mixerRemoveChannel(channelId: string): void {
   const gen = mixerGenerators.get(channelId);
+  // The lock screen hangs off one channel's native player; removing that
+  // channel left the controls bound to a disposed player.
+  const ownedLockScreen =
+    lockScreenOwner === 'mixer' && !!gen && gen.getNativePlayer() === lockScreenPlayer;
+  if (ownedLockScreen) clearNowPlaying();
   if (gen) {
     gen.stop();
     gen.dispose();
@@ -640,7 +645,13 @@ export function mixerRemoveChannel(channelId: string): void {
   useAudioStore.getState().removeMixerChannel(channelId);
   useAudioStore.getState().setActiveMixId(null);
   if (useAudioStore.getState().mixerChannels.length === 0) {
-    useAudioStore.getState().setIsMixerPlaying(false);
+    // Same teardown as stopping: also closes the listening-time session.
+    mixerStop();
+    return;
+  }
+  if (ownedLockScreen && useAudioStore.getState().isMixerPlaying) {
+    const leader = mixerGenerators.values().next().value as Generator | undefined;
+    setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer');
   }
 }
 

@@ -28,7 +28,7 @@
     "settings": "Ustawienia"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Skup się, odpocznij, słuchaj",
     "quickStart": "Szybki start",
     "quickStartDesc": "Popularne ustawienia na początek",
@@ -152,7 +152,9 @@
     "renameMix": "Zmień nazwę miksu",
     "mixRenamed": "Nazwa miksu zmieniona",
     "addToMixer": "Dodaj do miksera",
-    "addedToMixer": "Dodano do miksera"
+    "addedToMixer": "Dodano do miksera",
+    "emptyTitle": "Stwórz własny miks dźwięków",
+    "emptyDesc": "Połącz do 4 dźwięków — deszcz, szum i częstotliwości — i zapisz miks."
   },
   "player": {
     "nowPlaying": "Teraz odtwarzane",
@@ -210,11 +212,11 @@
     "title": "Polityka prywatności",
     "updated": "Ostatnia aktualizacja: {{date}}",
     "summaryTitle": "W skrócie",
-    "summaryBody": "NeuroSound nie zbiera, nie przechowuje ani nie przesyła żadnych Twoich danych. Wszystko, co robisz w aplikacji — ulubione, własne miksy i ustawienia — zostaje na Twoim urządzeniu.",
+    "summaryBody": "852Hz nie zbiera, nie przechowuje ani nie przesyła żadnych Twoich danych. Wszystko, co robisz w aplikacji — ulubione, własne miksy i ustawienia — zostaje na Twoim urządzeniu.",
     "dataTitle": "Co aplikacja zapisuje",
     "dataBody": "Twoje ulubione, zapisane miksy i preferencje (motyw, język, głośność, ustawienia dostępności) są zapisywane lokalnie na urządzeniu. Kopia zapasowa w chmurze Androida jest wyłączona. Te dane nigdy nie trafiają do nas ani do nikogo innego i znikają po odinstalowaniu aplikacji lub użyciu opcji Zresetuj dane w Ustawieniach.",
     "networkTitle": "Dostęp do sieci",
-    "networkBody": "Dźwięki działają całkowicie offline. Jedyny dostęp do sieci to usługa płatności Google Play, gdy otwierasz ekran Premium, kupujesz lub przywracasz zakup. Sama aplikacja NeuroSound nie wysyła niczego na żaden serwer, do usług analitycznych ani stron trzecich.",
+    "networkBody": "Dźwięki działają całkowicie offline. Jedyny dostęp do sieci to usługa płatności Google Play, gdy otwierasz ekran Premium, kupujesz lub przywracasz zakup. Sama aplikacja 852Hz nie wysyła niczego na żaden serwer, do usług analitycznych ani stron trzecich.",
     "accountsTitle": "Konta i identyfikatory",
     "accountsBody": "Nie ma kont użytkowników, logowania ani identyfikatorów śledzących. Nie mamy żadnego sposobu, by Cię rozpoznać lub powiązać z Tobą korzystanie z aplikacji.",
     "childrenTitle": "Dzieci",
@@ -282,6 +284,7 @@
     "welcome": "Premium odblokowane. Miłego słuchania!",
     "error": "Nie udało się dokończyć zakupu. Spróbuj ponownie.",
     "unavailable": "Premium jest teraz niedostępne. Sprawdź połączenie i spróbuj ponownie.",
-    "legal": "Subskrypcje odnawiają się automatycznie do czasu anulowania. Anuluj w dowolnej chwili w Google Play › Subskrypcje. Płatność jest pobierana z Twojego konta Google Play."
+    "legal": "Subskrypcje odnawiają się automatycznie do czasu anulowania. Anuluj w dowolnej chwili w Google Play › Subskrypcje. Płatność jest pobierana z Twojego konta Google Play.",
+    "bestValue": "Najlepsza cena"
   }
 }

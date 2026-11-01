@@ -14,7 +14,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { PressableScale } from './PressableScale';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { onPrimary } from '@/constants/theme';
 
 interface TransportButtonProps {
   playing: boolean;
@@ -61,12 +60,12 @@ export function TransportButton({
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={onPrimary} />
+        <ActivityIndicator size="small" color={colors.onPrimary} />
       ) : (
         <Ionicons
           name={playing ? 'pause' : 'play'}
           size={iconSize}
-          color={onPrimary}
+          color={colors.onPrimary}
           // A play triangle's optical centre sits left of its bounding box;
           // nudging it right centres it in the circle. Pause is symmetric.
           style={playing ? undefined : { marginLeft: iconSize * 0.09 }}

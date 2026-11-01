@@ -28,11 +28,10 @@ import {
   Typography,
   AccessibilitySize,
   withAlpha,
-  onPrimary,
   Radius,
   ControlSize,
-  FontFamily,
 } from '@/constants/theme';
+import { upper } from '@/lib/upper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetRow } from '@/components/ui/PresetRow';
@@ -186,17 +185,13 @@ export default function IntentScreen() {
             </View>
           </TouchableOpacity>
           <View style={styles.heroText}>
-            {/* The photo screen now speaks the same catalogue language as
-                the cards that lead to it, so it reads as this app's one
-                full-bleed moment rather than a stray image. */}
             <Text
               style={[
                 styles.heroCatalog,
                 { color: artwork.foreground.secondary },
               ]}
             >
-              <Text style={styles.heroCatalogCode}>{intent.catalogCode}</Text>
-              {` · ${t('home.soundCount', { n: intent.presetIds.length })}`}
+              {upper(t('home.soundCount', { n: intent.presetIds.length }))}
             </Text>
             <Text
               style={[styles.heroTitle, { color: artwork.foreground.primary }]}
@@ -229,10 +224,10 @@ export default function IntentScreen() {
             <Ionicons
               name="play"
               size={18}
-              color={onPrimary}
+              color={colors.onPrimary}
               style={styles.startButtonIcon}
             />
-            <Text style={[styles.startButtonText, { color: onPrimary }]}>
+            <Text style={[styles.startButtonText, { color: colors.onPrimary }]}>
               {t('intents.startSession', {
                 minutes: intent.recommendedMinutes,
               })}
@@ -302,11 +297,6 @@ const styles = StyleSheet.create({
   },
   heroCatalog: {
     ...Typography.label,
-    textTransform: 'uppercase',
-  },
-  heroCatalogCode: {
-    fontFamily: FontFamily.mono,
-    letterSpacing: 1.2,
   },
   heroTitle: {
     ...Typography.largeTitle,

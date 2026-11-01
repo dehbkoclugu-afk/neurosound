@@ -52,6 +52,7 @@ import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import { isLockedPreset } from '@/lib/premium';
 import { useIsPremium, usePremiumReady } from '@/stores/premiumStore';
 import * as playerController from '@/lib/audio/playerController';
+import { upper } from '@/lib/upper';
 
 /**
  * Presets a phone speaker cannot deliver: every binaural beat (the effect only
@@ -159,6 +160,8 @@ export default function PlayerScreen() {
   }, [preset, t, showToast]);
 
   const isFavorite = id ? favoriteIds.includes(id) : false;
+  const timerActive =
+    timerDuration !== null && timerRemaining !== null && timerRemaining > 0;
 
   const handleFavoriteToggle = useCallback(() => {
     if (!id) return;
@@ -194,11 +197,16 @@ export default function PlayerScreen() {
   }, [router]);
 
   if (!preset) {
+    // Still waiting on the entitlement (or about to redirect to the paywall):
+    // a blank frame, not a flash of "Error" for a perfectly valid sound.
+    const missing = premiumReady && !(id && getPresetById(id));
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.missingText, { color: colors.text }]}>
-          {t('common.error')}
-        </Text>
+        {missing && (
+          <Text style={[styles.missingText, { color: colors.text }]}>
+            {t('common.error')}
+          </Text>
+        )}
       </View>
     );
   }
@@ -282,7 +290,34 @@ export default function PlayerScreen() {
             </ArtBackground>
           </Animated.View>
 
+          {/* The sleep timer is the reason half the users open this screen;
+              it sat below the fold under volume. It now flanks play, with
+              add-to-mixer on the other side, all within thumb reach. */}
           <View style={styles.heroTransport}>
+            <TouchableOpacity
+              onPress={() => setShowTimerModal(true)}
+              style={[
+                styles.sideControl,
+                {
+                  backgroundColor: timerActive
+                    ? withAlpha(colors.accent, BADGE_ALPHA)
+                    : colors.backgroundSecondary,
+                  borderColor: timerActive ? colors.accent : colors.cardBorder,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                timerActive
+                  ? `${t('player.timer')}, ${formatTimerValue(timerRemaining!)}`
+                  : t('player.timer')
+              }
+            >
+              <Ionicons
+                name="timer-outline"
+                size={24}
+                color={timerActive ? colors.accent : colors.text}
+              />
+            </TouchableOpacity>
             <TransportButton
               playing={isPlaying}
               onPress={handlePlayPause}
@@ -294,6 +329,20 @@ export default function PlayerScreen() {
                   : t('accessibility.playButton')
               }
             />
+            <TouchableOpacity
+              onPress={handleAddToMixer}
+              style={[
+                styles.sideControl,
+                {
+                  backgroundColor: colors.backgroundSecondary,
+                  borderColor: colors.cardBorder,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={t('mixer.addToMixer')}
+            >
+              <Ionicons name="layers-outline" size={24} color={colors.text} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -324,7 +373,7 @@ export default function PlayerScreen() {
                     { color: categoryColors[preset.type] },
                   ]}
                 >
-                  {t(`explore.categories.${preset.type}`)}
+                  {upper(t(`explore.categories.${preset.type}`))}
                 </Text>
               </View>
 
@@ -345,6 +394,20 @@ export default function PlayerScreen() {
               )}
             </View>
 
+            {timerActive && (
+              <TouchableOpacity
+                onPress={() => setShowTimerModal(true)}
+                style={styles.timerReadout}
+                accessibilityRole="button"
+                accessibilityLabel={`${t('player.timer')}, ${formatTimerValue(timerRemaining!)}`}
+              >
+                <Ionicons name="moon-outline" size={14} color={colors.accent} />
+                <Text style={[styles.timerReadoutText, { color: colors.accent }]}>
+                  {formatTimerValue(timerRemaining!)}
+                </Text>
+              </TouchableOpacity>
+            )}
+
             <Text
               style={[
                 styles.description,
@@ -355,31 +418,15 @@ export default function PlayerScreen() {
               {t(preset.descriptionKey)}
             </Text>
 
-            {preset.type === 'binaural' && (
-              <View style={styles.mechanismRow}>
-                <Ionicons
-                  name="headset-outline"
-                  size={16}
-                  color={colors.textSecondary}
-                />
-                <Text
-                  style={[styles.mechanism, { color: colors.textSecondary }]}
-                >
-                  {t('explore.binauralDescription')}
-                </Text>
-              </View>
-            )}
-
             {/* The one preset failure that looks identical to a bug: a phone
                 speaker rolls off long before 40 Hz, and a binaural pair needs
                 two ears fed separately. Both play perfectly and are heard as
                 nothing, so the app gets blamed for "this sound doesn't work".
-                Stated here rather than at the entry points because Explore —
-                where all five binaural presets actually live — pushes straight
-                to this screen and warned about none of it. */}
+                One line, not a mechanism paragraph stacked on a warning: the
+                how-it-works copy already lives in Explore. */}
             {needsHeadphones(preset) && (
               <View style={styles.mechanismRow}>
-                <Ionicons name="warning-outline" size={16} color={colors.warning} />
+                <Ionicons name="headset-outline" size={16} color={colors.warning} />
                 <Text style={[styles.mechanism, { color: colors.warning }]}>
                   {t('player.headphonesRequired')}
                 </Text>
@@ -450,66 +497,6 @@ export default function PlayerScreen() {
             )}
           </View>
 
-          <View style={styles.actionsRow}>
-            <TouchableOpacity
-              onPress={() => setShowTimerModal(true)}
-              style={[
-                styles.actionButton,
-                {
-                  backgroundColor: colors.backgroundSecondary,
-                  borderColor: colors.cardBorder,
-                },
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={
-                timerRemaining !== null && timerRemaining > 0
-                  ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
-                  : t('player.timer')
-              }
-            >
-              <Ionicons
-                name="timer-outline"
-                size={23}
-                color={timerDuration ? colors.accent : colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.actionLabel,
-                  {
-                    color: timerDuration ? colors.accent : colors.textSecondary,
-                  },
-                ]}
-                numberOfLines={2}
-              >
-                {t('player.timer')}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleAddToMixer}
-              style={[
-                styles.actionButton,
-                {
-                  backgroundColor: colors.backgroundSecondary,
-                  borderColor: colors.cardBorder,
-                },
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t('mixer.addToMixer')}
-            >
-              <Ionicons
-                name="layers-outline"
-                size={23}
-                color={colors.textSecondary}
-              />
-              <Text
-                style={[styles.actionLabel, { color: colors.textSecondary }]}
-                numberOfLines={2}
-              >
-                {t('mixer.addToMixer')}
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ScrollView>
 
@@ -561,7 +548,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.lg,
   },
   body: {
     paddingHorizontal: Spacing.lg,
@@ -591,7 +581,6 @@ const styles = StyleSheet.create({
   },
   categoryTagText: {
     ...Typography.label,
-    textTransform: 'uppercase',
   },
   frequencyLine: {
     ...Typography.body,
@@ -651,26 +640,25 @@ const styles = StyleSheet.create({
     ...Typography.caption,
     textAlign: 'center',
   },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-  },
-  actionButton: {
-    flex: 1,
-    minWidth: 0,
-    minHeight: 84,
+  sideControl: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     borderWidth: 1,
-    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.sm,
+    marginTop: 14,
   },
-  actionLabel: {
-    ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
-    textAlign: 'center',
+  timerReadout: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    minHeight: 36,
+    paddingHorizontal: Spacing.sm,
+  },
+  timerReadoutText: {
+    ...Typography.headline,
+    ...Typography.numeral,
   },
   missingText: {
     ...Typography.body,

@@ -28,7 +28,7 @@
     "settings": "Instellingen"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Focussen, ontspannen, luisteren",
     "quickStart": "Snel starten",
     "quickStartDesc": "Populaire presets om te beginnen",
@@ -152,7 +152,9 @@
     "renameMix": "Mix hernoemen",
     "mixRenamed": "Mix hernoemd",
     "addToMixer": "Aan mixer toevoegen",
-    "addedToMixer": "Toegevoegd aan mixer"
+    "addedToMixer": "Toegevoegd aan mixer",
+    "emptyTitle": "Maak je eigen geluidsmix",
+    "emptyDesc": "Combineer tot 4 geluiden — regen, ruis en frequenties — en bewaar de mix."
   },
   "player": {
     "nowPlaying": "Speelt nu",
@@ -210,11 +212,11 @@
     "title": "Privacybeleid",
     "updated": "Laatst bijgewerkt: {{date}}",
     "summaryTitle": "Kort gezegd",
-    "summaryBody": "NeuroSound verzamelt, bewaart of verstuurt geen enkel gegeven van je. Alles wat je in deze app doet — favorieten, eigen mixen en instellingen — blijft op je toestel.",
+    "summaryBody": "852Hz verzamelt, bewaart of verstuurt geen enkel gegeven van je. Alles wat je in deze app doet — favorieten, eigen mixen en instellingen — blijft op je toestel.",
     "dataTitle": "Wat de app bewaart",
     "dataBody": "Je favorieten, opgeslagen mixen en voorkeuren (thema, taal, volume, toegankelijkheidsinstellingen) worden lokaal op je toestel bewaard. De cloudback-up van Android staat uit. Deze gegevens gaan nooit naar ons of naar iemand anders en verdwijnen als je de app verwijdert of Gegevens wissen gebruikt in Instellingen.",
     "networkTitle": "Netwerktoegang",
-    "networkBody": "Geluiden spelen volledig offline. De enige netwerktoegang is de betaaldienst van Google Play, wanneer je het Premium-scherm opent, iets koopt of een aankoop herstelt. NeuroSound zelf stuurt niets naar servers, analysediensten of derden.",
+    "networkBody": "Geluiden spelen volledig offline. De enige netwerktoegang is de betaaldienst van Google Play, wanneer je het Premium-scherm opent, iets koopt of een aankoop herstelt. 852Hz zelf stuurt niets naar servers, analysediensten of derden.",
     "accountsTitle": "Accounts en identificatoren",
     "accountsBody": "Er zijn geen accounts, geen inlog en geen trackingidentificatoren. We hebben geen enkele manier om je te herkennen of gebruik aan jou te koppelen.",
     "childrenTitle": "Kinderen",
@@ -282,6 +284,7 @@
     "welcome": "Premium ontgrendeld. Veel plezier!",
     "error": "De aankoop kon niet worden voltooid. Probeer het opnieuw.",
     "unavailable": "Premium is nu niet beschikbaar. Controleer je verbinding en probeer het opnieuw.",
-    "legal": "Abonnementen worden automatisch verlengd tot je opzegt. Opzeggen kan altijd via Google Play › Abonnementen. De betaling wordt via je Google Play-account afgerekend."
+    "legal": "Abonnementen worden automatisch verlengd tot je opzegt. Opzeggen kan altijd via Google Play › Abonnementen. De betaling wordt via je Google Play-account afgerekend.",
+    "bestValue": "Beste prijs"
   }
 }

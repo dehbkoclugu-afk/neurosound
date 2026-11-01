@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, FontFamily } from '@/constants/theme';
+import { upper } from '@/lib/upper';
 
 interface CategoryHeaderProps {
   title: string;
@@ -43,7 +44,7 @@ export function CategoryHeader({
           style={[styles.title, { color: colors.textSecondary }]}
           accessibilityRole="header"
         >
-          {title}
+          {upper(title)}
         </Text>
         {subtitle && (
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
@@ -88,7 +89,6 @@ const styles = StyleSheet.create({
   },
   title: {
     ...Typography.label,
-    textTransform: 'uppercase',
   },
   subtitle: {
     ...Typography.caption,

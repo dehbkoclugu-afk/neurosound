@@ -28,10 +28,10 @@
     "settings": "Ayarlar"
   },
   "home": {
-    "title": "NeuroSound",
+    "title": "852Hz",
     "subtitle": "Odaklan, Rahatla, Dinlen",
     "quickStart": "Hızlı Başlat",
-    "quickStartDesc": "Başlamak için popüler presetler",
+    "quickStartDesc": "Başlamak için popüler sesler",
     "favorites": "Favoriler",
     "recentlyPlayed": "Son Dinlenenler",
     "headphoneWarning": "Binaural beat'ler için kulaklık kullanın",
@@ -53,7 +53,7 @@
   "explore": {
     "title": "Frekansları Keşfet",
     "categories": {
-      "binaural": "Binaural Beats",
+      "binaural": "Binaural Ritimler",
       "solfeggio": "Solfeggio",
       "noise": "Ortam Sesleri"
     },
@@ -131,8 +131,8 @@
     "addSound": "Ses Ekle",
     "volume": "Ses Seviyesi",
     "master": "Ana Ses",
-    "savePreset": "Preset Kaydet",
-    "presetName": "Preset Adı",
+    "savePreset": "Karışımı Kaydet",
+    "presetName": "Karışım adı",
     "namePlaceholder": "Özel Karışımım",
     "myMixes": "Karışımlarım",
     "activeChannels": "Aktif Sesler",
@@ -152,7 +152,9 @@
     "renameMix": "Karışımı yeniden adlandır",
     "mixRenamed": "Karışım yeniden adlandırıldı",
     "addToMixer": "Karıştırıcıya ekle",
-    "addedToMixer": "Karıştırıcıya eklendi"
+    "addedToMixer": "Karıştırıcıya eklendi",
+    "emptyTitle": "Kendi ses karışımını oluştur",
+    "emptyDesc": "Yağmur, gürültü ve frekanslardan 4 sese kadar üst üste koy, karışımı kaydet."
   },
   "player": {
     "nowPlaying": "Şu an çalıyor",
@@ -210,11 +212,11 @@
     "title": "Gizlilik Politikası",
     "updated": "Son güncelleme: {{date}}",
     "summaryTitle": "Kısaca",
-    "summaryBody": "NeuroSound hiçbir verinizi toplamaz, saklamaz ya da başka bir yere göndermez. Uygulamada yaptığınız her şey — favoriler, özel karışımlar ve ayarlar — yalnızca cihazınızda kalır.",
+    "summaryBody": "852Hz hiçbir verinizi toplamaz, saklamaz ya da başka bir yere göndermez. Uygulamada yaptığınız her şey — favoriler, özel karışımlar ve ayarlar — yalnızca cihazınızda kalır.",
     "dataTitle": "Uygulama neyi saklıyor",
     "dataBody": "Favorileriniz, kaydettiğiniz karışımlar ve tercihleriniz cihazınızda yerel olarak saklanır. Android bulut yedeklemesi kapalıdır. Bu veriler bize veya üçüncü taraflara gönderilmez; uygulamayı kaldırdığınızda ya da Verileri sıfırla seçeneğini kullandığınızda silinir.",
     "networkTitle": "Ağ erişimi",
-    "networkBody": "Sesler tamamen çevrimdışı çalar. Tek ağ erişimi, Premium ekranını açtığında, satın aldığında veya satın alımı geri yüklediğinde kullanılan Google Play faturalandırma hizmetidir. NeuroSound kendisi hiçbir sunucuya, analiz hizmetine veya üçüncü tarafa veri göndermez.",
+    "networkBody": "Sesler tamamen çevrimdışı çalar. Tek ağ erişimi, Premium ekranını açtığında, satın aldığında veya satın alımı geri yüklediğinde kullanılan Google Play faturalandırma hizmetidir. 852Hz kendisi hiçbir sunucuya, analiz hizmetine veya üçüncü tarafa veri göndermez.",
     "accountsTitle": "Hesaplar ve kimlikler",
     "accountsBody": "Kullanıcı hesabı, giriş ya da takip kimliği yoktur. Sizi tanımlamamızın ya da kullanımınızı size bağlamamızın hiçbir yolu yoktur.",
     "childrenTitle": "Çocuklar",
@@ -282,6 +284,7 @@
     "welcome": "Premium açıldı. Keyfini çıkar!",
     "error": "Satın alma tamamlanamadı. Lütfen tekrar dene.",
     "unavailable": "Premium şu anda kullanılamıyor. Bağlantını kontrol edip tekrar dene.",
-    "legal": "Abonelikler iptal edilene kadar otomatik yenilenir. Google Play › Abonelikler bölümünden istediğin zaman iptal edebilirsin. Ödeme Google Play hesabından alınır."
+    "legal": "Abonelikler iptal edilene kadar otomatik yenilenir. Google Play › Abonelikler bölümünden istediğin zaman iptal edebilirsin. Ödeme Google Play hesabından alınır.",
+    "bestValue": "En avantajlı"
   }
 }

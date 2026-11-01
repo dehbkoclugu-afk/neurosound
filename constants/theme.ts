@@ -18,12 +18,12 @@ const inkBlueLight = '#7FA8CC';
 const inkBlueLighter = '#A6C4DE';
 const inkBlueDark = '#1F3F5E';
 
-/**
- * Text/icon colour for anything sitting ON a filled primary surface.
- * Computed against each theme's own primary fill (see constants/__tests__
- * notes in PRODUCT.md/DESIGN.md); every pairing below clears 6:1.
- */
-export const onPrimary = '#F7F9FC';
+// Text/icon colour on a filled primary surface lives in each palette as
+// `onPrimary`: light palettes fill with a deep ink blue (paper text), dark
+// palettes with a pale one (ink text). A single shared value was paper
+// everywhere and fell to ~2.4:1 on the dark palettes' #7FA8CC buttons.
+const onPrimaryPaper = '#F7F9FC';
+const onPrimaryInk = '#0A1622';
 
 /**
  * Text/icon colour for anything sitting ON a photograph — the Intent hero,
@@ -148,6 +148,7 @@ export const Colors = {
     tint: inkBlue,
     primary: inkBlue,
     primaryLight: '#5C82AA',
+    onPrimary: onPrimaryPaper,
     accent: inkBlue, // 6.23:1 on both surface levels
     icon: '#566575',
     tabIconDefault: '#8A98A8',
@@ -175,6 +176,7 @@ export const Colors = {
     tint: inkBlueLight,
     primary: inkBlueLight,
     primaryLight: inkBlueLighter,
+    onPrimary: onPrimaryInk,
     accent: inkBlueLight, // 7.40:1 on both surface levels
     icon: '#9AA6B5',
     tabIconDefault: '#657181',
@@ -202,6 +204,7 @@ export const Colors = {
     tint: '#3F6690',
     primary: '#3F6690',
     primaryLight: '#6D8CAC',
+    onPrimary: onPrimaryPaper,
     accent: '#3F6690', // AA on both surface levels
     icon: '#687686',
     tabIconDefault: '#9AA7B4',
@@ -225,6 +228,7 @@ export const Colors = {
     tint: '#7FA8CC',
     primary: '#7FA8CC',
     primaryLight: '#A0BFDA',
+    onPrimary: onPrimaryInk,
     accent: '#7FA8CC',
     icon: '#8C98A6',
     tabIconDefault: '#596574',
