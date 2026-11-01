@@ -469,7 +469,9 @@ export default function PlayerScreen() {
               value={volume}
               onValueChange={setVolume}
               max={1}
-              cap={maxVolume}
+              // No `cap`: the safety limit scales the whole range (volume ×
+              // maxVolume), it does not clip the top of it, so shading the
+              // last 20% as "not heard" was false — every position is audible.
               label={t('mixer.volume')}
               accessibilityLabel={t('accessibility.volumeSlider')}
             />

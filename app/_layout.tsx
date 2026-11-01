@@ -76,7 +76,9 @@ export default function RootLayout() {
         </Stack>
         <PremiumSync />
         <ToastHost />
-        <StatusBar style="auto" />
+        {/* Follows the app's own theme, not the system's: "auto" drew dark
+            status icons over the dark-default UI on light-mode phones. */}
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       </ThemeProvider>
     </I18nextProvider>
   );

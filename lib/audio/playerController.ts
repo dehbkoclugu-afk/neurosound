@@ -351,6 +351,7 @@ export async function play(): Promise<void> {
     ramp(effectiveVolume(), FADE_IN_MS);
     useAudioStore.getState().setIsPlaying(true);
     beginListening();
+    bindTimerHeartbeat(gen.getNativePlayer());
     const preset = useAudioStore.getState().currentPreset;
     if (preset) setNowPlaying(gen.getNativePlayer(), i18n.t(preset.nameKey), 'single');
   } catch (e) {
@@ -403,6 +404,7 @@ export function syncVolume(): void {
 /** Tear down the single-preset generator, leaving the timer alone. */
 function disposePreset(): void {
   pause(true);
+  if (generator) unbindTimerHeartbeat();
   clearNowPlaying();
   generator?.dispose();
   generator = null;
@@ -492,6 +494,36 @@ export function startTimer(minutes: number | null): void {
   evaluateTimer();
 }
 
+/**
+ * Drives the sleep timer from the playing native player's own status events.
+ *
+ * React Native on Android pauses JS timers (setTimeout) while the app is in
+ * the background — which, for a sleep timer, is the entire time it matters:
+ * the phone is locked, the countdown froze, and the sound played all night,
+ * only "catching up" when the user next opened the app. The audio player
+ * keeps emitting playbackStatusUpdate while it plays in the foreground
+ * service, and those events do reach JS, so they make a reliable clock.
+ */
+let timerHeartbeat: { remove: () => void } | null = null;
+let lastHeartbeat = 0;
+
+function bindTimerHeartbeat(player: AudioPlayer | null | undefined): void {
+  timerHeartbeat?.remove();
+  timerHeartbeat = null;
+  if (!player || typeof player.addListener !== 'function') return;
+  timerHeartbeat = player.addListener('playbackStatusUpdate', () => {
+    const now = Date.now();
+    if (now - lastHeartbeat < 1000) return;
+    lastHeartbeat = now;
+    if (useAudioStore.getState().timerEndsAt !== null) evaluateTimer();
+  });
+}
+
+function unbindTimerHeartbeat(): void {
+  timerHeartbeat?.remove();
+  timerHeartbeat = null;
+}
+
 // A suspended JS thread stops ticking; re-evaluating on resume closes the gap.
 AppState.addEventListener('change', (next) => {
   if (next === 'active' && useAudioStore.getState().timerEndsAt !== null) {
@@ -548,6 +580,7 @@ async function startMixerChannels(
     beginListening();
     const leader = mixerGenerators.values().next().value as Generator | undefined;
     setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer');
+    bindTimerHeartbeat(leader?.getNativePlayer());
   } catch {
     mixerGenerators.forEach((gen) => {
       gen.stop();
@@ -561,6 +594,7 @@ async function startMixerChannels(
 
 export function mixerStop(): void {
   if (lockScreenOwner === 'mixer') clearNowPlaying();
+  if (mixerGenerators.size > 0) unbindTimerHeartbeat();
   mixerGenerators.forEach((gen) => {
     gen.stop();
     gen.dispose();
@@ -649,9 +683,12 @@ export function mixerRemoveChannel(channelId: string): void {
     mixerStop();
     return;
   }
-  if (ownedLockScreen && useAudioStore.getState().isMixerPlaying) {
+  if (useAudioStore.getState().isMixerPlaying && gen) {
+    // The removed channel may have been the one carrying the lock screen and
+    // the timer heartbeat; hand both to whichever channel now leads.
     const leader = mixerGenerators.values().next().value as Generator | undefined;
-    setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer');
+    if (ownedLockScreen) setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer');
+    bindTimerHeartbeat(leader?.getNativePlayer());
   }
 }
 

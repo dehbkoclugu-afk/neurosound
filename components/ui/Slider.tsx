@@ -64,6 +64,9 @@ export function Slider({
 
   const handleValueFromPosition = useCallback(
     (x: number) => {
+      // A touch before the first layout pass would divide by zero and hand
+      // NaN to the audio engine.
+      if (sliderWidth <= 0) return;
       const clampedX = Math.max(0, Math.min(sliderWidth, x));
       const newNormalized = clampedX / sliderWidth;
       const newValue = min + newNormalized * (max - min);
@@ -95,6 +98,9 @@ export function Slider({
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
+      // Every slider lives inside a vertical ScrollView; letting it claim the
+      // gesture mid-drag froze the value wherever the finger drifted.
+      onPanResponderTerminationRequest: () => false,
       onPanResponderGrant: (evt) => {
         startXRef.current = evt.nativeEvent.locationX;
         handleValueFromPositionRef.current(startXRef.current);

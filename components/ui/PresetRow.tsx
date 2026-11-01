@@ -26,6 +26,7 @@ import { ArtBackground } from './ArtBackground';
 import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import { isLockedPreset } from '@/lib/premium';
+import { foldForSearch } from '@/lib/upper';
 import { useIsPremium } from '@/stores/premiumStore';
 
 export function presetIcon(preset: FrequencyPreset): IconConfig {
@@ -144,13 +145,22 @@ function BandScale({
   );
 }
 
-/** Splits `text` on the first case-insensitive occurrence of `term`. */
+/** Splits `text` on the first occurrence of an already-folded `term`
+ *  (see foldForSearch). Folded one character at a time so indices into the
+ *  folded string still line up with the original. */
 function splitOnMatch(
   text: string,
   term: string,
 ): [string, string, string] | null {
   if (!term) return null;
-  const at = text.toLowerCase().indexOf(term);
+  const folded = text
+    .split('')
+    .map((c) => {
+      const f = foldForSearch(c);
+      return f.length === 1 ? f : c;
+    })
+    .join('');
+  const at = folded.indexOf(term);
   if (at < 0) return null;
   return [
     text.slice(0, at),

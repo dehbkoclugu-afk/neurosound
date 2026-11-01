@@ -28,6 +28,7 @@ import { PresetRow } from '@/components/ui/PresetRow';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
+import { foldForSearch } from '@/lib/upper';
 import {
   binauralPresets,
   solfeggioPresets,
@@ -71,7 +72,7 @@ const categories: CategoryTab[] = [
 ];
 
 export default function ExploreScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
   const { isFavorite, favoriteIds } = usePresetsStore();
@@ -161,7 +162,7 @@ export default function ExploreScreen() {
     setFavoritesOnly(false);
   };
 
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = foldForSearch(query.trim());
 
   const filteredPresetsByCategory = useMemo(() => {
     const map: Record<CategoryType, FrequencyPreset[]> = {
@@ -172,7 +173,7 @@ export default function ExploreScreen() {
     categories.forEach((category) => {
       const matching = category.presets.filter((preset) => {
         if (favoritesOnly && !isFavorite(preset.id)) return false;
-        if (normalizedQuery && !t(preset.nameKey).toLowerCase().includes(normalizedQuery)) {
+        if (normalizedQuery && !foldForSearch(t(preset.nameKey)).includes(normalizedQuery)) {
           return false;
         }
         return true;
@@ -190,7 +191,7 @@ export default function ExploreScreen() {
     // get() internally), so it never changes and never invalidates this
     // memo on its own — favoriteIds is the dependency that actually moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [normalizedQuery, favoritesOnly, favoriteIds, sortBy]);
+  }, [normalizedQuery, favoritesOnly, favoriteIds, sortBy, i18n.language]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>

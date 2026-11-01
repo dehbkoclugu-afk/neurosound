@@ -56,7 +56,7 @@ import { useIsPremium } from '@/stores/premiumStore';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
-import { upper } from '@/lib/upper';
+import { upper, foldForSearch } from '@/lib/upper';
 
 // Preset picker groups — 33 flat items is unusable; group by category
 const pickerGroups = [
@@ -116,13 +116,13 @@ export default function MixerScreen() {
 
   // 33 presets in a flat scroll is unusable without a filter.
   const filteredPickerGroups = useMemo(() => {
-    const query = pickerQuery.trim().toLowerCase();
+    const query = foldForSearch(pickerQuery.trim());
     if (!query) return pickerGroups;
     return pickerGroups
       .map((group) => ({
         ...group,
         presets: group.presets.filter((preset) =>
-          t(preset.nameKey).toLowerCase().includes(query),
+          foldForSearch(t(preset.nameKey)).includes(query),
         ),
       }))
       .filter((group) => group.presets.length > 0);

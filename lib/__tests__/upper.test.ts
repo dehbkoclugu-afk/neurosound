@@ -1,6 +1,14 @@
 jest.mock('@/i18n', () => ({ __esModule: true, default: { language: 'en' } }));
 
-import { upper } from '../upper';
+import { upper, foldForSearch } from '../upper';
+
+describe('foldForSearch', () => {
+  it('matches Turkish names without the exact dots and accents', () => {
+    expect(foldForSearch('Işık')).toBe(foldForSearch('isik'));
+    expect(foldForSearch('İçe Dönüş')).toBe('ice donus');
+    expect(foldForSearch('Kahverengi Gürültü').includes(foldForSearch('gurultu'))).toBe(true);
+  });
+});
 
 describe('upper', () => {
   it('keeps the Turkish dotted capital I', () => {

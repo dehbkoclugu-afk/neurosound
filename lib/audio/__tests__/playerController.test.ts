@@ -374,4 +374,28 @@ describe('sleep timer', () => {
     expect(useAudioStore.getState().isMixerPlaying).toBe(false);
     expect(live()).toHaveLength(0);
   });
+
+  it('still fires when JS timers are frozen in the background', async () => {
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+    playerController.startTimer(1);
+
+    // Android pauses setTimeout in the background: move the wall clock past
+    // the deadline without running any JS timer, then deliver the status
+    // event the playing native player keeps emitting.
+    jest.setSystemTime(Date.now() + 61_000);
+    const statusListeners = createdPlayers.flatMap((p) =>
+      p.addListener.mock.calls
+        .filter(([event]: [string]) => event === 'playbackStatusUpdate')
+        .map(([, cb]: [string, (s: { playing: boolean }) => void]) => cb)
+    );
+    expect(statusListeners.length).toBeGreaterThan(0);
+    statusListeners.forEach((cb) => cb({ playing: true }));
+
+    expect(useAudioStore.getState().timerDuration).toBeNull();
+    // The fade-out to pause is itself a JS interval; once it runs, the
+    // native player is silent.
+    await settle();
+    expect(live().some((p) => p.playing)).toBe(false);
+  });
 });
