@@ -1,0 +1,128 @@
+{
+  "en-US": {
+    "01-home": ["Sleep, focus, relax in one tap", "Fully offline. No ads. No account."],
+    "02-explore": ["852 Hz and every frequency in one place", "Binaural beats, Solfeggio tones and nature sounds"],
+    "03-player": ["Fall asleep to the rain", "Set a timer and the sound fades out gently"],
+    "04-mixer": ["Mix your own soundscape", "Layer up to 4 sounds: rain, noise and frequencies"]
+  },
+  "tr-TR": {
+    "01-home": ["Tek dokunuşla uyu, odaklan, rahatla", "Tamamen çevrimdışı. Reklam yok. Hesap yok."],
+    "02-explore": ["852 Hz ve tüm frekanslar tek yerde", "Binaural ritimler, Solfeggio tonları ve doğa sesleri"],
+    "03-player": ["Yağmurla uykuya dal", "Zamanlayıcıyı kur, ses kendiliğinden yavaşça kısılsın"],
+    "04-mixer": ["Kendi ses karışımını yap", "Yağmur, gürültü ve frekanslardan 4 sesi üst üste koy"]
+  },
+  "de-DE": {
+    "01-home": ["Schlaf, Fokus, Ruhe mit einem Tipp", "Komplett offline. Keine Werbung. Kein Konto."],
+    "02-explore": ["852 Hz und alle Frequenzen an einem Ort", "Binaurale Beats, Solfeggio-Töne und Naturklänge"],
+    "03-player": ["Mit Regen einschlafen", "Timer stellen – der Klang wird sanft leiser"],
+    "04-mixer": ["Dein eigener Klangmix", "Bis zu 4 Sounds kombinieren: Regen, Rauschen, Frequenzen"]
+  },
+  "es-ES": {
+    "01-home": ["Duerme, concéntrate, relájate con un toque", "Sin conexión. Sin anuncios. Sin cuenta."],
+    "02-explore": ["852 Hz y todas las frecuencias en un solo lugar", "Ritmos binaurales, tonos Solfeggio y sonidos de la naturaleza"],
+    "03-player": ["Duérmete con la lluvia", "Pon el temporizador y el sonido baja suavemente"],
+    "04-mixer": ["Crea tu propia mezcla", "Combina hasta 4 sonidos: lluvia, ruido y frecuencias"]
+  },
+  "fr-FR": {
+    "01-home": ["Dormir, se concentrer, se détendre en un geste", "100 % hors ligne. Sans pub. Sans compte."],
+    "02-explore": ["852 Hz et toutes les fréquences réunies", "Battements binauraux, tons Solfège et sons de la nature"],
+    "03-player": ["Endormez-vous sous la pluie", "Réglez la minuterie, le son baisse en douceur"],
+    "04-mixer": ["Créez votre propre ambiance", "Mélangez jusqu'à 4 sons : pluie, bruit et fréquences"]
+  },
+  "it-IT": {
+    "01-home": ["Dormi, concentrati, rilassati con un tocco", "Completamente offline. Niente pubblicità. Nessun account."],
+    "02-explore": ["852 Hz e tutte le frequenze in un unico posto", "Battiti binaurali, toni Solfeggio e suoni della natura"],
+    "03-player": ["Addormentati con la pioggia", "Imposta il timer, il suono si abbassa dolcemente"],
+    "04-mixer": ["Crea il tuo mix di suoni", "Combina fino a 4 suoni: pioggia, rumore e frequenze"]
+  },
+  "pt-BR": {
+    "01-home": ["Durma, foque, relaxe com um toque", "Totalmente offline. Sem anúncios. Sem conta."],
+    "02-explore": ["852 Hz e todas as frequências em um só lugar", "Batidas binaurais, tons Solfeggio e sons da natureza"],
+    "03-player": ["Durma ouvindo a chuva", "Ative o timer e o som diminui suavemente"],
+    "04-mixer": ["Crie sua própria mistura", "Combine até 4 sons: chuva, ruído e frequências"]
+  },
+  "nl-NL": {
+    "01-home": ["Slapen, focussen, ontspannen met één tik", "Volledig offline. Geen advertenties. Geen account."],
+    "02-explore": ["852 Hz en alle frequenties op één plek", "Binaurale beats, Solfeggio-tonen en natuurgeluiden"],
+    "03-player": ["Val in slaap bij de regen", "Zet de timer en het geluid sterft zacht weg"],
+    "04-mixer": ["Maak je eigen geluidsmix", "Combineer tot 4 geluiden: regen, ruis en frequenties"]
+  },
+  "pl-PL": {
+    "01-home": ["Sen, skupienie, relaks jednym dotknięciem", "W pełni offline. Bez reklam. Bez konta."],
+    "02-explore": ["852 Hz i wszystkie częstotliwości w jednym miejscu", "Dudnienia binauralne, tony Solfeggio i dźwięki natury"],
+    "03-player": ["Zasypiaj przy deszczu", "Ustaw minutnik, a dźwięk łagodnie ucichnie"],
+    "04-mixer": ["Stwórz własny miks dźwięków", "Połącz do 4 dźwięków: deszcz, szum i częstotliwości"]
+  },
+  "ro": {
+    "01-home": ["Somn, focus, relaxare cu o atingere", "Complet offline. Fără reclame. Fără cont."],
+    "02-explore": ["852 Hz și toate frecvențele într-un singur loc", "Ritmuri binaurale, tonuri Solfeggio și sunete din natură"],
+    "03-player": ["Adormi pe sunet de ploaie", "Setează temporizatorul, sunetul scade treptat"],
+    "04-mixer": ["Creează-ți propriul mix", "Combină până la 4 sunete: ploaie, zgomot și frecvențe"]
+  },
+  "ru-RU": {
+    "01-home": ["Сон, фокус, отдых — одним касанием", "Полностью офлайн. Без рекламы. Без аккаунта."],
+    "02-explore": ["852 Гц и все частоты в одном месте", "Бинауральные ритмы, тона Сольфеджио и звуки природы"],
+    "03-player": ["Засыпайте под шум дождя", "Поставьте таймер — звук мягко затихнет"],
+    "04-mixer": ["Создайте свой микс звуков", "Смешивайте до 4 звуков: дождь, шум и частоты"]
+  },
+  "uk": {
+    "01-home": ["Сон, фокус, відпочинок — одним дотиком", "Повністю офлайн. Без реклами. Без акаунта."],
+    "02-explore": ["852 Гц і всі частоти в одному місці", "Бінауральні ритми, тони Сольфеджіо та звуки природи"],
+    "03-player": ["Засинайте під шум дощу", "Увімкніть таймер — звук м'яко затихне"],
+    "04-mixer": ["Створіть свій мікс звуків", "Змішуйте до 4 звуків: дощ, шум і частоти"]
+  },
+  "sv-SE": {
+    "01-home": ["Sov, fokusera, slappna av med ett tryck", "Helt offline. Inga annonser. Inget konto."],
+    "02-explore": ["852 Hz och alla frekvenser på ett ställe", "Binaurala beats, Solfeggio-toner och naturljud"],
+    "03-player": ["Somna till regnet", "Ställ in timern så tonas ljudet mjukt ut"],
+    "04-mixer": ["Skapa din egen ljudmix", "Blanda upp till 4 ljud: regn, brus och frekvenser"]
+  },
+  "id": {
+    "01-home": ["Tidur, fokus, rileks dengan satu ketukan", "Sepenuhnya offline. Tanpa iklan. Tanpa akun."],
+    "02-explore": ["852 Hz dan semua frekuensi di satu tempat", "Binaural beats, nada Solfeggio, dan suara alam"],
+    "03-player": ["Tertidur dengan suara hujan", "Atur timer, suara akan memelan perlahan"],
+    "04-mixer": ["Buat campuran suaramu sendiri", "Gabungkan hingga 4 suara: hujan, noise, dan frekuensi"]
+  },
+  "vi": {
+    "01-home": ["Ngủ, tập trung, thư giãn chỉ với một chạm", "Hoàn toàn ngoại tuyến. Không quảng cáo. Không cần tài khoản."],
+    "02-explore": ["852 Hz và mọi tần số ở một nơi", "Nhịp binaural, âm Solfeggio và âm thanh thiên nhiên"],
+    "03-player": ["Chìm vào giấc ngủ cùng tiếng mưa", "Đặt hẹn giờ, âm thanh sẽ nhỏ dần nhẹ nhàng"],
+    "04-mixer": ["Tự tạo bản phối âm thanh", "Kết hợp tối đa 4 âm thanh: mưa, tiếng ồn và tần số"]
+  },
+  "th": {
+    "01-home": ["หลับ โฟกัส ผ่อนคลาย ในแตะเดียว", "ใช้งานออฟไลน์ทั้งหมด ไม่มีโฆษณา ไม่ต้องมีบัญชี"],
+    "02-explore": ["852 Hz และทุกคลื่นความถี่ในที่เดียว", "Binaural beats เสียง Solfeggio และเสียงธรรมชาติ"],
+    "03-player": ["หลับสบายไปกับเสียงฝน", "ตั้งเวลา แล้วเสียงจะค่อยๆ เบาลงเอง"],
+    "04-mixer": ["สร้างมิกซ์เสียงของคุณเอง", "ผสมได้สูงสุด 4 เสียง: ฝน นอยส์ และคลื่นความถี่"]
+  },
+  "hi-IN": {
+    "01-home": ["एक टैप में नींद, फोकस और सुकून", "पूरी तरह ऑफ़लाइन। कोई विज्ञापन नहीं। कोई अकाउंट नहीं।"],
+    "02-explore": ["852 Hz और सभी फ़्रीक्वेंसी एक ही जगह", "बाइनॉरल बीट्स, सॉल्फ़ेजियो टोन और प्रकृति की आवाज़ें"],
+    "03-player": ["बारिश की आवाज़ के साथ सो जाएँ", "टाइमर सेट करें, आवाज़ धीरे-धीरे कम हो जाएगी"],
+    "04-mixer": ["अपना खुद का साउंड मिक्स बनाएँ", "4 तक आवाज़ें मिलाएँ: बारिश, नॉइज़ और फ़्रीक्वेंसी"]
+  },
+  "bn-BD": {
+    "01-home": ["এক ট্যাপে ঘুম, মনোযোগ আর প্রশান্তি", "সম্পূর্ণ অফলাইন। কোনো বিজ্ঞাপন নেই। কোনো অ্যাকাউন্ট নেই।"],
+    "02-explore": ["852 Hz আর সব ফ্রিকোয়েন্সি এক জায়গায়", "বাইনোরাল বিটস, সলফেজিও টোন আর প্রকৃতির শব্দ"],
+    "03-player": ["বৃষ্টির শব্দে ঘুমিয়ে পড়ুন", "টাইমার সেট করুন, শব্দ ধীরে ধীরে কমে যাবে"],
+    "04-mixer": ["নিজের সাউন্ড মিক্স তৈরি করুন", "৪টি পর্যন্ত শব্দ মেশান: বৃষ্টি, নয়েজ আর ফ্রিকোয়েন্সি"]
+  },
+  "ja-JP": {
+    "01-home": ["ワンタップで、睡眠・集中・リラックス", "完全オフライン。広告なし。アカウント不要。"],
+    "02-explore": ["852Hzも、すべての周波数も、ここに", "バイノーラルビート、ソルフェジオ、自然音"],
+    "03-player": ["雨音で、ぐっすり眠る", "タイマーをセットすれば、音がやさしくフェードアウト"],
+    "04-mixer": ["自分だけのサウンドミックス", "雨音・ノイズ・周波数を最大4つ重ねられる"]
+  },
+  "ko-KR": {
+    "01-home": ["한 번의 탭으로 수면, 집중, 휴식", "완전 오프라인. 광고 없음. 계정 불필요."],
+    "02-explore": ["852Hz부터 모든 주파수까지 한곳에", "바이노럴 비트, 솔페지오 톤, 자연의 소리"],
+    "03-player": ["빗소리와 함께 잠드세요", "타이머를 설정하면 소리가 부드럽게 줄어들어요"],
+    "04-mixer": ["나만의 사운드 믹스", "빗소리, 노이즈, 주파수를 최대 4개까지 섞어보세요"]
+  },
+  "zh-CN": {
+    "01-home": ["一键入睡、专注、放松", "完全离线。无广告。无需账号。"],
+    "02-explore": ["852Hz 及所有频率，尽在一处", "双耳节拍、索尔费吉奥音频与自然声音"],
+    "03-player": ["伴着雨声入眠", "设定定时器，声音会轻柔渐弱"],
+    "04-mixer": ["打造专属混音", "最多叠加 4 种声音：雨声、噪音与频率"]
+  }
+}
