@@ -174,7 +174,11 @@
     "beatFrequency": "Częstotliwość dudnienia",
     "playbackError": "Nie udało się uruchomić dźwięku. Spróbuj ponownie.",
     "headphonesRequired": "Potrzebne słuchawki — głośnik telefonu nie odtworzy tych częstotliwości.",
-    "volumeCapped": "Głośność ograniczona do {{percent}}%"
+    "volumeCapped": "Głośność ograniczona do {{percent}}%",
+    "untilFade": "do wyciszenia",
+    "noTimer": "Nie zatrzyma się",
+    "noTimerHint": "Gra, dopóki nie zatrzymasz",
+    "setTimer": "Ustaw minutnik"
   },
   "settings": {
     "title": "Ustawienia",
@@ -287,6 +291,7 @@
     "error": "Nie udało się dokończyć zakupu. Spróbuj ponownie.",
     "unavailable": "Premium jest teraz niedostępne. Sprawdź połączenie i spróbuj ponownie.",
     "legal": "Subskrypcje odnawiają się automatycznie do czasu anulowania. Anuluj w dowolnej chwili w Google Play › Subskrypcje. Płatność jest pobierana z Twojego konta Google Play.",
-    "bestValue": "Najlepsza cena"
+    "bestValue": "Najlepsza cena",
+    "trialTerms": "7 dni za darmo, potem {{price}}"
   }
 }

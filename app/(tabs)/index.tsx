@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
@@ -20,12 +21,12 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, Radius } from '@/constants/theme';
-import { upper } from '@/lib/upper';
+import * as playerController from '@/lib/audio/playerController';
+import * as haptics from '@/lib/haptics';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { PresetRow } from '@/components/ui/PresetRow';
-import { Icon } from '@/components/ui/Icon';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { intents, getSuggestedIntent } from '@/lib/intents';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
@@ -121,6 +122,33 @@ export default function HomeScreen() {
     }
   };
 
+  // The suggested card's button: same one-tap session as the Intent screen's
+  // (its lead sound, its timer), started straight from Home.
+  const handleStartSession = () => {
+    const preset = suggestedSound;
+    if (!preset) return;
+    const start = () => {
+      haptics.commit();
+      playerController.loadPreset(preset);
+      playerController.startTimer(suggestedIntent.recommendedMinutes);
+      playerController.play();
+      router.push(`/player/${preset.id}`);
+    };
+    if (preset.type === 'binaural' && !hasSeenHeadphoneWarning) {
+      Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
+        {
+          text: t('common.ok'),
+          onPress: () => {
+            setHasSeenHeadphoneWarning(true);
+            start();
+          },
+        },
+      ]);
+    } else {
+      start();
+    }
+  };
+
   const favoritePresets = favoriteIds
     .map((id) => getPresetById(id))
     .filter((p): p is FrequencyPreset => p !== undefined);
@@ -155,7 +183,9 @@ export default function HomeScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Intent Section — primary entry, led by cinematic local artwork. */}
+        {/* Intent first: the question, one suggested answer given room and a
+            real start button, then the other three as tiles. The frequency
+            behind each is secondary information, not the headline. */}
         <View style={styles.section}>
           <Text
             style={[styles.intentsTitle, { color: colors.text }]}
@@ -163,107 +193,87 @@ export default function HomeScreen() {
           >
             {t('home.intentsTitle')}
           </Text>
-          {/* The clock's answer, given room. Four identical cards asked the
-              question and then refused to help answer it; at 2am the app can
-              reasonably lead with Sleep. The other three stay one tap away
-              below, so the guess is a suggestion, not a decision. */}
-          <PressableScale
-            onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
-            scaleTo={0.99}
-            pressedOpacity={0.85}
-            style={styles.intentCard}
-            accessibilityRole="button"
-            accessibilityLabel={[
-              t(`home.suggestedFor.${band}`),
-              t(suggestedIntent.nameKey),
-              t(suggestedIntent.descKey),
-              t('home.recommendedMinutes', {
-                minutes: suggestedIntent.recommendedMinutes,
-              }),
-              suggestedSound ? t(suggestedSound.nameKey) : null,
-            ]
-              .filter(Boolean)
-              .join('. ')}
-          >
-            <ArtBackground
-              source={artwork.source(intentArt(suggestedIntent.id))}
-              style={[styles.intentSurface, styles.featuredBody]}
-              variant="card"
-            >
-              <View style={styles.intentTopRow}>
-                {/* A word, not a catalogue code — so it takes the printed-label
-                    style without the tape-counter monospace the codes use. */}
-                <Text
-                  style={[
-                    styles.featuredKicker,
-                    { color: artwork.foreground.primary },
-                  ]}
-                >
-                  {upper(t(`home.suggestedFor.${band}`))}
-                </Text>
-                <View
-                  style={[
-                    styles.intentIconTag,
-                    styles.featuredIconTag,
-                    { backgroundColor: artwork.foreground.badge },
-                  ]}
-                >
-                  <Icon
-                    icon={suggestedIntent.icon}
-                    size={22}
-                    color={artwork.foreground.primary}
-                  />
-                </View>
-              </View>
-              <Text
-                style={[
-                  styles.featuredName,
-                  { color: artwork.foreground.primary },
-                ]}
-              >
-                {t(suggestedIntent.nameKey)}
-              </Text>
-              <Text
-                style={[
-                  styles.intentDesc,
-                  { color: artwork.foreground.secondary },
-                ]}
-              >
-                {t(suggestedIntent.descKey)}
-              </Text>
-              {/* The curated session length was buried on the detail screen;
-                  it is the most useful thing to know before tapping in. */}
-              <View style={styles.featuredMeta}>
-                <View style={styles.featuredMetaLine}>
-                  <Ionicons
-                    name="time-outline"
-                    size={14}
-                    color={artwork.foreground.secondary}
-                  />
-                  <Text
-                    style={[
-                      styles.featuredMetaText,
-                      { color: artwork.foreground.secondary },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    <Text style={styles.featuredMetaNumber}>
-                      {suggestedIntent.recommendedMinutes}
-                    </Text>
-                    {t('home.recommendedMinutesSuffix')}
-                    {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
-                  </Text>
-                </View>
-              </View>
-            </ArtBackground>
-          </PressableScale>
 
-          {/* Placed between the suggestion and the rest of the intents: a
-              returning user's most likely next action is replaying last
-              night's sound, and at the bottom of the page — under four
-              intent cards — that shortcut was never found. Rendered only
-              when there is history; an empty "nothing here yet" panel taught
-              nothing and cost the same vertical space. */}
+          <ArtBackground
+            source={artwork.source(intentArt(suggestedIntent.id))}
+            style={styles.leadCard}
+            variant="hero"
+          >
+            <View style={styles.leadTop}>
+              <Text style={[styles.leadKicker, { color: artwork.foreground.secondary }]}>
+                {t(`home.suggestedFor.${band}`)}
+              </Text>
+              {/* The card body no longer navigates, so the two targets on it
+                  are unambiguous: this link opens the intent, the button plays. */}
+              <TouchableOpacity
+                onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
+                style={styles.leadLink}
+                accessibilityRole="link"
+                accessibilityLabel={`${t(suggestedIntent.nameKey)}: ${t('common.seeAll')}`}
+              >
+                <Text style={[styles.leadLinkText, { color: artwork.foreground.primary }]}>
+                  {t('common.seeAll')}
+                </Text>
+                <Ionicons name="chevron-forward" size={16} color={artwork.foreground.primary} />
+              </TouchableOpacity>
+            </View>
+            <Text
+              style={[styles.leadName, { color: artwork.foreground.primary }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              {t(suggestedIntent.nameKey)}
+            </Text>
+            <Text style={[styles.leadMeta, { color: artwork.foreground.secondary }]} numberOfLines={2}>
+              {t(suggestedIntent.descKey)}
+              {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
+            </Text>
+            <PressableScale
+              onPress={handleStartSession}
+              style={[styles.leadButton, { backgroundColor: colors.primary }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('intents.startSession', {
+                minutes: suggestedIntent.recommendedMinutes,
+              })}
+            >
+              <Ionicons name="play" size={18} color={colors.onPrimary} />
+              <Text style={[styles.leadButtonText, { color: colors.onPrimary }]}>
+                {t('intents.startSession', { minutes: suggestedIntent.recommendedMinutes })}
+              </Text>
+            </PressableScale>
+          </ArtBackground>
+
+          <View style={styles.tiles}>
+            {otherIntents.map((intent) => (
+              <PressableScale
+                key={intent.id}
+                onPress={() => router.push(`/intent/${intent.id}`)}
+                scaleTo={0.97}
+                style={styles.tilePress}
+                accessibilityRole="button"
+                accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
+              >
+                <ArtBackground
+                  source={artwork.source(intentArt(intent.id))}
+                  style={styles.tile}
+                  variant="hero"
+                >
+                  <Text
+                    style={[styles.tileName, { color: artwork.foreground.primary }]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                  >
+                    {t(intent.nameKey)}
+                  </Text>
+                  <Text style={[styles.tileMeta, { color: artwork.foreground.secondary }]}>
+                    {intent.recommendedMinutes}
+                    {t('home.recommendedMinutesSuffix')}
+                  </Text>
+                </ArtBackground>
+              </PressableScale>
+            ))}
+          </View>
+
           {recentPresets.length > 0 && (
             <View style={styles.recentSection}>
               <CategoryHeader title={t('home.recentlyPlayed')} />
@@ -278,78 +288,6 @@ export default function HomeScreen() {
               ))}
             </View>
           )}
-
-          <Text
-            style={[styles.otherIntentsLabel, { color: colors.textSecondary }]}
-          >
-            {upper(t('home.otherIntents'))}
-          </Text>
-
-          <View style={styles.intentStack}>
-            {otherIntents.map((intent) => (
-              <PressableScale
-                key={intent.id}
-                onPress={() => router.push(`/intent/${intent.id}`)}
-                scaleTo={0.99}
-                pressedOpacity={0.85}
-                style={styles.intentCard}
-                accessibilityRole="button"
-                accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
-              >
-                <ArtBackground
-                  source={artwork.source(intentArt(intent.id))}
-                  style={styles.intentSurface}
-                  variant="card"
-                >
-                  <View style={styles.intentTopRow}>
-                    {/* Session length and size — what someone deciding
-                        between intents actually weighs. The old "ND-02"
-                        catalogue code indexed nothing a user could look up. */}
-                    <Text
-                      style={[
-                        styles.intentMeta,
-                        { color: artwork.foreground.secondary },
-                      ]}
-                    >
-                      <Text style={styles.featuredMetaNumber}>
-                        {intent.recommendedMinutes}
-                      </Text>
-                      {`${t('home.recommendedMinutesSuffix')} · ${t('home.soundCount', { n: intent.presetIds.length })}`}
-                    </Text>
-                    <View
-                      style={[
-                        styles.intentIconTag,
-                        { backgroundColor: artwork.foreground.badge },
-                      ]}
-                    >
-                      <Icon
-                        icon={intent.icon}
-                        size={18}
-                        color={artwork.foreground.primary}
-                      />
-                    </View>
-                  </View>
-                  <Text
-                    style={[
-                      styles.intentName,
-                      { color: artwork.foreground.primary },
-                    ]}
-                  >
-                    {t(intent.nameKey)}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.intentDesc,
-                      { color: artwork.foreground.secondary },
-                    ]}
-                    numberOfLines={2}
-                  >
-                    {t(intent.descKey)}
-                  </Text>
-                </ArtBackground>
-              </PressableScale>
-            ))}
-          </View>
         </View>
 
         {/* Favorites Section — teaches the heart affordance when empty */}
@@ -441,84 +379,75 @@ const styles = StyleSheet.create({
     ...Typography.largeTitle,
     marginBottom: Spacing.lg,
   },
-  intentStack: {
-    gap: Spacing.sm,
-  },
-  intentCard: {
-    borderRadius: Radius.card,
-    overflow: 'hidden',
-    backgroundColor: '#0B1018',
-  },
-  intentSurface: {
-    minHeight: 142,
+  leadCard: {
+    height: 300,
+    borderRadius: 26,
     padding: Spacing.md,
-    gap: 4,
+    paddingTop: Spacing.md,
   },
-  featuredBody: {
-    minHeight: 210,
-    padding: Spacing.lg,
-    gap: 6,
+  leadTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  featuredKicker: {
-    ...Typography.label,
+  leadKicker: {
+    ...Typography.footnote,
   },
-  featuredIconTag: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  featuredName: {
-    ...Typography.largeTitle,
-    fontSize: 28,
-    lineHeight: 34,
-  },
-  featuredMeta: {
-    alignItems: 'flex-start',
-    gap: Spacing.xs,
-    marginTop: Spacing.xs,
-  },
-  featuredMetaLine: {
+  leadLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
-    maxWidth: '100%',
+    gap: 2,
+    minHeight: 44,
+    paddingLeft: Spacing.sm,
   },
-  featuredMetaText: {
+  leadLinkText: {
     ...Typography.footnote,
-    flexShrink: 1,
   },
-  featuredMetaNumber: {
-    ...Typography.numeral,
+  leadName: {
+    fontFamily: Typography.largeTitle.fontFamily,
+    fontSize: 44,
+    lineHeight: 50,
+    marginTop: 'auto',
+  },
+  leadMeta: {
+    ...Typography.footnote,
+    marginTop: Spacing.xs,
+  },
+  leadButton: {
+    marginTop: Spacing.md,
+    height: 52,
+    borderRadius: 26,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  leadButtonText: {
+    ...Typography.headline,
+  },
+  tiles: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  tilePress: {
+    flex: 1,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  tile: {
+    height: 112,
+    padding: Spacing.sm + 4,
+    justifyContent: 'flex-end',
+  },
+  tileName: {
+    ...Typography.headline,
+  },
+  tileMeta: {
+    ...Typography.caption,
   },
   recentSection: {
     marginTop: Spacing.xl,
-  },
-  otherIntentsLabel: {
-    ...Typography.label,
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.sm,
-  },
-  intentTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 2,
-  },
-  intentMeta: {
-    ...Typography.footnote,
-  },
-  intentIconTag: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  intentName: {
-    ...Typography.title,
-  },
-  intentDesc: {
-    ...Typography.footnote,
   },
   emptyState: {
     minHeight: 142,

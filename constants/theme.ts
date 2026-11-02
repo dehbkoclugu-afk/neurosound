@@ -12,18 +12,14 @@
 
 import { Platform, TextStyle } from 'react-native';
 
-// Primary brand colour — deep record-label ink blue, not the old amber.
+// Light palettes still use the previous ink blue; they get redesigned
+// separately. The dark palettes below are the "Gece" violet system.
 const inkBlue = '#2F5C8A';
-const inkBlueLight = '#7FA8CC';
-const inkBlueLighter = '#A6C4DE';
 const inkBlueDark = '#1F3F5E';
 
 // Text/icon colour on a filled primary surface lives in each palette as
-// `onPrimary`: light palettes fill with a deep ink blue (paper text), dark
-// palettes with a pale one (ink text). A single shared value was paper
-// everywhere and fell to ~2.4:1 on the dark palettes' #7FA8CC buttons.
+// `onPrimary`, since each palette fills its buttons differently.
 const onPrimaryPaper = '#F7F9FC';
-const onPrimaryInk = '#0A1622';
 
 /**
  * Text/icon colour for anything sitting ON a photograph — the Intent hero,
@@ -165,29 +161,32 @@ export const Colors = {
     overlay: 'rgba(16, 24, 32, 0.42)',
     miniPlayer: '#F8FAFC',
   },
+  // "Gece": near-black with a hair of violet, warm paper text (low blue at
+  // night), one violet accent. Filled actions use a dim violet (`primary`)
+  // so the brightest thing on screen at 1am is never a button.
   dark: {
-    text: '#F2F5F8',
-    textSecondary: '#A6B0BD',
-    background: '#080B10',
-    backgroundSecondary: '#10151D',
-    card: '#10151D',
-    cardBorder: '#26303C',
-    cardElevated: '#171E28',
-    tint: inkBlueLight,
-    primary: inkBlueLight,
-    primaryLight: inkBlueLighter,
-    onPrimary: onPrimaryInk,
-    accent: inkBlueLight, // 7.40:1 on both surface levels
-    icon: '#9AA6B5',
-    tabIconDefault: '#657181',
-    tabIconSelected: inkBlueLight,
-    success: '#8FB27A',
-    warning: '#D9A253',
-    error: '#D98267',
-    slider: '#273140',
-    sliderThumb: '#F2F5F8',
+    text: '#EEE7DC', // 16.6:1 on background
+    textSecondary: '#B3AA9F', // 8.9:1
+    background: '#0A090D',
+    backgroundSecondary: '#131118',
+    card: '#131118',
+    cardBorder: '#2B2731',
+    cardElevated: '#1B1821',
+    tint: '#B7A3E8',
+    primary: '#3A3060',
+    primaryLight: '#4A3E78',
+    onPrimary: '#EEE7DC', // 10.9:1 on primary
+    accent: '#B7A3E8', // 8.6:1
+    icon: '#B3AA9F',
+    tabIconDefault: '#8C847A', // 5.3:1, the floor for any text
+    tabIconSelected: '#EEE7DC',
+    success: '#A9BE8E',
+    warning: '#E0B070',
+    error: '#E39A86',
+    slider: '#2B2731',
+    sliderThumb: '#EEE7DC',
     overlay: 'rgba(0, 0, 0, 0.7)',
-    miniPlayer: '#0D1219',
+    miniPlayer: '#1B1821',
   },
   // Low contrast mode for visual sensitivity — accent stays a legible ink
   // blue so selected/active states remain distinguishable (never plain
@@ -218,26 +217,26 @@ export const Colors = {
     miniPlayer: '#F4F7F9',
   },
   lowContrastDark: {
-    text: '#D9E0E8',
-    textSecondary: '#9EA9B6',
-    background: '#10151B',
-    backgroundSecondary: '#18212B',
-    card: '#18212B',
-    cardBorder: '#303B49',
-    cardElevated: '#202A35',
-    tint: '#7FA8CC',
-    primary: '#7FA8CC',
-    primaryLight: '#A0BFDA',
-    onPrimary: onPrimaryInk,
-    accent: '#7FA8CC',
-    icon: '#8C98A6',
-    tabIconDefault: '#596574',
-    tabIconSelected: '#A0BFDA',
-    success: '#8CA97D',
-    warning: '#C7A166',
-    error: '#BD826C',
-    slider: '#303B49',
-    sliderThumb: '#D9E0E8',
+    text: '#D6CFC5',
+    textSecondary: '#ACA49A',
+    background: '#16141B',
+    backgroundSecondary: '#1D1A23',
+    card: '#1D1A23',
+    cardBorder: '#34303B',
+    cardElevated: '#24212B',
+    tint: '#A595CF',
+    primary: '#3B3456',
+    primaryLight: '#463E66',
+    onPrimary: '#D6CFC5',
+    accent: '#A595CF',
+    icon: '#ACA49A',
+    tabIconDefault: '#948C82',
+    tabIconSelected: '#D6CFC5',
+    success: '#9CAE86',
+    warning: '#D0A86C',
+    error: '#D2927F',
+    slider: '#34303B',
+    sliderThumb: '#D6CFC5',
     overlay: 'rgba(0, 0, 0, 0.5)',
     miniPlayer: '#18212B',
   },
@@ -325,15 +324,18 @@ export const Spacing = {
   xxxl: 64,
 };
 
-// Font families — Nunito Sans, loaded in app/_layout.tsx via expo-font
+// Font families, loaded in app/_layout.tsx via expo-font. Schibsted Grotesk
+// for UI text, Young Serif for display (screen titles, the big frequency or
+// sound name), Spline Sans Mono for numerals. None of the three has Cyrillic,
+// CJK, Thai, Devanagari or Bengali; Android and iOS fall back to the system
+// face per missing glyph, so those scripts still render, in the system font.
 export const FontFamily = {
-  regular: 'NunitoSans_400Regular',
-  semibold: 'NunitoSans_600SemiBold',
-  bold: 'NunitoSans_700Bold',
-  /** Tape-counter numerals: the one authored display moment, reserved for
-   *  Hz/frequency values and the sleep timer. Platform monospace, not a new
-   *  font asset — the point is the tabular rhythm, not a display face. */
-  mono: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+  regular: 'SchibstedGrotesk_400Regular',
+  medium: 'SchibstedGrotesk_500Medium',
+  semibold: 'SchibstedGrotesk_600SemiBold',
+  bold: 'SchibstedGrotesk_700Bold',
+  display: 'YoungSerif_400Regular',
+  mono: 'SplineSansMono_500Medium',
 };
 
 // Typography scale (product register: tight ratio, hierarchy via weight).
@@ -345,40 +347,48 @@ export const FontFamily = {
 // screen. headline and body both stay at 17 and lean on weight, not size, to
 // separate — the same trick Apple's own type scale uses at this step.
 export const Typography = {
+  // Screen titles and section headings are set in the display serif; the
+  // UI underneath stays in the grotesk. Floors: 16 for body, 13 for the
+  // smallest readable text — someone half asleep is reading this.
   largeTitle: {
     fontSize: 32,
-    fontFamily: FontFamily.bold,
-    lineHeight: 39,
-    letterSpacing: -0.5,
+    fontFamily: FontFamily.display,
+    lineHeight: 38,
+    letterSpacing: -0.3,
   },
   title: {
     fontSize: 22,
-    fontFamily: FontFamily.semibold,
+    fontFamily: FontFamily.display,
     lineHeight: 28,
-    letterSpacing: -0.3,
   },
   headline: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: FontFamily.semibold,
     lineHeight: 22,
   },
   body: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: FontFamily.regular,
     lineHeight: 23,
   },
   footnote: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: FontFamily.regular,
-    lineHeight: 18,
-    letterSpacing: 0.1,
+    lineHeight: 19,
   },
   caption: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: FontFamily.regular,
-    lineHeight: 16,
-    letterSpacing: 0.15,
+    lineHeight: 17,
   },
+  /** The one oversized moment per screen: the playing frequency or sound
+   *  name on the Player, the suggested intent on Home. */
+  display: {
+    fontSize: 88,
+    fontFamily: FontFamily.display,
+    lineHeight: 92,
+    letterSpacing: -1.5,
+  } as TextStyle,
   /** Tape-counter numerals. Apply to the **number only**, as a nested
    *  `<Text>`, never to the phrase around it: the monospace space glyph is
    *  far wider than Nunito's, so styling "2 Hz" wholesale renders as
@@ -393,9 +403,9 @@ export const Typography = {
    *  uppercase is otherwise banned (craft-floor) — this is the one named
    *  system use, not a decoration sprinkled per-section. */
   label: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: FontFamily.semibold,
-    lineHeight: 14,
+    lineHeight: 15,
     letterSpacing: 0.6,
   },
 };

@@ -19,20 +19,20 @@ type ArtBackgroundProps = {
 
 const DARK_SCRIMS = {
   card: [
-    'rgba(5, 8, 13, 0.94)',
-    'rgba(5, 8, 13, 0.72)',
-    'rgba(5, 8, 13, 0.16)',
+    'rgba(10, 9, 13, 0.94)',
+    'rgba(10, 9, 13, 0.72)',
+    'rgba(10, 9, 13, 0.16)',
   ],
-  row: ['rgba(5, 8, 13, 0.97)', 'rgba(5, 8, 13, 0.82)', 'rgba(5, 8, 13, 0.22)'],
+  row: ['rgba(10, 9, 13, 0.97)', 'rgba(10, 9, 13, 0.82)', 'rgba(10, 9, 13, 0.22)'],
   channel: [
-    'rgba(5, 8, 13, 0.97)',
-    'rgba(5, 8, 13, 0.88)',
-    'rgba(5, 8, 13, 0.38)',
+    'rgba(10, 9, 13, 0.97)',
+    'rgba(10, 9, 13, 0.88)',
+    'rgba(10, 9, 13, 0.38)',
   ],
   hero: [
-    'rgba(5, 8, 13, 0.16)',
-    'rgba(5, 8, 13, 0.28)',
-    'rgba(5, 8, 13, 0.92)',
+    'rgba(10, 9, 13, 0.16)',
+    'rgba(10, 9, 13, 0.28)',
+    'rgba(10, 9, 13, 0.92)',
   ],
 } as const;
 
@@ -109,10 +109,10 @@ export function ArtBackground({
 const styles = StyleSheet.create({
   surface: {
     overflow: 'hidden',
-    backgroundColor: '#0B1018',
+    backgroundColor: '#0A090D',
   },
   fallback: {
-    backgroundColor: '#0B1018',
+    backgroundColor: '#0A090D',
   },
   lightFallback: {
     backgroundColor: '#F1F4F8',

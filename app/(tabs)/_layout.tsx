@@ -15,9 +15,19 @@ import { FontFamily, Spacing } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import {
   useMiniPlayerVisible,
-  MINI_PLAYER_HEIGHT,
   TAB_BAR_HEIGHT,
 } from '@/hooks/use-mini-player';
+
+/** Android-style active indicator: a filled pill behind the selected icon.
+ *  Colour alone (the old cue) is a weak signal for a drowsy user. */
+function TabIcon({ name, color, focused }: { name: keyof typeof Ionicons.glyphMap; color: string; focused: boolean }) {
+  const colors = useThemeColors();
+  return (
+    <View style={[styles.pill, focused && { backgroundColor: colors.primary }]}>
+      <Ionicons name={name} size={22} color={focused ? colors.onPrimary : color} />
+    </View>
+  );
+}
 
 export default function TabLayout() {
   const { t } = useTranslation();
@@ -40,18 +50,18 @@ export default function TabLayout() {
             paddingBottom: insets.bottom,
             paddingTop: Spacing.xs,
           },
-          // fontWeight alone is a silent bug with the loaded Nunito Sans
-          // faces: React Native does not synthesize weights for custom
-          // fonts, so '600' quietly fell back to the system font and these
-          // four always-visible labels were the only text in the app not in
-          // the brand face.
+          // Weight comes from fontFamily: React Native does not synthesize
+          // weights for custom fonts.
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: 12,
             fontFamily: FontFamily.semibold,
             marginTop: 2,
           },
+          // Room for the 56pt active pill; the default icon slot is ~24pt
+          // wide and would clip it.
           tabBarIconStyle: {
-            marginBottom: -2,
+            width: 56,
+            height: 30,
           },
           headerShown: false,
           tabBarButton: HapticTab,
@@ -62,11 +72,7 @@ export default function TabLayout() {
           options={{
             title: t('tabs.home'),
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? 'home' : 'home-outline'}
-                size={24}
-                color={color}
-              />
+              <TabIcon name={focused ? 'home' : 'home-outline'} color={color} focused={focused} />
             ),
           }}
         />
@@ -75,11 +81,7 @@ export default function TabLayout() {
           options={{
             title: t('tabs.explore'),
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? 'compass' : 'compass-outline'}
-                size={24}
-                color={color}
-              />
+              <TabIcon name={focused ? 'compass' : 'compass-outline'} color={color} focused={focused} />
             ),
           }}
         />
@@ -88,11 +90,7 @@ export default function TabLayout() {
           options={{
             title: t('tabs.mixer'),
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? 'layers' : 'layers-outline'}
-                size={24}
-                color={color}
-              />
+              <TabIcon name={focused ? 'layers' : 'layers-outline'} color={color} focused={focused} />
             ),
           }}
         />
@@ -101,11 +99,7 @@ export default function TabLayout() {
           options={{
             title: t('tabs.settings'),
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? 'settings' : 'settings-outline'}
-                size={24}
-                color={color}
-              />
+              <TabIcon name={focused ? 'settings' : 'settings-outline'} color={color} focused={focused} />
             ),
           }}
         />
@@ -114,7 +108,7 @@ export default function TabLayout() {
       {/* MiniPlayer overlay above tab bar */}
       <MiniPlayerHost
         visible={miniPlayerVisible}
-        bottom={MINI_PLAYER_HEIGHT + insets.bottom}
+        bottom={TAB_BAR_HEIGHT + insets.bottom}
       />
     </View>
   );
@@ -123,5 +117,12 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  pill: {
+    width: 56,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -174,7 +174,11 @@
     "beatFrequency": "Frecvența ritmului",
     "playbackError": "Sunetul nu a putut porni. Încearcă din nou.",
     "headphonesRequired": "Sunt necesare căști — difuzorul telefonului nu redă aceste frecvențe.",
-    "volumeCapped": "Volum limitat la {{percent}}%"
+    "volumeCapped": "Volum limitat la {{percent}}%",
+    "untilFade": "până la stingere",
+    "noTimer": "Nu se oprește",
+    "noTimerHint": "Cântă până îl oprești",
+    "setTimer": "Setează temporizatorul"
   },
   "settings": {
     "title": "Setări",
@@ -287,6 +291,7 @@
     "error": "Achiziția nu a putut fi finalizată. Încearcă din nou.",
     "unavailable": "Premium nu este disponibil acum. Verifică conexiunea și încearcă din nou.",
     "legal": "Abonamentele se reînnoiesc automat până la anulare. Anulează oricând din Google Play › Abonamente. Plata se face din contul tău Google Play.",
-    "bestValue": "Cel mai avantajos"
+    "bestValue": "Cel mai avantajos",
+    "trialTerms": "7 zile gratuit, apoi {{price}}"
   }
 }

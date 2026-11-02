@@ -174,7 +174,11 @@
     "beatFrequency": "비트 주파수",
     "playbackError": "소리를 재생할 수 없습니다. 다시 시도해 주세요.",
     "headphonesRequired": "이어폰이 필요합니다. 휴대폰 스피커로는 이 주파수를 재생할 수 없습니다.",
-    "volumeCapped": "음량이 {{percent}}%로 제한됨"
+    "volumeCapped": "음량이 {{percent}}%로 제한됨",
+    "untilFade": "후 서서히 꺼짐",
+    "noTimer": "멈추지 않음",
+    "noTimerHint": "멈출 때까지 재생",
+    "setTimer": "타이머 설정"
   },
   "settings": {
     "title": "설정",
@@ -287,6 +291,7 @@
     "error": "구매를 완료하지 못했습니다. 다시 시도해 주세요.",
     "unavailable": "지금은 프리미엄을 이용할 수 없습니다. 연결을 확인하고 다시 시도해 주세요.",
     "legal": "구독은 해지할 때까지 자동으로 갱신됩니다. Google Play › 정기 결제에서 언제든지 해지할 수 있습니다. 결제는 Google Play 계정으로 청구됩니다.",
-    "bestValue": "가장 저렴"
+    "bestValue": "가장 저렴",
+    "trialTerms": "7일 무료, 이후 {{price}}"
   }
 }

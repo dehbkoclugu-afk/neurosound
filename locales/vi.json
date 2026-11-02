@@ -174,7 +174,11 @@
     "beatFrequency": "Tần số nhịp",
     "playbackError": "Không thể bắt đầu phát. Hãy thử lại.",
     "headphonesRequired": "Cần tai nghe — loa điện thoại không tái tạo được những tần số này.",
-    "volumeCapped": "Âm lượng giới hạn ở {{percent}}%"
+    "volumeCapped": "Âm lượng giới hạn ở {{percent}}%",
+    "untilFade": "trước khi nhỏ dần",
+    "noTimer": "Sẽ không dừng",
+    "noTimerHint": "Phát cho đến khi bạn dừng",
+    "setTimer": "Đặt hẹn giờ"
   },
   "settings": {
     "title": "Cài đặt",
@@ -287,6 +291,7 @@
     "error": "Không thể hoàn tất giao dịch. Vui lòng thử lại.",
     "unavailable": "Premium hiện không khả dụng. Hãy kiểm tra kết nối và thử lại.",
     "legal": "Gói đăng ký tự động gia hạn cho đến khi bạn hủy. Hủy bất cứ lúc nào trong Google Play › Gói đăng ký. Khoản thanh toán được tính vào tài khoản Google Play của bạn.",
-    "bestValue": "Tiết kiệm nhất"
+    "bestValue": "Tiết kiệm nhất",
+    "trialTerms": "Miễn phí 7 ngày, sau đó {{price}}"
   }
 }

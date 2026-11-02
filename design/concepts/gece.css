@@ -199,3 +199,4 @@ h2 { font: 400 22px 'Young Serif', 'PT Serif'; }
 .welcome .li svg { color: var(--violet); flex: none; }
 .welcome .btn { width: 100%; margin-top: 24px; background: var(--cta); color: var(--on-cta); }
 .light .itile::after { background: linear-gradient(180deg, rgba(245,241,235,0) 5%, rgba(245,241,235,.97) 70%); }
+.light .tile::after { background: linear-gradient(180deg, rgba(245,241,235,0) 10%, rgba(245,241,235,.95) 72%); }

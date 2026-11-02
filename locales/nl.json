@@ -174,7 +174,11 @@
     "beatFrequency": "Beatfrequentie",
     "playbackError": "Kon het geluid niet starten. Probeer het opnieuw.",
     "headphonesRequired": "Koptelefoon nodig — een telefoonspeaker kan deze frequenties niet weergeven.",
-    "volumeCapped": "Volume begrensd op {{percent}}%"
+    "volumeCapped": "Volume begrensd op {{percent}}%",
+    "untilFade": "tot het uitfadet",
+    "noTimer": "Stopt niet",
+    "noTimerHint": "Speelt tot je stopt",
+    "setTimer": "Slaaptimer instellen"
   },
   "settings": {
     "title": "Instellingen",
@@ -287,6 +291,7 @@
     "error": "De aankoop kon niet worden voltooid. Probeer het opnieuw.",
     "unavailable": "Premium is nu niet beschikbaar. Controleer je verbinding en probeer het opnieuw.",
     "legal": "Abonnementen worden automatisch verlengd tot je opzegt. Opzeggen kan altijd via Google Play › Abonnementen. De betaling wordt via je Google Play-account afgerekend.",
-    "bestValue": "Beste prijs"
+    "bestValue": "Beste prijs",
+    "trialTerms": "7 dagen gratis, daarna {{price}}"
   }
 }

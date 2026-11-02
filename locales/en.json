@@ -174,7 +174,11 @@
     "beatFrequency": "Beat Frequency",
     "playbackError": "Could not start audio. Please try again.",
     "headphonesRequired": "Headphones needed — a phone speaker cannot reproduce these frequencies.",
-    "volumeCapped": "Volume capped at {{percent}}%"
+    "volumeCapped": "Volume capped at {{percent}}%",
+    "untilFade": "until it fades out",
+    "noTimer": "Won't stop",
+    "noTimerHint": "Plays until you stop it",
+    "setTimer": "Set a sleep timer"
   },
   "settings": {
     "title": "Settings",
@@ -287,6 +291,7 @@
     "error": "The purchase could not be completed. Please try again.",
     "unavailable": "Premium isn't available right now. Check your connection and try again.",
     "legal": "Subscriptions renew automatically until cancelled. Cancel anytime in Google Play › Subscriptions. Payment is charged to your Google Play account.",
-    "bestValue": "Best value"
+    "bestValue": "Best value",
+    "trialTerms": "7 days free, then {{price}}"
   }
 }

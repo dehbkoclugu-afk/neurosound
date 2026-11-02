@@ -174,7 +174,11 @@
     "beatFrequency": "Frecuencia del pulso",
     "playbackError": "No se pudo iniciar el audio. Inténtalo de nuevo.",
     "headphonesRequired": "Se necesitan auriculares: el altavoz del teléfono no reproduce estas frecuencias.",
-    "volumeCapped": "Volumen limitado al {{percent}} %"
+    "volumeCapped": "Volumen limitado al {{percent}} %",
+    "untilFade": "hasta que se apague",
+    "noTimer": "No se detendrá",
+    "noTimerHint": "Suena hasta que lo pares",
+    "setTimer": "Poner temporizador"
   },
   "settings": {
     "title": "Ajustes",
@@ -287,6 +291,7 @@
     "error": "No se pudo completar la compra. Inténtalo de nuevo.",
     "unavailable": "Premium no está disponible ahora mismo. Revisa tu conexión e inténtalo de nuevo.",
     "legal": "Las suscripciones se renuevan automáticamente hasta que las canceles. Cancela cuando quieras en Google Play › Suscripciones. El pago se carga a tu cuenta de Google Play.",
-    "bestValue": "Mejor precio"
+    "bestValue": "Mejor precio",
+    "trialTerms": "7 días gratis, luego {{price}}"
   }
 }

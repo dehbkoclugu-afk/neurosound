@@ -354,12 +354,24 @@ export default function PaywallScreen() {
           },
         ]}
       >
+        {/* What happens after the trial, stated next to the button that
+            starts it (Play requires the post-trial price to be this clear). */}
+        {plan && (
+          <Text style={[styles.terms, { color: colors.text }]}>
+            {plan.hasTrial
+              ? t('paywall.trialTerms', { price: t(`paywall.price.${plan.key}`, { price: plan.price }) })
+              : t(`paywall.price.${plan.key}`, { price: plan.price })}
+          </Text>
+        )}
+        {/* The one bright fill in the app: a deliberate decision, not a
+            control someone brushes past at 1am. */}
         <Button
           title={ctaTitle}
           onPress={handleBuy}
           disabled={!plan || busy}
           size="large"
-          style={contentColumn}
+          style={{ ...contentColumn, backgroundColor: colors.accent }}
+          textStyle={{ color: colors.background }}
         />
       </View>
     </View>
@@ -514,6 +526,11 @@ const styles = StyleSheet.create({
   legal: {
     ...Typography.caption,
     textAlign: 'center',
+  },
+  terms: {
+    ...Typography.footnote,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
   },
   footer: {
     paddingTop: Spacing.md,

@@ -174,7 +174,11 @@
     "beatFrequency": "Beatfrekvens",
     "playbackError": "Kunde inte starta ljudet. Försök igen.",
     "headphonesRequired": "Hörlurar krävs — en mobilhögtalare klarar inte de här frekvenserna.",
-    "volumeCapped": "Volymen begränsad till {{percent}}%"
+    "volumeCapped": "Volymen begränsad till {{percent}}%",
+    "untilFade": "tills det tonas ut",
+    "noTimer": "Stannar inte",
+    "noTimerHint": "Spelar tills du stoppar",
+    "setTimer": "Ställ in timer"
   },
   "settings": {
     "title": "Inställningar",
@@ -287,6 +291,7 @@
     "error": "Köpet kunde inte slutföras. Försök igen.",
     "unavailable": "Premium är inte tillgängligt just nu. Kontrollera anslutningen och försök igen.",
     "legal": "Prenumerationer förnyas automatiskt tills de sägs upp. Säg upp när som helst i Google Play › Prenumerationer. Betalningen dras från ditt Google Play-konto.",
-    "bestValue": "Bästa pris"
+    "bestValue": "Bästa pris",
+    "trialTerms": "7 dagar gratis, sedan {{price}}"
   }
 }

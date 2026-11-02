@@ -7,10 +7,13 @@ import 'react-native-reanimated';
 import { I18nextProvider } from 'react-i18next';
 import {
   useFonts,
-  NunitoSans_400Regular,
-  NunitoSans_600SemiBold,
-  NunitoSans_700Bold,
-} from '@expo-google-fonts/nunito-sans';
+  SchibstedGrotesk_400Regular,
+  SchibstedGrotesk_500Medium,
+  SchibstedGrotesk_600SemiBold,
+  SchibstedGrotesk_700Bold,
+} from '@expo-google-fonts/schibsted-grotesk';
+import { YoungSerif_400Regular } from '@expo-google-fonts/young-serif';
+import { SplineSansMono_500Medium } from '@expo-google-fonts/spline-sans-mono';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ToastHost } from '@/components/ui/ToastHost';
@@ -26,9 +29,12 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [fontsLoaded] = useFonts({
-    NunitoSans_400Regular,
-    NunitoSans_600SemiBold,
-    NunitoSans_700Bold,
+    SchibstedGrotesk_400Regular,
+    SchibstedGrotesk_500Medium,
+    SchibstedGrotesk_600SemiBold,
+    SchibstedGrotesk_700Bold,
+    YoungSerif_400Regular,
+    SplineSansMono_500Medium,
   });
 
   useEffect(() => {

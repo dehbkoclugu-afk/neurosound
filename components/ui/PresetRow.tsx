@@ -11,18 +11,19 @@ import {
   Text,
   StyleSheet,
   ViewStyle,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { useSettingsStore } from '@/stores/settingsStore';
-import { Spacing, Typography, FontFamily, withAlpha } from '@/constants/theme';
-import { useCategoryColors } from '@/hooks/use-theme-colors';
+import { Spacing, Typography, FontFamily } from '@/constants/theme';
 import { FrequencyPreset } from '@/lib/frequencies';
-import { Icon, getPresetIcon, IconConfig } from './Icon';
+import { getPresetIcon, IconConfig } from './Icon';
 import { EqualizerBars } from './EqualizerBars';
-import { ArtBackground } from './ArtBackground';
+import { useThemeColors } from '@/hooks/use-theme-colors';
+import { usePresetsStore } from '@/stores/presetsStore';
 import { presetArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import { isLockedPreset } from '@/lib/premium';
@@ -180,8 +181,10 @@ export function PresetRow({
 }: PresetRowProps) {
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
-  const categoryColors = useCategoryColors();
+  const colors = useThemeColors();
   const artwork = useArtwork();
+  const addFavorite = usePresetsStore((s) => s.addFavorite);
+  const removeFavorite = usePresetsStore((s) => s.removeFavorite);
   const name = t(preset.nameKey);
   const match = highlight ? splitOnMatch(name, highlight) : null;
   const isPremium = useIsPremium();
@@ -213,74 +216,64 @@ export function PresetRow({
         .filter(Boolean)
         .join(', ')}
     >
-      <ArtBackground
-        source={artwork.source(presetArt(preset.id))}
-        style={styles.row}
-        variant="row"
-      >
-        <View
+      {/* A list row, not a card: the sound's own art as a thumbnail, name and
+          frequency, then one trailing control. Full-bleed art behind every
+          row made 33 rows of the same visual weight. */}
+      <View style={[styles.row, { borderBottomColor: colors.cardBorder }]}>
+        <Image
+          source={artwork.source(presetArt(preset.id))}
           style={[
-            styles.iconBadge,
-            { backgroundColor: withAlpha(categoryColors[preset.type], 0.28) },
+            styles.thumb,
+            { backgroundColor: colors.cardBorder },
+            locked && styles.thumbLocked,
           ]}
-        >
-          <Icon
-            icon={presetIcon(preset)}
-            size={19}
-            color={artwork.foreground.primary}
-          />
-        </View>
-        <View style={styles.rowText}>
-          <View style={styles.nameRow}>
-            <Text
-              style={[styles.name, { color: artwork.foreground.primary }]}
-              numberOfLines={1}
-            >
-              {match ? (
-                <>
-                  {match[0]}
-                  <Text
-                    style={[
-                      styles.nameMatch,
-                      { color: artwork.foreground.primary },
-                    ]}
-                  >
-                    {match[1]}
-                  </Text>
-                  {match[2]}
-                </>
-              ) : (
-                name
-              )}
-            </Text>
-            {isFavorite && (
-              <Ionicons
-                name="heart"
-                size={14}
-                color={artwork.foreground.primary}
-                accessibilityElementsHidden
-                importantForAccessibility="no-hide-descendants"
-              />
-            )}
-          </View>
-          <View style={styles.sublineRow}>
-            <Subline
-              preset={preset}
-              color={artwork.foreground.secondary}
-              t={t}
-            />
-            <BandScale preset={preset} color={artwork.foreground.secondary} />
-          </View>
-        </View>
-        {isPlaying && <EqualizerBars color={artwork.foreground.primary} />}
-        <Ionicons
-          name={locked ? 'lock-closed' : 'chevron-forward'}
-          size={17}
-          color={artwork.foreground.secondary}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
         />
-      </ArtBackground>
+        <View style={styles.rowText}>
+          <Text
+            style={[
+              styles.name,
+              { color: isPlaying ? colors.accent : locked ? colors.textSecondary : colors.text },
+            ]}
+            numberOfLines={1}
+          >
+            {match ? (
+              <>
+                {match[0]}
+                <Text style={styles.nameMatch}>{match[1]}</Text>
+                {match[2]}
+              </>
+            ) : (
+              name
+            )}
+          </Text>
+          <View style={styles.sublineRow}>
+            {isPlaying && <EqualizerBars color={colors.accent} size={12} />}
+            <Subline preset={preset} color={colors.textSecondary} t={t} />
+            <BandScale preset={preset} color={colors.textSecondary} />
+          </View>
+        </View>
+        {locked ? (
+          <View style={styles.trailing}>
+            <Ionicons name="lock-closed-outline" size={19} color={colors.textSecondary} />
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => (isFavorite ? removeFavorite(preset.id) : addFavorite(preset.id))}
+            style={styles.trailing}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            accessibilityRole="button"
+            accessibilityLabel={
+              isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')
+            }
+          >
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={21}
+              color={isFavorite ? colors.accent : colors.textSecondary}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     </AnimatedTouchable>
   );
 }
@@ -288,23 +281,27 @@ export function PresetRow({
 const styles = StyleSheet.create({
   rowShell: {
     width: '100%',
-    borderRadius: 14,
-    overflow: 'hidden',
-    marginBottom: Spacing.sm,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
     gap: Spacing.md,
-    minHeight: 92,
+    minHeight: 72,
+    paddingVertical: Spacing.sm + 2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  iconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  thumb: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+  },
+  thumbLocked: {
+    opacity: 0.55,
+  },
+  trailing: {
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },

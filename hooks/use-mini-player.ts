@@ -11,7 +11,8 @@ import { usePathname } from 'expo-router';
 
 import { useAudioStore } from '@/stores/audioStore';
 
-export const MINI_PLAYER_HEIGHT = 56;
+/** A 64pt floating card plus the 8pt gap that lifts it off the tab bar. */
+export const MINI_PLAYER_HEIGHT = 72;
 
 /**
  * Tab bar height. It used to be `MINI_PLAYER_HEIGHT` with `- 14` subtracted
@@ -19,7 +20,7 @@ export const MINI_PLAYER_HEIGHT = 56;
  * turned a design decision ("the night tab bar is shorter because it drops
  * its labels") into arithmetic on someone else's constant.
  */
-export const TAB_BAR_HEIGHT = 56;
+export const TAB_BAR_HEIGHT = 64;
 export const TAB_BAR_HEIGHT_NIGHT = 42;
 
 /** True when the MiniPlayer has something to show — a loaded preset or a

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
@@ -13,6 +13,8 @@ import { useAudioStore } from '@/stores/audioStore';
 import * as playerController from '@/lib/audio/playerController';
 import * as haptics from '@/lib/haptics';
 import { TransportButton } from './TransportButton';
+import { useArtwork } from '@/hooks/use-artwork';
+import { presetArt } from '@/lib/artAssets';
 import { useTranslation } from 'react-i18next';
 
 interface MiniPlayerProps {
@@ -33,6 +35,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
   } = useAudioStore();
 
   const colors = useThemeColors();
+  const artwork = useArtwork();
 
   // The mixer is a second, independent source of playback. Without this branch
   // it had no global control at all: leaving the Mixer tab mid-playback left
@@ -105,7 +108,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         styles.container,
         {
           backgroundColor: colors.miniPlayer,
-          borderTopColor: colors.cardBorder,
+          borderColor: colors.cardBorder,
         },
       ]}
     >
@@ -123,6 +126,11 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         />
       )}
       <View style={styles.content}>
+        {/* The sound's own artwork: the bar is recognisable before it is read. */}
+        <Image
+          source={artwork.source(currentPreset ? presetArt(currentPreset.id) : presetArt(mixerChannels[0]?.preset.id ?? ''))}
+          style={[styles.thumb, { backgroundColor: colors.cardBorder }]}
+        />
         {/* A pressable row wrapping the play/stop buttons would nest
             interactive elements inside one another — invalid HTML on web
             (React logs a hydration-error warning for it) and an ambiguous
@@ -195,20 +203,29 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
 }
 
 const styles = StyleSheet.create({
+  // A floating card above the tab bar rather than a full-width strip: it reads
+  // as "the thing playing", not as more chrome.
   container: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    bottom: 8,
+    left: Spacing.sm,
+    right: Spacing.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    minHeight: 56,
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    height: 64,
+  },
+  thumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
   },
   infoContainer: {
     flex: 1,
@@ -217,7 +234,7 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   presetName: {
-    ...Typography.body,
+    ...Typography.headline,
   },
   presetType: {
     ...Typography.caption,
@@ -240,7 +257,7 @@ const styles = StyleSheet.create({
   },
   timerTrace: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     height: 2,
   },

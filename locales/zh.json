@@ -174,7 +174,11 @@
     "beatFrequency": "节拍频率",
     "playbackError": "无法开始播放，请重试。",
     "headphonesRequired": "需要耳机——手机扬声器无法播放这些频率。",
-    "volumeCapped": "音量已限制为 {{percent}}%"
+    "volumeCapped": "音量已限制为 {{percent}}%",
+    "untilFade": "后渐弱",
+    "noTimer": "不会停止",
+    "noTimerHint": "播放直到你停止",
+    "setTimer": "设置定时"
   },
   "settings": {
     "title": "设置",
@@ -287,6 +291,7 @@
     "error": "无法完成购买，请重试。",
     "unavailable": "高级版暂时不可用。请检查网络连接后重试。",
     "legal": "订阅会自动续订，直到你取消为止。可随时在 Google Play › 订阅 中取消。费用将从你的 Google Play 账号扣除。",
-    "bestValue": "最划算"
+    "bestValue": "最划算",
+    "trialTerms": "免费 7 天，之后 {{price}}"
   }
 }

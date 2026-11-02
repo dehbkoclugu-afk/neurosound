@@ -174,7 +174,11 @@
     "beatFrequency": "Beat Frekansı",
     "playbackError": "Ses başlatılamadı. Tekrar deneyin.",
     "headphonesRequired": "Kulaklık gerekli — telefon hoparlörü bu frekansları üretemez.",
-    "volumeCapped": "Maksimum ses %{{percent}} ile sınırlı"
+    "volumeCapped": "Maksimum ses %{{percent}} ile sınırlı",
+    "untilFade": "sonra yavaşça kısılacak",
+    "noTimer": "Kapanmayacak",
+    "noTimerHint": "Sen durdurana kadar çalar",
+    "setTimer": "Zamanlayıcı kur"
   },
   "settings": {
     "title": "Ayarlar",
@@ -287,6 +291,7 @@
     "error": "Satın alma tamamlanamadı. Lütfen tekrar dene.",
     "unavailable": "Premium şu anda kullanılamıyor. Bağlantını kontrol edip tekrar dene.",
     "legal": "Abonelikler iptal edilene kadar otomatik yenilenir. Google Play › Abonelikler bölümünden istediğin zaman iptal edebilirsin. Ödeme Google Play hesabından alınır.",
-    "bestValue": "En avantajlı"
+    "bestValue": "En avantajlı",
+    "trialTerms": "7 gün ücretsiz, sonra {{price}}"
   }
 }
