@@ -88,7 +88,7 @@ export default function HomeScreen() {
   // AsyncStorage hydration must finish before the onboarding default is used.
   if (!hasHydrated) {
     return (
-      <SafeAreaView
+      <SafeAreaView edges={['top', 'left', 'right']}
         style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={styles.hydrationLoading}>
@@ -171,7 +171,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView
+    <SafeAreaView edges={['top', 'left', 'right']}
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView

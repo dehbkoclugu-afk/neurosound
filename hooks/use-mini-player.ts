@@ -20,7 +20,7 @@ export const MINI_PLAYER_HEIGHT = 72;
  * turned a design decision ("the night tab bar is shorter because it drops
  * its labels") into arithmetic on someone else's constant.
  */
-export const TAB_BAR_HEIGHT = 64;
+export const TAB_BAR_HEIGHT = 60;
 export const TAB_BAR_HEIGHT_NIGHT = 42;
 
 /** True when the MiniPlayer has something to show — a loaded preset or a

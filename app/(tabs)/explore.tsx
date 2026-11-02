@@ -194,7 +194,7 @@ export default function ExploreScreen() {
   }, [normalizedQuery, favoritesOnly, favoriteIds, sortBy, i18n.language]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header with category title — Explore is a tab, so no back button */}
       <View style={[styles.header, contentColumn]}>
         <Text
