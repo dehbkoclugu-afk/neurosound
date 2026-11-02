@@ -36,6 +36,7 @@ import { CategoryHeader } from '@/components/ui/CategoryHeader';
 import { Slider } from '@/components/ui/Slider';
 import { useToastStore } from '@/stores/toastStore';
 import { LanguageRow, LanguageSheet } from '@/components/ui/LanguageSheet';
+import { Sheet } from '@/components/ui/Sheet';
 import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import i18n from '@/i18n';
@@ -103,6 +104,7 @@ export default function SettingsScreen() {
 
   const showToast = useToastStore((st) => st.show);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
+  const [showThemeSheet, setShowThemeSheet] = useState(false);
   const miniPlayerInset = useMiniPlayerInset();
 
   // resetSettings and presetsStore.reset both existed and were wired to
@@ -177,77 +179,25 @@ export default function SettingsScreen() {
               },
             ]}
           >
-            {/* Theme */}
-            <View
-              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
+            {/* Theme: a row that states the current choice and opens a sheet,
+                like Language. Three large swatch tiles were the heaviest thing
+                on a screen of plain switches. */}
+            <TouchableOpacity
+              onPress={() => setShowThemeSheet(true)}
+              style={[styles.card, styles.valueRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole="button"
+              accessibilityLabel={`${t('settings.theme')}: ${t(THEME_OPTIONS.find((o) => o.value === theme)?.labelKey ?? '')}`}
             >
-              <Text
-                style={[
-                  styles.cardTitle,
-                  styles.cardTitleSpaced,
-                  { color: colors.text },
-                ]}
-              >
+              <Text style={[styles.cardTitle, { color: colors.text }]}>
                 {t('settings.theme')}
               </Text>
-              <View style={styles.optionGroup}>
-                {THEME_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    onPress={() => setTheme(option.value)}
-                    style={[
-                      styles.optionButton,
-                      styles.optionButtonHalf,
-                      {
-                        backgroundColor:
-                          theme === option.value
-                            ? colors.primary
-                            : colors.backgroundSecondary,
-                        borderColor:
-                          theme === option.value
-                            ? colors.primary
-                            : colors.cardBorder,
-                      },
-                    ]}
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected: theme === option.value }}
-                  >
-                    <View
-                      style={[
-                        styles.swatch,
-                        { borderColor: colors.cardBorder },
-                      ]}
-                      accessibilityElementsHidden
-                      importantForAccessibility="no-hide-descendants"
-                    >
-                      <View
-                        style={[
-                          styles.swatchHalf,
-                          { backgroundColor: option.swatch[0] },
-                        ]}
-                      />
-                      <View
-                        style={[
-                          styles.swatchHalf,
-                          { backgroundColor: option.swatch[1] },
-                        ]}
-                      />
-                    </View>
-                    <Text
-                      style={[
-                        styles.optionText,
-                        {
-                          color:
-                            theme === option.value ? colors.onPrimary : colors.text,
-                        },
-                      ]}
-                    >
-                      {t(option.labelKey)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+              <View style={styles.valueRight}>
+                <Text style={[styles.valueText, { color: colors.textSecondary }]}>
+                  {t(THEME_OPTIONS.find((o) => o.value === theme)?.labelKey ?? '')}
+                </Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
               </View>
-            </View>
+            </TouchableOpacity>
 
             {/* Reduce Motion */}
             <View
@@ -255,13 +205,6 @@ export default function SettingsScreen() {
             >
               <View style={styles.switchRow}>
                 <View style={styles.switchLabel}>
-                  <Ionicons
-                    name="sparkles-outline"
-                    size={24}
-                    color={colors.icon}
-                    accessibilityElementsHidden
-                    importantForAccessibility="no-hide-descendants"
-                  />
                   <View style={styles.switchText}>
                     <Text style={[styles.cardTitle, { color: colors.text }]}>
                       {t('settings.reduceMotion')}
@@ -291,43 +234,12 @@ export default function SettingsScreen() {
               </View>
             </View>
 
-            {/* Sits with Reduce Motion because that is the control that
-              answers it — the warning is about the breathing ring. */}
-            <View
-              style={[styles.warningCard, { borderBottomColor: colors.cardBorder }]}
-            >
-              <View style={styles.warningHeading}>
-                <Ionicons
-                  name="warning-outline"
-                  size={16}
-                  color={colors.warning}
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                />
-                <Text style={[styles.warningTitle, { color: colors.warning }]}>
-                  {t('settings.epilepsyWarning')}
-                </Text>
-              </View>
-              <Text
-                style={[styles.warningText, { color: colors.textSecondary }]}
-              >
-                {t('settings.epilepsyText')}
-              </Text>
-            </View>
-
             {/* Low Contrast */}
             <View
               style={[styles.card, { borderBottomColor: colors.cardBorder }]}
             >
               <View style={styles.switchRow}>
                 <View style={styles.switchLabel}>
-                  <Ionicons
-                    name="contrast-outline"
-                    size={24}
-                    color={colors.icon}
-                    accessibilityElementsHidden
-                    importantForAccessibility="no-hide-descendants"
-                  />
                   <View style={styles.switchText}>
                     <Text style={[styles.cardTitle, { color: colors.text }]}>
                       {t('settings.lowContrast')}
@@ -362,13 +274,6 @@ export default function SettingsScreen() {
             >
               <View style={styles.switchRow}>
                 <View style={styles.switchLabel}>
-                  <Ionicons
-                    name="phone-portrait-outline"
-                    size={24}
-                    color={colors.icon}
-                    accessibilityElementsHidden
-                    importantForAccessibility="no-hide-descendants"
-                  />
                   <View style={styles.switchText}>
                     <Text style={[styles.cardTitle, { color: colors.text }]}>
                       {t('settings.haptics')}
@@ -392,6 +297,14 @@ export default function SettingsScreen() {
                 />
               </View>
             </View>
+          </View>
+          {/* A footnote under the group it concerns, not a tinted row in the
+              middle of it: it informs, it is not a setting. */}
+          <View style={styles.footnoteRow}>
+            <Ionicons name="warning-outline" size={15} color={colors.textSecondary} />
+            <Text style={[styles.footnote, { color: colors.textSecondary }]}>
+              {t('settings.epilepsyWarning')}: {t('settings.epilepsyText')}
+            </Text>
           </View>
         </View>
 
@@ -417,9 +330,11 @@ export default function SettingsScreen() {
               style={[
                 styles.card,
                 styles.lastCard,
-                { borderBottomColor: colors.cardBorder },
+                { borderBottomColor: colors.cardBorder, paddingVertical: Spacing.xs },
               ]}
             >
+              {/* The row brings its own 48pt height; the card's full padding on
+                  top of it made this one row half again as tall as Theme. */}
               <LanguageRow onPress={() => setShowLanguageSheet(true)} />
             </View>
           </View>
@@ -591,6 +506,38 @@ export default function SettingsScreen() {
         visible={showLanguageSheet}
         onClose={() => setShowLanguageSheet(false)}
       />
+
+      <Sheet
+        visible={showThemeSheet}
+        onClose={() => setShowThemeSheet(false)}
+        title={t('settings.theme')}
+      >
+        {THEME_OPTIONS.map((option) => {
+          const selected = theme === option.value;
+          return (
+            <TouchableOpacity
+              key={option.value}
+              onPress={() => {
+                setTheme(option.value);
+                setShowThemeSheet(false);
+              }}
+              style={[styles.sheetRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+            >
+              <Text
+                style={[
+                  styles.sheetRowText,
+                  { color: selected ? colors.accent : colors.text },
+                ]}
+              >
+                {t(option.labelKey)}
+              </Text>
+              {selected && <Ionicons name="checkmark" size={20} color={colors.accent} />}
+            </TouchableOpacity>
+          );
+        })}
+      </Sheet>
     </SafeAreaView>
   );
 }
@@ -643,58 +590,12 @@ const styles = StyleSheet.create({
     ...Typography.body,
     fontFamily: FontFamily.semibold,
   },
-  cardTitleSpaced: {
-    marginBottom: Spacing.sm,
-  },
-  optionGroup: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-  },
-  // Two per row, equal width: four pills wrapping on their own put three on
-  // one line and one orphan below in English and two-and-two in Turkish, so
-  // the same control had a different shape per language.
-  optionButtonHalf: {
-    flex: 1,
-    alignItems: 'center',
-    minWidth: 0,
-    gap: Spacing.sm,
-  },
-  swatch: {
-    flexDirection: 'row',
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  swatchHalf: {
-    flex: 1,
-  },
-  optionCode: {
-    ...Typography.label,
-    fontFamily: FontFamily.mono,
-    letterSpacing: 1,
-    marginRight: Spacing.xs,
-  },
   resetBadge: {
     width: 36,
     height: 36,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  optionButton: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.sm,
-    borderRadius: 12,
-    borderWidth: 1,
-    minHeight: 72,
-    justifyContent: 'center',
-  },
-  optionText: {
-    ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
-    textAlign: 'center',
   },
   switchRow: {
     flexDirection: 'row',
@@ -733,28 +634,38 @@ const styles = StyleSheet.create({
     ...Typography.footnote,
     ...Typography.numeral,
   },
-  // It sat between two switch rows with nothing but whitespace around it,
-  // so it read as a stray paragraph rather than a notice.
-  // A plain row in the list, indented to the switch text it qualifies — a
-  // tinted box nested in the settings group was a card inside a card.
-  warningCard: {
-    paddingLeft: Spacing.md + 24 + Spacing.sm,
-    paddingRight: Spacing.md,
-    paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    gap: Spacing.xs,
+  valueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: ControlSize.row,
   },
-  warningHeading: {
+  valueRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
-    marginBottom: Spacing.xs,
   },
-  warningTitle: {
-    ...Typography.footnote,
-    fontFamily: FontFamily.semibold,
+  valueText: {
+    ...Typography.body,
   },
-  warningText: {
-    ...Typography.footnote,
+  footnoteRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+    marginTop: Spacing.sm,
+  },
+  footnote: {
+    ...Typography.caption,
+    flex: 1,
+  },
+  sheetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: ControlSize.row,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  sheetRowText: {
+    ...Typography.body,
   },
 });

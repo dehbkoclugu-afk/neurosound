@@ -107,8 +107,10 @@ export function LanguageRow({ onPress }: { onPress: () => void }) {
       accessibilityRole="button"
       accessibilityLabel={`${t('settings.language')}: ${current?.label ?? language}`}
     >
+      {/* No flag here: Android renders most flag emoji as two letters, so
+          the row read "TR Türkçe". The sheet keeps them as a colour cue. */}
       <Text style={[styles.triggerLabel, { color: colors.text }]}>
-        {current ? `${current.flag}  ${current.label}` : language}
+        {current?.label ?? language}
       </Text>
       <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
     </TouchableOpacity>

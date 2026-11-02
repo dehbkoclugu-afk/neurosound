@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
-import { Radius, Spacing, Typography, ControlSize, Elevation } from '@/constants/theme';
+import { Spacing, Typography, ControlSize, Elevation } from '@/constants/theme';
 
 interface SliderProps {
   value: number;
@@ -132,7 +132,7 @@ export function Slider({
       )}
 
       <View
-        style={[styles.sliderContainer, { backgroundColor: colors.slider }]}
+        style={styles.sliderContainer}
         onLayout={(e) => setSliderWidth(e.nativeEvent.layout.width)}
         {...panResponder.panHandlers}
         accessible
@@ -164,16 +164,19 @@ export function Slider({
             (partial-width) view or the thumb below gets a locationX relative
             to that child's own bounds instead of the track, and the slider
             jumps to the wrong value on touch-down. */}
-        <View
-          pointerEvents="none"
-          style={[
-            styles.trackFill,
-            {
-              backgroundColor: fillColor ?? colors.accent,
-              width: `${normalizedValue * 100}%`,
-            },
-          ]}
-        />
+        {/* A thin track inside the full-height touch area: the finger still
+            gets 48pt, the eye gets a line instead of a solid block of colour. */}
+        <View pointerEvents="none" style={[styles.track, { backgroundColor: colors.slider }]}>
+          <View
+            style={[
+              styles.trackFill,
+              {
+                backgroundColor: fillColor ?? colors.accent,
+                width: `${normalizedValue * 100}%`,
+              },
+            ]}
+          />
+        </View>
 
         {/* Everything above the ceiling, struck through. Drawn over the
             fill so it reads as "this part is not doing anything". */}
@@ -230,9 +233,12 @@ const styles = StyleSheet.create({
   },
   sliderContainer: {
     height: ControlSize.row,
-    borderRadius: Radius.tag,
     justifyContent: 'center',
     position: 'relative',
+  },
+  track: {
+    height: 6,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   trackFill: {
@@ -240,13 +246,13 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    borderRadius: Radius.tag,
+    borderRadius: 3,
   },
   capZone: {
     position: 'absolute',
     right: 0,
-    top: 0,
-    bottom: 0,
+    top: ControlSize.row / 2 - 3,
+    height: 6,
     opacity: 0.55,
   },
   thumb: {
