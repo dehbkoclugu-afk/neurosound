@@ -156,9 +156,11 @@ export default function IntentScreen() {
             style={StyleSheet.absoluteFill}
           />
           <LinearGradient
+            // White hero copy in both themes, so the scrim is dark in both; by
+            // day it stops short of the page colour instead of fading into it.
             colors={
               artwork.scheme === 'light'
-                ? ['transparent', 'rgba(247,249,252,0.48)', colors.background]
+                ? ['transparent', 'rgba(10,9,13,0.35)', 'rgba(10,9,13,0.75)']
                 : ['transparent', 'rgba(0,0,0,0.45)', colors.background]
             }
             locations={[0.3, 0.72, 1]}

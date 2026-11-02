@@ -197,7 +197,7 @@ export default function HomeScreen() {
           <ArtBackground
             source={artwork.source(intentArt(suggestedIntent.id))}
             style={styles.leadCard}
-            variant="hero"
+            variant="tile"
           >
             <View style={styles.leadTop}>
               <Text style={[styles.leadKicker, { color: artwork.foreground.secondary }]}>
@@ -256,7 +256,7 @@ export default function HomeScreen() {
                 <ArtBackground
                   source={artwork.source(intentArt(intent.id))}
                   style={styles.tile}
-                  variant="hero"
+                  variant="tile"
                 >
                   <Text
                     style={[styles.tileName, { color: artwork.foreground.primary }]}

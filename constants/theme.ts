@@ -12,14 +12,8 @@
 
 import { Platform, TextStyle } from 'react-native';
 
-// Light palettes still use the previous ink blue; they get redesigned
-// separately. The dark palettes below are the "Gece" violet system.
-const inkBlue = '#2F5C8A';
-const inkBlueDark = '#1F3F5E';
-
 // Text/icon colour on a filled primary surface lives in each palette as
 // `onPrimary`, since each palette fills its buttons differently.
-const onPrimaryPaper = '#F7F9FC';
 
 /**
  * Text/icon colour for anything sitting ON a photograph — the Intent hero,
@@ -133,33 +127,34 @@ export const IntentColorSets = { light: intentColorsLight, dark: intentColorsDar
 export const BADGE_ALPHA = 0.16;
 
 export const Colors = {
+  // Day: a clean, chroma-free off-white (not the cream/sand default), white
+  // cards with visible borders, the same violet as the accent. Violet fills
+  // only the primary button; selection elsewhere is a pale violet tint.
   light: {
-    text: '#18212B',
-    textSecondary: '#566575',
-    background: '#F1F4F7',
-    backgroundSecondary: '#E8EDF2',
-    card: '#F8FAFC',
-    cardBorder: '#D5DDE6',
+    text: '#1C1A20', // 16:1 on background
+    textSecondary: '#57525C', // 7.4:1
+    background: '#F7F7F5',
+    backgroundSecondary: '#EFEEEB',
+    card: '#FFFFFF',
+    cardBorder: '#DEDBD6',
     cardElevated: '#FFFFFF',
-    tint: inkBlue,
-    primary: inkBlue,
-    primaryLight: '#5C82AA',
-    onPrimary: onPrimaryPaper,
-    accent: inkBlue, // 6.23:1 on both surface levels
-    icon: '#566575',
-    tabIconDefault: '#8A98A8',
-    tabIconSelected: inkBlueDark,
+    tint: '#5B45A8',
+    primary: '#5B45A8',
+    primaryLight: '#6E58BC',
+    onPrimary: '#FFFFFF', // 8:1 on primary
+    accent: '#5B45A8', // 7.6:1
+    icon: '#57525C',
+    tabIconDefault: '#6E6873', // 5.2:1
+    tabIconSelected: '#5B45A8',
+    tabPill: '#E9E4F5',
+    tabPillIcon: '#5B45A8',
     success: '#4C7A4C',
-    warning: '#8A5A1E', // AA on both surface levels
-    error: '#A34B37', // AA on both surface levels
-    slider: '#D5DDE6',
-    // Foreground on track: the thumb used to be the accent colour
-    // in every palette — in three of them literally the same hex — so at full
-    // value it sat invisible on its own fill. Matching `text` gives it
-    // contrast against both the empty track and every fill by construction.
-    sliderThumb: '#18212B',
-    overlay: 'rgba(16, 24, 32, 0.42)',
-    miniPlayer: '#F8FAFC',
+    warning: '#8A5A12',
+    error: '#A3452F',
+    slider: '#E2DFDA',
+    sliderThumb: '#1C1A20',
+    overlay: 'rgba(16, 14, 20, 0.42)',
+    miniPlayer: '#FFFFFF',
   },
   // "Gece": near-black with a hair of violet, warm paper text (low blue at
   // night), one violet accent. Filled actions use a dim violet (`primary`)
@@ -180,6 +175,8 @@ export const Colors = {
     icon: '#B3AA9F',
     tabIconDefault: '#8C847A', // 5.3:1, the floor for any text
     tabIconSelected: '#EEE7DC',
+    tabPill: '#3A3060',
+    tabPillIcon: '#EEE7DC',
     success: '#A9BE8E',
     warning: '#E0B070',
     error: '#E39A86',
@@ -193,28 +190,30 @@ export const Colors = {
   // gray). "Low contrast" softens the *ceiling* (no near-black on
   // near-white); it must never push text under AA.
   lowContrastLight: {
-    text: '#3F4A56',
-    textSecondary: '#596775',
-    background: '#EEF2F5',
-    backgroundSecondary: '#E3E9EF',
-    card: '#F4F7F9',
-    cardBorder: '#D2DAE3',
+    text: '#3D3942',
+    textSecondary: '#5E5963',
+    background: '#F2F1EF',
+    backgroundSecondary: '#E9E8E5',
+    card: '#FAFAF8',
+    cardBorder: '#DAD7D2',
     cardElevated: '#FFFFFF',
-    tint: '#3F6690',
-    primary: '#3F6690',
-    primaryLight: '#6D8CAC',
-    onPrimary: onPrimaryPaper,
-    accent: '#3F6690', // AA on both surface levels
-    icon: '#687686',
-    tabIconDefault: '#9AA7B4',
-    tabIconSelected: '#33547A',
-    success: '#6D946D',
-    warning: '#82591F', // AA on both surface levels
-    error: '#96513C', // AA on both surface levels
-    slider: '#D2DAE3',
-    sliderThumb: '#3F4A56',
-    overlay: 'rgba(20, 30, 40, 0.3)',
-    miniPlayer: '#F4F7F9',
+    tint: '#64519F',
+    primary: '#64519F',
+    primaryLight: '#7563AE',
+    onPrimary: '#FFFFFF',
+    accent: '#64519F',
+    icon: '#5E5963',
+    tabIconDefault: '#716B75',
+    tabIconSelected: '#64519F',
+    tabPill: '#E6E1F0',
+    tabPillIcon: '#64519F',
+    success: '#5E8A5E',
+    warning: '#82591F',
+    error: '#96513C',
+    slider: '#DAD7D2',
+    sliderThumb: '#3D3942',
+    overlay: 'rgba(20, 18, 24, 0.3)',
+    miniPlayer: '#FAFAF8',
   },
   lowContrastDark: {
     text: '#D6CFC5',
@@ -232,6 +231,8 @@ export const Colors = {
     icon: '#ACA49A',
     tabIconDefault: '#948C82',
     tabIconSelected: '#D6CFC5',
+    tabPill: '#3B3456',
+    tabPillIcon: '#D6CFC5',
     success: '#9CAE86',
     warning: '#D0A86C',
     error: '#D2927F',

@@ -14,50 +14,27 @@ type ArtBackgroundProps = {
   source?: ImageSourcePropType;
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
-  variant?: 'card' | 'row' | 'channel' | 'hero';
+  /**
+   * card / row / channel — copy on the left, scrim runs left to right.
+   * tile — copy at the bottom, scrim runs top to bottom.
+   * hero — full-bleed header (Player): darkens the top for the status bar
+   *        and buttons; fades into the page at night, keeps a crisp edge by day.
+   */
+  variant?: 'card' | 'row' | 'channel' | 'tile' | 'hero';
 };
 
-const DARK_SCRIMS = {
-  card: [
-    'rgba(10, 9, 13, 0.94)',
-    'rgba(10, 9, 13, 0.72)',
-    'rgba(10, 9, 13, 0.16)',
-  ],
-  row: ['rgba(10, 9, 13, 0.97)', 'rgba(10, 9, 13, 0.82)', 'rgba(10, 9, 13, 0.22)'],
-  channel: [
-    'rgba(10, 9, 13, 0.97)',
-    'rgba(10, 9, 13, 0.88)',
-    'rgba(10, 9, 13, 0.38)',
-  ],
-  hero: [
-    'rgba(10, 9, 13, 0.16)',
-    'rgba(10, 9, 13, 0.28)',
-    'rgba(10, 9, 13, 0.92)',
-  ],
+// Copy on artwork is always white over a dark scrim, in both themes. A light
+// scrim with dark text (the old light theme) washed every photograph out to a
+// milky haze and still left the words unreadable over busy, bright images.
+const SCRIMS = {
+  card: ['rgba(10, 9, 13, 0.86)', 'rgba(10, 9, 13, 0.55)', 'rgba(10, 9, 13, 0.05)'],
+  row: ['rgba(10, 9, 13, 0.92)', 'rgba(10, 9, 13, 0.7)', 'rgba(10, 9, 13, 0.15)'],
+  channel: ['rgba(10, 9, 13, 0.94)', 'rgba(10, 9, 13, 0.8)', 'rgba(10, 9, 13, 0.3)'],
+  tile: ['rgba(10, 9, 13, 0.05)', 'rgba(10, 9, 13, 0.3)', 'rgba(10, 9, 13, 0.88)'],
 } as const;
 
-const LIGHT_SCRIMS = {
-  card: [
-    'rgba(247,249,252,0.96)',
-    'rgba(247,249,252,0.76)',
-    'rgba(247,249,252,0.14)',
-  ],
-  row: [
-    'rgba(247,249,252,0.98)',
-    'rgba(247,249,252,0.86)',
-    'rgba(247,249,252,0.22)',
-  ],
-  channel: [
-    'rgba(247,249,252,0.98)',
-    'rgba(247,249,252,0.90)',
-    'rgba(247,249,252,0.42)',
-  ],
-  hero: [
-    'rgba(247,249,252,0.18)',
-    'rgba(247,249,252,0.28)',
-    'rgba(247,249,252,0.94)',
-  ],
-} as const;
+const HERO_DARK = ['rgba(10, 9, 13, 0.16)', 'rgba(10, 9, 13, 0.28)', 'rgba(10, 9, 13, 0.92)'] as const;
+const HERO_LIGHT = ['rgba(10, 9, 13, 0.4)', 'rgba(10, 9, 13, 0)', 'rgba(10, 9, 13, 0)'] as const;
 
 export function ArtBackground({
   source,
@@ -66,14 +43,16 @@ export function ArtBackground({
   variant = 'row',
 }: ArtBackgroundProps) {
   const scheme = useColorScheme();
-  const scrims = scheme === 'light' ? LIGHT_SCRIMS : DARK_SCRIMS;
+  const vertical = variant === 'hero' || variant === 'tile';
+  const lightHero = variant === 'hero' && scheme === 'light';
+  const scrim = variant === 'hero' ? (lightHero ? HERO_LIGHT : HERO_DARK) : SCRIMS[variant];
   const content = (
     <>
       <LinearGradient
-        colors={scrims[variant]}
-        locations={[0, 0.56, 1]}
-        start={variant === 'hero' ? { x: 0.5, y: 0 } : { x: 0, y: 0.5 }}
-        end={variant === 'hero' ? { x: 0.5, y: 1 } : { x: 1, y: 0.5 }}
+        colors={scrim}
+        locations={lightHero ? [0, 0.3, 1] : [0, 0.56, 1]}
+        start={vertical ? { x: 0.5, y: 0 } : { x: 0, y: 0.5 }}
+        end={vertical ? { x: 0.5, y: 1 } : { x: 1, y: 0.5 }}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
@@ -82,25 +61,11 @@ export function ArtBackground({
   );
 
   if (!source) {
-    return (
-      <View
-        style={[
-          styles.surface,
-          scheme === 'light' ? styles.lightFallback : styles.fallback,
-          style,
-        ]}
-      >
-        {content}
-      </View>
-    );
+    return <View style={[styles.surface, style]}>{content}</View>;
   }
 
   return (
-    <ImageBackground
-      source={source}
-      resizeMode="cover"
-      style={[styles.surface, style]}
-    >
+    <ImageBackground source={source} resizeMode="cover" style={[styles.surface, style]}>
       {content}
     </ImageBackground>
   );
@@ -109,12 +74,6 @@ export function ArtBackground({
 const styles = StyleSheet.create({
   surface: {
     overflow: 'hidden',
-    backgroundColor: '#0A090D',
-  },
-  fallback: {
-    backgroundColor: '#0A090D',
-  },
-  lightFallback: {
-    backgroundColor: '#F1F4F8',
+    backgroundColor: '#1B1821',
   },
 });

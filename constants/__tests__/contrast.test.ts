@@ -62,25 +62,25 @@ const AA_TEXT = 4.5; // WCAG AA, normal-size text
 const GRAPHIC = 3; // WCAG AA, non-text graphics
 
 describe('approved light shell tokens', () => {
-  it('uses cool fog surfaces instead of the retired warm paper palette', () => {
+  it('uses a chroma-free off-white with white cards, not a cream/sand ground', () => {
     expect(Colors.light).toMatchObject({
-      text: '#18212B',
-      textSecondary: '#566575',
-      background: '#F1F4F7',
-      backgroundSecondary: '#E8EDF2',
-      card: '#F8FAFC',
-      cardBorder: '#D5DDE6',
-      slider: '#D5DDE6',
-      miniPlayer: '#F8FAFC',
+      text: '#1C1A20',
+      textSecondary: '#57525C',
+      background: '#F7F7F5',
+      backgroundSecondary: '#EFEEEB',
+      card: '#FFFFFF',
+      cardBorder: '#DEDBD6',
+      slider: '#E2DFDA',
+      miniPlayer: '#FFFFFF',
     });
 
     expect(Colors.lowContrastLight).toMatchObject({
-      text: '#3F4A56',
-      textSecondary: '#596775',
-      background: '#EEF2F5',
-      backgroundSecondary: '#E3E9EF',
-      card: '#F4F7F9',
-      cardBorder: '#D2DAE3',
+      text: '#3D3942',
+      textSecondary: '#5E5963',
+      background: '#F2F1EF',
+      backgroundSecondary: '#E9E8E5',
+      card: '#FAFAF8',
+      cardBorder: '#DAD7D2',
     });
   });
 });

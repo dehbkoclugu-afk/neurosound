@@ -25,6 +25,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import {
@@ -248,7 +249,15 @@ export default function PlayerScreen() {
           </ArtBackground>
         </Animated.View>
 
-        <View style={[styles.body, contentColumn, { marginTop: -150 }]}>
+        {/* At night the title overlaps the hero's fade into the page; by day
+            the hero keeps a crisp edge, so the title starts below it. */}
+        <View
+          style={[
+            styles.body,
+            contentColumn,
+            { marginTop: artwork.scheme === 'light' ? Spacing.lg : -150 },
+          ]}
+        >
           <View style={styles.titleRow}>
             <Text
               style={[styles.bigTitle, { color: colors.text }]}
@@ -398,6 +407,8 @@ export default function PlayerScreen() {
       </ScrollView>
 
       <TimerModal visible={showTimerModal} onClose={() => setShowTimerModal(false)} />
+      {/* The status bar sits on the artwork's darkened top in every theme. */}
+      <StatusBar style="light" />
     </View>
   );
 }

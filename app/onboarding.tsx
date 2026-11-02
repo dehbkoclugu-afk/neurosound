@@ -163,7 +163,7 @@ export default function OnboardingScreen() {
   return (
     <ArtBackground
       source={artwork.source(current.art)}
-      variant="hero"
+      variant="tile"
       style={[styles.container, { backgroundColor: colors.background }]}
     >
     <SafeAreaView style={styles.container}>
@@ -219,12 +219,12 @@ export default function OnboardingScreen() {
         ]}
       >
         <Text
-          style={[styles.title, { color: colors.text }]}
+          style={[styles.title, { color: artwork.foreground.primary }]}
           accessibilityRole="header"
         >
           {t(current.titleKey)}
         </Text>
-        <Text style={[styles.description, { color: colors.textSecondary }]}>
+        <Text style={[styles.description, { color: artwork.foreground.secondary }]}>
           {t(current.descKey)}
         </Text>
       </Animated.View>

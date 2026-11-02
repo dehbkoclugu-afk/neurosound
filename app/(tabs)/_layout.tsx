@@ -23,8 +23,8 @@ import {
 function TabIcon({ name, color, focused }: { name: keyof typeof Ionicons.glyphMap; color: string; focused: boolean }) {
   const colors = useThemeColors();
   return (
-    <View style={[styles.pill, focused && { backgroundColor: colors.primary }]}>
-      <Ionicons name={name} size={22} color={focused ? colors.onPrimary : color} />
+    <View style={[styles.pill, focused && { backgroundColor: colors.tabPill }]}>
+      <Ionicons name={name} size={22} color={focused ? colors.tabPillIcon : color} />
     </View>
   );
 }

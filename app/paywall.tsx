@@ -198,7 +198,7 @@ export default function PaywallScreen() {
       >
         <ArtBackground
           source={artwork.source(presetArt(HERO_PRESET))}
-          variant="hero"
+          variant="tile"
           style={[styles.hero, { paddingTop: insets.top + Spacing.sm }]}
         >
           <View style={styles.heroHeader}>
@@ -238,7 +238,7 @@ export default function PaywallScreen() {
             <ArtBackground
               key={preset.id}
               source={artwork.source(presetArt(preset.id))}
-              variant="hero"
+              variant="tile"
               style={styles.previewTile}
             >
               <View style={[styles.previewLock, { backgroundColor: artwork.foreground.badge }]}>
