@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>852Hz — Gece konsepti</title>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Schibsted+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&family=Golos+Text:wght@400;500;600&family=PT+Serif&display=block" rel="stylesheet">
+<link rel="stylesheet" href="gece.css">
+<style>html, body { width: 2700px; height: 1000px; }</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="home-f" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="currentColor"/></symbol>
+  <symbol id="wave" viewBox="0 0 24 24"><path d="M2 12c2-5 4-5 6 0s4 5 6 0 4-5 6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+  <symbol id="pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="4" height="14" rx="1.3" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.3" fill="currentColor"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="heart-f" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="currentColor"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 9v4l2.5 2M9.5 2.5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="sys" viewBox="0 0 44 14"><path d="M2 5.5a8 8 0 0 1 11 0M4.5 8.2a4.5 4.5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.5" cy="11" r="1.4" fill="currentColor"/><path d="M18 13L28 3v10z" fill="currentColor"/><rect x="33" y="1.5" width="9" height="12" rx="2" fill="none" stroke="currentColor" stroke-opacity=".6"/><rect x="34.5" y="5" width="6" height="7" rx="1" fill="currentColor"/></symbol>
+</defs></svg>
+
+<!-- HOME -->
+<div class="wrap"><div class="phone home">
+  <div class="status"><span>01:12</span><svg width="44" height="14"><use href="#sys"/></svg></div>
+  <div class="in">
+    <h1>İyi geceler.</h1>
+    <div class="ask">Ne yapmak istiyorsun?</div>
+    <div class="lead-card"><img class="bg" src="../../assets/images/art/intents/sleep.jpg">
+      <div class="topline"><span>Bu gece için öneri</span><a>İçindekiler <svg width="16" height="16"><use href="#chev"/></svg></a></div>
+      <div class="nm">Uyku</div>
+      <div class="meta">Delta ve yağmur · sonra yavaşça kısılır</div>
+      <div class="btn"><svg width="20" height="20"><use href="#play"/></svg>30 dakika başlat</div>
+    </div>
+    <div class="intents">
+      <div class="itile"><img src="../../assets/images/art/intents/focus.jpg"><b>Odak</b><span>45 dk</span></div>
+      <div class="itile"><img src="../../assets/images/art/intents/relax.jpg"><b>Rahatlama</b><span>20 dk</span></div>
+      <div class="itile"><img src="../../assets/images/art/intents/meditate.jpg"><b>Meditasyon</b><span>15 dk</span></div>
+    </div>
+    <div class="recent"><img src="../../assets/images/art/presets/noise-rain.jpg"><div class="t"><b>Yağmur</b><span>Dün gece · 52 dk dinledin</span></div><div class="go"><svg width="18" height="18"><use href="#play"/></svg></div></div>
+  </div>
+  <div class="tabbar">
+    <div class="tab on"><span class="pill"><svg><use href="#home-f"/></svg></span>Ana sayfa</div>
+    <div class="tab"><span class="pill"><svg><use href="#wave"/></svg></span>Sesler</div>
+    <div class="tab"><span class="pill"><svg><use href="#layers"/></svg></span>Mikser</div>
+    <div class="tab"><span class="pill"><svg><use href="#gear"/></svg></span>Ayarlar</div>
+  </div>
+</div><div class="caption">Ana sayfa</div></div>
+
+<!-- LIBRARY -->
+<div class="wrap"><div class="phone">
+  <div class="status"><span>01:14</span><svg width="44" height="14"><use href="#sys"/></svg></div>
+  <div class="lib">
+    <h1>Sesler</h1>
+    <div class="search"><svg width="20" height="20"><use href="#search"/></svg>852, yağmur, odak…</div>
+    <div class="seg"><span class="on">Solfeggio</span><span>Binaural</span><span>Doğa</span><span>Favoriler</span></div>
+    <div class="rows">
+      <div class="r on"><img src="../../assets/images/art/presets/solfeggio-528.jpg"><div class="tx"><b>Sevgi Frekansı</b><span><span class="eq"><i style="height:5px"></i><i style="height:12px"></i><i style="height:8px"></i></span><span class="mono">528 Hz</span> · çalıyor</span></div><span class="end fav"><svg width="22" height="22"><use href="#heart-f"/></svg></span></div>
+      <div class="r"><img src="../../assets/images/art/presets/solfeggio-852.jpg"><div class="tx"><b>Sezgi</b><span><span class="mono">852 Hz</span></span></div><span class="end"><svg width="22" height="22"><use href="#heart"/></svg></span></div>
+      <div class="r"><img src="../../assets/images/art/presets/solfeggio-432.jpg"><div class="tx"><b>Doğal Uyum</b><span><span class="mono">432 Hz</span></span></div><span class="end fav"><svg width="22" height="22"><use href="#heart-f"/></svg></span></div>
+      <div class="r lock"><img src="../../assets/images/art/presets/solfeggio-963.jpg"><div class="tx"><b>Kozmik Bilinç</b><span><span class="mono">963 Hz</span></span></div><span class="end"><svg width="20" height="20"><use href="#lock"/></svg></span></div>
+      <div class="r lock"><img src="../../assets/images/art/presets/solfeggio-741.jpg"><div class="tx"><b>İfade</b><span><span class="mono">741 Hz</span></span></div><span class="end"><svg width="20" height="20"><use href="#lock"/></svg></span></div>
+    </div>
+  </div>
+  <div class="mini"><img src="../../assets/images/art/presets/solfeggio-528.jpg"><div class="t"><b>Sevgi Frekansı</b><span>38:12 sonra kısılacak</span></div><div class="pp"><svg width="20" height="20"><use href="#pause"/></svg></div><div class="prog"></div></div>
+  <div class="tabbar">
+    <div class="tab"><span class="pill"><svg><use href="#home"/></svg></span>Ana sayfa</div>
+    <div class="tab on"><span class="pill"><svg><use href="#wave"/></svg></span>Sesler</div>
+    <div class="tab"><span class="pill"><svg><use href="#layers"/></svg></span>Mikser</div>
+    <div class="tab"><span class="pill"><svg><use href="#gear"/></svg></span>Ayarlar</div>
+  </div>
+</div><div class="caption">Sesler</div></div>
+
+<!-- PLAYER: FREQUENCY -->
+<div class="wrap"><div class="phone player">
+  <div class="art"><img src="../../assets/images/art/presets/solfeggio-528.jpg"></div>
+  <div class="status"><span>01:15</span><svg width="44" height="14"><use href="#sys"/></svg></div>
+  <div class="top"><div class="ib"><svg width="24" height="24"><use href="#down"/></svg></div><div class="ib" style="color:var(--violet)"><svg width="22" height="22"><use href="#heart-f"/></svg></div></div>
+  <div class="pb">
+    <div class="pbig"><b>528</b><small>Hz</small></div>
+    <div class="pmeta">Sevgi Frekansı · Solfeggio</div>
+    <div class="ctrl">
+      <div class="ring"><svg class="r2" width="84" height="84"><circle cx="42" cy="42" r="39" stroke="var(--line)" stroke-width="3" fill="none"/><circle cx="42" cy="42" r="39" stroke="var(--violet)" stroke-width="3" fill="none" stroke-dasharray="245" stroke-dashoffset="38" stroke-linecap="round"/></svg>
+        <div class="fab"><svg width="28" height="28"><use href="#pause"/></svg></div></div>
+      <div class="left"><b>38:12</b><span>sonra yavaşça kısılacak</span></div>
+    </div>
+    <div class="tbtn"><svg class="ic" width="20" height="20"><use href="#clock"/></svg>Zamanlayıcı: 45 dk<svg class="ch" width="18" height="18"><use href="#chev"/></svg></div>
+    <div class="more-link"><svg width="20" height="20"><use href="#plus"/></svg>Üstüne başka ses ekle</div>
+  </div>
+</div><div class="caption">Oynatıcı · frekans</div></div>
+
+<!-- PLAYER: NATURE -->
+<div class="wrap"><div class="phone player">
+  <div class="art"><img src="../../assets/images/art/presets/noise-fire.jpg"></div>
+  <div class="status"><span>23:48</span><svg width="44" height="14"><use href="#sys"/></svg></div>
+  <div class="top"><div class="ib"><svg width="24" height="24"><use href="#down"/></svg></div><div class="ib"><svg width="22" height="22"><use href="#heart"/></svg></div></div>
+  <div class="pb" style="top:318px">
+    <div class="pbig"><b style="font-size:84px">Ateş</b></div>
+    <div class="pmeta">Doğa sesi · şömine çıtırtısı</div>
+    <div class="ctrl">
+      <div class="ring"><svg class="r2" width="84" height="84"><circle cx="42" cy="42" r="39" stroke="var(--line)" stroke-width="3" fill="none"/></svg>
+        <div class="fab"><svg width="28" height="28"><use href="#pause"/></svg></div></div>
+      <div class="left"><b style="font:400 24px 'Young Serif', 'PT Serif'">Kapanmayacak</b><span>sen durdurana kadar çalar</span></div>
+    </div>
+    <div class="tbtn"><svg class="ic" width="20" height="20"><use href="#clock"/></svg>Zamanlayıcı kur<svg class="ch" width="18" height="18"><use href="#chev"/></svg></div>
+    <div class="more-link"><svg width="20" height="20"><use href="#plus"/></svg>Üstüne başka ses ekle</div>
+  </div>
+</div><div class="caption">Oynatıcı · doğa sesi</div></div>
+
+<!-- EMPTY MIXER -->
+<div class="wrap"><div class="phone">
+  <div class="status"><span>22:05</span><svg width="44" height="14"><use href="#sys"/></svg></div>
+  <div class="mix">
+    <h1>Mikser</h1>
+    <div class="empty">
+      <div class="ph"><img src="../../assets/images/art/presets/noise-rain.jpg"></div>
+      <div class="bd">
+        <h3>Kendi gece sesini kur</h3>
+        <p>4 sese kadar üst üste koy, seviyelerini ayarla, kaydet. Bir dahakine tek dokunuşla açılır.</p>
+        <div class="btn"><svg width="18" height="18"><use href="#plus"/></svg>İlk sesi ekle</div>
+      </div>
+    </div>
+    <div class="sug"><h2>Ya da hazır bir karışımla başla</h2>
+      <div class="r"><img src="../../assets/images/art/presets/noise-ocean.jpg"><div class="tx"><b>Okyanus + Delta</b><span>Derin uyku için</span></div><span class="end"><svg width="20" height="20"><use href="#play"/></svg></span></div>
+      <div class="r"><img src="../../assets/images/art/presets/noise-forest.jpg"><div class="tx"><b>Orman + 432 Hz</b><span>Sakinleşmek için</span></div><span class="end"><svg width="20" height="20"><use href="#play"/></svg></span></div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <div class="tab"><span class="pill"><svg><use href="#home"/></svg></span>Ana sayfa</div>
+    <div class="tab"><span class="pill"><svg><use href="#wave"/></svg></span>Sesler</div>
+    <div class="tab on"><span class="pill"><svg><use href="#layers"/></svg></span>Mikser</div>
+    <div class="tab"><span class="pill"><svg><use href="#gear"/></svg></span>Ayarlar</div>
+  </div>
+</div><div class="caption">Mikser · boş hali</div></div>
+
+<!-- PREMIUM -->
+<div class="wrap"><div class="phone prem">
+  <div class="bg"><img src="../../assets/images/art/presets/solfeggio-963.jpg"></div>
+  <div class="status"><span>21:40</span><svg width="44" height="14"><use href="#sys"/></svg></div>
+  <div class="in">
+    <div class="x"><div class="ib"><svg width="20" height="20"><use href="#x"/></svg></div></div>
+    <h1>Tüm kütüphane senin olsun</h1>
+    <p>Doğa sesleri ve 7 frekans zaten ücretsiz. Premium 13 ses daha ekler:</p>
+    <div class="grid">
+      <div class="tile"><img src="../../assets/images/art/presets/solfeggio-963.jpg"><b>Kozmik<br>Bilinç</b><span>963 Hz</span></div>
+      <div class="tile"><img src="../../assets/images/art/presets/solfeggio-741.jpg"><b>İfade</b><span>741 Hz</span></div>
+      <div class="tile"><img src="../../assets/images/art/presets/solfeggio-639.jpg"><b>İlişkiler</b><span>639 Hz</span></div>
+      <div class="tile"><img src="../../assets/images/art/presets/binaural-gamma.jpg"><b>Gamma</b><span>40 Hz</span></div>
+      <div class="tile"><img src="../../assets/images/art/presets/solfeggio-174.jpg"><b>Rahatlama</b><span>174 Hz</span></div>
+      <div class="tile more"><b>+8</b></div>
+    </div>
+    <div class="plans">
+      <div class="plan on"><span class="rb"></span><div class="t"><b>Yıllık</b><span class="badge">7 gün ücretsiz</span><span class="s">Ayda $2,50'ye denk</span></div><div class="pr">$29.99</div></div>
+      <div class="plan"><span class="rb"></span><div class="t"><b>Aylık</b><span class="s">İstediğin an iptal</span></div><div class="pr">$4.99</div></div>
+      <div class="plan"><span class="rb"></span><div class="t"><b>Ömür boyu</b><span class="s">Tek ödeme</span></div><div class="pr">$49.99</div></div>
+    </div>
+  </div>
+  <div class="buy"><div class="terms">7 gün ücretsiz, sonra yılda <b class="mono">$29.99</b></div><div class="btn">Ücretsiz denemeyi başlat</div><div class="fine"><span>Deneme içinde iptal edersen ücret yok</span><span>Geri yükle</span></div></div>
+</div><div class="caption">Premium</div></div>
+
+</body>
+</html>
