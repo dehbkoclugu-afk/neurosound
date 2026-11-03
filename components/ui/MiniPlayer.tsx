@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/hooks/use-theme-colors';
@@ -129,6 +130,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
         {/* The sound's own artwork: the bar is recognisable before it is read. */}
         <Image
           source={artwork.source(currentPreset ? presetArt(currentPreset.id) : presetArt(mixerChannels[0]?.preset.id ?? ''))}
+          cachePolicy="memory-disk"
           style={[styles.thumb, { backgroundColor: colors.cardBorder }]}
         />
         {/* A pressable row wrapping the play/stop buttons would nest

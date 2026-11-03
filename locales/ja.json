@@ -145,7 +145,7 @@
     "deleteMix": "ミックスを削除",
     "emptySlot": "空のチャンネル",
     "transportDisabled": "再生・保存するには音を追加してください。",
-    "trySample": "サンプルのミックスを試す",
+    "suggested": "または、用意されたミックスから始める",
     "mute": "ミュート",
     "channelsFull": "4/4 — 追加するには1つ外してください",
     "loaded": "読み込み済み",

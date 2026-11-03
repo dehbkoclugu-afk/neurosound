@@ -145,7 +145,7 @@
     "deleteMix": "删除混音",
     "emptySlot": "空声道",
     "transportDisabled": "添加一种声音后才能播放或保存这个混音。",
-    "trySample": "试试示例混音",
+    "suggested": "或者从现成的混音开始",
     "mute": "静音",
     "channelsFull": "4/4 — 移除一个才能再加",
     "loaded": "已载入",

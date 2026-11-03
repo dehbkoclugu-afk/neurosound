@@ -145,7 +145,7 @@
     "deleteMix": "Eliminar mezcla",
     "emptySlot": "Canal vacío",
     "transportDisabled": "Añade un sonido para reproducir o guardar esta mezcla.",
-    "trySample": "Probar una mezcla de ejemplo",
+    "suggested": "O empieza con una mezcla lista",
     "mute": "Silenciar",
     "channelsFull": "4 de 4 — quita uno para añadir otro",
     "loaded": "Cargada",

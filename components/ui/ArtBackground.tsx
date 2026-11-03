@@ -1,12 +1,12 @@
 import React, { ReactNode } from 'react';
 import {
-  ImageBackground,
   ImageSourcePropType,
   StyleProp,
   StyleSheet,
   View,
   ViewStyle,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
@@ -64,10 +64,19 @@ export function ArtBackground({
     return <View style={[styles.surface, style]}>{content}</View>;
   }
 
+  // expo-image, not ImageBackground: RN decoded the full 1774px artwork on
+  // every mount with no memory cache, so cards janked and flashed dark first.
   return (
-    <ImageBackground source={source} resizeMode="cover" style={[styles.surface, style]}>
+    <View style={[styles.surface, style]}>
+      <Image
+        source={source}
+        style={StyleSheet.absoluteFill}
+        contentFit="cover"
+        cachePolicy="memory-disk"
+        transition={150}
+      />
       {content}
-    </ImageBackground>
+    </View>
   );
 }
 

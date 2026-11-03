@@ -13,6 +13,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -76,11 +77,32 @@ function mixPresets(mix: {
     .filter((p): p is FrequencyPreset => p !== undefined);
 }
 
-// One-tap sample mix for the empty state
-const SAMPLE_MIX = [
-  { presetId: 'noise-rain', volume: 0.6 },
-  { presetId: 'noise-brown', volume: 0.35 },
-  { presetId: 'binaural-alpha', volume: 0.5 },
+// One-tap starter mixes for the empty state. Free presets only — a starter
+// that opens the paywall is bait. The row is named by its own sounds and the
+// intent it serves, so no extra strings per mix.
+const SUGGESTED_MIXES = [
+  {
+    intentKey: 'intents.sleep',
+    channels: [
+      { presetId: 'noise-rain', volume: 0.6 },
+      { presetId: 'noise-brown', volume: 0.35 },
+      { presetId: 'binaural-delta', volume: 0.5 },
+    ],
+  },
+  {
+    intentKey: 'intents.relax',
+    channels: [
+      { presetId: 'noise-forest', volume: 0.6 },
+      { presetId: 'solfeggio-432', volume: 0.4 },
+    ],
+  },
+  {
+    intentKey: 'intents.focus',
+    channels: [
+      { presetId: 'noise-white', volume: 0.3 },
+      { presetId: 'binaural-beta', volume: 0.5 },
+    ],
+  },
 ];
 
 export default function MixerScreen() {
@@ -314,12 +336,10 @@ export default function MixerScreen() {
           />
 
           {/* One invitation, not four ghost strips: "Empty channel" ×3 under
-              a greyed play button read as a broken screen. The scene is the
-              sample mix's own rain, so the card previews what one tap on
-              "try the sample" will sound like. */}
+              a greyed play button read as a broken screen. */}
           {isEmpty && (
             <ArtBackground
-              source={artwork.source(presetArt(SAMPLE_MIX[0].presetId))}
+              source={artwork.source(presetArt('noise-rain'))}
               style={styles.emptyCard}
               variant="card"
             >
@@ -339,14 +359,61 @@ export default function MixerScreen() {
                   onPress={() => setShowPresetPicker(true)}
                   icon={<Ionicons name="add" size={18} color={colors.onPrimary} />}
                 />
-                <Button
-                  title={t('mixer.trySample')}
-                  onPress={() => playerController.mixerLoadChannels(SAMPLE_MIX)}
-                  variant="ghost"
-                  textStyle={{ color: artwork.foreground.primary }}
-                />
               </View>
             </ArtBackground>
+          )}
+
+          {isEmpty && (
+            <View style={styles.suggested}>
+              <CategoryHeader title={t('mixer.suggested')} />
+              {SUGGESTED_MIXES.map((mix) => {
+                const presets = mixPresets(mix);
+                const title = presets.map((p) => t(p.nameKey)).join(' + ');
+                return (
+                  <TouchableOpacity
+                    key={mix.intentKey}
+                    onPress={() => {
+                      haptics.commit();
+                      playerController.mixerLoadChannels(mix.channels);
+                    }}
+                    activeOpacity={0.6}
+                    style={[
+                      styles.suggestedRow,
+                      { borderBottomColor: colors.cardBorder },
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${title}, ${t(mix.intentKey)}`}
+                  >
+                    <Image
+                      source={artwork.source(presetArt(mix.channels[0].presetId))}
+                      cachePolicy="memory-disk"
+                      transition={150}
+                      style={[
+                        styles.suggestedThumb,
+                        { backgroundColor: colors.cardBorder },
+                      ]}
+                    />
+                    <View style={styles.mixTextContainer}>
+                      <Text
+                        style={[styles.mixName, { color: colors.text }]}
+                        numberOfLines={2}
+                      >
+                        {title}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.suggestedIntent,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        {t(mix.intentKey)}
+                      </Text>
+                    </View>
+                    <Ionicons name="play" size={20} color={colors.accent} />
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           )}
 
           {channels.map((channel) => (
@@ -992,6 +1059,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     marginTop: Spacing.sm,
+  },
+  suggested: {
+    marginTop: Spacing.xl,
+  },
+  suggestedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    minHeight: 72,
+    paddingVertical: Spacing.sm + 2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  suggestedThumb: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+  },
+  suggestedIntent: {
+    ...Typography.footnote,
   },
   presetItem: {
     flexDirection: 'row',

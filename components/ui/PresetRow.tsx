@@ -11,8 +11,8 @@ import {
   Text,
   StyleSheet,
   ViewStyle,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -222,6 +222,8 @@ export function PresetRow({
       <View style={[styles.row, { borderBottomColor: colors.cardBorder }]}>
         <Image
           source={artwork.source(presetArt(preset.id))}
+          cachePolicy="memory-disk"
+          transition={150}
           style={[
             styles.thumb,
             { backgroundColor: colors.cardBorder },
