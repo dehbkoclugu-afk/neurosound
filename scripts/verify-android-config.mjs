@@ -16,8 +16,10 @@ if (android.allowBackup !== false) errors.push('android.allowBackup must be fals
 for (const permission of blocked) {
   if (!android.blockedPermissions?.includes(permission)) errors.push(`missing ${permission}`);
 }
-if (!audio || audio[1]?.recordAudioAndroid !== false || audio[1]?.microphonePermission !== false) {
-  errors.push('expo-audio recording and microphone must be disabled');
+// microphonePermission only writes the iOS purpose string (needed there so the
+// upload is not rejected for linked recording APIs); Android is gated here.
+if (!audio || audio[1]?.recordAudioAndroid !== false) {
+  errors.push('expo-audio Android recording must be disabled');
 }
 // Blocking RECORD_AUDIO is not enough: expo-audio's plugin leaves its
 // AudioRecordingService in the manifest, declared foregroundServiceType

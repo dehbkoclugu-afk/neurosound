@@ -70,14 +70,14 @@
       "beta": "Beta (14-30 Hz)",
       "betaDesc": "Focus, concentration",
       "gamma": "Gamma (30-100 Hz)",
-      "gammaDesc": "Higher cognitive functions"
+      "gammaDesc": "Fast, bright rhythm"
     },
     "solfeggioFreqs": {
       "40": "Gamma Focus",
       "111": "Deep Calm",
       "174": "Relaxation",
       "285": "Renewal",
-      "396": "Liberation from Fear",
+      "396": "Letting Go",
       "417": "Facilitating Change",
       "432": "Natural Harmony",
       "440": "Standard Pitch",

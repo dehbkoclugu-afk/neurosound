@@ -70,14 +70,14 @@
       "beta": "Beta (14-30 Hz)",
       "betaDesc": "Odaklanma, konsantrasyon",
       "gamma": "Gamma (30-100 Hz)",
-      "gammaDesc": "Yüksek bilişsel işlevler"
+      "gammaDesc": "Hızlı, parlak ritim"
     },
     "solfeggioFreqs": {
       "40": "Gamma Odak",
       "111": "Derin Dinginlik",
       "174": "Rahatlama",
       "285": "Yenilenme Hissi",
-      "396": "Korkudan Arınma",
+      "396": "Bırakış",
       "417": "Değişimi Kolaylaştırma",
       "432": "Doğal Uyum",
       "440": "Standart Akort",

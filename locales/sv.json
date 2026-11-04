@@ -70,14 +70,14 @@
       "beta": "Beta (14-30 Hz)",
       "betaDesc": "Fokus, koncentration",
       "gamma": "Gamma (30-100 Hz)",
-      "gammaDesc": "Högre kognitiva funktioner"
+      "gammaDesc": "Snabb, ljus rytm"
     },
     "solfeggioFreqs": {
       "40": "Gammafokus",
       "111": "Djupt lugn",
       "174": "Avslappning",
       "285": "Förnyelse",
-      "396": "Befrielse från rädsla",
+      "396": "Släppa taget",
       "417": "Öppning för förändring",
       "432": "Naturlig harmoni",
       "440": "Standardstämning",

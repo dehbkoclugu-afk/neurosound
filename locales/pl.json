@@ -70,14 +70,14 @@
       "beta": "Beta (14-30 Hz)",
       "betaDesc": "Skupienie, koncentracja",
       "gamma": "Gamma (30-100 Hz)",
-      "gammaDesc": "Wyższe funkcje poznawcze"
+      "gammaDesc": "Szybki, jasny rytm"
     },
     "solfeggioFreqs": {
       "40": "Skupienie gamma",
       "111": "Głęboki spokój",
       "174": "Odprężenie",
       "285": "Odnowa",
-      "396": "Uwolnienie od lęku",
+      "396": "Odpuszczanie",
       "417": "Otwarcie na zmianę",
       "432": "Naturalna harmonia",
       "440": "Strój wzorcowy",
