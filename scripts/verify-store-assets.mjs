@@ -11,8 +11,11 @@
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+// fileURLToPath, not .pathname: the pathname stays percent-encoded, so a
+// checkout under a non-ASCII folder ("Masaüstü") resolved to no files at all.
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const PHONE = join(ROOT, 'store/google-play/assets/phone');
 
 // Play: each screenshot side 320–3840 px, between 2 and 8 per locale, and the

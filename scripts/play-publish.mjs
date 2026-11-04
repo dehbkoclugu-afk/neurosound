@@ -23,8 +23,10 @@ import { createReadStream } from 'node:fs';
 import { google } from 'googleapis';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+// .pathname stays percent-encoded and breaks under non-ASCII folders.
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const STORE = join(ROOT, 'store/google-play');
 const PACKAGE = process.env.PACKAGE_NAME || 'com.dehbkoclugu.neurosound';
 const DRY_RUN = process.env.DRY_RUN !== '0';
