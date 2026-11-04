@@ -6,6 +6,7 @@ on:
     paths:
       - docs/privacy.html
       - docs/support.html
+      - docs/terms.html
       - .github/workflows/privacy-pages.yml
   workflow_dispatch:
 
