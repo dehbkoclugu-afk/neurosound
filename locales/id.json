@@ -221,8 +221,10 @@
     "summaryBody": "852Hz tidak mengumpulkan, menyimpan, atau mengirim data kamu. Semua yang kamu lakukan di aplikasi ini — favorit, mix buatanmu, dan pengaturan — tetap ada di perangkatmu.",
     "dataTitle": "Apa yang disimpan aplikasi",
     "dataBody": "Favorit, mix tersimpan, dan preferensimu (tema, bahasa, volume, pengaturan aksesibilitas) disimpan secara lokal di perangkatmu. Cadangan cloud Android dinonaktifkan. Data ini tidak pernah dikirim kepada kami atau siapa pun, dan terhapus saat kamu mencopot aplikasi atau memakai Atur ulang data di Pengaturan.",
+    "dataBody_ios": "Favorit, mix tersimpan, dan preferensi (tema, bahasa, volume, aksesibilitas) disimpan secara lokal di perangkat dan dapat ikut dalam cadangan iCloud jika diaktifkan. Data ini tidak pernah dikirim kepada kami dan dihapus jika Anda menghapus aplikasi.",
     "networkTitle": "Akses jaringan",
     "networkBody": "Suara diputar sepenuhnya offline. Satu-satunya akses jaringan adalah layanan penagihan Google Play, saat kamu membuka layar Premium, membeli, atau memulihkan pembelian. 852Hz sendiri tidak mengirim apa pun ke server, layanan analitik, atau pihak ketiga.",
+    "networkBody_ios": "Suara diputar sepenuhnya offline. Satu-satunya akses jaringan adalah layanan pembayaran App Store milik Apple, yang digunakan saat Anda membuka layar Premium, membeli, atau memulihkan pembelian. 852Hz sendiri tidak mengirim apa pun ke server, layanan analitik, atau pihak ketiga.",
     "accountsTitle": "Akun dan pengenal",
     "accountsBody": "Tidak ada akun pengguna, proses masuk, atau pengenal pelacakan. Kami tidak punya cara untuk mengenali kamu atau mengaitkan pemakaian denganmu.",
     "childrenTitle": "Anak-anak",
@@ -291,6 +293,8 @@
     "error": "Pembelian tidak dapat diselesaikan. Coba lagi.",
     "unavailable": "Premium sedang tidak tersedia. Periksa koneksi lalu coba lagi.",
     "legal": "Langganan diperpanjang otomatis hingga dibatalkan. Batalkan kapan saja di Google Play › Langganan. Pembayaran ditagihkan ke akun Google Play kamu.",
+    "legal_ios": "Langganan diperpanjang otomatis kecuali dibatalkan paling lambat 24 jam sebelum periode berjalan berakhir. Pembayaran ditagihkan ke Apple ID Anda. Kelola atau batalkan kapan saja di pengaturan akun App Store.",
+    "termsOfUse": "Ketentuan Penggunaan",
     "bestValue": "Paling hemat",
     "trialTerms": "Gratis 7 hari, lalu {{price}}"
   }

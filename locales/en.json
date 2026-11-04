@@ -221,8 +221,10 @@
     "summaryBody": "852Hz doesn't collect, store, or transmit any of your data. Everything you do in this app — favourites, custom mixes, and settings — stays on your device.",
     "dataTitle": "What the app stores",
     "dataBody": "Your favourites, saved mixes, and preferences (theme, language, volume, accessibility settings) are saved locally on your device. Android cloud backup is disabled. This data is never sent to us or anyone else and is deleted if you uninstall the app or use Reset data in Settings.",
+    "dataBody_ios": "Your favourites, saved mixes, and preferences (theme, language, volume, accessibility settings) are saved locally on your device and may be included in your iCloud backup if you have it turned on. This data is never sent to us and is deleted if you uninstall the app.",
     "networkTitle": "Network access",
     "networkBody": "Sounds play fully offline. The only network access is Google Play’s own billing service, used when you open the Premium screen, buy, or restore a purchase. 852Hz itself sends nothing to any server, analytics service, or third party.",
+    "networkBody_ios": "Sounds play fully offline. The only network access is Apple’s App Store billing service, used when you open the Premium screen, buy, or restore a purchase. 852Hz itself sends nothing to any server, analytics service, or third party.",
     "accountsTitle": "Accounts and identifiers",
     "accountsBody": "There are no user accounts, sign-ins, or tracking identifiers. We have no way to identify you or link your usage to you.",
     "childrenTitle": "Children",
@@ -291,6 +293,8 @@
     "error": "The purchase could not be completed. Please try again.",
     "unavailable": "Premium isn't available right now. Check your connection and try again.",
     "legal": "Subscriptions renew automatically until cancelled. Cancel anytime in Google Play › Subscriptions. Payment is charged to your Google Play account.",
+    "legal_ios": "Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period. Payment is charged to your Apple ID. Manage or cancel anytime in your App Store account settings.",
+    "termsOfUse": "Terms of Use",
     "bestValue": "Best value",
     "trialTerms": "7 days free, then {{price}}"
   }

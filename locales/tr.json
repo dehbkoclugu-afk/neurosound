@@ -221,8 +221,10 @@
     "summaryBody": "852Hz hiçbir verinizi toplamaz, saklamaz ya da başka bir yere göndermez. Uygulamada yaptığınız her şey — favoriler, özel karışımlar ve ayarlar — yalnızca cihazınızda kalır.",
     "dataTitle": "Uygulama neyi saklıyor",
     "dataBody": "Favorileriniz, kaydettiğiniz karışımlar ve tercihleriniz cihazınızda yerel olarak saklanır. Android bulut yedeklemesi kapalıdır. Bu veriler bize veya üçüncü taraflara gönderilmez; uygulamayı kaldırdığınızda ya da Verileri sıfırla seçeneğini kullandığınızda silinir.",
+    "dataBody_ios": "Favorilerin, kayıtlı karışımların ve tercihlerin (tema, dil, ses düzeyi, erişilebilirlik ayarları) cihazında yerel olarak saklanır; iCloud yedeklemesi açıksa bu yedeğe dahil olabilir. Bu veriler bize asla gönderilmez ve uygulamayı kaldırdığında silinir.",
     "networkTitle": "Ağ erişimi",
     "networkBody": "Sesler tamamen çevrimdışı çalar. Tek ağ erişimi, Premium ekranını açtığında, satın aldığında veya satın alımı geri yüklediğinde kullanılan Google Play faturalandırma hizmetidir. 852Hz kendisi hiçbir sunucuya, analiz hizmetine veya üçüncü tarafa veri göndermez.",
+    "networkBody_ios": "Sesler tamamen çevrimdışı çalar. Tek ağ erişimi, Premium ekranını açtığında, satın aldığında veya satın alımı geri yüklediğinde kullanılan Apple App Store ödeme hizmetidir. 852Hz kendisi hiçbir sunucuya, analiz hizmetine veya üçüncü tarafa veri göndermez.",
     "accountsTitle": "Hesaplar ve kimlikler",
     "accountsBody": "Kullanıcı hesabı, giriş ya da takip kimliği yoktur. Sizi tanımlamamızın ya da kullanımınızı size bağlamamızın hiçbir yolu yoktur.",
     "childrenTitle": "Çocuklar",
@@ -291,6 +293,8 @@
     "error": "Satın alma tamamlanamadı. Lütfen tekrar dene.",
     "unavailable": "Premium şu anda kullanılamıyor. Bağlantını kontrol edip tekrar dene.",
     "legal": "Abonelikler iptal edilene kadar otomatik yenilenir. Google Play › Abonelikler bölümünden istediğin zaman iptal edebilirsin. Ödeme Google Play hesabından alınır.",
+    "legal_ios": "Abonelikler, mevcut dönemin bitiminden en az 24 saat önce iptal edilmezse otomatik olarak yenilenir. Ödeme Apple Kimliğinizden alınır. İstediğiniz zaman App Store hesap ayarlarından yönetebilir veya iptal edebilirsiniz.",
+    "termsOfUse": "Kullanım Koşulları",
     "bestValue": "En avantajlı",
     "trialTerms": "7 gün ücretsiz, sonra {{price}}"
   }

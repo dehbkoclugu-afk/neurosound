@@ -221,8 +221,10 @@
     "summaryBody": "852Hz samlar inte in, lagrar eller skickar några av dina uppgifter. Allt du gör i appen — favoriter, egna mixar och inställningar — stannar på din enhet.",
     "dataTitle": "Vad appen sparar",
     "dataBody": "Dina favoriter, sparade mixar och inställningar (tema, språk, volym, tillgänglighetsval) sparas lokalt på din enhet. Androids molnsäkerhetskopiering är avstängd. Uppgifterna skickas aldrig till oss eller någon annan och försvinner om du avinstallerar appen eller använder Nollställ data i inställningarna.",
+    "dataBody_ios": "Dina favoriter, sparade mixar och inställningar (tema, språk, volym, tillgänglighet) sparas lokalt på enheten och kan ingå i din iCloud-säkerhetskopia om den är påslagen. Uppgifterna skickas aldrig till oss och raderas om du avinstallerar appen.",
     "networkTitle": "Nätverksåtkomst",
     "networkBody": "Ljuden spelas helt offline. Den enda nätverksåtkomsten är Google Plays betaltjänst, när du öppnar Premium-skärmen, köper eller återställer ett köp. 852Hz skickar själv ingenting till någon server, analystjänst eller tredje part.",
+    "networkBody_ios": "Ljuden spelas helt offline. Den enda nätverksåtkomsten är Apples App Store-betaltjänst, som används när du öppnar Premium-skärmen, köper eller återställer ett köp. 852Hz skickar själv ingenting till någon server, analystjänst eller tredje part.",
     "accountsTitle": "Konton och identifierare",
     "accountsBody": "Det finns inga användarkonton, ingen inloggning och inga spårningsidentifierare. Vi har inget sätt att känna igen dig eller koppla användningen till dig.",
     "childrenTitle": "Barn",
@@ -291,6 +293,8 @@
     "error": "Köpet kunde inte slutföras. Försök igen.",
     "unavailable": "Premium är inte tillgängligt just nu. Kontrollera anslutningen och försök igen.",
     "legal": "Prenumerationer förnyas automatiskt tills de sägs upp. Säg upp när som helst i Google Play › Prenumerationer. Betalningen dras från ditt Google Play-konto.",
+    "legal_ios": "Prenumerationer förnyas automatiskt om de inte sägs upp minst 24 timmar före den aktuella periodens slut. Betalningen debiteras ditt Apple-ID. Hantera eller säg upp när som helst i inställningarna för ditt App Store-konto.",
+    "termsOfUse": "Användarvillkor",
     "bestValue": "Bästa pris",
     "trialTerms": "7 dagar gratis, sedan {{price}}"
   }

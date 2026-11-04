@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.dehbkoclugu.neurosound",
       "infoPlist": {
         "_localizationsNote": "Without CFBundleLocalizations iOS reports the app as English-only: the App Store listing shows no other languages and the system picks en for a device set to, say, Japanese even though ja.json exists. Keep in sync with locales/index.ts.",
@@ -36,6 +36,7 @@
           "sv",
           "ro"
         ],
+        "ITSAppUsesNonExemptEncryption": false,
         "UIBackgroundModes": [
           "audio"
         ]

@@ -221,8 +221,10 @@
     "summaryBody": "O 852Hz não coleta, não armazena e não transmite nenhum dado seu. Tudo o que você faz neste app — favoritos, mixagens personalizadas e ajustes — fica no seu dispositivo.",
     "dataTitle": "O que o app armazena",
     "dataBody": "Favoritos, mixagens e ajustes ficam armazenados localmente. O backup em nuvem do Android está desativado. Os dados não são enviados para nós nem para terceiros e são apagados ao desinstalar ou redefinir o app.",
+    "dataBody_ios": "Seus favoritos, mixes salvos e preferências (tema, idioma, volume, acessibilidade) ficam salvos localmente no dispositivo e podem ser incluídos no backup do iCloud, se estiver ativado. Esses dados nunca são enviados para nós e são apagados se você desinstalar o app.",
     "networkTitle": "Acesso à rede",
     "networkBody": "Os sons tocam totalmente offline. O único acesso à rede é o serviço de faturamento do Google Play, quando você abre a tela Premium, compra ou restaura uma compra. O 852Hz não envia nada a nenhum servidor, serviço de análise ou terceiro.",
+    "networkBody_ios": "Os sons tocam totalmente offline. O único acesso à rede é o serviço de pagamento da App Store da Apple, usado ao abrir a tela Premium, comprar ou restaurar uma compra. O 852Hz não envia nada a nenhum servidor, serviço de análise ou terceiro.",
     "accountsTitle": "Contas e identificadores",
     "accountsBody": "Não há contas de usuário, logins nem identificadores de rastreamento. Não temos como identificar você nem vincular seu uso a você.",
     "childrenTitle": "Crianças",
@@ -291,6 +293,8 @@
     "error": "Não foi possível concluir a compra. Tente novamente.",
     "unavailable": "O Premium não está disponível agora. Verifique sua conexão e tente novamente.",
     "legal": "As assinaturas são renovadas automaticamente até o cancelamento. Cancele quando quiser em Google Play › Assinaturas. O pagamento é cobrado na sua conta do Google Play.",
+    "legal_ios": "As assinaturas são renovadas automaticamente, a menos que sejam canceladas pelo menos 24 horas antes do fim do período atual. O pagamento é cobrado no seu ID Apple. Gerencie ou cancele quando quiser nos ajustes da sua conta da App Store.",
+    "termsOfUse": "Termos de Uso",
     "bestValue": "Melhor preço",
     "trialTerms": "7 dias grátis, depois {{price}}"
   }

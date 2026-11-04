@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,9 @@ import { contentColumn } from '@/constants/layout';
 // policy's own "last updated" date without a second constant to keep in sync.
 const LAST_UPDATED = '2026-11-01';
 
+// Bodies are read with { context: Platform.OS }: `dataBody_ios` and
+// `networkBody_ios` name Apple and iCloud; any platform without its own
+// variant falls back to the plain (Play) text.
 const SECTIONS = [
   ['summaryTitle', 'summaryBody'],
   ['dataTitle', 'dataBody'],
@@ -52,7 +55,7 @@ export default function PrivacyScreen() {
         {SECTIONS.map(([titleKey, bodyKey]) => (
           <View key={titleKey} style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{t(`privacy.${titleKey}`)}</Text>
-            <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>{t(`privacy.${bodyKey}`)}</Text>
+            <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>{t(`privacy.${bodyKey}`, { context: Platform.OS })}</Text>
           </View>
         ))}
       </ScrollView>

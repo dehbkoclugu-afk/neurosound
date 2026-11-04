@@ -221,8 +221,10 @@
     "summaryBody": "852Hz nu colectează, nu stochează și nu trimite niciun fel de date despre tine. Tot ce faci în aplicație — favorite, mixuri proprii și setări — rămâne pe dispozitivul tău.",
     "dataTitle": "Ce salvează aplicația",
     "dataBody": "Favoritele, mixurile salvate și preferințele tale (temă, limbă, volum, setări de accesibilitate) sunt păstrate local pe dispozitiv. Copia de rezervă în cloud a Android este dezactivată. Aceste date nu ajung niciodată la noi sau la altcineva și dispar dacă dezinstalezi aplicația sau folosești Resetează datele în Setări.",
+    "dataBody_ios": "Favoritele, mixurile salvate și preferințele (temă, limbă, volum, accesibilitate) sunt stocate local pe dispozitiv și pot fi incluse în backupul iCloud, dacă este activat. Aceste date nu ne sunt trimise niciodată și sunt șterse dacă dezinstalezi aplicația.",
     "networkTitle": "Acces la rețea",
     "networkBody": "Sunetele rulează complet offline. Singurul acces la rețea este serviciul de facturare Google Play, când deschizi ecranul Premium, cumperi sau restabilești o achiziție. 852Hz nu trimite nimic către vreun server, serviciu de analiză sau terț.",
+    "networkBody_ios": "Sunetele funcționează complet offline. Singurul acces la rețea este serviciul de plată al App Store de la Apple, folosit când deschizi ecranul Premium, cumperi sau restaurezi o achiziție. 852Hz nu trimite nimic către niciun server, serviciu de analiză sau terț.",
     "accountsTitle": "Conturi și identificatori",
     "accountsBody": "Nu există conturi de utilizator, autentificare sau identificatori de urmărire. Nu avem nicio cale să te recunoaștem sau să legăm utilizarea de tine.",
     "childrenTitle": "Copii",
@@ -291,6 +293,8 @@
     "error": "Achiziția nu a putut fi finalizată. Încearcă din nou.",
     "unavailable": "Premium nu este disponibil acum. Verifică conexiunea și încearcă din nou.",
     "legal": "Abonamentele se reînnoiesc automat până la anulare. Anulează oricând din Google Play › Abonamente. Plata se face din contul tău Google Play.",
+    "legal_ios": "Abonamentele se reînnoiesc automat dacă nu sunt anulate cu cel puțin 24 de ore înainte de sfârșitul perioadei curente. Plata se face din contul tău Apple ID. Gestionează sau anulează oricând din setările contului App Store.",
+    "termsOfUse": "Termeni de utilizare",
     "bestValue": "Cel mai avantajos",
     "trialTerms": "7 zile gratuit, apoi {{price}}"
   }

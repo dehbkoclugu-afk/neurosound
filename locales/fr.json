@@ -221,8 +221,10 @@
     "summaryBody": "852Hz ne collecte, ne stocke et ne transmet aucune de vos données. Tout ce que vous faites dans cette application — favoris, mix personnalisés et réglages — reste sur votre appareil.",
     "dataTitle": "Ce que l'application enregistre",
     "dataBody": "Vos favoris, mix et réglages sont stockés localement. La sauvegarde cloud Android est désactivée. Les données ne nous sont pas envoyées, ni à des tiers, et sont supprimées lors de la désinstallation ou de la réinitialisation.",
+    "dataBody_ios": "Vos favoris, mix enregistrés et préférences (thème, langue, volume, accessibilité) sont stockés localement sur votre appareil et peuvent être inclus dans votre sauvegarde iCloud si elle est activée. Ces données ne nous sont jamais envoyées et sont supprimées si vous désinstallez l’app.",
     "networkTitle": "Accès au réseau",
     "networkBody": "Les sons fonctionnent entièrement hors ligne. Le seul accès réseau est le service de facturation de Google Play, lorsque vous ouvrez l'écran Premium, achetez ou restaurez un achat. 852Hz n'envoie rien à aucun serveur, service d'analyse ou tiers.",
+    "networkBody_ios": "Les sons fonctionnent entièrement hors ligne. Le seul accès réseau est le service de paiement de l’App Store d’Apple, utilisé lorsque vous ouvrez l’écran Premium, achetez ou restaurez un achat. 852Hz n’envoie rien à aucun serveur, service d’analyse ou tiers.",
     "accountsTitle": "Comptes et identifiants",
     "accountsBody": "Il n'y a ni compte utilisateur, ni connexion, ni identifiant de suivi. Nous n'avons aucun moyen de vous identifier ou de relier votre usage à vous.",
     "childrenTitle": "Enfants",
@@ -291,6 +293,8 @@
     "error": "L'achat n'a pas pu aboutir. Veuillez réessayer.",
     "unavailable": "Premium n'est pas disponible pour le moment. Vérifiez votre connexion et réessayez.",
     "legal": "Les abonnements se renouvellent automatiquement jusqu'à résiliation. Résiliez à tout moment dans Google Play › Abonnements. Le paiement est débité de votre compte Google Play.",
+    "legal_ios": "Les abonnements se renouvellent automatiquement sauf résiliation au moins 24 heures avant la fin de la période en cours. Le paiement est débité sur votre identifiant Apple. Gérez ou résiliez à tout moment dans les réglages de votre compte App Store.",
+    "termsOfUse": "Conditions d’utilisation",
     "bestValue": "Meilleur prix",
     "trialTerms": "7 jours gratuits, puis {{price}}"
   }

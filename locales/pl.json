@@ -221,8 +221,10 @@
     "summaryBody": "852Hz nie zbiera, nie przechowuje ani nie przesyła żadnych Twoich danych. Wszystko, co robisz w aplikacji — ulubione, własne miksy i ustawienia — zostaje na Twoim urządzeniu.",
     "dataTitle": "Co aplikacja zapisuje",
     "dataBody": "Twoje ulubione, zapisane miksy i preferencje (motyw, język, głośność, ustawienia dostępności) są zapisywane lokalnie na urządzeniu. Kopia zapasowa w chmurze Androida jest wyłączona. Te dane nigdy nie trafiają do nas ani do nikogo innego i znikają po odinstalowaniu aplikacji lub użyciu opcji Zresetuj dane w Ustawieniach.",
+    "dataBody_ios": "Ulubione, zapisane miksy i preferencje (motyw, język, głośność, dostępność) są przechowywane lokalnie na urządzeniu i mogą trafić do kopii zapasowej iCloud, jeśli jest włączona. Te dane nigdy nie są do nas wysyłane i są usuwane po odinstalowaniu aplikacji.",
     "networkTitle": "Dostęp do sieci",
     "networkBody": "Dźwięki działają całkowicie offline. Jedyny dostęp do sieci to usługa płatności Google Play, gdy otwierasz ekran Premium, kupujesz lub przywracasz zakup. Sama aplikacja 852Hz nie wysyła niczego na żaden serwer, do usług analitycznych ani stron trzecich.",
+    "networkBody_ios": "Dźwięki działają całkowicie offline. Jedyny dostęp do sieci to usługa płatności App Store firmy Apple, używana przy otwieraniu ekranu Premium, zakupie lub przywracaniu zakupu. Sama aplikacja 852Hz nie wysyła niczego do żadnego serwera, usługi analitycznej ani podmiotu trzeciego.",
     "accountsTitle": "Konta i identyfikatory",
     "accountsBody": "Nie ma kont użytkowników, logowania ani identyfikatorów śledzących. Nie mamy żadnego sposobu, by Cię rozpoznać lub powiązać z Tobą korzystanie z aplikacji.",
     "childrenTitle": "Dzieci",
@@ -291,6 +293,8 @@
     "error": "Nie udało się dokończyć zakupu. Spróbuj ponownie.",
     "unavailable": "Premium jest teraz niedostępne. Sprawdź połączenie i spróbuj ponownie.",
     "legal": "Subskrypcje odnawiają się automatycznie do czasu anulowania. Anuluj w dowolnej chwili w Google Play › Subskrypcje. Płatność jest pobierana z Twojego konta Google Play.",
+    "legal_ios": "Subskrypcje odnawiają się automatycznie, jeśli nie zostaną anulowane co najmniej 24 godziny przed końcem bieżącego okresu. Płatność jest pobierana z Twojego Apple ID. Zarządzaj subskrypcją lub anuluj ją w dowolnej chwili w ustawieniach konta App Store.",
+    "termsOfUse": "Warunki korzystania",
     "bestValue": "Najlepsza cena",
     "trialTerms": "7 dni za darmo, potem {{price}}"
   }

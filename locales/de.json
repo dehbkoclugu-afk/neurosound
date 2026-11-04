@@ -221,8 +221,10 @@
     "summaryBody": "852Hz erhebt, speichert und überträgt keine deiner Daten. Alles, was du in dieser App tust — Favoriten, eigene Mixe und Einstellungen — bleibt auf deinem Gerät.",
     "dataTitle": "Was die App speichert",
     "dataBody": "Deine Favoriten, Mixe und Einstellungen werden lokal auf deinem Gerät gespeichert. Android-Cloud-Backups sind deaktiviert. Die Daten werden weder an uns noch an Dritte gesendet und beim Deinstallieren oder Zurücksetzen gelöscht.",
+    "dataBody_ios": "Deine Favoriten, gespeicherten Mixe und Einstellungen (Design, Sprache, Lautstärke, Bedienungshilfen) werden lokal auf deinem Gerät gespeichert und können in dein iCloud-Backup aufgenommen werden, wenn es aktiviert ist. Diese Daten werden nie an uns gesendet und beim Deinstallieren der App gelöscht.",
     "networkTitle": "Netzwerkzugriff",
     "networkBody": "Klänge laufen komplett offline. Der einzige Netzwerkzugriff ist der Abrechnungsdienst von Google Play, wenn du den Premium-Bildschirm öffnest, etwas kaufst oder einen Kauf wiederherstellst. 852Hz selbst sendet nichts an Server, Analysedienste oder Dritte.",
+    "networkBody_ios": "Sounds laufen vollständig offline. Der einzige Netzwerkzugriff ist der Abrechnungsdienst des Apple App Store, wenn du den Premium-Bildschirm öffnest, etwas kaufst oder einen Kauf wiederherstellst. 852Hz selbst sendet nichts an Server, Analysedienste oder Dritte.",
     "accountsTitle": "Konten und Kennungen",
     "accountsBody": "Es gibt keine Benutzerkonten, Anmeldungen oder Tracking-Kennungen. Wir haben keine Möglichkeit, dich zu identifizieren oder deine Nutzung mit dir zu verknüpfen.",
     "childrenTitle": "Kinder",
@@ -291,6 +293,8 @@
     "error": "Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
     "unavailable": "Premium ist gerade nicht verfügbar. Prüfe deine Verbindung und versuche es erneut.",
     "legal": "Abos verlängern sich automatisch, bis sie gekündigt werden. Jederzeit kündbar unter Google Play › Abos. Die Zahlung erfolgt über dein Google-Play-Konto.",
+    "legal_ios": "Abonnements verlängern sich automatisch, sofern sie nicht mindestens 24 Stunden vor Ende des aktuellen Zeitraums gekündigt werden. Die Zahlung wird über deine Apple-ID abgerechnet. Verwalten oder kündigen kannst du jederzeit in deinen App Store-Kontoeinstellungen.",
+    "termsOfUse": "Nutzungsbedingungen",
     "bestValue": "Bester Preis",
     "trialTerms": "7 Tage gratis, danach {{price}}"
   }

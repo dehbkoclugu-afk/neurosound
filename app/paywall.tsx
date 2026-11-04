@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
+  Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -54,7 +55,17 @@ const BENEFITS = ['benefitLibrary', 'benefitMix', 'benefitOffline'] as const;
 const HERO_PRESET = 'solfeggio-963';
 const PREVIEW_COUNT = 6;
 
-type StoreProduct = { id: string; displayPrice: string; subscriptionOfferDetailsAndroid?: unknown };
+type StoreProduct = {
+  id: string;
+  displayPrice: string;
+  subscriptionOfferDetailsAndroid?: unknown;
+  introductoryPricePaymentModeIOS?: string;
+};
+
+// Apple's standard EULA — App Review (3.1.2) wants a Terms of Use link next to
+// any auto-renewing subscription, and this is the default one App Store
+// Connect applies when no custom EULA is uploaded.
+const APPLE_EULA = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 type Offer = {
   offerToken: string;
   pricingPhases: { pricingPhaseList: { formattedPrice: string; priceAmountMicros: string }[] };
@@ -63,6 +74,17 @@ type Offer = {
 function toPlan(product: StoreProduct): Plan | null {
   const key = PLAN_ORDER.find((k) => PREMIUM_SKUS[k] === product.id);
   if (!key) return null;
+  if (Platform.OS === 'ios') {
+    // ponytail: StoreKit reports the configured intro offer, not this user's
+    // eligibility; Apple's own sheet shows the real price. Check
+    // isEligibleForIntroOfferIOS if returning users see a trial they lack.
+    return {
+      key,
+      sku: product.id,
+      price: product.displayPrice,
+      hasTrial: product.introductoryPricePaymentModeIOS === 'free-trial',
+    };
+  }
   const offers = (product.subscriptionOfferDetailsAndroid ?? []) as Offer[];
   // Play only lists offers this user is eligible for, so a zero-price phase
   // here means the trial is genuinely available to them.
@@ -340,7 +362,31 @@ export default function PaywallScreen() {
             <Text style={[styles.restoreText, { color: colors.accent }]}>{t('paywall.restore')}</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.legal, { color: colors.textSecondary }]}>{t('paywall.legal')}</Text>
+          <Text style={[styles.legal, { color: colors.textSecondary }]}>
+            {t('paywall.legal', { context: Platform.OS })}
+          </Text>
+          {Platform.OS === 'ios' && (
+            <View style={styles.links}>
+              <TouchableOpacity
+                onPress={() => Linking.openURL(APPLE_EULA)}
+                style={styles.link}
+                accessibilityRole="link"
+              >
+                <Text style={[styles.linkText, { color: colors.textSecondary }]}>
+                  {t('paywall.termsOfUse')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push('/privacy')}
+                style={styles.link}
+                accessibilityRole="link"
+              >
+                <Text style={[styles.linkText, { color: colors.textSecondary }]}>
+                  {t('settings.privacyPolicy')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -526,6 +572,20 @@ const styles = StyleSheet.create({
   legal: {
     ...Typography.caption,
     textAlign: 'center',
+  },
+  links: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: Spacing.md,
+  },
+  link: {
+    minHeight: AccessibilitySize.minTouchTarget,
+    justifyContent: 'center',
+  },
+  linkText: {
+    ...Typography.caption,
+    textDecorationLine: 'underline',
   },
   terms: {
     ...Typography.footnote,

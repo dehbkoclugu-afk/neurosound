@@ -221,8 +221,10 @@
     "summaryBody": "852Hz không thu thập, lưu trữ hay gửi đi bất kỳ dữ liệu nào của bạn. Mọi thứ bạn làm trong ứng dụng — mục yêu thích, bản trộn riêng và cài đặt — đều nằm lại trên thiết bị của bạn.",
     "dataTitle": "Ứng dụng lưu những gì",
     "dataBody": "Mục yêu thích, bản trộn đã lưu và tùy chọn của bạn (chủ đề, ngôn ngữ, âm lượng, cài đặt trợ năng) được lưu ngay trên thiết bị. Sao lưu đám mây của Android đã bị tắt. Dữ liệu này không bao giờ được gửi cho chúng tôi hay bất kỳ ai, và sẽ mất khi bạn gỡ ứng dụng hoặc dùng Đặt lại dữ liệu trong Cài đặt.",
+    "dataBody_ios": "Mục yêu thích, bản phối đã lưu và tùy chọn (giao diện, ngôn ngữ, âm lượng, trợ năng) được lưu cục bộ trên thiết bị và có thể nằm trong bản sao lưu iCloud nếu bạn bật tính năng này. Dữ liệu này không bao giờ được gửi cho chúng tôi và sẽ bị xóa khi bạn gỡ ứng dụng.",
     "networkTitle": "Truy cập mạng",
     "networkBody": "Âm thanh phát hoàn toàn ngoại tuyến. Kết nối mạng duy nhất là dịch vụ thanh toán của Google Play, khi bạn mở màn hình Premium, mua hoặc khôi phục giao dịch. Bản thân 852Hz không gửi gì đến máy chủ, dịch vụ phân tích hay bên thứ ba nào.",
+    "networkBody_ios": "Âm thanh phát hoàn toàn ngoại tuyến. Truy cập mạng duy nhất là dịch vụ thanh toán App Store của Apple, dùng khi bạn mở màn hình Premium, mua hoặc khôi phục giao dịch. Bản thân 852Hz không gửi gì đến máy chủ, dịch vụ phân tích hay bên thứ ba nào.",
     "accountsTitle": "Tài khoản và định danh",
     "accountsBody": "Không có tài khoản người dùng, không đăng nhập, không mã định danh theo dõi. Chúng tôi không có cách nào nhận ra bạn hay gắn việc sử dụng với bạn.",
     "childrenTitle": "Trẻ em",
@@ -291,6 +293,8 @@
     "error": "Không thể hoàn tất giao dịch. Vui lòng thử lại.",
     "unavailable": "Premium hiện không khả dụng. Hãy kiểm tra kết nối và thử lại.",
     "legal": "Gói đăng ký tự động gia hạn cho đến khi bạn hủy. Hủy bất cứ lúc nào trong Google Play › Gói đăng ký. Khoản thanh toán được tính vào tài khoản Google Play của bạn.",
+    "legal_ios": "Gói đăng ký tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kỳ hiện tại kết thúc. Khoản thanh toán được tính vào Apple ID của bạn. Bạn có thể quản lý hoặc hủy bất cứ lúc nào trong cài đặt tài khoản App Store.",
+    "termsOfUse": "Điều khoản sử dụng",
     "bestValue": "Tiết kiệm nhất",
     "trialTerms": "Miễn phí 7 ngày, sau đó {{price}}"
   }

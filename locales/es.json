@@ -221,8 +221,10 @@
     "summaryBody": "852Hz no recopila, almacena ni transmite ninguno de tus datos. Todo lo que haces en esta app —favoritos, mezclas personalizadas y ajustes— se queda en tu dispositivo.",
     "dataTitle": "Qué guarda la app",
     "dataBody": "Tus favoritos, mezclas y preferencias se guardan localmente. La copia de seguridad en la nube de Android está desactivada. Los datos no se envían a nosotros ni a terceros y se eliminan al desinstalar o restablecer la app.",
+    "dataBody_ios": "Tus favoritos, mezclas guardadas y preferencias (tema, idioma, volumen, ajustes de accesibilidad) se guardan localmente en tu dispositivo y pueden incluirse en tu copia de seguridad de iCloud si la tienes activada. Estos datos nunca se nos envían y se eliminan si desinstalas la app.",
     "networkTitle": "Acceso a la red",
     "networkBody": "Los sonidos se reproducen totalmente sin conexión. El único acceso a la red es el servicio de facturación de Google Play, al abrir la pantalla Premium, comprar o restaurar una compra. 852Hz no envía nada a ningún servidor, servicio de analítica ni tercero.",
+    "networkBody_ios": "Los sonidos se reproducen totalmente sin conexión. El único acceso a la red es el servicio de pagos del App Store de Apple, usado al abrir la pantalla Premium, comprar o restaurar una compra. 852Hz no envía nada a ningún servidor, servicio de analítica ni tercero.",
     "accountsTitle": "Cuentas e identificadores",
     "accountsBody": "No hay cuentas de usuario, inicios de sesión ni identificadores de seguimiento. No tenemos forma de identificarte ni de vincular tu uso contigo.",
     "childrenTitle": "Menores",
@@ -291,6 +293,8 @@
     "error": "No se pudo completar la compra. Inténtalo de nuevo.",
     "unavailable": "Premium no está disponible ahora mismo. Revisa tu conexión e inténtalo de nuevo.",
     "legal": "Las suscripciones se renuevan automáticamente hasta que las canceles. Cancela cuando quieras en Google Play › Suscripciones. El pago se carga a tu cuenta de Google Play.",
+    "legal_ios": "Las suscripciones se renuevan automáticamente salvo que se cancelen al menos 24 horas antes del final del período actual. El pago se carga a tu Apple ID. Gestiona o cancela cuando quieras en los ajustes de tu cuenta del App Store.",
+    "termsOfUse": "Términos de uso",
     "bestValue": "Mejor precio",
     "trialTerms": "7 días gratis, luego {{price}}"
   }

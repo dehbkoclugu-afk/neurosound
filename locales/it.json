@@ -221,8 +221,10 @@
     "summaryBody": "852Hz non raccoglie, non conserva e non trasmette alcun tuo dato. Tutto ciò che fai in questa app — preferiti, mix personalizzati e impostazioni — resta sul tuo dispositivo.",
     "dataTitle": "Cosa salva l'app",
     "dataBody": "Preferiti, mix e impostazioni sono salvati localmente. Il backup cloud Android è disattivato. I dati non vengono inviati a noi o a terzi e vengono eliminati disinstallando o azzerando l'app.",
+    "dataBody_ios": "Preferiti, mix salvati e preferenze (tema, lingua, volume, accessibilità) sono salvati localmente sul dispositivo e possono essere inclusi nel backup iCloud, se attivo. Questi dati non ci vengono mai inviati e vengono eliminati se disinstalli l’app.",
     "networkTitle": "Accesso alla rete",
     "networkBody": "I suoni funzionano completamente offline. L'unico accesso alla rete è il servizio di fatturazione di Google Play, quando apri la schermata Premium, acquisti o ripristini un acquisto. 852Hz non invia nulla a server, servizi di analisi o terze parti.",
+    "networkBody_ios": "I suoni funzionano completamente offline. L’unico accesso alla rete è il servizio di pagamento dell’App Store di Apple, usato quando apri la schermata Premium, acquisti o ripristini un acquisto. 852Hz non invia nulla a server, servizi di analisi o terze parti.",
     "accountsTitle": "Account e identificatori",
     "accountsBody": "Non esistono account, accessi o identificatori di tracciamento. Non abbiamo alcun modo di identificarti o di collegare a te il tuo utilizzo.",
     "childrenTitle": "Minori",
@@ -291,6 +293,8 @@
     "error": "Impossibile completare l'acquisto. Riprova.",
     "unavailable": "Premium non è disponibile ora. Controlla la connessione e riprova.",
     "legal": "Gli abbonamenti si rinnovano automaticamente fino alla disdetta. Puoi disdire quando vuoi in Google Play › Abbonamenti. Il pagamento viene addebitato sul tuo account Google Play.",
+    "legal_ios": "Gli abbonamenti si rinnovano automaticamente se non disdetti almeno 24 ore prima della fine del periodo in corso. Il pagamento viene addebitato sul tuo ID Apple. Gestisci o disdici in qualsiasi momento nelle impostazioni del tuo account App Store.",
+    "termsOfUse": "Condizioni d’uso",
     "bestValue": "Più conveniente",
     "trialTerms": "7 giorni gratis, poi {{price}}"
   }
