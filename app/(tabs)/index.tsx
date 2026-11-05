@@ -36,14 +36,13 @@ import { useIsPresetPlaying } from '@/hooks/use-is-preset-playing';
 import { contentColumn } from '@/constants/layout';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import { ArtBackground } from '@/components/ui/ArtBackground';
+import { Image } from 'expo-image';
 import { intentArt, stateArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import { lastNightMinutes } from '@/lib/lastNight';
 
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
-const ON_LEAD_BUTTON = '#15131A';
-const CARD_EDGE = 'rgba(255, 255, 255, 0.14)';
 
 // Recently played is a "pick up where you left off" shortcut, not an archive.
 // Three rows keep it above the fold; ten pushed favourites off the page and
@@ -70,7 +69,7 @@ export default function HomeScreen() {
   // Read once per mount, not on a ticking timer: this is a launcher, not a
   // clock, and re-rendering the list every minute would fight the user's
   // scroll for a change nobody is waiting to see.
-  const { intent: suggestedIntent, band } = useMemo(
+  const { intent: suggestedIntent } = useMemo(
     () => getSuggestedIntent(new Date().getHours()),
     [],
   );
@@ -92,8 +91,8 @@ export default function HomeScreen() {
 
   const today = new Date();
   const lastNight = lastNightMinutes(lastSession, today);
-  // The night art in both themes: copy on a card is always white, and the washed
-  // daylight versions turned these into stock photos on a white page.
+  // The night art in both themes: the washed daylight versions looked like stock
+  // photos on a white page.
   const cardShadow = artwork.scheme === 'light' ? styles.cardShadow : undefined;
 
   // AsyncStorage hydration must finish before the onboarding default is used.
@@ -214,54 +213,55 @@ export default function HomeScreen() {
             </Text>
           )}
 
-          <View style={[styles.leadShell, cardShadow]}>
-          <ArtBackground
-            source={intentArt(suggestedIntent.id).dark}
-            style={styles.leadCard}
-            variant="tile"
+          {/* Picture and words apart: a scrim for white text over the photo was what
+              turned every image to fog, and hid the Focus one altogether. */}
+          <View
+            style={[
+              styles.leadCard,
+              cardShadow,
+              { backgroundColor: colors.card, borderColor: colors.cardBorder },
+            ]}
           >
-            <View style={styles.leadTop}>
-              <Text style={[styles.leadKicker, { color: artwork.foreground.secondary }]}>
-                {t(`home.suggestedFor.${band}`)}
+            <Image
+              source={intentArt(suggestedIntent.id).dark}
+              style={styles.leadImage}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+            />
+            <View style={styles.leadBody}>
+              <View style={styles.leadTop}>
+                <TouchableOpacity
+                  onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
+                  style={styles.leadLink}
+                  accessibilityRole="link"
+                  accessibilityLabel={`${t(suggestedIntent.nameKey)}: ${t('home.allSounds')}`}
+                >
+                  <Text style={[styles.leadLinkText, { color: colors.text }]}>
+                    {t('home.allSounds')}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.leadName, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit>
+                {t(suggestedIntent.nameKey)}
               </Text>
-              {/* The card body no longer navigates, so the two targets on it
-                  are unambiguous: this link opens the intent, the button plays. */}
-              <TouchableOpacity
-                onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
-                style={styles.leadLink}
-                accessibilityRole="link"
-                accessibilityLabel={`${t(suggestedIntent.nameKey)}: ${t('home.allSounds')}`}
+              <Text style={[styles.leadMeta, { color: colors.textSecondary }]} numberOfLines={2}>
+                {t(suggestedIntent.descKey)}
+              </Text>
+              <PressableScale
+                onPress={handleStartSession}
+                style={[styles.leadButton, { backgroundColor: colors.text }]}
+                accessibilityRole="button"
+                accessibilityLabel={t('intents.startSession', {
+                  minutes: suggestedIntent.recommendedMinutes,
+                })}
               >
-                <Text style={[styles.leadLinkText, { color: artwork.foreground.primary }]}>
-                  {t('home.allSounds')}
+                <Ionicons name="play" size={18} color={colors.background} />
+                <Text style={[styles.leadButtonText, { color: colors.background }]}>
+                  {t('intents.startSession', { minutes: suggestedIntent.recommendedMinutes })}
                 </Text>
-                <Ionicons name="chevron-forward" size={16} color={artwork.foreground.primary} />
-              </TouchableOpacity>
+              </PressableScale>
             </View>
-            <Text
-              style={[styles.leadName, { color: artwork.foreground.primary }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              {t(suggestedIntent.nameKey)}
-            </Text>
-            <Text style={[styles.leadMeta, { color: artwork.foreground.secondary }]} numberOfLines={2}>
-              {t(suggestedIntent.descKey)}
-            </Text>
-            <PressableScale
-              onPress={handleStartSession}
-              style={styles.leadButton}
-              accessibilityRole="button"
-              accessibilityLabel={t('intents.startSession', {
-                minutes: suggestedIntent.recommendedMinutes,
-              })}
-            >
-              <Ionicons name="play" size={18} color={ON_LEAD_BUTTON} />
-              <Text style={styles.leadButtonText}>
-                {t('intents.startSession', { minutes: suggestedIntent.recommendedMinutes })}
-              </Text>
-            </PressableScale>
-          </ArtBackground>
           </View>
 
           <View style={styles.tiles}>
@@ -270,27 +270,27 @@ export default function HomeScreen() {
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
                 scaleTo={0.97}
-                style={[styles.tilePress, cardShadow]}
+                style={styles.tilePress}
                 accessibilityRole="button"
                 accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
-                <ArtBackground
+                <Image
                   source={intentArt(intent.id).dark}
-                  style={styles.tile}
-                  variant="tile"
+                  style={styles.tileImage}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                />
+                <Text
+                  style={[styles.tileName, { color: colors.text }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
                 >
-                  <Text
-                    style={[styles.tileName, { color: artwork.foreground.primary }]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                  >
-                    {t(intent.nameKey)}
-                  </Text>
-                  <Text style={[styles.tileMeta, { color: artwork.foreground.secondary }]}>
-                    {intent.recommendedMinutes}
-                    {t('home.recommendedMinutesSuffix')}
-                  </Text>
-                </ArtBackground>
+                  {t(intent.nameKey)}
+                </Text>
+                <Text style={[styles.tileMeta, { color: colors.textSecondary }]}>
+                  {intent.recommendedMinutes}
+                  {t('home.recommendedMinutesSuffix')}
+                </Text>
               </PressableScale>
             ))}
           </View>
@@ -418,30 +418,28 @@ const styles = StyleSheet.create({
       shadowRadius: 30,
     },
   }) as ViewStyle,
-  leadShell: {
-    borderRadius: 28,
-    backgroundColor: '#15131A',
-  },
   lastNight: {
     ...Typography.footnote,
     marginTop: -Spacing.sm,
     marginBottom: Spacing.md,
   },
   leadCard: {
-    height: 400,
     borderRadius: 28,
-    padding: Spacing.lg,
-    paddingTop: Spacing.sm,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: CARD_EDGE,
+    overflow: 'hidden',
+  },
+  leadImage: {
+    height: 230,
+    width: '100%',
+  },
+  leadBody: {
+    padding: Spacing.md + 4,
+    paddingTop: Spacing.xs,
   },
   leadTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-  },
-  leadKicker: {
-    ...Typography.footnote,
   },
   leadLink: {
     flexDirection: 'row',
@@ -455,21 +453,17 @@ const styles = StyleSheet.create({
   },
   leadName: {
     fontFamily: Typography.largeTitle.fontFamily,
-    fontSize: 56,
-    lineHeight: 62,
-    marginTop: 'auto',
+    fontSize: 44,
+    lineHeight: 50,
   },
   leadMeta: {
     ...Typography.footnote,
     marginTop: Spacing.xs,
   },
-  // Warm white, the one bright thing on the card: reads as a lit control rather
-  // than a filled brand-colour banner.
   leadButton: {
-    marginTop: Spacing.lg,
+    marginTop: Spacing.md,
     height: 54,
     borderRadius: 27,
-    backgroundColor: '#F6F2EA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -477,25 +471,20 @@ const styles = StyleSheet.create({
   },
   leadButtonText: {
     ...Typography.headline,
-    color: ON_LEAD_BUTTON,
   },
   tiles: {
     flexDirection: 'row',
-    gap: Spacing.sm,
-    marginTop: Spacing.sm,
+    gap: Spacing.sm + 4,
+    marginTop: Spacing.lg,
   },
   tilePress: {
     flex: 1,
-    borderRadius: 22,
-    backgroundColor: '#15131A',
   },
-  tile: {
-    height: 132,
-    borderRadius: 22,
-    padding: Spacing.sm + 4,
-    justifyContent: 'flex-end',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: CARD_EDGE,
+  tileImage: {
+    aspectRatio: 1,
+    width: '100%',
+    borderRadius: 20,
+    marginBottom: Spacing.sm,
   },
   tileName: {
     ...Typography.headline,
