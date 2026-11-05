@@ -1,13 +1,15 @@
-# NeuroSound
+# 852Hz
 
 ## App name
-Neurosound: Głos Wszechświata
+852Hz: Sen, Binaural, Fokus
 
 ## Short description
-Offline'owy mikser dźwięków, minutnik snu i dźwięki skupienia.
+Dźwięki do snu, biały szum, dudnienia binauralne i 432 Hz. Działa offline.
 
 ## Full description
-NeuroSound to offline'owa aplikacja dźwiękowa do snu, skupienia, medytacji i odpoczynku.
+Dźwięki do snu, odgłosy deszczu, biały, brązowy i różowy szum, dudnienia binauralne (delta, theta, alfa, beta, gamma) oraz częstotliwości Solfeggio, takie jak 432 Hz, 528 Hz i 852 Hz: spokojna aplikacja do snu, skupienia, medytacji i relaksu.
+
+852Hz to offline'owa aplikacja dźwiękowa do snu, skupienia, medytacji i odpoczynku.
 
 Odtwórz jeden dźwięk osobno albo połącz w mikserze do czterech. Gdy czas się kończy, minutnik snu łagodnie ścisza i zatrzymuje odtwarzanie. Sterowanie z ekranu blokady pozwala zatrzymać dźwięk bez ponownego otwierania aplikacji.
 
@@ -22,4 +24,4 @@ Odtwórz jeden dźwięk osobno albo połącz w mikserze do czterech. Gdy czas si
 
 Dudnienia binauralne i niskie częstotliwości wymagają słuchawek; głośnik telefonu ich nie odtworzy.
 
-NeuroSound nie stawia diagnoz, nie leczy i nie obiecuje efektów medycznych. Utrzymuj głośność na wygodnym poziomie.
+852Hz nie stawia diagnoz, nie leczy i nie obiecuje efektów medycznych. Utrzymuj głośność na wygodnym poziomie.

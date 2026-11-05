@@ -1,13 +1,15 @@
-# NeuroSound
+# 852Hz
 
 ## App name
-Neurosound: Voix de l'Univers
+852Hz: Sommeil, Sons Binauraux
 
 ## Short description
-Mixeur de sons hors ligne, minuteur de sommeil et focus.
+Sons pour dormir, bruit blanc, sons binauraux et 432 Hz. Fonctionne hors ligne.
 
 ## Full description
-NeuroSound est une application de sons hors ligne pour dormir, se concentrer, méditer et se détendre.
+Sons pour dormir, bruit de pluie, bruit blanc, brun et rose, sons binauraux (delta, thêta, alpha, bêta, gamma) et fréquences Solfège comme 432 Hz, 528 Hz et 852 Hz : une appli apaisante pour le sommeil, la concentration, la méditation et la détente.
+
+852Hz est une application de sons hors ligne pour dormir, se concentrer, méditer et se détendre.
 
 Écoutez un son seul ou combinez jusqu'à quatre sons dans le mixeur. À la fin du décompte, le minuteur baisse doucement le volume puis arrête la lecture. Les commandes de l'écran de verrouillage permettent de mettre en pause sans rouvrir l'application.
 
@@ -22,4 +24,4 @@ NeuroSound est une application de sons hors ligne pour dormir, se concentrer, m�
 
 Les battements binauraux et les fréquences graves nécessitent un casque ; le haut-parleur du téléphone ne peut pas les restituer.
 
-NeuroSound ne fournit ni diagnostic, ni traitement, ni promesse de résultat médical. Gardez le volume à un niveau confortable.
+852Hz ne fournit ni diagnostic, ni traitement, ni promesse de résultat médical. Gardez le volume à un niveau confortable.

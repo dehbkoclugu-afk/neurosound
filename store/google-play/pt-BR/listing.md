@@ -1,13 +1,15 @@
-# NeuroSound
+# 852Hz
 
 ## App name
-Neurosound: Voz do Universo
+852Hz: Sono, Binaural e Foco
 
 ## Short description
-Mixer de sons offline, timer de sono e sons para foco.
+Sons para dormir, ruído branco, batidas binaurais e 432 Hz. Funciona offline.
 
 ## Full description
-O NeuroSound é um aplicativo de sons offline para dormir, focar, meditar e relaxar.
+Sons para dormir, som de chuva, ruído branco, marrom e rosa, batidas binaurais (delta, teta, alfa, beta, gama) e frequências Solfeggio como 432 Hz, 528 Hz e 852 Hz: um app tranquilo para sono, foco, meditação e relaxamento.
+
+O 852Hz é um aplicativo de sons offline para dormir, focar, meditar e relaxar.
 
 Toque um som sozinho ou combine até quatro sons no mixer. Quando o tempo acaba, o timer de sono baixa o volume aos poucos e encerra a reprodução. Os controles na tela de bloqueio permitem pausar e retomar sem abrir o app de novo.
 
@@ -22,4 +24,4 @@ Toque um som sozinho ou combine até quatro sons no mixer. Quando o tempo acaba,
 
 Os sons binaurais e as frequências mais graves exigem fones de ouvido; o alto-falante do celular não consegue reproduzi-los.
 
-O NeuroSound não oferece diagnóstico, tratamento nem promessas de resultado médico. Mantenha o volume em um nível confortável.
+O 852Hz não oferece diagnóstico, tratamento nem promessas de resultado médico. Mantenha o volume em um nível confortável.

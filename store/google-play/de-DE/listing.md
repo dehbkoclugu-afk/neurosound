@@ -1,13 +1,15 @@
-# NeuroSound
+# 852Hz
 
 ## App name
-Neurosound: Stimme des Alls
+852Hz: Schlaf, Binaural, Fokus
 
 ## Short description
-Offline-Klangmixer, Einschlaftimer und Klänge zum Fokus.
+Schlafgeräusche, weißes Rauschen, binaurale Beats, 432 Hz. Offline nutzbar.
 
 ## Full description
-NeuroSound ist eine Offline-Klang-App zum Schlafen, Fokussieren, Meditieren und Entspannen.
+Einschlafgeräusche, Regengeräusche, weißes, braunes und rosa Rauschen, binaurale Beats (Delta, Theta, Alpha, Beta, Gamma) und Solfeggio-Frequenzen wie 432 Hz, 528 Hz und 852 Hz: eine ruhige App für Schlaf, Fokus, Meditation und Entspannung.
+
+852Hz ist eine Offline-Klang-App zum Schlafen, Fokussieren, Meditieren und Entspannen.
 
 Spiele einen Klang für sich allein oder mische bis zu vier Klänge im Mixer. Läuft die Zeit ab, senkt der Einschlaftimer die Lautstärke behutsam und beendet die Wiedergabe. Über die Sperrbildschirm-Steuerung pausierst und startest du, ohne die App erneut zu öffnen.
 
@@ -22,4 +24,4 @@ Spiele einen Klang für sich allein oder mische bis zu vier Klänge im Mixer. L�
 
 Binaurale Klänge und tiefe Frequenzen brauchen Kopfhörer; ein Handylautsprecher kann sie nicht wiedergeben.
 
-NeuroSound stellt keine Diagnose, bietet keine Behandlung und verspricht keine medizinischen Ergebnisse. Halte die Lautstärke auf einem angenehmen Niveau.
+852Hz stellt keine Diagnose, bietet keine Behandlung und verspricht keine medizinischen Ergebnisse. Halte die Lautstärke auf einem angenehmen Niveau.

@@ -1,13 +1,15 @@
-# NeuroSound
+# 852Hz
 
 ## App name
-Neurosound: Âm Thanh Vũ Trụ
+852Hz: Ngủ Ngon, Binaural
 
 ## Short description
-Bàn trộn âm ngoại tuyến, hẹn giờ ngủ và âm thanh tập trung.
+Âm thanh ngủ ngon, tiếng ồn trắng, sóng binaural, 432 Hz. Dùng ngoại tuyến.
 
 ## Full description
-NeuroSound là ứng dụng âm thanh hoạt động ngoại tuyến, dành cho giấc ngủ, sự tập trung, thiền và thư giãn.
+Âm thanh ngủ ngon, tiếng mưa, tiếng ồn trắng, nâu và hồng, sóng binaural (delta, theta, alpha, beta, gamma) cùng tần số Solfeggio như 432 Hz, 528 Hz và 852 Hz: một ứng dụng êm dịu cho giấc ngủ, tập trung, thiền và thư giãn.
+
+852Hz là ứng dụng âm thanh hoạt động ngoại tuyến, dành cho giấc ngủ, sự tập trung, thiền và thư giãn.
 
 Phát một âm thanh riêng lẻ, hoặc trộn tối đa bốn âm thanh trong bàn trộn. Khi hết giờ, bộ hẹn giờ ngủ hạ dần âm lượng rồi dừng hẳn. Điều khiển trên màn hình khóa giúp bạn bật tắt mà không cần mở lại ứng dụng.
 
@@ -22,4 +24,4 @@ Phát một âm thanh riêng lẻ, hoặc trộn tối đa bốn âm thanh trong
 
 Nhịp binaural và các nốt tần số thấp cần tai nghe; loa điện thoại không tái tạo được chúng.
 
-NeuroSound không chẩn đoán, không điều trị và không đưa ra tuyên bố về kết quả y tế. Hãy giữ âm lượng ở mức dễ chịu.
+852Hz không chẩn đoán, không điều trị và không đưa ra tuyên bố về kết quả y tế. Hãy giữ âm lượng ở mức dễ chịu.

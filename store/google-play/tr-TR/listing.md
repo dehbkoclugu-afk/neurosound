@@ -1,13 +1,15 @@
-# NeuroSound
+# 852Hz
 
 ## Uygulama adı
-Neurosound: Evrenin Sesi
+852Hz: Uyku, Binaural ve Odak
 
 ## Kısa açıklama
-Çevrimdışı ses mikseri, uyku zamanlayıcısı ve odak sesleri.
+Uyku sesleri, beyaz gürültü, binaural ritimler, 432 Hz. Çevrimdışı çalışır.
 
 ## Tam açıklama
-NeuroSound, uyku, odaklanma, meditasyon ve rahatlama rutinleri için hazırlanmış çevrimdışı bir ses uygulamasıdır.
+Uyku sesleri, yağmur sesi, beyaz gürültü, kahverengi ve pembe gürültü, binaural ritimler (delta, teta, alfa, beta, gama) ve 432 Hz, 528 Hz, 852 Hz gibi Solfeggio frekansları: uyku, odaklanma, meditasyon ve rahatlama için tek bir sakin uygulama.
+
+852Hz, uyku, odaklanma, meditasyon ve rahatlama rutinleri için hazırlanmış çevrimdışı bir ses uygulamasıdır.
 
 Hazır sesleri tek başına dinleyebilir veya mikserde dört sesi bir araya getirip kendi karışımınızı oluşturabilirsiniz. Uyku zamanlayıcısı süre dolduğunda sesi yumuşakça azaltır. Kilit ekranı kontrolleri, uygulamayı yeniden açmadan oynatmayı yönetmenizi sağlar.
 
@@ -22,4 +24,4 @@ Hazır sesleri tek başına dinleyebilir veya mikserde dört sesi bir araya geti
 
 Binaural sesler ve düşük frekanslı tonlar kulaklık ister; telefon hoparlörü bu frekansları üretemez.
 
-NeuroSound tıbbi tanı, tedavi veya sağlık sonucu vaat etmez. Ses seviyesini rahat bir düzeyde tutun.
+852Hz tıbbi tanı, tedavi veya sağlık sonucu vaat etmez. Ses seviyesini rahat bir düzeyde tutun.
