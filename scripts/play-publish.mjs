@@ -177,7 +177,7 @@ async function uploadImage(key, editId, locale, type, path) {
 async function clearImages(token, editId, locale, type) {
   try {
     await call(token, 'DELETE',
-      `${API}/applications/${PACKAGE}/edits/${editId}/images/${locale}/${type}`);
+      `${API}/applications/${PACKAGE}/edits/${editId}/listings/${locale}/${type}`);
   } catch (e) {
     if (e.status !== 404) throw e;
   }
@@ -301,6 +301,13 @@ A grant can take a few minutes to take effect.`);
         await clearImages(token, edit.id, locale, 'phoneScreenshots');
         for (const path of shots) {
           await uploadImage(key, edit.id, locale, 'phoneScreenshots', path);
+        }
+        // A clear that quietly did nothing stacked new images on the old ones,
+        // and Play only objected at commit once a locale passed eight.
+        const { images = [] } = await call(token, 'GET',
+          `${API}/applications/${PACKAGE}/edits/${edit.id}/listings/${locale}/phoneScreenshots`);
+        if (images.length !== shots.length) {
+          throw new Error(`${images.length} screenshots in the edit, expected ${shots.length}`);
         }
         console.log(`  ${locale.padEnd(6)} ${shots.length} screenshots ok`);
       } catch (e) {
