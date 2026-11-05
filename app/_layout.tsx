@@ -3,6 +3,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
 import 'react-native-reanimated';
 import { I18nextProvider } from 'react-i18next';
 import {
@@ -44,6 +46,13 @@ export default function RootLayout() {
       SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded]);
+
+  // The scrim is gone (plugins/withoutNavigationBarScrim), so the buttons have to
+  // follow the app's own theme or they vanish against the tab bar.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    NavigationBar.setButtonStyleAsync(colorScheme === 'dark' ? 'light' : 'dark').catch(() => {});
+  }, [colorScheme]);
 
   if (!fontsLoaded) {
     return null;

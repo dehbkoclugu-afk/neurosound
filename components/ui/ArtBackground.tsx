@@ -81,7 +81,6 @@ export function ArtBackground({
         style={StyleSheet.absoluteFill}
         contentFit="cover"
         cachePolicy="memory-disk"
-        transition={150}
       />
       {/* Film grain on the large surfaces: it takes the digital flatness off the
           gradients. Rows are too small to show it, so they skip the overdraw. */}

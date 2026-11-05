@@ -121,6 +121,7 @@
       "expo-localization",
       "expo-font",
       "./plugins/withoutMicrophoneService",
+      "./plugins/withoutNavigationBarScrim",
       "expo-quick-actions",
       [
         "expo-alternate-app-icons",

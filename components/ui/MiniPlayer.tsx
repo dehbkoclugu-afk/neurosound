@@ -78,7 +78,8 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
     if (onPress) {
       onPress();
     } else if (currentPreset) {
-      router.push(`/player/${currentPreset.id}`);
+      // Opening what is already loaded: a paused sound stays paused.
+      router.push(`/player/${currentPreset.id}?from=mini`);
     } else {
       router.push('/(tabs)/mixer');
     }

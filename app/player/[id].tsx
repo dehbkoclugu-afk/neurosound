@@ -76,7 +76,7 @@ function needsHeadphones(preset: FrequencyPreset): boolean {
 }
 
 export default function PlayerScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
@@ -102,6 +102,7 @@ export default function PlayerScreen() {
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [showBedMode, setShowBedMode] = useState(false);
   const showToast = useToastStore((s) => s.show);
+  const autoplayedId = useRef<string | null>(null);
   const heartScale = useRef(new Animated.Value(1)).current;
   const heroScale = useRef(new Animated.Value(1)).current;
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -120,8 +121,14 @@ export default function PlayerScreen() {
       setPreset(loadedPreset);
       playerController.loadPreset(loadedPreset);
       addRecentlyPlayed(id);
+      // Tapping a sound means wanting to hear it. Once per sound: this effect
+      // re-runs when the entitlement refreshes, which must not undo a pause.
+      if (autoplayedId.current !== id) {
+        autoplayedId.current = id;
+        if (from !== 'mini' && !useAudioStore.getState().isPlaying) playerController.play();
+      }
     }
-  }, [id, addRecentlyPlayed, premiumReady, isPremium, router]);
+  }, [id, from, addRecentlyPlayed, premiumReady, isPremium, router]);
 
   useEffect(() => {
     playerController.syncVolume();

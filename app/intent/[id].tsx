@@ -145,7 +145,6 @@ export default function IntentScreen() {
             source={artwork.source(intent.image)}
             style={StyleSheet.absoluteFill}
             contentFit="cover"
-            transition={300}
           />
           {/* Same split as the home blocks: colour is decorative, the
               legibility floor is its own vertical pass. */}

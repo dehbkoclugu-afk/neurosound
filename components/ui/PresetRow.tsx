@@ -182,7 +182,6 @@ export function PresetRow({
         <Image
           source={artwork.source(presetThumb(preset.id))}
           cachePolicy="memory-disk"
-          transition={150}
           style={[
             styles.thumb,
             { backgroundColor: colors.cardBorder },

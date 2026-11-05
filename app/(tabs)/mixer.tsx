@@ -448,7 +448,6 @@ export default function MixerScreen() {
                     <Image
                       source={artwork.source(presetThumb(mix.channels[0].presetId))}
                       cachePolicy="memory-disk"
-                      transition={150}
                       style={[
                         styles.suggestedThumb,
                         { backgroundColor: colors.cardBorder },

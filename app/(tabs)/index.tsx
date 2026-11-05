@@ -13,6 +13,8 @@ import {
   Alert,
   ActivityIndicator,
   TouchableOpacity,
+  Platform,
+  ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
@@ -40,6 +42,8 @@ import { lastNightMinutes } from '@/lib/lastNight';
 
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
+const ON_LEAD_BUTTON = '#15131A';
+const CARD_EDGE = 'rgba(255, 255, 255, 0.14)';
 
 // Recently played is a "pick up where you left off" shortcut, not an archive.
 // Three rows keep it above the fold; ten pushed favourites off the page and
@@ -47,7 +51,7 @@ const FAVORITES_PREVIEW = 4;
 const RECENT_PREVIEW = 3;
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const {
     hasHydrated,
@@ -86,7 +90,11 @@ export default function HomeScreen() {
     [suggestedIntent.presetIds],
   );
 
-  const lastNight = lastNightMinutes(lastSession, new Date());
+  const today = new Date();
+  const lastNight = lastNightMinutes(lastSession, today);
+  // The night art in both themes: copy on a card is always white, and the washed
+  // daylight versions turned these into stock photos on a white page.
+  const cardShadow = artwork.scheme === 'light' ? styles.cardShadow : undefined;
 
   // AsyncStorage hydration must finish before the onboarding default is used.
   if (!hasHydrated) {
@@ -190,6 +198,9 @@ export default function HomeScreen() {
             real start button, then the other three as tiles. The frequency
             behind each is secondary information, not the headline. */}
         <View style={styles.section}>
+          <Text style={[styles.date, { color: colors.textSecondary }]}>
+            {today.toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' })}
+          </Text>
           <Text
             style={[styles.intentsTitle, { color: colors.text }]}
             accessibilityRole="header"
@@ -203,8 +214,9 @@ export default function HomeScreen() {
             </Text>
           )}
 
+          <View style={[styles.leadShell, cardShadow]}>
           <ArtBackground
-            source={artwork.source(intentArt(suggestedIntent.id))}
+            source={intentArt(suggestedIntent.id).dark}
             style={styles.leadCard}
             variant="tile"
           >
@@ -238,18 +250,19 @@ export default function HomeScreen() {
             </Text>
             <PressableScale
               onPress={handleStartSession}
-              style={[styles.leadButton, { backgroundColor: colors.primary }]}
+              style={styles.leadButton}
               accessibilityRole="button"
               accessibilityLabel={t('intents.startSession', {
                 minutes: suggestedIntent.recommendedMinutes,
               })}
             >
-              <Ionicons name="play" size={18} color={colors.onPrimary} />
-              <Text style={[styles.leadButtonText, { color: colors.onPrimary }]}>
+              <Ionicons name="play" size={18} color={ON_LEAD_BUTTON} />
+              <Text style={styles.leadButtonText}>
                 {t('intents.startSession', { minutes: suggestedIntent.recommendedMinutes })}
               </Text>
             </PressableScale>
           </ArtBackground>
+          </View>
 
           <View style={styles.tiles}>
             {otherIntents.map((intent) => (
@@ -257,12 +270,12 @@ export default function HomeScreen() {
                 key={intent.id}
                 onPress={() => router.push(`/intent/${intent.id}`)}
                 scaleTo={0.97}
-                style={styles.tilePress}
+                style={[styles.tilePress, cardShadow]}
                 accessibilityRole="button"
                 accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
               >
                 <ArtBackground
-                  source={artwork.source(intentArt(intent.id))}
+                  source={intentArt(intent.id).dark}
                   style={styles.tile}
                   variant="tile"
                 >
@@ -383,9 +396,31 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Spacing.xl,
   },
+  date: {
+    ...Typography.footnote,
+    marginBottom: Spacing.xs,
+  },
+  // One line, not two: the page's weight belongs to the picture below it.
   intentsTitle: {
     ...Typography.largeTitle,
+    fontSize: 30,
+    lineHeight: 36,
     marginBottom: Spacing.lg,
+  },
+  // A soft lift on the light page; on the dark one a shadow has nothing to fall on.
+  cardShadow: Platform.select({
+    web: { boxShadow: '0px 14px 30px rgba(21, 19, 26, 0.22)' },
+    default: {
+      elevation: 8,
+      shadowColor: '#15131A',
+      shadowOffset: { width: 0, height: 14 },
+      shadowOpacity: 0.22,
+      shadowRadius: 30,
+    },
+  }) as ViewStyle,
+  leadShell: {
+    borderRadius: 28,
+    backgroundColor: '#15131A',
   },
   lastNight: {
     ...Typography.footnote,
@@ -393,10 +428,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   leadCard: {
-    height: 300,
-    borderRadius: 26,
-    padding: Spacing.md,
-    paddingTop: Spacing.md,
+    height: 400,
+    borderRadius: 28,
+    padding: Spacing.lg,
+    paddingTop: Spacing.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: CARD_EDGE,
   },
   leadTop: {
     flexDirection: 'row',
@@ -418,18 +455,21 @@ const styles = StyleSheet.create({
   },
   leadName: {
     fontFamily: Typography.largeTitle.fontFamily,
-    fontSize: 44,
-    lineHeight: 50,
+    fontSize: 56,
+    lineHeight: 62,
     marginTop: 'auto',
   },
   leadMeta: {
     ...Typography.footnote,
     marginTop: Spacing.xs,
   },
+  // Warm white, the one bright thing on the card: reads as a lit control rather
+  // than a filled brand-colour banner.
   leadButton: {
-    marginTop: Spacing.md,
-    height: 52,
-    borderRadius: 26,
+    marginTop: Spacing.lg,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#F6F2EA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -437,6 +477,7 @@ const styles = StyleSheet.create({
   },
   leadButtonText: {
     ...Typography.headline,
+    color: ON_LEAD_BUTTON,
   },
   tiles: {
     flexDirection: 'row',
@@ -445,13 +486,16 @@ const styles = StyleSheet.create({
   },
   tilePress: {
     flex: 1,
-    borderRadius: 20,
-    overflow: 'hidden',
+    borderRadius: 22,
+    backgroundColor: '#15131A',
   },
   tile: {
-    height: 112,
+    height: 132,
+    borderRadius: 22,
     padding: Spacing.sm + 4,
     justifyContent: 'flex-end',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: CARD_EDGE,
   },
   tileName: {
     ...Typography.headline,

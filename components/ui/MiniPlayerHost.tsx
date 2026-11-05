@@ -13,10 +13,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { MiniPlayer } from './MiniPlayer';
 import { MINI_PLAYER_HEIGHT } from '@/hooks/use-mini-player';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { useThemeColors } from '@/hooks/use-theme-colors';
+import { withAlpha } from '@/constants/theme';
 
 const ENTER_MS = 220;
 const EXIT_MS = 160;
@@ -29,6 +32,7 @@ interface MiniPlayerHostProps {
 
 export function MiniPlayerHost({ visible, bottom }: MiniPlayerHostProps) {
   const { reduceMotion } = useSettingsStore();
+  const colors = useThemeColors();
   const [mounted, setMounted] = useState(visible);
   const progress = useRef(new Animated.Value(visible ? 1 : 0)).current;
 
@@ -70,12 +74,27 @@ export function MiniPlayerHost({ visible, bottom }: MiniPlayerHostProps) {
         },
       ]}
     >
+      {/* The list scrolled by right behind the card and showed through the gaps
+          around it, cut-off text and all. */}
+      <LinearGradient
+        pointerEvents="none"
+        colors={[withAlpha(colors.background, 0), colors.background]}
+        locations={[0, 0.45]}
+        style={styles.fade}
+      />
       <MiniPlayer />
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
+  fade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 108,
+  },
   container: {
     position: 'absolute',
     left: 0,
