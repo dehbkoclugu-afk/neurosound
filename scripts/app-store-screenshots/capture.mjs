@@ -2,6 +2,9 @@
 // usage: npx expo start --web --port 8091   (in another terminal)
 //        node scripts/app-store-screenshots/capture.mjs [http://localhost:8091]
 // Output: store/app-store/screenshots/<locale>/<shot>.png
+// With --play: bare 1080x2400 screens for all 21 Play locales, written to
+// store/google-play/assets/phone/<locale>/<shot>.jpg; run
+// scripts/captioned-screenshots/render.mjs afterwards to caption them.
 //
 // The Play set was cut from Android captures (status bar, old design), which
 // App Review rejects under 2.3.3/2.3.10. The web build renders the same React
@@ -15,7 +18,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
-const origin = process.argv[2] ?? 'http://localhost:8091';
+const play = process.argv.includes('--play');
+const origin = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? 'http://localhost:8091';
 const edge = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const captions = JSON.parse(
   fs.readFileSync(path.join(root, 'scripts/captioned-screenshots/captions.json'), 'utf8'),
@@ -114,7 +118,35 @@ try {
     const { data } = await send('Page.captureScreenshot', { format: 'png' });
     fs.writeFileSync(file, Buffer.from(data, 'base64'));
   };
-  for (const loc of LOCALES) {
+  const playPhone = path.join(root, 'store/google-play/assets/phone');
+  const locales = play
+    ? fs.readdirSync(playPhone).map((dir) => ({ dir, lang: dir.split('-')[0] }))
+    : LOCALES;
+  for (const loc of locales) {
+    if (play) {
+      await send('Emulation.setDeviceMetricsOverride', { width: 360, height: 800, deviceScaleFactor: 3, mobile: true });
+      await send('Page.navigate', { url: origin });
+      await sleep(4000);
+      const settings = {
+        state: { hasSeenOnboarding: true, hasSeenEpilepsyWarning: true, hasSeenHeadphoneWarning: true, language: loc.lang },
+        version: 2,
+      };
+      await send('Runtime.evaluate', {
+        expression: `localStorage.clear(); localStorage.setItem('neurosound-settings', ${JSON.stringify(JSON.stringify(settings))})`,
+      });
+      for (const s of SHOTS) {
+        await send('Page.navigate', { url: origin + s.route });
+        await sleep(5000);
+        if (s.act) {
+          await send('Runtime.evaluate', { expression: s.act });
+          await sleep(2500);
+        }
+        const { data } = await send('Page.captureScreenshot', { format: 'jpeg', quality: 88 });
+        fs.writeFileSync(path.join(playPhone, loc.dir, `${s.shot}.jpg`), Buffer.from(data, 'base64'));
+      }
+      console.log(loc.dir);
+      continue;
+    }
     const outDir = path.join(root, 'store/app-store/screenshots', loc.dir);
     fs.mkdirSync(outDir, { recursive: true });
     await send('Emulation.setDeviceMetricsOverride', { width: W / 3, height: H / 3, deviceScaleFactor: 3, mobile: true });

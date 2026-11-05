@@ -3,9 +3,9 @@
 //        node scripts/captioned-screenshots/render.mjs <locale> [shot] (one locale, or one shot)
 // Output: store/google-play/assets/captioned/<locale>/<shot>.png (1080x1920)
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
+import { spawn } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -19,6 +19,7 @@ const scriptFont = {
   th: 'Noto Sans Thai', 'hi-IN': 'Noto Sans Devanagari', 'bn-BD': 'Noto Sans Bengali',
 };
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 async function render(locale, shot, title, subtitle) {
@@ -52,19 +53,13 @@ async function render(locale, shot, title, subtitle) {
 </script>
 </body></html>`;
 
-  const htmlFile = path.join(outDir, `${shot}.html`);
+  const htmlFile = path.join(work, 'page.html');
   fs.writeFileSync(htmlFile, html);
+  await send('Page.navigate', { url: pathToFileURL(htmlFile).href });
+  await sleep(2500);
   const out = path.join(outDir, `${shot}.png`);
-  // Each run gets its own profile so parallel Edge instances don't collide.
-  const profile = fs.mkdtempSync(path.join(root, '.edge-profile-'));
-  try {
-    await promisify(execFile)(edge, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=1',
-      `--user-data-dir=${profile}`, '--window-size=1080,1920', '--virtual-time-budget=8000', '--allow-file-access-from-files',
-      `--screenshot=${out}`, pathToFileURL(htmlFile).href]);
-  } finally {
-    fs.unlinkSync(htmlFile);
-    fs.rmSync(profile, { recursive: true, force: true });
-  }
+  const { data } = await send('Page.captureScreenshot', { format: 'png' });
+  fs.writeFileSync(out, Buffer.from(data, 'base64'));
   console.log(out);
 }
 
@@ -75,5 +70,42 @@ const jobs = Object.entries(captions)
     .filter(([shot]) => !onlyShot || shot === onlyShot)
     .map(([shot, [title, subtitle]]) => () => render(locale, shot, title, subtitle)));
 
-const workers = Array.from({ length: 4 }, async () => { while (jobs.length) await jobs.shift()(); });
-await Promise.all(workers);
+// Over DevTools, not `--screenshot`: that flag exits 0 without writing anything
+// on this machine. Temp dir, not the repo: a profile there crashes Metro's watcher.
+const work = fs.mkdtempSync(path.join(os.tmpdir(), 'ns-caption-'));
+const port = 9334;
+const browser = spawn(edge, ['--headless=new', '--disable-gpu', '--hide-scrollbars', `--remote-debugging-port=${port}`,
+  `--user-data-dir=${path.join(work, 'profile')}`, '--allow-file-access-from-files', 'about:blank']);
+let send;
+try {
+  let page;
+  for (let i = 0; i < 50 && !page; i++) {
+    try {
+      page = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find((p) => p.type === 'page');
+    } catch {}
+    if (!page) await sleep(200);
+  }
+  if (!page) throw new Error('Edge DevTools did not come up');
+  const ws = new WebSocket(page.webSocketDebuggerUrl);
+  await new Promise((res, rej) => ((ws.onopen = res), (ws.onerror = rej)));
+  let id = 0;
+  const pending = new Map();
+  ws.onmessage = (e) => {
+    const m = JSON.parse(e.data);
+    if (pending.has(m.id)) pending.get(m.id)(m), pending.delete(m.id);
+  };
+  send = (method, params = {}) =>
+    new Promise((res, rej) => {
+      const n = ++id;
+      pending.set(n, (m) => (m.error ? rej(new Error(`${method}: ${m.error.message}`)) : res(m.result)));
+      ws.send(JSON.stringify({ id: n, method, params }));
+    });
+  await send('Page.enable');
+  await send('Emulation.setDeviceMetricsOverride', { width: 1080, height: 1920, deviceScaleFactor: 1, mobile: false });
+  for (const job of jobs) await job();
+  ws.close();
+} finally {
+  browser.kill();
+  await sleep(1500);
+  try { fs.rmSync(work, { recursive: true, force: true }); } catch {}
+}
