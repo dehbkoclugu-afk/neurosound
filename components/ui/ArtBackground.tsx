@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import {
+  Image as RNImage,
   ImageSourcePropType,
   StyleProp,
   StyleSheet,
@@ -36,6 +37,7 @@ const SCRIMS = {
   tile: ['rgba(10, 9, 13, 0.05)', 'rgba(10, 9, 13, 0.3)', 'rgba(10, 9, 13, 0.88)'],
 } as const;
 
+const GRAIN = require('@/assets/images/art/grain.png');
 const HERO_DARK = ['rgba(10, 9, 13, 0.16)', 'rgba(10, 9, 13, 0.28)', 'rgba(10, 9, 13, 0.92)'] as const;
 const HERO_LIGHT = ['rgba(10, 9, 13, 0.4)', 'rgba(10, 9, 13, 0)', 'rgba(10, 9, 13, 0)'] as const;
 
@@ -81,12 +83,24 @@ export function ArtBackground({
         cachePolicy="memory-disk"
         transition={150}
       />
+      {/* Film grain on the large surfaces: it takes the digital flatness off the
+          gradients. Rows are too small to show it, so they skip the overdraw. */}
+      {variant !== 'row' && variant !== 'channel' && (
+        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+          <RNImage source={GRAIN} resizeMode="repeat" style={styles.grain} />
+        </View>
+      )}
       {content}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  grain: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.05,
+  },
   surface: {
     overflow: 'hidden',
     backgroundColor: '#1B1821',

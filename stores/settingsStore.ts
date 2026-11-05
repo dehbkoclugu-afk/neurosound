@@ -62,6 +62,8 @@ interface SettingsState {
   // Audio
   maxVolume: number; // 0-1, safety limit
   defaultVolume: number;
+  /** Premium: mixer channels drift slowly instead of holding one balance. */
+  livingMix: boolean;
 
   // Onboarding
   hasSeenOnboarding: boolean;
@@ -80,6 +82,7 @@ interface SettingsState {
   setLanguage: (language: Language) => void;
   setMaxVolume: (volume: number) => void;
   setDefaultVolume: (volume: number) => void;
+  setLivingMix: (enabled: boolean) => void;
   setHasSeenOnboarding: (seen: boolean) => void;
   setHasSeenHeadphoneWarning: (seen: boolean) => void;
   setHasSeenEpilepsyWarning: (seen: boolean) => void;
@@ -99,6 +102,7 @@ const initialState = {
   language: deviceLanguageOrDefault,
   maxVolume: 0.8,
   defaultVolume: 0.5,
+  livingMix: false,
   hasSeenOnboarding: false,
   hasSeenHeadphoneWarning: false,
   hasSeenEpilepsyWarning: false,
@@ -118,6 +122,7 @@ export const useSettingsStore = create<SettingsState>()(
       setLanguage: (language) => set({ language }),
       setMaxVolume: (maxVolume) => set({ maxVolume: Math.max(0.1, Math.min(1, maxVolume)) }),
       setDefaultVolume: (defaultVolume) => set({ defaultVolume: Math.max(0, Math.min(1, defaultVolume)) }),
+      setLivingMix: (livingMix) => set({ livingMix }),
       setHasSeenOnboarding: (hasSeenOnboarding) => set({ hasSeenOnboarding }),
       setHasSeenHeadphoneWarning: (hasSeenHeadphoneWarning) => set({ hasSeenHeadphoneWarning }),
       setHasSeenEpilepsyWarning: (hasSeenEpilepsyWarning) => set({ hasSeenEpilepsyWarning }),

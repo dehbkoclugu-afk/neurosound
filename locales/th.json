@@ -49,7 +49,8 @@
     "otherIntents": "หรืออย่างอื่น",
     "recommendedMinutes": "แนะนำ {{minutes}} นาที",
     "recommendedMinutesSuffix": " นาที",
-    "allSounds": "เสียงทั้งหมด"
+    "allSounds": "เสียงทั้งหมด",
+    "lastNight": "เมื่อคืนคุณฟัง {{minutes}} นาที"
   },
   "explore": {
     "title": "สำรวจเสียง",
@@ -156,7 +157,10 @@
     "addedToMixer": "เพิ่มลงมิกเซอร์แล้ว",
     "emptyTitle": "สร้างมิกซ์เสียงของคุณเอง",
     "emptyDesc": "ผสมได้สูงสุด 4 เสียง ทั้งฝน นอยส์ และคลื่นความถี่ แล้วบันทึกไว้",
-    "removed": "ลบ {{name}} แล้ว"
+    "removed": "ลบ {{name}} แล้ว",
+    "livingMix": "มิกซ์มีชีวิต",
+    "livingMixHint": "แต่ละเสียงค่อย ๆ เปลี่ยน สมดุลจึงไม่หยุดนิ่ง",
+    "share": "แชร์มิกซ์"
   },
   "player": {
     "nowPlaying": "กำลังเล่น",
@@ -180,7 +184,9 @@
     "untilFade": "ก่อนเสียงค่อยๆ เบาลง",
     "noTimerHint": "เล่นจนกว่าคุณจะหยุด",
     "setTimer": "ตั้งเวลาปิด",
-    "headphonesBinaural": "ต้องใช้หูฟัง: หูแต่ละข้างต้องได้ยินเสียงของตัวเอง"
+    "headphonesBinaural": "ต้องใช้หูฟัง: หูแต่ละข้างต้องได้ยินเสียงของตัวเอง",
+    "bedMode": "โหมดเข้านอน",
+    "bedModeExit": "แตะเพื่อกลับ"
   },
   "settings": {
     "title": "การตั้งค่า",
@@ -217,7 +223,11 @@
     "premiumGet": "ปลดล็อกทุกเสียง",
     "premiumManage": "จัดการการสมัครสมาชิก",
     "support": "ความช่วยเหลือและการสนับสนุน",
-    "stats": "การฟังของคุณ"
+    "stats": "การฟังของคุณ",
+    "appIcon": "ไอคอนแอป",
+    "appIconDefault": "ค่าเริ่มต้น",
+    "appIconEmber": "ถ่านไฟ",
+    "appIconPaper": "กระดาษ"
   },
   "privacy": {
     "title": "นโยบายความเป็นส่วนตัว",
@@ -300,6 +310,9 @@
     "termsOfUse": "ข้อกำหนดการใช้งาน",
     "bestValue": "คุ้มที่สุด",
     "trialTerms": "ฟรี 7 วัน จากนั้น {{price}}",
-    "savePercent": "ประหยัด {{percent}}"
+    "savePercent": "ประหยัด {{percent}}",
+    "timelineToday": "วันนี้: ฟรี",
+    "timelineLater": "อีก 7 วัน: {{price}}",
+    "previewHint": "แตะเพื่อฟัง 15 วินาที"
   }
 }

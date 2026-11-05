@@ -49,7 +49,8 @@
     "otherIntents": "Ya da başka bir şey",
     "recommendedMinutes": "önerilen süre {{minutes}} dakika",
     "recommendedMinutesSuffix": " dk",
-    "allSounds": "Tüm sesler"
+    "allSounds": "Tüm sesler",
+    "lastNight": "Dün gece {{minutes}} dk dinledin."
   },
   "explore": {
     "title": "Sesleri Keşfet",
@@ -156,7 +157,10 @@
     "addedToMixer": "Miksere eklendi",
     "emptyTitle": "Kendi ses karışımını oluştur",
     "emptyDesc": "Yağmur, gürültü ve frekanslardan 4 sese kadar üst üste koy, karışımı kaydet.",
-    "removed": "{{name}} kaldırıldı"
+    "removed": "{{name}} kaldırıldı",
+    "livingMix": "Yaşayan miks",
+    "livingMixHint": "Her ses yavaşça dalgalanır, denge hep aynı kalmaz.",
+    "share": "Miksi paylaş"
   },
   "player": {
     "nowPlaying": "Şu an çalıyor",
@@ -180,7 +184,9 @@
     "untilFade": "sonra yavaşça kısılacak",
     "noTimerHint": "Sen durdurana kadar çalar",
     "setTimer": "Zamanlayıcı kur",
-    "headphonesBinaural": "Kulaklık gerekli: her kulak kendi sesini duymalı."
+    "headphonesBinaural": "Kulaklık gerekli: her kulak kendi sesini duymalı.",
+    "bedMode": "Yatak modu",
+    "bedModeExit": "Dönmek için dokun"
   },
   "settings": {
     "title": "Ayarlar",
@@ -217,7 +223,11 @@
     "premiumGet": "Tüm sesleri aç",
     "premiumManage": "Aboneliği yönet",
     "support": "Yardım ve destek",
-    "stats": "Dinleme geçmişin"
+    "stats": "Dinleme geçmişin",
+    "appIcon": "Uygulama simgesi",
+    "appIconDefault": "Varsayılan",
+    "appIconEmber": "Kor",
+    "appIconPaper": "Kâğıt"
   },
   "privacy": {
     "title": "Gizlilik Politikası",
@@ -300,6 +310,9 @@
     "termsOfUse": "Kullanım Koşulları",
     "bestValue": "En avantajlı",
     "trialTerms": "7 gün ücretsiz, sonra {{price}}",
-    "savePercent": "{{percent}} tasarruf"
+    "savePercent": "{{percent}} tasarruf",
+    "timelineToday": "Bugün: ücretsiz",
+    "timelineLater": "7 gün sonra: {{price}}",
+    "previewHint": "15 saniye dinlemek için dokun"
   }
 }

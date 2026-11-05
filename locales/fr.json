@@ -49,7 +49,8 @@
     "otherIntents": "Ou autre chose",
     "recommendedMinutes": "{{minutes}} min recommandées",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Tous les sons"
+    "allSounds": "Tous les sons",
+    "lastNight": "Hier soir, vous avez écouté {{minutes}} min."
   },
   "explore": {
     "title": "Explorer les sons",
@@ -156,7 +157,10 @@
     "addedToMixer": "Ajouté au mixeur",
     "emptyTitle": "Créez votre propre ambiance",
     "emptyDesc": "Superposez jusqu'à 4 sons — pluie, bruit, fréquences — et enregistrez le mix.",
-    "removed": "{{name}} retiré"
+    "removed": "{{name}} retiré",
+    "livingMix": "Mix vivant",
+    "livingMixHint": "Chaque son varie lentement, l’équilibre ne reste jamais figé.",
+    "share": "Partager le mix"
   },
   "player": {
     "nowPlaying": "En cours de lecture",
@@ -180,7 +184,9 @@
     "untilFade": "avant le fondu",
     "noTimerHint": "Joue jusqu'à ce que tu l'arrêtes",
     "setTimer": "Régler la minuterie",
-    "headphonesBinaural": "Casque nécessaire : chaque oreille doit entendre son propre son."
+    "headphonesBinaural": "Casque nécessaire : chaque oreille doit entendre son propre son.",
+    "bedMode": "Mode lit",
+    "bedModeExit": "Touchez pour revenir"
   },
   "settings": {
     "title": "Réglages",
@@ -217,7 +223,11 @@
     "premiumGet": "Débloquer tous les sons",
     "premiumManage": "Gérer l'abonnement",
     "support": "Aide et assistance",
-    "stats": "Votre écoute"
+    "stats": "Votre écoute",
+    "appIcon": "Icône de l’app",
+    "appIconDefault": "Par défaut",
+    "appIconEmber": "Braise",
+    "appIconPaper": "Papier"
   },
   "privacy": {
     "title": "Politique de confidentialité",
@@ -300,6 +310,9 @@
     "termsOfUse": "Conditions d’utilisation",
     "bestValue": "Meilleur prix",
     "trialTerms": "7 jours gratuits, puis {{price}}",
-    "savePercent": "Économisez {{percent}}"
+    "savePercent": "Économisez {{percent}}",
+    "timelineToday": "Aujourd’hui : gratuit",
+    "timelineLater": "Dans 7 jours : {{price}}",
+    "previewHint": "Touchez pour écouter 15 secondes"
   }
 }

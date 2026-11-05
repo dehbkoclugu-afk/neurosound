@@ -18,6 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, ControlSize, Elevation } from '@/constants/theme';
+import * as haptics from '@/lib/haptics';
 
 interface SliderProps {
   value: number;
@@ -63,6 +64,8 @@ export function Slider({
   const normalizedValue = (value - min) / (max - min);
   const thumbPosition = normalizedValue * sliderWidth;
 
+  const lastQuarterRef = useRef<number | null>(null);
+
   const handleValueFromPosition = useCallback(
     (x: number) => {
       // A touch before the first layout pass would divide by zero and hand
@@ -75,6 +78,12 @@ export function Slider({
       // Apply step
       const steppedValue = Math.round(newValue / step) * step;
       const clampedValue = Math.max(min, Math.min(max, steppedValue));
+
+      // A detent at each quarter of the track, so a level can be found by feel
+      // in the dark. The first touch sets the baseline rather than ticking.
+      const quarter = Math.floor(newNormalized * 4);
+      if (lastQuarterRef.current !== null && lastQuarterRef.current !== quarter) haptics.select();
+      lastQuarterRef.current = quarter;
 
       onValueChange(clampedValue);
     },
@@ -104,6 +113,7 @@ export function Slider({
       onPanResponderTerminationRequest: () => false,
       onPanResponderGrant: (evt) => {
         startXRef.current = evt.nativeEvent.locationX;
+        lastQuarterRef.current = null;
         handleValueFromPositionRef.current(startXRef.current);
       },
       onPanResponderMove: (_evt, gestureState) => {

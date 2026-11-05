@@ -49,7 +49,8 @@
     "otherIntents": "Eller något annat",
     "recommendedMinutes": "{{minutes}} min rekommenderas",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Alla ljud"
+    "allSounds": "Alla ljud",
+    "lastNight": "I natt lyssnade du i {{minutes}} min."
   },
   "explore": {
     "title": "Utforska ljud",
@@ -156,7 +157,10 @@
     "addedToMixer": "Tillagd i mixern",
     "emptyTitle": "Skapa din egen ljudmix",
     "emptyDesc": "Blanda upp till 4 ljud — regn, brus och frekvenser — och spara mixen.",
-    "removed": "{{name}} borttaget"
+    "removed": "{{name}} borttaget",
+    "livingMix": "Levande mix",
+    "livingMixHint": "Varje ljud skiftar långsamt, så balansen står aldrig still.",
+    "share": "Dela mix"
   },
   "player": {
     "nowPlaying": "Spelas nu",
@@ -180,7 +184,9 @@
     "untilFade": "tills det tonas ut",
     "noTimerHint": "Spelar tills du stoppar",
     "setTimer": "Ställ in timer",
-    "headphonesBinaural": "Hörlurar krävs: varje öra måste höra sitt eget ljud."
+    "headphonesBinaural": "Hörlurar krävs: varje öra måste höra sitt eget ljud.",
+    "bedMode": "Sängläge",
+    "bedModeExit": "Tryck för att återgå"
   },
   "settings": {
     "title": "Inställningar",
@@ -217,7 +223,11 @@
     "premiumGet": "Lås upp alla ljud",
     "premiumManage": "Hantera prenumeration",
     "support": "Hjälp och support",
-    "stats": "Ditt lyssnande"
+    "stats": "Ditt lyssnande",
+    "appIcon": "Appikon",
+    "appIconDefault": "Standard",
+    "appIconEmber": "Glöd",
+    "appIconPaper": "Papper"
   },
   "privacy": {
     "title": "Integritetspolicy",
@@ -300,6 +310,9 @@
     "termsOfUse": "Användarvillkor",
     "bestValue": "Bästa pris",
     "trialTerms": "7 dagar gratis, sedan {{price}}",
-    "savePercent": "Spara {{percent}}"
+    "savePercent": "Spara {{percent}}",
+    "timelineToday": "Idag: gratis",
+    "timelineLater": "Om 7 dagar: {{price}}",
+    "previewHint": "Tryck för att höra 15 sekunder"
   }
 }

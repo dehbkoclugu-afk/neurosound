@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
+  Platform,
+  Switch,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -56,6 +58,10 @@ import * as playerController from '@/lib/audio/playerController';
 import { isLockedPreset } from '@/lib/premium';
 import { useIsPremium } from '@/stores/premiumStore';
 import { ArtBackground } from '@/components/ui/ArtBackground';
+import { BedMode } from '@/components/ui/BedMode';
+import { MixCollage } from '@/components/ui/MixCollage';
+import { MixShareSheet, type ShareableMix } from '@/components/ui/MixShareSheet';
+import { useSettingsStore } from '@/stores/settingsStore';
 import { presetArt, presetThumb } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import { upper, foldForSearch } from '@/lib/upper';
@@ -122,6 +128,10 @@ export default function MixerScreen() {
   const [showPresetPicker, setShowPresetPicker] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showTimerModal, setShowTimerModal] = useState(false);
+  const [showBedMode, setShowBedMode] = useState(false);
+  const [sharingMix, setSharingMix] = useState<ShareableMix | null>(null);
+  const livingMix = useSettingsStore((s) => s.livingMix);
+  const setLivingMix = useSettingsStore((s) => s.setLivingMix);
   const [mixName, setMixName] = useState('');
   const [editingMixId, setEditingMixId] = useState<string | null>(null);
   const [pickerQuery, setPickerQuery] = useState('');
@@ -224,6 +234,19 @@ export default function MixerScreen() {
   const handleMasterVolume = useCallback((volume: number) => {
     playerController.mixerSetMasterVolume(volume);
   }, []);
+
+  const handleLivingMix = useCallback(
+    (enabled: boolean) => {
+      if (enabled && !isPremium) {
+        router.push('/paywall');
+        return;
+      }
+      haptics.select();
+      setLivingMix(enabled);
+      playerController.syncVolume();
+    },
+    [isPremium, router, setLivingMix],
+  );
 
   const handleToggleMute = useCallback((channelId: string, muted: boolean) => {
     haptics.select();
@@ -579,6 +602,37 @@ export default function MixerScreen() {
               showValue={false}
               accessibilityLabel={t('mixer.master')}
             />
+            <View style={styles.livingRow}>
+              <View style={styles.livingText}>
+                <Text style={[styles.livingTitle, { color: colors.text }]}>
+                  {t('mixer.livingMix')}
+                </Text>
+                <Text style={[styles.suggestedIntent, { color: colors.textSecondary }]}>
+                  {t('mixer.livingMixHint')}
+                </Text>
+              </View>
+              <Switch
+                value={livingMix && isPremium}
+                onValueChange={handleLivingMix}
+                trackColor={{ false: colors.slider, true: colors.accent }}
+                thumbColor="#fff"
+                accessibilityLabel={t('mixer.livingMix')}
+                {...({
+                  activeThumbColor: '#fff',
+                  activeTrackColor: colors.accent,
+                } as any)}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => setShowBedMode(true)}
+              style={styles.addRow}
+              accessibilityRole="button"
+            >
+              <Ionicons name="moon-outline" size={20} color={colors.textSecondary} />
+              <Text style={[styles.addRowText, { color: colors.textSecondary }]}>
+                {t('player.bedMode')}
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -615,6 +669,12 @@ export default function MixerScreen() {
                       .filter(Boolean)
                       .join(', ')}
                   >
+                    <MixCollage
+                      images={mixPresets(mix)
+                        .map((p) => artwork.source(presetThumb(p.id)))
+                        .filter((source) => source !== undefined)}
+                      style={styles.mixCover}
+                    />
                     <View style={styles.mixTextContainer}>
                       <View style={styles.mixNameRow}>
                         <Text
@@ -674,6 +734,16 @@ export default function MixerScreen() {
                       </View>
                     </View>
                   </TouchableOpacity>
+                  {Platform.OS !== 'web' && (
+                    <TouchableOpacity
+                      onPress={() => setSharingMix(mix)}
+                      style={styles.mixAction}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('mixer.share')} ${mix.name}`}
+                    >
+                      <Ionicons name="share-outline" size={20} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity
                     onPress={() => handleRenameMix(mix)}
                     style={styles.mixAction}
@@ -773,6 +843,9 @@ export default function MixerScreen() {
         visible={showTimerModal}
         onClose={() => setShowTimerModal(false)}
       />
+
+      <BedMode visible={showBedMode} onClose={() => setShowBedMode(false)} />
+      <MixShareSheet mix={sharingMix} onClose={() => setSharingMix(null)} />
 
       {/* Preset picker — a tall sheet rather than a full screen. 33 items
           need the height, but taking over the whole display made picking a
@@ -1011,9 +1084,29 @@ const styles = StyleSheet.create({
   },
   mixMain: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
     paddingVertical: Spacing.md,
-    justifyContent: 'center',
     minHeight: 56,
+  },
+  mixCover: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+  },
+  livingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginTop: Spacing.md,
+  },
+  livingText: {
+    flex: 1,
+    gap: 2,
+  },
+  livingTitle: {
+    ...Typography.headline,
   },
   mixTextContainer: {
     flex: 1,

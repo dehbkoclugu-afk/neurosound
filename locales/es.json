@@ -49,7 +49,8 @@
     "otherIntents": "O algo distinto",
     "recommendedMinutes": "{{minutes}} min recomendados",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Todos los sonidos"
+    "allSounds": "Todos los sonidos",
+    "lastNight": "Anoche escuchaste {{minutes}} min."
   },
   "explore": {
     "title": "Explorar sonidos",
@@ -156,7 +157,10 @@
     "addedToMixer": "Añadido al mezclador",
     "emptyTitle": "Crea tu propia mezcla",
     "emptyDesc": "Combina hasta 4 sonidos — lluvia, ruido y frecuencias — y guarda la mezcla.",
-    "removed": "{{name}} eliminado"
+    "removed": "{{name}} eliminado",
+    "livingMix": "Mezcla viva",
+    "livingMixHint": "Cada sonido varía despacio, así el equilibrio nunca queda fijo.",
+    "share": "Compartir mezcla"
   },
   "player": {
     "nowPlaying": "Sonando ahora",
@@ -180,7 +184,9 @@
     "untilFade": "hasta que se apague",
     "noTimerHint": "Suena hasta que lo pares",
     "setTimer": "Poner temporizador",
-    "headphonesBinaural": "Necesitas auriculares: cada oído debe oír su propio tono."
+    "headphonesBinaural": "Necesitas auriculares: cada oído debe oír su propio tono.",
+    "bedMode": "Modo cama",
+    "bedModeExit": "Toca para volver"
   },
   "settings": {
     "title": "Ajustes",
@@ -217,7 +223,11 @@
     "premiumGet": "Desbloquear todos los sonidos",
     "premiumManage": "Gestionar suscripción",
     "support": "Ayuda y soporte",
-    "stats": "Tu escucha"
+    "stats": "Tu escucha",
+    "appIcon": "Icono de la app",
+    "appIconDefault": "Predeterminado",
+    "appIconEmber": "Ascua",
+    "appIconPaper": "Papel"
   },
   "privacy": {
     "title": "Política de privacidad",
@@ -300,6 +310,9 @@
     "termsOfUse": "Términos de uso",
     "bestValue": "Mejor precio",
     "trialTerms": "7 días gratis, luego {{price}}",
-    "savePercent": "Ahorra {{percent}}"
+    "savePercent": "Ahorra {{percent}}",
+    "timelineToday": "Hoy: gratis",
+    "timelineLater": "En 7 días: {{price}}",
+    "previewHint": "Toca para oír 15 segundos"
   }
 }

@@ -49,7 +49,8 @@
     "otherIntents": "Sau altceva",
     "recommendedMinutes": "{{minutes}} min recomandate",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Toate sunetele"
+    "allSounds": "Toate sunetele",
+    "lastNight": "Aseară ai ascultat {{minutes}} min."
   },
   "explore": {
     "title": "Explorează sunetele",
@@ -156,7 +157,10 @@
     "addedToMixer": "Adăugat în mixer",
     "emptyTitle": "Creează-ți propriul mix",
     "emptyDesc": "Combină până la 4 sunete — ploaie, zgomot și frecvențe — și salvează mixul.",
-    "removed": "{{name}} eliminat"
+    "removed": "{{name}} eliminat",
+    "livingMix": "Mix viu",
+    "livingMixHint": "Fiecare sunet variază lent, așa că echilibrul nu stă pe loc.",
+    "share": "Distribuie mixul"
   },
   "player": {
     "nowPlaying": "Se redă acum",
@@ -180,7 +184,9 @@
     "untilFade": "până la stingere",
     "noTimerHint": "Cântă până îl oprești",
     "setTimer": "Setează temporizatorul",
-    "headphonesBinaural": "Sunt necesare căști: fiecare ureche trebuie să audă propriul sunet."
+    "headphonesBinaural": "Sunt necesare căști: fiecare ureche trebuie să audă propriul sunet.",
+    "bedMode": "Mod noapte",
+    "bedModeExit": "Atinge pentru a reveni"
   },
   "settings": {
     "title": "Setări",
@@ -217,7 +223,11 @@
     "premiumGet": "Deblochează toate sunetele",
     "premiumManage": "Gestionează abonamentul",
     "support": "Ajutor și asistență",
-    "stats": "Ascultările tale"
+    "stats": "Ascultările tale",
+    "appIcon": "Pictograma aplicației",
+    "appIconDefault": "Implicită",
+    "appIconEmber": "Jar",
+    "appIconPaper": "Hârtie"
   },
   "privacy": {
     "title": "Politica de confidențialitate",
@@ -300,6 +310,9 @@
     "termsOfUse": "Termeni de utilizare",
     "bestValue": "Cel mai avantajos",
     "trialTerms": "7 zile gratuit, apoi {{price}}",
-    "savePercent": "Economisești {{percent}}"
+    "savePercent": "Economisești {{percent}}",
+    "timelineToday": "Azi: gratuit",
+    "timelineLater": "Peste 7 zile: {{price}}",
+    "previewHint": "Atinge pentru a asculta 15 secunde"
   }
 }

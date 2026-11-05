@@ -49,7 +49,8 @@
     "otherIntents": "Hoặc thứ khác",
     "recommendedMinutes": "Nên nghe {{minutes}} phút",
     "recommendedMinutesSuffix": " phút",
-    "allSounds": "Tất cả âm thanh"
+    "allSounds": "Tất cả âm thanh",
+    "lastNight": "Đêm qua bạn đã nghe {{minutes}} phút."
   },
   "explore": {
     "title": "Khám phá âm thanh",
@@ -156,7 +157,10 @@
     "addedToMixer": "Đã thêm vào bàn trộn",
     "emptyTitle": "Tự tạo bản phối âm thanh",
     "emptyDesc": "Kết hợp tối đa 4 âm thanh — mưa, tiếng ồn và tần số — rồi lưu lại.",
-    "removed": "Đã xóa {{name}}"
+    "removed": "Đã xóa {{name}}",
+    "livingMix": "Bản phối sống động",
+    "livingMixHint": "Mỗi âm thanh thay đổi chậm, nên sự cân bằng không bao giờ đứng yên.",
+    "share": "Chia sẻ bản phối"
   },
   "player": {
     "nowPlaying": "Đang phát",
@@ -180,7 +184,9 @@
     "untilFade": "trước khi nhỏ dần",
     "noTimerHint": "Phát cho đến khi bạn dừng",
     "setTimer": "Đặt hẹn giờ",
-    "headphonesBinaural": "Cần tai nghe: mỗi tai phải nghe âm thanh riêng."
+    "headphonesBinaural": "Cần tai nghe: mỗi tai phải nghe âm thanh riêng.",
+    "bedMode": "Chế độ đi ngủ",
+    "bedModeExit": "Chạm để quay lại"
   },
   "settings": {
     "title": "Cài đặt",
@@ -217,7 +223,11 @@
     "premiumGet": "Mở khóa mọi âm thanh",
     "premiumManage": "Quản lý gói đăng ký",
     "support": "Trợ giúp và hỗ trợ",
-    "stats": "Lịch sử nghe của bạn"
+    "stats": "Lịch sử nghe của bạn",
+    "appIcon": "Biểu tượng ứng dụng",
+    "appIconDefault": "Mặc định",
+    "appIconEmber": "Than hồng",
+    "appIconPaper": "Giấy"
   },
   "privacy": {
     "title": "Chính sách bảo mật",
@@ -300,6 +310,9 @@
     "termsOfUse": "Điều khoản sử dụng",
     "bestValue": "Tiết kiệm nhất",
     "trialTerms": "Miễn phí 7 ngày, sau đó {{price}}",
-    "savePercent": "Tiết kiệm {{percent}}"
+    "savePercent": "Tiết kiệm {{percent}}",
+    "timelineToday": "Hôm nay: miễn phí",
+    "timelineLater": "Sau 7 ngày: {{price}}",
+    "previewHint": "Chạm để nghe 15 giây"
   }
 }

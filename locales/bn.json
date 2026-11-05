@@ -49,7 +49,8 @@
     "otherIntents": "অথবা অন্য কিছু",
     "recommendedMinutes": "{{minutes}} মিনিট প্রস্তাবিত",
     "recommendedMinutesSuffix": " মিনিট",
-    "allSounds": "সব শব্দ"
+    "allSounds": "সব শব্দ",
+    "lastNight": "গত রাতে আপনি {{minutes}} মিনিট শুনেছেন।"
   },
   "explore": {
     "title": "শব্দ খুঁজুন",
@@ -156,7 +157,10 @@
     "addedToMixer": "মিক্সারে যোগ হয়েছে",
     "emptyTitle": "নিজের সাউন্ড মিক্স তৈরি করুন",
     "emptyDesc": "৪টি পর্যন্ত শব্দ মেশান — বৃষ্টি, নয়েজ আর ফ্রিকোয়েন্সি — তারপর সেভ করুন।",
-    "removed": "{{name}} সরানো হয়েছে"
+    "removed": "{{name}} সরানো হয়েছে",
+    "livingMix": "লিভিং মিক্স",
+    "livingMixHint": "প্রতিটি শব্দ ধীরে বদলায়, তাই ভারসাম্য স্থির থাকে না।",
+    "share": "মিক্স শেয়ার করুন"
   },
   "player": {
     "nowPlaying": "এখন বাজছে",
@@ -180,7 +184,9 @@
     "untilFade": "তারপর ধীরে কমবে",
     "noTimerHint": "আপনি না থামানো পর্যন্ত চলবে",
     "setTimer": "টাইমার সেট করুন",
-    "headphonesBinaural": "হেডফোন প্রয়োজন: প্রতিটি কানকে আলাদা শব্দ শুনতে হয়।"
+    "headphonesBinaural": "হেডফোন প্রয়োজন: প্রতিটি কানকে আলাদা শব্দ শুনতে হয়।",
+    "bedMode": "বেড মোড",
+    "bedModeExit": "ফিরতে ট্যাপ করুন"
   },
   "settings": {
     "title": "সেটিংস",
@@ -217,7 +223,11 @@
     "premiumGet": "সব শব্দ আনলক করুন",
     "premiumManage": "সাবস্ক্রিপশন পরিচালনা",
     "support": "সহায়তা",
-    "stats": "আপনার শোনার তথ্য"
+    "stats": "আপনার শোনার তথ্য",
+    "appIcon": "অ্যাপ আইকন",
+    "appIconDefault": "ডিফল্ট",
+    "appIconEmber": "অঙ্গার",
+    "appIconPaper": "কাগজ"
   },
   "privacy": {
     "title": "গোপনীয়তা নীতি",
@@ -300,6 +310,9 @@
     "termsOfUse": "ব্যবহারের শর্তাবলি",
     "bestValue": "সবচেয়ে সাশ্রয়ী",
     "trialTerms": "৭ দিন বিনামূল্যে, তারপর {{price}}",
-    "savePercent": "{{percent}} সাশ্রয়"
+    "savePercent": "{{percent}} সাশ্রয়",
+    "timelineToday": "আজ: বিনামূল্যে",
+    "timelineLater": "৭ দিন পরে: {{price}}",
+    "previewHint": "১৫ সেকেন্ড শুনতে ট্যাপ করুন"
   }
 }

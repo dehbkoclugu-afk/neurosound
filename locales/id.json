@@ -49,7 +49,8 @@
     "otherIntents": "Atau yang lain",
     "recommendedMinutes": "{{minutes}} mnt disarankan",
     "recommendedMinutesSuffix": " mnt",
-    "allSounds": "Semua suara"
+    "allSounds": "Semua suara",
+    "lastNight": "Tadi malam Anda mendengarkan {{minutes}} mnt."
   },
   "explore": {
     "title": "Jelajahi Suara",
@@ -156,7 +157,10 @@
     "addedToMixer": "Ditambahkan ke mixer",
     "emptyTitle": "Buat campuran suaramu sendiri",
     "emptyDesc": "Gabungkan hingga 4 suara — hujan, noise, dan frekuensi — lalu simpan.",
-    "removed": "{{name}} dihapus"
+    "removed": "{{name}} dihapus",
+    "livingMix": "Mix hidup",
+    "livingMixHint": "Setiap suara berubah perlahan, jadi keseimbangannya tidak pernah diam.",
+    "share": "Bagikan mix"
   },
   "player": {
     "nowPlaying": "Sedang Diputar",
@@ -180,7 +184,9 @@
     "untilFade": "hingga memudar",
     "noTimerHint": "Diputar sampai kamu hentikan",
     "setTimer": "Atur timer",
-    "headphonesBinaural": "Perlu headphone: tiap telinga harus mendengar suaranya sendiri."
+    "headphonesBinaural": "Perlu headphone: tiap telinga harus mendengar suaranya sendiri.",
+    "bedMode": "Mode tidur",
+    "bedModeExit": "Ketuk untuk kembali"
   },
   "settings": {
     "title": "Pengaturan",
@@ -217,7 +223,11 @@
     "premiumGet": "Buka semua suara",
     "premiumManage": "Kelola langganan",
     "support": "Bantuan dan dukungan",
-    "stats": "Riwayat mendengarmu"
+    "stats": "Riwayat mendengarmu",
+    "appIcon": "Ikon aplikasi",
+    "appIconDefault": "Default",
+    "appIconEmber": "Bara",
+    "appIconPaper": "Kertas"
   },
   "privacy": {
     "title": "Kebijakan Privasi",
@@ -300,6 +310,9 @@
     "termsOfUse": "Ketentuan Penggunaan",
     "bestValue": "Paling hemat",
     "trialTerms": "Gratis 7 hari, lalu {{price}}",
-    "savePercent": "Hemat {{percent}}"
+    "savePercent": "Hemat {{percent}}",
+    "timelineToday": "Hari ini: gratis",
+    "timelineLater": "7 hari lagi: {{price}}",
+    "previewHint": "Ketuk untuk mendengar 15 detik"
   }
 }

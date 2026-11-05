@@ -49,7 +49,8 @@
     "otherIntents": "或者别的",
     "recommendedMinutes": "建议 {{minutes}} 分钟",
     "recommendedMinutesSuffix": " 分钟",
-    "allSounds": "所有声音"
+    "allSounds": "所有声音",
+    "lastNight": "昨晚你听了 {{minutes}} 分钟。"
   },
   "explore": {
     "title": "探索声音",
@@ -156,7 +157,10 @@
     "addedToMixer": "已加入混音器",
     "emptyTitle": "打造专属混音",
     "emptyDesc": "最多叠加 4 种声音——雨声、噪音与频率——并保存混音。",
-    "removed": "已移除{{name}}"
+    "removed": "已移除{{name}}",
+    "livingMix": "流动混音",
+    "livingMixHint": "每个声音缓慢起伏，平衡不会一成不变。",
+    "share": "分享混音"
   },
   "player": {
     "nowPlaying": "正在播放",
@@ -180,7 +184,9 @@
     "untilFade": "后渐弱",
     "noTimerHint": "播放直到你停止",
     "setTimer": "设置定时",
-    "headphonesBinaural": "需要耳机：两只耳朵必须分别听到各自的声音。"
+    "headphonesBinaural": "需要耳机：两只耳朵必须分别听到各自的声音。",
+    "bedMode": "床头模式",
+    "bedModeExit": "轻触返回"
   },
   "settings": {
     "title": "设置",
@@ -217,7 +223,11 @@
     "premiumGet": "解锁所有声音",
     "premiumManage": "管理订阅",
     "support": "帮助与支持",
-    "stats": "你的收听记录"
+    "stats": "你的收听记录",
+    "appIcon": "应用图标",
+    "appIconDefault": "默认",
+    "appIconEmber": "余烬",
+    "appIconPaper": "纸"
   },
   "privacy": {
     "title": "隐私政策",
@@ -300,6 +310,9 @@
     "termsOfUse": "使用条款",
     "bestValue": "最划算",
     "trialTerms": "免费 7 天，之后 {{price}}",
-    "savePercent": "节省 {{percent}}"
+    "savePercent": "节省 {{percent}}",
+    "timelineToday": "今天：免费",
+    "timelineLater": "7 天后：{{price}}",
+    "previewHint": "轻触试听 15 秒"
   }
 }

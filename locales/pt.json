@@ -49,7 +49,8 @@
     "otherIntents": "Ou outra coisa",
     "recommendedMinutes": "{{minutes}} min recomendados",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Todos os sons"
+    "allSounds": "Todos os sons",
+    "lastNight": "Ontem à noite você ouviu por {{minutes}} min."
   },
   "explore": {
     "title": "Explorar sons",
@@ -156,7 +157,10 @@
     "addedToMixer": "Adicionado ao mixer",
     "emptyTitle": "Crie sua própria mistura",
     "emptyDesc": "Combine até 4 sons — chuva, ruído e frequências — e salve a mistura.",
-    "removed": "{{name}} removido"
+    "removed": "{{name}} removido",
+    "livingMix": "Mix vivo",
+    "livingMixHint": "Cada som varia devagar, e o equilíbrio nunca fica parado.",
+    "share": "Compartilhar mix"
   },
   "player": {
     "nowPlaying": "Tocando agora",
@@ -180,7 +184,9 @@
     "untilFade": "até diminuir",
     "noTimerHint": "Toca até você parar",
     "setTimer": "Definir timer",
-    "headphonesBinaural": "Fones necessários: cada ouvido precisa ouvir seu próprio som."
+    "headphonesBinaural": "Fones necessários: cada ouvido precisa ouvir seu próprio som.",
+    "bedMode": "Modo cama",
+    "bedModeExit": "Toque para voltar"
   },
   "settings": {
     "title": "Ajustes",
@@ -217,7 +223,11 @@
     "premiumGet": "Desbloquear todos os sons",
     "premiumManage": "Gerenciar assinatura",
     "support": "Ajuda e suporte",
-    "stats": "Sua escuta"
+    "stats": "Sua escuta",
+    "appIcon": "Ícone do app",
+    "appIconDefault": "Padrão",
+    "appIconEmber": "Brasa",
+    "appIconPaper": "Papel"
   },
   "privacy": {
     "title": "Política de Privacidade",
@@ -300,6 +310,9 @@
     "termsOfUse": "Termos de Uso",
     "bestValue": "Melhor preço",
     "trialTerms": "7 dias grátis, depois {{price}}",
-    "savePercent": "Economize {{percent}}"
+    "savePercent": "Economize {{percent}}",
+    "timelineToday": "Hoje: grátis",
+    "timelineLater": "Em 7 dias: {{price}}",
+    "previewHint": "Toque para ouvir 15 segundos"
   }
 }

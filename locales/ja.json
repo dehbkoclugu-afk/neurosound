@@ -49,7 +49,8 @@
     "otherIntents": "ほかの目的",
     "recommendedMinutes": "おすすめ {{minutes}} 分",
     "recommendedMinutesSuffix": " 分",
-    "allSounds": "すべてのサウンド"
+    "allSounds": "すべてのサウンド",
+    "lastNight": "昨夜は{{minutes}}分聴きました。"
   },
   "explore": {
     "title": "サウンドを探す",
@@ -156,7 +157,10 @@
     "addedToMixer": "ミキサーに追加しました",
     "emptyTitle": "自分だけのサウンドミックス",
     "emptyDesc": "雨音・ノイズ・周波数を最大4つ重ねて、ミックスを保存できます。",
-    "removed": "{{name}}を削除しました"
+    "removed": "{{name}}を削除しました",
+    "livingMix": "リビングミックス",
+    "livingMixHint": "各サウンドがゆっくり変化し、バランスが固定されません。",
+    "share": "ミックスを共有"
   },
   "player": {
     "nowPlaying": "再生中",
@@ -180,7 +184,9 @@
     "untilFade": "後にフェードアウト",
     "noTimerHint": "停止するまで再生",
     "setTimer": "タイマーを設定",
-    "headphonesBinaural": "ヘッドホンが必要です：左右の耳でそれぞれ別の音を聴きます。"
+    "headphonesBinaural": "ヘッドホンが必要です：左右の耳でそれぞれ別の音を聴きます。",
+    "bedMode": "ベッドモード",
+    "bedModeExit": "タップして戻る"
   },
   "settings": {
     "title": "設定",
@@ -217,7 +223,11 @@
     "premiumGet": "すべてのサウンドを解放",
     "premiumManage": "サブスクリプションを管理",
     "support": "ヘルプとサポート",
-    "stats": "リスニング記録"
+    "stats": "リスニング記録",
+    "appIcon": "アプリアイコン",
+    "appIconDefault": "デフォルト",
+    "appIconEmber": "残り火",
+    "appIconPaper": "ペーパー"
   },
   "privacy": {
     "title": "プライバシーポリシー",
@@ -300,6 +310,9 @@
     "termsOfUse": "利用規約",
     "bestValue": "いちばんお得",
     "trialTerms": "7日間無料、その後 {{price}}",
-    "savePercent": "{{percent}}お得"
+    "savePercent": "{{percent}}お得",
+    "timelineToday": "本日：無料",
+    "timelineLater": "7日後：{{price}}",
+    "previewHint": "タップして15秒試聴"
   }
 }

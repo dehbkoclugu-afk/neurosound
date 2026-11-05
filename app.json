@@ -120,7 +120,29 @@
       "expo-asset",
       "expo-localization",
       "expo-font",
-      "./plugins/withoutMicrophoneService"
+      "./plugins/withoutMicrophoneService",
+      "expo-quick-actions",
+      [
+        "expo-alternate-app-icons",
+        [
+          {
+            "name": "Ember",
+            "ios": "./assets/images/alt-icons/ember.png",
+            "android": {
+              "foregroundImage": "./assets/images/alt-icons/ember-foreground.png",
+              "backgroundColor": "#101418"
+            }
+          },
+          {
+            "name": "Paper",
+            "ios": "./assets/images/alt-icons/paper.png",
+            "android": {
+              "foregroundImage": "./assets/images/alt-icons/paper-foreground.png",
+              "backgroundColor": "#F0EDEA"
+            }
+          }
+        ]
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

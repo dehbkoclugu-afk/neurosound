@@ -14,6 +14,7 @@ Add-Type -AssemblyName System.Drawing
 $art = (Resolve-Path (Join-Path $PSScriptRoot '..\assets\images\art')).Path
 $MaxWidth = 1080
 $ThumbSize = 156
+$LockSize = 320
 $jpeg = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' }
 
 function Save-Jpeg($bitmap, $path, [long]$quality) {
@@ -48,8 +49,24 @@ foreach ($set in @(@('dark', 'presets'), @('light', 'light\presets'))) {
   }
 }
 
+# Android's now-playing notification carries its artwork as a bitmap through
+# binder, so it gets its own small square: full-size art risks a
+# TransactionTooLarge crash in the audio service. iOS uses the full art.
+$lockOut = Join-Path $art 'lock'
+New-Item -ItemType Directory -Force $lockOut | Out-Null
+Get-ChildItem (Join-Path $art 'presets') -Filter *.jpg | ForEach-Object {
+  $src = [System.Drawing.Image]::FromFile($_.FullName)
+  $side = [Math]::Min($src.Width, $src.Height)
+  $from = New-Object System.Drawing.Rectangle ([int](($src.Width - $side) / 2)), ([int](($src.Height - $side) / 2)), $side, $side
+  $to = New-Object System.Drawing.Rectangle 0, 0, $LockSize, $LockSize
+  $bmp, $g = New-Canvas $LockSize $LockSize
+  $g.DrawImage($src, $to, $from, [System.Drawing.GraphicsUnit]::Pixel)
+  Save-Jpeg $bmp (Join-Path $lockOut $_.Name) 80
+  $g.Dispose(); $bmp.Dispose(); $src.Dispose()
+}
+
 # Then shrink the full-size art in place.
-Get-ChildItem $art -Recurse -Filter *.jpg | Where-Object { $_.FullName -notlike '*\thumbs\*' } | ForEach-Object {
+Get-ChildItem $art -Recurse -Filter *.jpg | Where-Object { $_.FullName -notlike '*\thumbs\*' -and $_.FullName -notlike '*\lock\*' } | ForEach-Object {
   $src = [System.Drawing.Image]::FromFile($_.FullName)
   if ($src.Width -le $MaxWidth) { $src.Dispose(); return }
   $h = [int][Math]::Round($src.Height * $MaxWidth / $src.Width)

@@ -36,6 +36,7 @@ import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { intentArt, stateArt } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
+import { lastNightMinutes } from '@/lib/lastNight';
 
 // How many favourites the home screen previews before offering the rest.
 const FAVORITES_PREVIEW = 4;
@@ -54,7 +55,7 @@ export default function HomeScreen() {
     setHasSeenHeadphoneWarning,
     hasSeenOnboarding,
   } = useSettingsStore();
-  const { favoriteIds, recentlyPlayed } = usePresetsStore();
+  const { favoriteIds, recentlyPlayed, lastSession } = usePresetsStore();
 
   const colors = useThemeColors();
   const artwork = useArtwork();
@@ -84,6 +85,8 @@ export default function HomeScreen() {
     () => getPresetById(suggestedIntent.presetIds[0]),
     [suggestedIntent.presetIds],
   );
+
+  const lastNight = lastNightMinutes(lastSession, new Date());
 
   // AsyncStorage hydration must finish before the onboarding default is used.
   if (!hasHydrated) {
@@ -193,6 +196,12 @@ export default function HomeScreen() {
           >
             {t('home.intentsTitle')}
           </Text>
+          {/* A fact, not a score: no streak, no judgement of the number. */}
+          {lastNight !== null && (
+            <Text style={[styles.lastNight, { color: colors.textSecondary }]}>
+              {t('home.lastNight', { minutes: lastNight })}
+            </Text>
+          )}
 
           <ArtBackground
             source={artwork.source(intentArt(suggestedIntent.id))}
@@ -377,6 +386,11 @@ const styles = StyleSheet.create({
   intentsTitle: {
     ...Typography.largeTitle,
     marginBottom: Spacing.lg,
+  },
+  lastNight: {
+    ...Typography.footnote,
+    marginTop: -Spacing.sm,
+    marginBottom: Spacing.md,
   },
   leadCard: {
     height: 300,

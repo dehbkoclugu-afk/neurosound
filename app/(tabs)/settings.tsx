@@ -20,6 +20,8 @@ import type { TFunction } from 'i18next';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
+import { Image } from 'expo-image';
+import { getAppIconName, setAlternateAppIcon } from 'expo-alternate-app-icons';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import {
@@ -86,6 +88,13 @@ const THEME_OPTIONS: {
   },
 ];
 
+// Names match the `expo-alternate-app-icons` entry in app.json.
+const APP_ICONS = [
+  { name: null, labelKey: 'settings.appIconDefault', image: require('@/assets/images/icon.png') },
+  { name: 'Ember', labelKey: 'settings.appIconEmber', image: require('@/assets/images/alt-icons/ember.png') },
+  { name: 'Paper', labelKey: 'settings.appIconPaper', image: require('@/assets/images/alt-icons/paper.png') },
+] as const;
+
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -116,6 +125,20 @@ export default function SettingsScreen() {
   const showToast = useToastStore((st) => st.show);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showThemeSheet, setShowThemeSheet] = useState(false);
+  const [showIconSheet, setShowIconSheet] = useState(false);
+  const [appIcon, setAppIcon] = useState<string | null>(() =>
+    Platform.OS === 'web' ? null : getAppIconName(),
+  );
+
+  const handleSelectIcon = async (name: string | null) => {
+    setShowIconSheet(false);
+    try {
+      await setAlternateAppIcon(name);
+      setAppIcon(name);
+    } catch {
+      showToast(t('common.error'), 'error');
+    }
+  };
   const miniPlayerInset = useMiniPlayerInset();
 
   // resetSettings and presetsStore.reset both existed and were wired to
@@ -244,6 +267,29 @@ export default function SettingsScreen() {
                 <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
               </View>
             </TouchableOpacity>
+
+            {/* App icon, a Premium extra. Web has no icon to change. */}
+            {Platform.OS !== 'web' && (
+              <TouchableOpacity
+                onPress={() => (isPremium ? setShowIconSheet(true) : router.push('/paywall'))}
+                style={[styles.card, styles.valueRow, { borderBottomColor: colors.cardBorder }]}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.cardTitle, { color: colors.text }]}>
+                  {t('settings.appIcon')}
+                </Text>
+                <View style={styles.valueRight}>
+                  <Text style={[styles.valueText, { color: colors.textSecondary }]}>
+                    {t(APP_ICONS.find((icon) => icon.name === appIcon)?.labelKey ?? 'settings.appIconDefault')}
+                  </Text>
+                  <Ionicons
+                    name={isPremium ? 'chevron-forward' : 'lock-closed'}
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
 
             {/* Reduce Motion */}
             <View
@@ -555,6 +601,37 @@ export default function SettingsScreen() {
           );
         })}
       </Sheet>
+
+      <Sheet
+        visible={showIconSheet}
+        onClose={() => setShowIconSheet(false)}
+        title={t('settings.appIcon')}
+      >
+        {APP_ICONS.map((icon) => {
+          const selected = appIcon === icon.name;
+          return (
+            <TouchableOpacity
+              key={icon.labelKey}
+              onPress={() => handleSelectIcon(icon.name)}
+              style={[styles.sheetRow, styles.iconRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+            >
+              <Image source={icon.image} style={styles.iconPreview} />
+              <Text
+                style={[
+                  styles.sheetRowText,
+                  styles.iconLabel,
+                  { color: selected ? colors.accent : colors.text },
+                ]}
+              >
+                {t(icon.labelKey)}
+              </Text>
+              {selected && <Ionicons name="checkmark" size={20} color={colors.accent} />}
+            </TouchableOpacity>
+          );
+        })}
+      </Sheet>
     </SafeAreaView>
   );
 }
@@ -674,6 +751,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     minHeight: ControlSize.row,
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  iconRow: {
+    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  iconPreview: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+  },
+  iconLabel: {
+    flex: 1,
   },
   sheetRowText: {
     ...Typography.body,

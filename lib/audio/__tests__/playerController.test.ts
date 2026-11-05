@@ -35,6 +35,7 @@ jest.mock('expo-audio', () => ({
       setActiveForLockScreen: jest.fn(() => {
         if (lockScreen.refuse) throw new Error('ForegroundServiceStartNotAllowedException');
       }),
+      updateLockScreenMetadata: jest.fn(),
       clearLockScreenControls: jest.fn(() => {
         if (lockScreen.refuse) throw new Error('service already gone');
       }),
@@ -290,11 +291,23 @@ describe('lock screen artwork', () => {
     expect(mockAsset.downloadAsync).toHaveBeenCalled();
   });
 
-  it('uses the real path once the asset resolves', async () => {
-    mockAsset.localUri = 'file:///data/user/0/com.dehbkoclugu.neurosound/files/icon.png';
+  it('sends the real path once the asset resolves, without holding up the controls', async () => {
+    mockAsset.localUri = 'file:///data/user/0/com.dehbkoclugu.neurosound/cache/ocean.jpg';
     playerController.loadPreset(preset('noise-ocean'));
     await playerController.play();
+    await Promise.resolve();
+    await Promise.resolve();
 
+    const player = live()[0];
+    expect(metadataFor(player)?.artworkUrl).toBeUndefined();
+    expect(player.updateLockScreenMetadata).toHaveBeenCalledWith(
+      expect.objectContaining({ artworkUrl: mockAsset.localUri }),
+    );
+
+    // Already copied: the next session has it from the first call.
+    playerController.unload();
+    playerController.loadPreset(preset('noise-ocean'));
+    await playerController.play();
     expect(metadataFor(live()[0])?.artworkUrl).toBe(mockAsset.localUri);
     mockAsset.localUri = null;
   });
@@ -375,6 +388,51 @@ describe('sleep timer', () => {
     expect(live()).toHaveLength(0);
   });
 
+  it('falls slowly over the last three minutes, on a curve', async () => {
+    useAudioStore.setState({ volume: 1 });
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+    await settle();
+    playerController.startTimer(15);
+
+    const volumeAt = (secondsLeft: number) => {
+      jest.setSystemTime(useAudioStore.getState().timerEndsAt! - secondsLeft * 1000);
+      jest.advanceTimersByTime(1000);
+      return live()[0].volume;
+    };
+    expect(volumeAt(300)).toBeCloseTo(1);
+    const half = volumeAt(90);
+    expect(half).toBeGreaterThan(0.2);
+    expect(half).toBeLessThan(0.3);
+    expect(volumeAt(9)).toBeLessThan(0.01);
+  });
+
+  it('keeps a short timer from spending most of it fading', async () => {
+    useAudioStore.setState({ volume: 1 });
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+    await settle();
+    playerController.startTimer(1);
+
+    jest.setSystemTime(useAudioStore.getState().timerEndsAt! - 21_000);
+    jest.advanceTimersByTime(1000);
+    expect(live()[0].volume).toBeCloseTo(1, 0);
+  });
+
+  it('brings the sound back up when cancelled mid-fade', async () => {
+    useAudioStore.setState({ volume: 1 });
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+    await settle();
+    playerController.startTimer(15);
+    jest.setSystemTime(useAudioStore.getState().timerEndsAt! - 60_000);
+    jest.advanceTimersByTime(1000);
+    expect(live()[0].volume).toBeLessThan(0.2);
+
+    playerController.startTimer(null);
+    expect(live()[0].volume).toBeCloseTo(1);
+  });
+
   it('still fires when JS timers are frozen in the background', async () => {
     playerController.loadPreset(preset('noise-rain'));
     await playerController.play();
@@ -397,5 +455,47 @@ describe('sleep timer', () => {
     // native player is silent.
     await settle();
     expect(live().some((p) => p.playing)).toBe(false);
+  });
+});
+
+describe('living mix', () => {
+  afterEach(() => {
+    useSettingsStore.setState({ livingMix: false, legacyPremium: false });
+  });
+
+  it('only ever turns a channel down, and only slowly', () => {
+    const id = 'channel-1730000000000-abc1234';
+    let previous = playerController.livingDrift(id, 0);
+    for (let t = 1000; t < 300_000; t += 1000) {
+      const value = playerController.livingDrift(id, t);
+      expect(value).toBeLessThanOrEqual(1);
+      expect(value).toBeGreaterThanOrEqual(0.76);
+      expect(Math.abs(value - previous)).toBeLessThan(0.02);
+      previous = value;
+    }
+  });
+
+  const channelVolume = async () => {
+    await playerController.mixerAddChannel(preset('noise-rain'));
+    await playerController.mixerStart();
+    jest.setSystemTime(Date.now() + 37_000);
+    createdPlayers
+      .flatMap((p) => p.addListener.mock.calls)
+      .filter(([event]: [string]) => event === 'playbackStatusUpdate')
+      .forEach(([, cb]: [string, (s: { playing: boolean }) => void]) => cb({ playing: true }));
+    return live()[0].volume;
+  };
+
+  it('holds the set level without Premium, even if the setting is on', async () => {
+    useSettingsStore.setState({ livingMix: true, legacyPremium: false });
+    expect(await channelVolume()).toBeCloseTo(useAudioStore.getState().mixerChannels[0].volume * useAudioStore.getState().mixerMasterVolume);
+  });
+
+  it('moves the level below the set one with Premium', async () => {
+    useSettingsStore.setState({ livingMix: true, legacyPremium: true });
+    const set = await channelVolume();
+    const full = useAudioStore.getState().mixerChannels[0].volume * useAudioStore.getState().mixerMasterVolume;
+    expect(set).toBeLessThanOrEqual(full);
+    expect(set).toBeGreaterThanOrEqual(full * 0.76);
   });
 });

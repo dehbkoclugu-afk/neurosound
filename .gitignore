@@ -48,3 +48,7 @@ app-example
 
 # local visual-review artifacts
 /output/
+
+# Remotion promo: copied inputs and rendered video
+/promo/public/
+/promo/out/

@@ -299,6 +299,43 @@ export const PRESET_THUMB: Record<string, ArtworkPair> = {
   },
 };
 
+/** Small squares for Android's now-playing notification; see optimize-art.ps1. */
+export const PRESET_LOCK_ART: Record<string, ImageSourcePropType> = {
+  'binaural-alpha': require('@/assets/images/art/lock/binaural-alpha.jpg'),
+  'binaural-beta': require('@/assets/images/art/lock/binaural-beta.jpg'),
+  'binaural-delta': require('@/assets/images/art/lock/binaural-delta.jpg'),
+  'binaural-gamma': require('@/assets/images/art/lock/binaural-gamma.jpg'),
+  'binaural-theta': require('@/assets/images/art/lock/binaural-theta.jpg'),
+  'noise-airplane': require('@/assets/images/art/lock/noise-airplane.jpg'),
+  'noise-brown': require('@/assets/images/art/lock/noise-brown.jpg'),
+  'noise-fan': require('@/assets/images/art/lock/noise-fan.jpg'),
+  'noise-fire': require('@/assets/images/art/lock/noise-fire.jpg'),
+  'noise-forest': require('@/assets/images/art/lock/noise-forest.jpg'),
+  'noise-ocean': require('@/assets/images/art/lock/noise-ocean.jpg'),
+  'noise-pink': require('@/assets/images/art/lock/noise-pink.jpg'),
+  'noise-rain': require('@/assets/images/art/lock/noise-rain.jpg'),
+  'noise-stream': require('@/assets/images/art/lock/noise-stream.jpg'),
+  'noise-thunder': require('@/assets/images/art/lock/noise-thunder.jpg'),
+  'noise-train': require('@/assets/images/art/lock/noise-train.jpg'),
+  'noise-white': require('@/assets/images/art/lock/noise-white.jpg'),
+  'noise-wind': require('@/assets/images/art/lock/noise-wind.jpg'),
+  'solfeggio-111': require('@/assets/images/art/lock/solfeggio-111.jpg'),
+  'solfeggio-174': require('@/assets/images/art/lock/solfeggio-174.jpg'),
+  'solfeggio-285': require('@/assets/images/art/lock/solfeggio-285.jpg'),
+  'solfeggio-396': require('@/assets/images/art/lock/solfeggio-396.jpg'),
+  'solfeggio-40': require('@/assets/images/art/lock/solfeggio-40.jpg'),
+  'solfeggio-417': require('@/assets/images/art/lock/solfeggio-417.jpg'),
+  'solfeggio-432': require('@/assets/images/art/lock/solfeggio-432.jpg'),
+  'solfeggio-440': require('@/assets/images/art/lock/solfeggio-440.jpg'),
+  'solfeggio-528': require('@/assets/images/art/lock/solfeggio-528.jpg'),
+  'solfeggio-639': require('@/assets/images/art/lock/solfeggio-639.jpg'),
+  'solfeggio-741': require('@/assets/images/art/lock/solfeggio-741.jpg'),
+  'solfeggio-777': require('@/assets/images/art/lock/solfeggio-777.jpg'),
+  'solfeggio-852': require('@/assets/images/art/lock/solfeggio-852.jpg'),
+  'solfeggio-888': require('@/assets/images/art/lock/solfeggio-888.jpg'),
+  'solfeggio-963': require('@/assets/images/art/lock/solfeggio-963.jpg'),
+};
+
 export const STATE_ART: Record<ArtworkStateId, ArtworkPair> = {
   'favorites-empty': {
     dark: require('@/assets/images/art/states/favorites-empty.jpg'),

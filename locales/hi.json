@@ -49,7 +49,8 @@
     "otherIntents": "या कुछ और",
     "recommendedMinutes": "{{minutes}} मिनट सुझाए गए",
     "recommendedMinutesSuffix": " मिनट",
-    "allSounds": "सभी आवाज़ें"
+    "allSounds": "सभी आवाज़ें",
+    "lastNight": "कल रात आपने {{minutes}} मिनट सुना।"
   },
   "explore": {
     "title": "आवाज़ें खोजें",
@@ -156,7 +157,10 @@
     "addedToMixer": "मिक्सर में जोड़ा गया",
     "emptyTitle": "अपना साउंड मिक्स बनाएँ",
     "emptyDesc": "4 तक आवाज़ें मिलाएँ — बारिश, नॉइज़ और फ़्रीक्वेंसी — और मिक्स सेव करें।",
-    "removed": "{{name}} हटाया गया"
+    "removed": "{{name}} हटाया गया",
+    "livingMix": "लिविंग मिक्स",
+    "livingMixHint": "हर ध्वनि धीरे-धीरे बदलती है, इसलिए संतुलन कभी एक-सा नहीं रहता।",
+    "share": "मिक्स साझा करें"
   },
   "player": {
     "nowPlaying": "अभी चल रहा है",
@@ -180,7 +184,9 @@
     "untilFade": "फिर धीरे से धीमा होगा",
     "noTimerHint": "जब तक आप न रोकें, चलेगा",
     "setTimer": "टाइमर सेट करें",
-    "headphonesBinaural": "हेडफ़ोन ज़रूरी हैं: हर कान को अपनी अलग आवाज़ सुननी होती है।"
+    "headphonesBinaural": "हेडफ़ोन ज़रूरी हैं: हर कान को अपनी अलग आवाज़ सुननी होती है।",
+    "bedMode": "बेड मोड",
+    "bedModeExit": "वापस जाने के लिए टैप करें"
   },
   "settings": {
     "title": "सेटिंग्स",
@@ -217,7 +223,11 @@
     "premiumGet": "सभी आवाज़ें अनलॉक करें",
     "premiumManage": "सदस्यता प्रबंधित करें",
     "support": "सहायता और समर्थन",
-    "stats": "आपकी सुनने की जानकारी"
+    "stats": "आपकी सुनने की जानकारी",
+    "appIcon": "ऐप आइकन",
+    "appIconDefault": "डिफ़ॉल्ट",
+    "appIconEmber": "अंगारा",
+    "appIconPaper": "काग़ज़"
   },
   "privacy": {
     "title": "गोपनीयता नीति",
@@ -300,6 +310,9 @@
     "termsOfUse": "उपयोग की शर्तें",
     "bestValue": "सबसे किफ़ायती",
     "trialTerms": "7 दिन मुफ़्त, फिर {{price}}",
-    "savePercent": "{{percent}} बचाएँ"
+    "savePercent": "{{percent}} बचाएँ",
+    "timelineToday": "आज: मुफ़्त",
+    "timelineLater": "7 दिन बाद: {{price}}",
+    "previewHint": "15 सेकंड सुनने के लिए टैप करें"
   }
 }

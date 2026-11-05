@@ -1,0 +1,16 @@
+{
+  "name": "852hz-promo",
+  "private": true,
+  "description": "Vertical promo video, rendered with Remotion. Separate from the app: nothing here ships in the bundle.",
+  "scripts": {
+    "copy-assets": "node copy-assets.js",
+    "studio": "npm run copy-assets && remotion studio src/index.ts",
+    "render": "npm run copy-assets && remotion render src/index.ts Promo-tr out/852hz-promo-tr.mp4 && remotion render src/index.ts Promo-en out/852hz-promo-en.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.300",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.300"
+  }
+}

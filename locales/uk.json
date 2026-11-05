@@ -49,7 +49,8 @@
     "otherIntents": "Або щось інше",
     "recommendedMinutes": "Радимо {{minutes}} хв",
     "recommendedMinutesSuffix": " хв",
-    "allSounds": "Усі звуки"
+    "allSounds": "Усі звуки",
+    "lastNight": "Минулої ночі ви слухали {{minutes}} хв."
   },
   "explore": {
     "title": "Огляд звуків",
@@ -156,7 +157,10 @@
     "addedToMixer": "Додано до мікшера",
     "emptyTitle": "Створіть свій мікс звуків",
     "emptyDesc": "Змішайте до 4 звуків — дощ, шум і частоти — і збережіть мікс.",
-    "removed": "{{name}}: вилучено"
+    "removed": "{{name}}: вилучено",
+    "livingMix": "Живий мікс",
+    "livingMixHint": "Кожен звук повільно змінюється, тож баланс не стоїть на місці.",
+    "share": "Поділитися міксом"
   },
   "player": {
     "nowPlaying": "Зараз звучить",
@@ -180,7 +184,9 @@
     "untilFade": "до плавного згасання",
     "noTimerHint": "Грає, доки не зупините",
     "setTimer": "Встановити таймер",
-    "headphonesBinaural": "Потрібні навушники: кожне вухо має чути свій звук."
+    "headphonesBinaural": "Потрібні навушники: кожне вухо має чути свій звук.",
+    "bedMode": "Режим сну",
+    "bedModeExit": "Торкніться, щоб повернутися"
   },
   "settings": {
     "title": "Налаштування",
@@ -217,7 +223,11 @@
     "premiumGet": "Відкрити всі звуки",
     "premiumManage": "Керувати підпискою",
     "support": "Допомога та підтримка",
-    "stats": "Ваше прослуховування"
+    "stats": "Ваше прослуховування",
+    "appIcon": "Значок застосунку",
+    "appIconDefault": "За замовчуванням",
+    "appIconEmber": "Жар",
+    "appIconPaper": "Папір"
   },
   "privacy": {
     "title": "Політика конфіденційності",
@@ -300,6 +310,9 @@
     "termsOfUse": "Умови використання",
     "bestValue": "Найвигідніше",
     "trialTerms": "7 днів безкоштовно, потім {{price}}",
-    "savePercent": "Заощадьте {{percent}}"
+    "savePercent": "Заощадьте {{percent}}",
+    "timelineToday": "Сьогодні: безкоштовно",
+    "timelineLater": "Через 7 днів: {{price}}",
+    "previewHint": "Торкніться, щоб послухати 15 секунд"
   }
 }

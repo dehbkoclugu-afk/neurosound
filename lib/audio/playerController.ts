@@ -14,6 +14,8 @@ import i18n from '@/i18n';
 import { useAudioStore, MixerChannelState } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { usePremiumStore } from '@/stores/premiumStore';
+import { PRESET_ART, PRESET_LOCK_ART } from '../artAssets';
 import { FrequencyPreset, getPresetById } from '../frequencies';
 import {
   getBinauralPlayer,
@@ -79,47 +81,32 @@ function watchLockScreenPlayer(player: AudioPlayer, owner: 'single' | 'mixer'): 
 }
 
 /**
- * The lock screen's artwork slot was left empty, so the one place the app
- * appears while the phone is face-down showed a blank square.
+ * The sound's own artwork on the lock screen.
  *
- * Only ever returns something with a URI scheme. expo-audio parses this field
- * into a `java.net.URL`, and in a release build `Asset.fromModule().uri` is
- * the bare bundled-resource name — "assets_images_icon" — which is not a URL.
- * Handing that over threw MalformedURLException out of
- * `setActiveForLockScreen`, taking the whole call with it, so lock screen
- * controls never appeared on a release build at all. Worse, before that call
- * was wrapped the throw surfaced as "could not start audio" over sound that
- * was already playing.
+ * Only ever hands over a real file path. expo-audio parses this field into a
+ * `java.net.URL`, and in a release build `Asset.fromModule().uri` is the bare
+ * bundled-resource name, which threw MalformedURLException out of
+ * `setActiveForLockScreen` and took the controls with it. `downloadAsync` copies
+ * even a bare resource into the cache and gives back a `file://` path, but only
+ * asynchronously, so the controls go up first and the artwork follows.
  *
- * `Asset.fromModule` is synchronous but its `localUri` only exists after the
- * asset has been copied out on Android, so an unresolved call starts that and
- * returns nothing; a later call picks up the real `file://` path. Nothing is
- * cached until it is usable, since caching the unusable value was what made
- * this permanent.
- *
- * On a release build nothing usable ever arrives, so the artwork square stays
- * empty — checked on a device, across sessions. expo-asset only rewrites an
- * Android embedded asset to `file:///android_res/…` when it is running with
- * local assets (expo-updates), and updates are disabled here, so `uri` stays
- * the bare drawable name. Constructing that path by hand is possible but it
- * is not established that Media3's artwork loader resolves it, and the payoff
- * is one small square. Title, artist and the transport all work.
+ * Android gets a 320px square because the bitmap travels through binder in the
+ * notification; iOS has no such limit and shows it large.
  */
-let artworkUri: string | null = null;
-function ensureArtwork(): string | undefined {
-  if (artworkUri) return artworkUri;
-  try {
-    const asset = Asset.fromModule(require('@/assets/images/icon.png'));
-    const candidate = asset.localUri ?? asset.uri ?? null;
-    if (candidate && /^[a-z][a-z0-9+.-]*:/i.test(candidate)) {
-      artworkUri = candidate;
-      return artworkUri;
-    }
-    void asset.downloadAsync().catch(() => {});
-  } catch {
-    return undefined;
-  }
-  return undefined;
+const artworkUris = new Map<string, string>();
+
+function artworkModule(presetId: string): number | undefined {
+  const source = Platform.OS === 'android' ? PRESET_LOCK_ART[presetId] : PRESET_ART[presetId]?.dark;
+  return source as number | undefined;
+}
+
+async function resolveArtwork(presetId: string): Promise<string | undefined> {
+  const module = artworkModule(presetId);
+  if (!module) return undefined;
+  const asset = Asset.fromModule(module);
+  await asset.downloadAsync();
+  if (asset.localUri) artworkUris.set(presetId, asset.localUri);
+  return asset.localUri ?? undefined;
 }
 
 /**
@@ -140,21 +127,32 @@ function ensureArtwork(): string | undefined {
 function setNowPlaying(
   player: AudioPlayer | null,
   title: string,
-  owner: 'single' | 'mixer'
+  owner: 'single' | 'mixer',
+  artPresetId?: string
 ): void {
   if (Platform.OS === 'web') return;
   if (!player) return;
   if (lockScreenPlayer && lockScreenPlayer !== player) clearNowPlaying();
+  const known = artPresetId ? artworkUris.get(artPresetId) : undefined;
   try {
     player.setActiveForLockScreen(true, {
       title,
       artist: '852Hz',
-      artworkUrl: ensureArtwork(),
+      artworkUrl: known,
     }, { showSeekBackward: false, showSeekForward: false });
     watchLockScreenPlayer(player, owner);
   } catch (e) {
     console.log('Lock screen controls unavailable:', e);
+    return;
   }
+  if (known || !artPresetId) return;
+  resolveArtwork(artPresetId)
+    .then((artworkUrl) => {
+      // The sound may have changed while the file was being copied.
+      if (!artworkUrl || lockScreenPlayer !== player) return;
+      player.updateLockScreenMetadata({ title, artist: '852Hz', artworkUrl });
+    })
+    .catch((e) => console.log('Lock screen artwork unavailable:', e));
 }
 
 function clearNowPlaying(): void {
@@ -206,8 +204,12 @@ function effectiveVolume(): number {
 
 const FADE_IN_MS = 400;
 const FADE_OUT_MS = 250;
-const TIMER_FADE_WINDOW_S = 30; // sleep timer fades over the last 30 seconds
+// Three minutes rather than thirty seconds: a slow fall is what lets someone
+// stay asleep through the end. A short timer never spends over a third fading.
+const TIMER_FADE_WINDOW_S = 180;
 
+/** Where the sleep timer's closing fade currently stands; 1 outside of it. */
+let timerFadeRatio = 1;
 let rampInterval: ReturnType<typeof setInterval> | null = null;
 let lastVolume = 0;
 
@@ -353,7 +355,7 @@ export async function play(): Promise<void> {
     beginListening();
     bindTimerHeartbeat(gen.getNativePlayer());
     const preset = useAudioStore.getState().currentPreset;
-    if (preset) setNowPlaying(gen.getNativePlayer(), i18n.t(preset.nameKey), 'single');
+    if (preset) setNowPlaying(gen.getNativePlayer(), i18n.t(preset.nameKey), 'single', preset.id);
   } catch (e) {
     if (generator === gen) useAudioStore.getState().setPlaybackError(true);
   } finally {
@@ -392,12 +394,12 @@ export async function toggle(): Promise<void> {
 export function syncVolume(): void {
   if (!rampInterval) {
     // don't fight an active fade
-    setGenVolume(effectiveVolume());
+    setGenVolume(effectiveVolume() * timerFadeRatio);
   }
   const { mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
   mixerChannels.forEach((ch) =>
-    mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume))
+    mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume) * timerFadeRatio)
   );
 }
 
@@ -423,6 +425,7 @@ function clearTimer(): void {
     clearTimeout(timerTimeout);
     timerTimeout = null;
   }
+  timerFadeRatio = 1;
   useAudioStore.getState().setTimer(null);
 }
 
@@ -434,6 +437,7 @@ function clearTimer(): void {
  */
 /** Scale whatever is currently playing, for the timer's closing fade. */
 function applyTimerFade(ratio: number): void {
+  timerFadeRatio = ratio;
   const { isPlaying, isMixerPlaying, mixerChannels } = useAudioStore.getState();
   const { maxVolume } = useSettingsStore.getState();
 
@@ -457,7 +461,7 @@ function stopForTimer(): void {
 function evaluateTimer(): void {
   if (timerTimeout) clearTimeout(timerTimeout);
   timerTimeout = null;
-  const { timerEndsAt, updateTimerRemaining, isPlaying, isMixerPlaying } =
+  const { timerEndsAt, timerDuration, updateTimerRemaining, isPlaying, isMixerPlaying } =
     useAudioStore.getState();
   if (timerEndsAt === null) {
     clearTimer();
@@ -474,9 +478,11 @@ function evaluateTimer(): void {
 
   updateTimerRemaining(remaining);
 
-  // Gentle fade over the final window instead of an abrupt cut
-  if ((isPlaying || isMixerPlaying) && remaining <= TIMER_FADE_WINDOW_S && !rampInterval) {
-    applyTimerFade(remaining / TIMER_FADE_WINDOW_S);
+  // Squared because hearing is roughly logarithmic: a straight line down sounds
+  // like nothing happens for two minutes and then the sound drops away.
+  const fadeWindow = Math.min(TIMER_FADE_WINDOW_S, ((timerDuration ?? 0) * 60) / 3);
+  if ((isPlaying || isMixerPlaying) && remaining <= fadeWindow && !rampInterval) {
+    applyTimerFade((remaining / fadeWindow) ** 2);
   }
 
   timerTimeout = setTimeout(evaluateTimer, Math.min(1000, remaining * 1000));
@@ -489,6 +495,11 @@ export function startTimer(minutes: number | null): void {
     timerTimeout = null;
   }
   useAudioStore.getState().setTimer(minutes);
+  // Cancelled or replaced mid-fade: the sound comes back up to its real level.
+  if (timerFadeRatio !== 1) {
+    timerFadeRatio = 1;
+    syncVolume();
+  }
   if (!minutes) return;
 
   evaluateTimer();
@@ -516,6 +527,7 @@ function bindTimerHeartbeat(player: AudioPlayer | null | undefined): void {
     if (now - lastHeartbeat < 1000) return;
     lastHeartbeat = now;
     if (useAudioStore.getState().timerEndsAt !== null) evaluateTimer();
+    applyLivingMix();
   });
 }
 
@@ -579,7 +591,7 @@ async function startMixerChannels(
     useAudioStore.getState().setIsMixerPlaying(true);
     beginListening();
     const leader = mixerGenerators.values().next().value as Generator | undefined;
-    setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer');
+    setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer', mixerChannels[0]?.preset.id);
     bindTimerHeartbeat(leader?.getNativePlayer());
   } catch {
     mixerGenerators.forEach((gen) => {
@@ -613,11 +625,46 @@ export function mixerStop(): void {
  * rather than rewriting them.
  */
 function channelVolume(
-  ch: { volume: number; muted: boolean },
+  ch: { id: string; volume: number; muted: boolean },
   maxVolume: number,
   master = useAudioStore.getState().mixerMasterVolume
 ): number {
-  return ch.muted ? 0 : ch.volume * master * maxVolume;
+  if (ch.muted) return 0;
+  const drift = livingMixActive() ? livingDrift(ch.id, Date.now()) : 1;
+  return ch.volume * master * maxVolume * drift;
+}
+
+/**
+ * Living mix: each channel breathes on its own slow cycle, so a long mix never
+ * settles into the exact same balance. Only ever turns a channel down from what
+ * the user set, which keeps the hearing-safety cap a true ceiling.
+ */
+const LIVING_DEPTH = 0.24;
+
+export function livingDrift(channelId: string, nowMs: number): number {
+  let hash = 0;
+  for (let i = 0; i < channelId.length; i++) hash = (hash * 31 + channelId.charCodeAt(i)) | 0;
+  const seed = Math.abs(hash);
+  const periodS = 70 + (seed % 61);
+  const phase = ((seed % 360) * Math.PI) / 180;
+  const wave = Math.sin((2 * Math.PI * nowMs) / (periodS * 1000) + phase);
+  return 1 - LIVING_DEPTH * (0.5 + 0.5 * wave);
+}
+
+function livingMixActive(): boolean {
+  const { livingMix, legacyPremium } = useSettingsStore.getState();
+  return livingMix && (usePremiumStore.getState().owned || legacyPremium);
+}
+
+/** Runs on the player's own status events: JS timers stop in the background,
+ *  and the background is where a mix plays for hours. */
+function applyLivingMix(): void {
+  const { isMixerPlaying, mixerChannels } = useAudioStore.getState();
+  if (!isMixerPlaying || !livingMixActive()) return;
+  const { maxVolume } = useSettingsStore.getState();
+  mixerChannels.forEach((ch) =>
+    mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume) * timerFadeRatio)
+  );
 }
 
 export function mixerSetChannelMuted(channelId: string, muted: boolean): void {
@@ -656,7 +703,7 @@ export async function mixerAddChannel(preset: FrequencyPreset): Promise<boolean>
       // whose master is turned down used to arrive at full level and blast
       // over the balance the user had just set.
       gen.setVolume(
-        channelVolume({ volume: 0.5, muted: false }, useSettingsStore.getState().maxVolume)
+        channelVolume({ id, volume: 0.5, muted: false }, useSettingsStore.getState().maxVolume)
       );
       await gen.play();
     }
@@ -687,7 +734,10 @@ export function mixerRemoveChannel(channelId: string): void {
     // The removed channel may have been the one carrying the lock screen and
     // the timer heartbeat; hand both to whichever channel now leads.
     const leader = mixerGenerators.values().next().value as Generator | undefined;
-    if (ownedLockScreen) setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer');
+    if (ownedLockScreen) {
+      const leadPreset = useAudioStore.getState().mixerChannels[0]?.preset.id;
+      setNowPlaying(leader?.getNativePlayer() ?? null, '852Hz Mixer', 'mixer', leadPreset);
+    }
     bindTimerHeartbeat(leader?.getNativePlayer());
   }
 }
@@ -701,7 +751,7 @@ export function mixerSetChannelVolume(channelId: string, volume: number): void {
   mixerGenerators
     .get(channelId)
     ?.setVolume(
-      channelVolume({ volume, muted: false }, useSettingsStore.getState().maxVolume)
+      channelVolume({ id: channelId, volume, muted: false }, useSettingsStore.getState().maxVolume)
     );
 }
 

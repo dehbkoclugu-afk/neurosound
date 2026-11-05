@@ -18,7 +18,8 @@ import {
   TouchableOpacity,
   Animated,
   Alert,
-  ScrollView,
+  Image,
+  Platform,
   useWindowDimensions,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -26,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import {
@@ -44,6 +46,9 @@ import { Slider } from '@/components/ui/Slider';
 import { TimerModal, formatTimerValue, TIMER_OPTIONS } from '@/components/ui/TimerModal';
 import { TransportButton } from '@/components/ui/TransportButton';
 import { EqualizerBars } from '@/components/ui/EqualizerBars';
+import { BedMode } from '@/components/ui/BedMode';
+import { RollingCountdown } from '@/components/ui/RollingCountdown';
+import { toneSignature } from '@/lib/toneSignatures';
 import { formatPercent } from '@/lib/upper';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { useToastStore } from '@/stores/toastStore';
@@ -62,6 +67,8 @@ import * as playerController from '@/lib/audio/playerController';
  * of where small speakers give up, and it is also the binaural carrier.
  */
 const SPEAKER_FLOOR_HZ = 200;
+
+const SIGNATURE_OPACITY = 0.26;
 
 function needsHeadphones(preset: FrequencyPreset): boolean {
   if (preset.type === 'binaural') return true;
@@ -93,9 +100,12 @@ export default function PlayerScreen() {
 
   const [preset, setPreset] = useState<FrequencyPreset | null>(null);
   const [showTimerModal, setShowTimerModal] = useState(false);
+  const [showBedMode, setShowBedMode] = useState(false);
   const showToast = useToastStore((s) => s.show);
   const heartScale = useRef(new Animated.Value(1)).current;
   const heroScale = useRef(new Animated.Value(1)).current;
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const signatureOpacity = useRef(new Animated.Value(SIGNATURE_OPACITY)).current;
 
   useEffect(() => {
     // Wait for the cached entitlement, or a paying user flashes the paywall.
@@ -128,6 +138,32 @@ export default function PlayerScreen() {
       useNativeDriver: true,
     }).start();
   }, [isPlaying, reduceMotion, heroScale]);
+
+  // The tone's figure breathes while it plays: twelve seconds a cycle and a small
+  // swing in brightness, so it can never read as a flicker.
+  useEffect(() => {
+    signatureOpacity.stopAnimation();
+    if (!isPlaying || reduceMotion) {
+      signatureOpacity.setValue(SIGNATURE_OPACITY);
+      return;
+    }
+    const breathe = Animated.loop(
+      Animated.sequence([
+        Animated.timing(signatureOpacity, {
+          toValue: SIGNATURE_OPACITY + 0.14,
+          duration: 6000,
+          useNativeDriver: Platform.OS !== 'web',
+        }),
+        Animated.timing(signatureOpacity, {
+          toValue: SIGNATURE_OPACITY,
+          duration: 6000,
+          useNativeDriver: Platform.OS !== 'web',
+        }),
+      ]),
+    );
+    breathe.start();
+    return () => breathe.stop();
+  }, [isPlaying, reduceMotion, signatureOpacity]);
 
   const handlePlayPause = useCallback(async () => {
     haptics.commit();
@@ -209,20 +245,52 @@ export default function PlayerScreen() {
         ? `${preset.beatFrequency} Hz · ${t('explore.categories.binaural')}`
         : t(preset.descriptionKey);
   const timerLabel = TIMER_OPTIONS.find((o) => o.value === timerDuration)?.labelKey;
+  const signature = toneSignature(preset.id);
+  // The art slides at a third of the scroll speed inside its clipped frame.
+  const heroParallax = reduceMotion
+    ? undefined
+    : scrollY.interpolate({
+        inputRange: [0, heroHeight],
+        outputRange: [0, heroHeight / 3],
+        extrapolate: 'clamp',
+      });
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
+        scrollEventThrottle={16}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: Platform.OS !== 'web',
+        })}
       >
-        <Animated.View style={{ height: heroHeight, transform: [{ scale: heroScale }] }}>
+        {/* Clipped, so the slower-moving art can never slide behind the page. */}
+        <View style={{ height: heroHeight, overflow: 'hidden' }}>
+        <Animated.View
+          style={{
+            height: heroHeight,
+            transform: [{ translateY: heroParallax ?? 0 }, { scale: heroScale }],
+          }}
+        >
           <ArtBackground
             source={artwork.source(presetArt(preset.id))}
             placeholder={artwork.source(presetThumb(preset.id))}
             style={styles.hero}
             variant="hero"
           >
+            {signature && (
+              <View
+                pointerEvents="none"
+                style={styles.signatureFrame}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
+                <Animated.View style={{ opacity: signatureOpacity }}>
+                  <Image source={signature} style={styles.signature} />
+                </Animated.View>
+              </View>
+            )}
             <View style={[styles.heroHeader, { paddingTop: insets.top + Spacing.sm }]}>
               <TouchableOpacity
                 onPress={handleClose}
@@ -251,6 +319,16 @@ export default function PlayerScreen() {
             </View>
           </ArtBackground>
         </Animated.View>
+        {/* Stays put while the art moves: the scrim inside it slides away with
+            the parallax, and the clip would otherwise show as a hard edge. */}
+        {artwork.scheme !== 'light' && (
+          <LinearGradient
+            pointerEvents="none"
+            colors={[withAlpha(colors.background, 0), colors.background]}
+            style={styles.heroFade}
+          />
+        )}
+        </View>
 
         {/* At night the title overlaps the hero's fade into the page; by day
             the hero keeps a crisp edge, so the title starts below it. */}
@@ -309,9 +387,10 @@ export default function PlayerScreen() {
             <View style={styles.ctrlText} accessibilityLiveRegion="polite">
               {timerActive ? (
                 <>
-                  <Text style={[styles.countdown, { color: colors.text }]}>
-                    {formatTimerValue(timerRemaining!)}
-                  </Text>
+                  <RollingCountdown
+                    value={formatTimerValue(timerRemaining!)}
+                    style={[styles.countdown, { color: colors.text }]}
+                  />
                   <Text style={[styles.ctrlHint, { color: colors.textSecondary }]}>
                     {t('player.untilFade')}
                   </Text>
@@ -349,6 +428,17 @@ export default function PlayerScreen() {
             <Ionicons name="add" size={20} color={colors.textSecondary} />
             <Text style={[styles.addLinkText, { color: colors.textSecondary }]}>
               {t('mixer.addToMixer')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setShowBedMode(true)}
+            style={styles.addLink}
+            accessibilityRole="button"
+          >
+            <Ionicons name="moon-outline" size={20} color={colors.textSecondary} />
+            <Text style={[styles.addLinkText, { color: colors.textSecondary }]}>
+              {t('player.bedMode')}
             </Text>
           </TouchableOpacity>
 
@@ -406,9 +496,10 @@ export default function PlayerScreen() {
             )}
           </View>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       <TimerModal visible={showTimerModal} onClose={() => setShowTimerModal(false)} />
+      <BedMode visible={showBedMode} onClose={() => setShowBedMode(false)} />
       {/* The status bar sits on the artwork's darkened top in every theme. */}
       <StatusBar style="light" />
     </View>
@@ -421,6 +512,24 @@ const styles = StyleSheet.create({
   },
   hero: {
     flex: 1,
+  },
+  heroFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 140,
+  },
+  signatureFrame: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    // Above centre: at night the title covers the hero's lower part.
+    paddingTop: '16%',
+  },
+  signature: {
+    width: 220,
+    height: 220,
+    tintColor: '#FFFFFF',
   },
   heroHeader: {
     flexDirection: 'row',

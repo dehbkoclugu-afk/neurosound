@@ -49,7 +49,8 @@
     "otherIntents": "Or something else",
     "recommendedMinutes": "{{minutes}} min recommended",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "All sounds"
+    "allSounds": "All sounds",
+    "lastNight": "Last night you listened for {{minutes}} min."
   },
   "explore": {
     "title": "Explore Sounds",
@@ -156,7 +157,10 @@
     "addedToMixer": "Added to mixer",
     "emptyTitle": "Build your own soundscape",
     "emptyDesc": "Layer up to 4 sounds — rain, noise and frequencies — and save the mix.",
-    "removed": "{{name}} removed"
+    "removed": "{{name}} removed",
+    "livingMix": "Living mix",
+    "livingMixHint": "Each sound drifts slowly, so the balance never sits still.",
+    "share": "Share mix"
   },
   "player": {
     "nowPlaying": "Now Playing",
@@ -180,7 +184,9 @@
     "untilFade": "until it fades out",
     "noTimerHint": "Plays until you stop it",
     "setTimer": "Set a sleep timer",
-    "headphonesBinaural": "Headphones needed: each ear must hear its own tone."
+    "headphonesBinaural": "Headphones needed: each ear must hear its own tone.",
+    "bedMode": "Bed mode",
+    "bedModeExit": "Tap anywhere to return"
   },
   "settings": {
     "title": "Settings",
@@ -217,7 +223,11 @@
     "premiumGet": "Unlock every sound",
     "premiumManage": "Manage subscription",
     "support": "Help and support",
-    "stats": "Your listening"
+    "stats": "Your listening",
+    "appIcon": "App icon",
+    "appIconDefault": "Default",
+    "appIconEmber": "Ember",
+    "appIconPaper": "Paper"
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -300,6 +310,9 @@
     "termsOfUse": "Terms of Use",
     "bestValue": "Best value",
     "trialTerms": "7 days free, then {{price}}",
-    "savePercent": "Save {{percent}}"
+    "savePercent": "Save {{percent}}",
+    "timelineToday": "Today: free",
+    "timelineLater": "In 7 days: {{price}}",
+    "previewHint": "Tap to hear 15 seconds"
   }
 }

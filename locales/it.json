@@ -49,7 +49,8 @@
     "otherIntents": "Oppure altro",
     "recommendedMinutes": "{{minutes}} min consigliati",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Tutti i suoni"
+    "allSounds": "Tutti i suoni",
+    "lastNight": "Ieri notte hai ascoltato per {{minutes}} min."
   },
   "explore": {
     "title": "Esplora i suoni",
@@ -156,7 +157,10 @@
     "addedToMixer": "Aggiunto al mixer",
     "emptyTitle": "Crea il tuo mix di suoni",
     "emptyDesc": "Sovrapponi fino a 4 suoni — pioggia, rumore e frequenze — e salva il mix.",
-    "removed": "{{name}} rimosso"
+    "removed": "{{name}} rimosso",
+    "livingMix": "Mix vivo",
+    "livingMixHint": "Ogni suono varia lentamente, così l’equilibrio non resta mai fermo.",
+    "share": "Condividi mix"
   },
   "player": {
     "nowPlaying": "In riproduzione",
@@ -180,7 +184,9 @@
     "untilFade": "prima della dissolvenza",
     "noTimerHint": "Suona finché non lo fermi",
     "setTimer": "Imposta il timer",
-    "headphonesBinaural": "Servono le cuffie: ogni orecchio deve sentire il proprio suono."
+    "headphonesBinaural": "Servono le cuffie: ogni orecchio deve sentire il proprio suono.",
+    "bedMode": "Modalità letto",
+    "bedModeExit": "Tocca per tornare"
   },
   "settings": {
     "title": "Impostazioni",
@@ -217,7 +223,11 @@
     "premiumGet": "Sblocca tutti i suoni",
     "premiumManage": "Gestisci abbonamento",
     "support": "Aiuto e assistenza",
-    "stats": "I tuoi ascolti"
+    "stats": "I tuoi ascolti",
+    "appIcon": "Icona dell’app",
+    "appIconDefault": "Predefinita",
+    "appIconEmber": "Brace",
+    "appIconPaper": "Carta"
   },
   "privacy": {
     "title": "Informativa sulla privacy",
@@ -300,6 +310,9 @@
     "termsOfUse": "Condizioni d’uso",
     "bestValue": "Più conveniente",
     "trialTerms": "7 giorni gratis, poi {{price}}",
-    "savePercent": "Risparmia {{percent}}"
+    "savePercent": "Risparmia {{percent}}",
+    "timelineToday": "Oggi: gratis",
+    "timelineLater": "Tra 7 giorni: {{price}}",
+    "previewHint": "Tocca per ascoltare 15 secondi"
   }
 }

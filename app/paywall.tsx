@@ -8,7 +8,7 @@
  * bottom edge so it never scrolls away from the plan it buys.
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchProducts, requestPurchase, ErrorCode } from 'expo-iap';
+import Animated, { FadeIn, ZoomOut } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { useArtwork } from '@/hooks/use-artwork';
@@ -31,6 +32,7 @@ import { Spacing, Typography, FontFamily, Radius, AccessibilitySize, withAlpha }
 import { contentColumn } from '@/constants/layout';
 import { Button } from '@/components/ui/Button';
 import { ArtBackground } from '@/components/ui/ArtBackground';
+import { EqualizerBars } from '@/components/ui/EqualizerBars';
 import { syncPremium } from '@/components/PremiumSync';
 import { PREMIUM_SKUS, SUBSCRIPTION_SKUS, isLockedPreset } from '@/lib/premium';
 import { allPresets, getPresetById, FrequencyPreset } from '@/lib/frequencies';
@@ -39,6 +41,9 @@ import { upper, formatPercent } from '@/lib/upper';
 import { useIsPremium } from '@/stores/premiumStore';
 import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
+import * as playerController from '@/lib/audio/playerController';
+import { useAudioStore } from '@/stores/audioStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 type PlanKey = keyof typeof PREMIUM_SKUS;
 
@@ -58,6 +63,10 @@ const HERO_PRESET = 'solfeggio-963';
 // Hand-picked rather than the first six in catalogue order, which opened on two
 // Gammas in a row. These are the most different-looking sounds Premium opens.
 const PREVIEW_IDS = ['solfeggio-963', 'solfeggio-741', 'binaural-gamma', 'solfeggio-639', 'solfeggio-396', 'solfeggio-174'];
+
+const PREVIEW_MS = 15000;
+const UNLOCK_STEP_MS = 170;
+const UNLOCK_HOLD_MS = 900;
 
 type StoreProduct = {
   id: string;
@@ -156,12 +165,90 @@ export default function PaywallScreen() {
       .catch(() => setPlans([]));
   }, []);
 
-  // PremiumSync flips the entitlement when Play confirms the purchase.
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restoreAfterPreview = useRef<(() => void) | null>(null);
+
+  const stopPreview = () => {
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    previewTimer.current = null;
+    setPreviewId(null);
+    restoreAfterPreview.current?.();
+    restoreAfterPreview.current = null;
+  };
+
+  // A preview borrows the one audio slot, so whatever was there comes back
+  // afterwards: tasting a sound must not end the sleep sound already running.
+  const togglePreview = (preset: FrequencyPreset) => {
+    haptics.select();
+    if (previewId === preset.id) {
+      stopPreview();
+      return;
+    }
+    if (!restoreAfterPreview.current) {
+      const { isMixerPlaying, isPlaying, currentPreset } = useAudioStore.getState();
+      restoreAfterPreview.current = () => {
+        if (isMixerPlaying) {
+          playerController.mixerStart();
+        } else if (currentPreset) {
+          playerController.loadPreset(currentPreset);
+          if (isPlaying) playerController.play();
+        } else {
+          playerController.unload();
+        }
+      };
+    }
+    playerController.loadPreset(preset);
+    playerController.play();
+    setPreviewId(preset.id);
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    previewTimer.current = setTimeout(stopPreview, PREVIEW_MS);
+  };
+
+  // Leaving the paywall ends the preview, however it was left.
+  useEffect(
+    () => () => {
+      if (previewTimer.current) clearTimeout(previewTimer.current);
+      restoreAfterPreview.current?.();
+    },
+    [],
+  );
+
+  // PremiumSync flips the entitlement when Play confirms the purchase. The moment
+  // is the one payoff the money buys today, so the locks come off one by one
+  // before the screen goes. Someone already premium just passes through.
+  const wasPremium = useRef(isPremium);
+  const reduceMotion = useSettingsStore((s) => s.reduceMotion);
+  const [unlocked, setUnlocked] = useState<number | null>(null);
+
   useEffect(() => {
     if (!isPremium) return;
-    haptics.save();
-    showToast(t('paywall.welcome'), 'success');
-    close();
+    const finish = () => {
+      haptics.save();
+      showToast(t('paywall.welcome'), 'success');
+      close();
+    };
+    if (wasPremium.current || reduceMotion) {
+      finish();
+      return;
+    }
+    if (previewTimer.current) stopPreview();
+    setUnlocked(0);
+    let opened = 0;
+    let done: ReturnType<typeof setTimeout> | undefined;
+    const step = setInterval(() => {
+      opened += 1;
+      setUnlocked(opened);
+      haptics.select();
+      if (opened >= lockedPreview.length) {
+        clearInterval(step);
+        done = setTimeout(finish, UNLOCK_HOLD_MS);
+      }
+    }, UNLOCK_STEP_MS);
+    return () => {
+      clearInterval(step);
+      if (done) clearTimeout(done);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPremium]);
 
@@ -272,6 +359,7 @@ export default function PaywallScreen() {
           ) : plans.length === 0 ? (
             <Text style={[styles.unavailable, { color: colors.textSecondary }]}>{t('paywall.unavailable')}</Text>
           ) : (
+            <>
             <View style={styles.plans} accessibilityRole="radiogroup">
               {plans.map((p) => {
                 const active = p.key === selected;
@@ -325,9 +413,34 @@ export default function PaywallScreen() {
                 );
               })}
             </View>
+            {/* When the charge happens, drawn rather than left to the small print:
+                nobody should be surprised when the trial ends. */}
+            {plan?.hasTrial && (
+              <View style={styles.timeline}>
+                <View style={styles.timelineStop}>
+                  <View style={[styles.timelineDot, { backgroundColor: colors.accent }]} />
+                  <Text style={[styles.timelineText, { color: colors.text }]}>
+                    {t('paywall.timelineToday')}
+                  </Text>
+                </View>
+                <View style={[styles.timelineLine, { backgroundColor: colors.cardBorder }]} />
+                <View style={styles.timelineStop}>
+                  <View style={[styles.timelineDot, { backgroundColor: colors.textSecondary }]} />
+                  <Text style={[styles.timelineText, { color: colors.text }]}>
+                    {t('paywall.timelineLater', {
+                      price: t(`paywall.price.${plan.key}`, { price: plan.price }),
+                    })}
+                  </Text>
+                </View>
+              </View>
+            )}
+            </>
           )}
         </View>
 
+        <Text style={[styles.previewHint, contentColumn, { color: colors.textSecondary }]}>
+          {t('paywall.previewHint')}
+        </Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -335,22 +448,34 @@ export default function PaywallScreen() {
           accessibilityLabel={t('paywall.benefitLibrary')}
         >
           {lockedPreview.map((preset) => (
-            <ArtBackground
+            <TouchableOpacity
               key={preset.id}
-              source={artwork.source(presetArt(preset.id))}
-              variant="tile"
-              style={styles.previewTile}
+              onPress={() => togglePreview(preset)}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityState={{ selected: previewId === preset.id }}
+              accessibilityLabel={`${t(preset.nameKey)}. ${t('paywall.previewHint')}`}
             >
-              <View style={[styles.previewLock, { backgroundColor: artwork.foreground.badge }]}>
-                <Ionicons name="lock-closed" size={12} color={artwork.foreground.primary} />
-              </View>
-              <Text
-                style={[styles.previewName, { color: artwork.foreground.primary }]}
-                numberOfLines={2}
+              <ArtBackground
+                source={artwork.source(presetArt(preset.id))}
+                variant="tile"
+                style={styles.previewTile}
               >
-                {t(preset.nameKey)}
-              </Text>
-            </ArtBackground>
+                <View style={[styles.previewLock, { backgroundColor: artwork.foreground.badge }]}>
+                  {previewId === preset.id ? (
+                    <EqualizerBars color={artwork.foreground.primary} size={12} />
+                  ) : (
+                    <Ionicons name="play" size={12} color={artwork.foreground.primary} />
+                  )}
+                </View>
+                <Text
+                  style={[styles.previewName, { color: artwork.foreground.primary }]}
+                  numberOfLines={2}
+                >
+                  {t(preset.nameKey)}
+                </Text>
+              </ArtBackground>
+            </TouchableOpacity>
           ))}
           <View
             style={[
@@ -442,6 +567,36 @@ export default function PaywallScreen() {
           textStyle={{ color: colors.background }}
         />
       </View>
+
+      {unlocked !== null && (
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          style={[styles.unlock, { backgroundColor: colors.background }]}
+        >
+          <View style={styles.unlockGrid}>
+            {lockedPreview.map((preset, index) => (
+              <ArtBackground
+                key={preset.id}
+                source={artwork.source(presetArt(preset.id))}
+                variant="tile"
+                style={[styles.previewTile, { opacity: index < unlocked ? 1 : 0.45 }]}
+              >
+                {index >= unlocked && (
+                  <Animated.View
+                    exiting={ZoomOut.duration(160)}
+                    style={[styles.previewLock, { backgroundColor: artwork.foreground.badge }]}
+                  >
+                    <Ionicons name="lock-closed" size={12} color={artwork.foreground.primary} />
+                  </Animated.View>
+                )}
+              </ArtBackground>
+            ))}
+          </View>
+          <Text style={[styles.unlockTitle, { color: colors.text }]} accessibilityLiveRegion="polite">
+            {t('paywall.welcome')}
+          </Text>
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -479,6 +634,55 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...Typography.body,
+  },
+  previewHint: {
+    ...Typography.footnote,
+    paddingHorizontal: Spacing.lg,
+    marginTop: Spacing.sm,
+  },
+  timeline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  timelineStop: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  timelineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  timelineLine: {
+    flex: 1,
+    minWidth: 16,
+    height: 1,
+  },
+  timelineText: {
+    ...Typography.footnote,
+    flexShrink: 1,
+  },
+  unlock: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.lg,
+    padding: Spacing.lg,
+  },
+  unlockGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    maxWidth: 340,
+  },
+  unlockTitle: {
+    ...Typography.title,
+    textAlign: 'center',
   },
   previewStrip: {
     gap: Spacing.sm,

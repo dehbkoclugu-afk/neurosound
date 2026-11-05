@@ -18,6 +18,8 @@ import { SplineSansMono_500Medium } from '@expo-google-fonts/spline-sans-mono';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ToastHost } from '@/components/ui/ToastHost';
 import { PremiumSync } from '@/components/PremiumSync';
+import { AppShortcuts } from '@/components/AppShortcuts';
+import { NightWarmth } from '@/components/ui/NightWarmth';
 import i18n from '@/i18n';
 
 export const unstable_settings = {
@@ -80,7 +82,9 @@ export default function RootLayout() {
             options={{ presentation: 'modal', headerShown: false }}
           />
         </Stack>
+        <NightWarmth />
         <PremiumSync />
+        <AppShortcuts />
         <ToastHost />
         {/* Follows the app's own theme, not the system's: "auto" drew dark
             status icons over the dark-default UI on light-mode phones. */}

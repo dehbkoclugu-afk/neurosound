@@ -49,7 +49,8 @@
     "otherIntents": "Albo coś innego",
     "recommendedMinutes": "Zalecane {{minutes}} min",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Wszystkie dźwięki"
+    "allSounds": "Wszystkie dźwięki",
+    "lastNight": "Ostatniej nocy słuchałeś(-aś) {{minutes}} min."
   },
   "explore": {
     "title": "Odkrywaj dźwięki",
@@ -156,7 +157,10 @@
     "addedToMixer": "Dodano do miksera",
     "emptyTitle": "Stwórz własny miks dźwięków",
     "emptyDesc": "Połącz do 4 dźwięków — deszcz, szum i częstotliwości — i zapisz miks.",
-    "removed": "Usunięto: {{name}}"
+    "removed": "Usunięto: {{name}}",
+    "livingMix": "Żywy miks",
+    "livingMixHint": "Każdy dźwięk powoli się zmienia, więc balans nigdy nie stoi w miejscu.",
+    "share": "Udostępnij miks"
   },
   "player": {
     "nowPlaying": "Teraz odtwarzane",
@@ -180,7 +184,9 @@
     "untilFade": "do wyciszenia",
     "noTimerHint": "Gra, dopóki nie zatrzymasz",
     "setTimer": "Ustaw minutnik",
-    "headphonesBinaural": "Potrzebne słuchawki: każde ucho musi słyszeć własny dźwięk."
+    "headphonesBinaural": "Potrzebne słuchawki: każde ucho musi słyszeć własny dźwięk.",
+    "bedMode": "Tryb nocny",
+    "bedModeExit": "Dotknij, aby wrócić"
   },
   "settings": {
     "title": "Ustawienia",
@@ -217,7 +223,11 @@
     "premiumGet": "Odblokuj wszystkie dźwięki",
     "premiumManage": "Zarządzaj subskrypcją",
     "support": "Pomoc i wsparcie",
-    "stats": "Twoje słuchanie"
+    "stats": "Twoje słuchanie",
+    "appIcon": "Ikona aplikacji",
+    "appIconDefault": "Domyślna",
+    "appIconEmber": "Żar",
+    "appIconPaper": "Papier"
   },
   "privacy": {
     "title": "Polityka prywatności",
@@ -300,6 +310,9 @@
     "termsOfUse": "Warunki korzystania",
     "bestValue": "Najlepsza cena",
     "trialTerms": "7 dni za darmo, potem {{price}}",
-    "savePercent": "Oszczędź {{percent}}"
+    "savePercent": "Oszczędź {{percent}}",
+    "timelineToday": "Dziś: za darmo",
+    "timelineLater": "Za 7 dni: {{price}}",
+    "previewHint": "Dotknij, aby posłuchać 15 sekund"
   }
 }

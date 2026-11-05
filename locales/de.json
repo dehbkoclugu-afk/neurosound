@@ -49,7 +49,8 @@
     "otherIntents": "Oder etwas anderes",
     "recommendedMinutes": "{{minutes}} Min. empfohlen",
     "recommendedMinutesSuffix": " Min.",
-    "allSounds": "Alle Sounds"
+    "allSounds": "Alle Sounds",
+    "lastNight": "Letzte Nacht hast du {{minutes}} Min. gehört."
   },
   "explore": {
     "title": "Sounds entdecken",
@@ -156,7 +157,10 @@
     "addedToMixer": "Zum Mixer hinzugefügt",
     "emptyTitle": "Gestalte deinen eigenen Klangmix",
     "emptyDesc": "Kombiniere bis zu 4 Sounds – Regen, Rauschen, Frequenzen – und speichere den Mix.",
-    "removed": "{{name}} entfernt"
+    "removed": "{{name}} entfernt",
+    "livingMix": "Lebendiger Mix",
+    "livingMixHint": "Jeder Klang verändert sich langsam, die Balance bleibt in Bewegung.",
+    "share": "Mix teilen"
   },
   "player": {
     "nowPlaying": "Läuft gerade",
@@ -180,7 +184,9 @@
     "untilFade": "bis zum sanften Ausblenden",
     "noTimerHint": "Spielt, bis du stoppst",
     "setTimer": "Sleep-Timer stellen",
-    "headphonesBinaural": "Kopfhörer nötig: Jedes Ohr muss seinen eigenen Ton hören."
+    "headphonesBinaural": "Kopfhörer nötig: Jedes Ohr muss seinen eigenen Ton hören.",
+    "bedMode": "Bettmodus",
+    "bedModeExit": "Zum Zurückkehren tippen"
   },
   "settings": {
     "title": "Einstellungen",
@@ -217,7 +223,11 @@
     "premiumGet": "Alle Sounds freischalten",
     "premiumManage": "Abo verwalten",
     "support": "Hilfe und Support",
-    "stats": "Dein Hörverlauf"
+    "stats": "Dein Hörverlauf",
+    "appIcon": "App-Symbol",
+    "appIconDefault": "Standard",
+    "appIconEmber": "Glut",
+    "appIconPaper": "Papier"
   },
   "privacy": {
     "title": "Datenschutzerklärung",
@@ -300,6 +310,9 @@
     "termsOfUse": "Nutzungsbedingungen",
     "bestValue": "Bester Preis",
     "trialTerms": "7 Tage gratis, danach {{price}}",
-    "savePercent": "{{percent}} sparen"
+    "savePercent": "{{percent}} sparen",
+    "timelineToday": "Heute: kostenlos",
+    "timelineLater": "In 7 Tagen: {{price}}",
+    "previewHint": "Tippen für 15 Sekunden Hörprobe"
   }
 }

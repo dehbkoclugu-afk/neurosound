@@ -93,6 +93,8 @@ interface PresetsState {
 
   addRecentlyPlayed: (presetId: string) => void;
   clearRecentlyPlayed: () => void;
+  /** Most recent listening stretch; pauses under 30 minutes don't split it. */
+  lastSession: { endedAt: number; seconds: number } | null;
   recordListening: (seconds: number) => void;
   recordSessionStart: () => void;
 
@@ -102,6 +104,7 @@ interface PresetsState {
 const MAX_RECENTLY_PLAYED = 10;
 
 const initialState = {
+  lastSession: null as { endedAt: number; seconds: number } | null,
   favoriteIds: [],
   customMixes: [],
   listenedSeconds: 0,
@@ -177,7 +180,16 @@ export const usePresetsStore = create<PresetsState>()(
       clearRecentlyPlayed: () => set({ recentlyPlayed: [] }),
 
       recordListening: (seconds) =>
-        set((state) => ({ listenedSeconds: state.listenedSeconds + Math.max(0, seconds) })),
+        set((state) => {
+          const now = Date.now();
+          const added = Math.max(0, seconds);
+          const previous = state.lastSession;
+          const continues = previous && now - seconds * 1000 - previous.endedAt < 30 * 60 * 1000;
+          return {
+            listenedSeconds: state.listenedSeconds + added,
+            lastSession: { endedAt: now, seconds: added + (continues ? previous.seconds : 0) },
+          };
+        }),
 
       recordSessionStart: () =>
         set((state) => ({ sessionCount: state.sessionCount + 1 })),

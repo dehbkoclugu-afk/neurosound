@@ -49,7 +49,8 @@
     "otherIntents": "Или что-то другое",
     "recommendedMinutes": "рекомендуется {{minutes}} мин",
     "recommendedMinutesSuffix": " мин",
-    "allSounds": "Все звуки"
+    "allSounds": "Все звуки",
+    "lastNight": "Прошлой ночью вы слушали {{minutes}} мин."
   },
   "explore": {
     "title": "Обзор звуков",
@@ -156,7 +157,10 @@
     "addedToMixer": "Добавлено в микшер",
     "emptyTitle": "Создайте свой микс звуков",
     "emptyDesc": "Смешайте до 4 звуков — дождь, шум и частоты — и сохраните микс.",
-    "removed": "{{name}}: удалено"
+    "removed": "{{name}}: удалено",
+    "livingMix": "Живой микс",
+    "livingMixHint": "Каждый звук медленно меняется, и баланс не стоит на месте.",
+    "share": "Поделиться миксом"
   },
   "player": {
     "nowPlaying": "Сейчас играет",
@@ -180,7 +184,9 @@
     "untilFade": "до плавного затухания",
     "noTimerHint": "Играет, пока не остановите",
     "setTimer": "Поставить таймер",
-    "headphonesBinaural": "Нужны наушники: каждое ухо должно слышать свой звук."
+    "headphonesBinaural": "Нужны наушники: каждое ухо должно слышать свой звук.",
+    "bedMode": "Режим сна",
+    "bedModeExit": "Коснитесь, чтобы вернуться"
   },
   "settings": {
     "title": "Настройки",
@@ -217,7 +223,11 @@
     "premiumGet": "Открыть все звуки",
     "premiumManage": "Управление подпиской",
     "support": "Помощь и поддержка",
-    "stats": "Ваше прослушивание"
+    "stats": "Ваше прослушивание",
+    "appIcon": "Значок приложения",
+    "appIconDefault": "По умолчанию",
+    "appIconEmber": "Угли",
+    "appIconPaper": "Бумага"
   },
   "privacy": {
     "title": "Политика конфиденциальности",
@@ -300,6 +310,9 @@
     "termsOfUse": "Условия использования",
     "bestValue": "Выгоднее всего",
     "trialTerms": "7 дней бесплатно, затем {{price}}",
-    "savePercent": "Экономия {{percent}}"
+    "savePercent": "Экономия {{percent}}",
+    "timelineToday": "Сегодня: бесплатно",
+    "timelineLater": "Через 7 дней: {{price}}",
+    "previewHint": "Коснитесь, чтобы послушать 15 секунд"
   }
 }

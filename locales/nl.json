@@ -49,7 +49,8 @@
     "otherIntents": "Of iets anders",
     "recommendedMinutes": "{{minutes}} min aanbevolen",
     "recommendedMinutesSuffix": " min",
-    "allSounds": "Alle geluiden"
+    "allSounds": "Alle geluiden",
+    "lastNight": "Vannacht heb je {{minutes}} min geluisterd."
   },
   "explore": {
     "title": "Geluiden ontdekken",
@@ -156,7 +157,10 @@
     "addedToMixer": "Toegevoegd aan mixer",
     "emptyTitle": "Maak je eigen geluidsmix",
     "emptyDesc": "Combineer tot 4 geluiden — regen, ruis en frequenties — en bewaar de mix.",
-    "removed": "{{name}} verwijderd"
+    "removed": "{{name}} verwijderd",
+    "livingMix": "Levende mix",
+    "livingMixHint": "Elk geluid verschuift langzaam, zodat de balans nooit stilstaat.",
+    "share": "Mix delen"
   },
   "player": {
     "nowPlaying": "Speelt nu",
@@ -180,7 +184,9 @@
     "untilFade": "tot het uitfadet",
     "noTimerHint": "Speelt tot je stopt",
     "setTimer": "Slaaptimer instellen",
-    "headphonesBinaural": "Koptelefoon nodig: elk oor moet een eigen geluid horen."
+    "headphonesBinaural": "Koptelefoon nodig: elk oor moet een eigen geluid horen.",
+    "bedMode": "Bedmodus",
+    "bedModeExit": "Tik om terug te gaan"
   },
   "settings": {
     "title": "Instellingen",
@@ -217,7 +223,11 @@
     "premiumGet": "Alle geluiden ontgrendelen",
     "premiumManage": "Abonnement beheren",
     "support": "Hulp en ondersteuning",
-    "stats": "Jouw luistertijd"
+    "stats": "Jouw luistertijd",
+    "appIcon": "App-pictogram",
+    "appIconDefault": "Standaard",
+    "appIconEmber": "Gloed",
+    "appIconPaper": "Papier"
   },
   "privacy": {
     "title": "Privacybeleid",
@@ -300,6 +310,9 @@
     "termsOfUse": "Gebruiksvoorwaarden",
     "bestValue": "Beste prijs",
     "trialTerms": "7 dagen gratis, daarna {{price}}",
-    "savePercent": "Bespaar {{percent}}"
+    "savePercent": "Bespaar {{percent}}",
+    "timelineToday": "Vandaag: gratis",
+    "timelineLater": "Over 7 dagen: {{price}}",
+    "previewHint": "Tik om 15 seconden te horen"
   }
 }
