@@ -12,6 +12,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 type ArtBackgroundProps = {
   source?: ImageSourcePropType;
+  /** Small image shown while `source` decodes, so a screen's first paint is
+   *  the artwork rather than the dark surface behind it. */
+  placeholder?: ImageSourcePropType;
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   /**
@@ -38,6 +41,7 @@ const HERO_LIGHT = ['rgba(10, 9, 13, 0.4)', 'rgba(10, 9, 13, 0)', 'rgba(10, 9, 1
 
 export function ArtBackground({
   source,
+  placeholder,
   children,
   style,
   variant = 'row',
@@ -70,6 +74,8 @@ export function ArtBackground({
     <View style={[styles.surface, style]}>
       <Image
         source={source}
+        placeholder={placeholder}
+        placeholderContentFit="cover"
         style={StyleSheet.absoluteFill}
         contentFit="cover"
         cachePolicy="memory-disk"

@@ -15,7 +15,7 @@ import * as playerController from '@/lib/audio/playerController';
 import * as haptics from '@/lib/haptics';
 import { TransportButton } from './TransportButton';
 import { useArtwork } from '@/hooks/use-artwork';
-import { presetArt } from '@/lib/artAssets';
+import { presetThumb } from '@/lib/artAssets';
 import { useTranslation } from 'react-i18next';
 
 interface MiniPlayerProps {
@@ -129,7 +129,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
       <View style={styles.content}>
         {/* The sound's own artwork: the bar is recognisable before it is read. */}
         <Image
-          source={artwork.source(currentPreset ? presetArt(currentPreset.id) : presetArt(mixerChannels[0]?.preset.id ?? ''))}
+          source={artwork.source(presetThumb(currentPreset?.id ?? mixerChannels[0]?.preset.id ?? ''))}
           cachePolicy="memory-disk"
           style={[styles.thumb, { backgroundColor: colors.cardBorder }]}
         />

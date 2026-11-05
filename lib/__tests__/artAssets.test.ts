@@ -1,6 +1,6 @@
 import { intents } from '../intents';
 import { allPresets } from '../frequencies';
-import { intentArt, PRESET_ART, presetArt, stateArt } from '../artAssets';
+import { intentArt, PRESET_ART, PRESET_THUMB, presetArt, stateArt } from '../artAssets';
 
 describe('local artwork registry', () => {
   it('covers every intent', () => {
@@ -20,6 +20,10 @@ describe('local artwork registry', () => {
     expect(Object.keys(PRESET_ART).sort()).toEqual(
       allPresets.map((preset) => preset.id).sort(),
     );
+  });
+
+  it('has a thumbnail for every preset', () => {
+    expect(Object.keys(PRESET_THUMB).sort()).toEqual(Object.keys(PRESET_ART).sort());
   });
 
   it('registers the favorites empty state artwork', () => {
