@@ -33,9 +33,9 @@ import { Button } from '@/components/ui/Button';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { syncPremium } from '@/components/PremiumSync';
 import { PREMIUM_SKUS, SUBSCRIPTION_SKUS, isLockedPreset } from '@/lib/premium';
-import { allPresets } from '@/lib/frequencies';
+import { allPresets, getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import { presetArt } from '@/lib/artAssets';
-import { upper } from '@/lib/upper';
+import { upper, formatPercent } from '@/lib/upper';
 import { useIsPremium } from '@/stores/premiumStore';
 import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
@@ -48,18 +48,23 @@ interface Plan {
   price: string;
   offerToken?: string;
   hasTrial: boolean;
+  /** Numeric recurring price in the store's currency, when the store gives one. */
+  amount?: number;
 }
 
 const PLAN_ORDER: PlanKey[] = ['yearly', 'monthly', 'lifetime'];
 const BENEFITS = ['benefitLibrary', 'benefitMix', 'benefitOffline'] as const;
 const HERO_PRESET = 'solfeggio-963';
-const PREVIEW_COUNT = 6;
+// Hand-picked rather than the first six in catalogue order, which opened on two
+// Gammas in a row. These are the most different-looking sounds Premium opens.
+const PREVIEW_IDS = ['solfeggio-963', 'solfeggio-741', 'binaural-gamma', 'solfeggio-639', 'solfeggio-396', 'solfeggio-174'];
 
 type StoreProduct = {
   id: string;
   displayPrice: string;
   subscriptionOfferDetailsAndroid?: unknown;
   introductoryPricePaymentModeIOS?: string;
+  price?: number;
 };
 
 // Apple's standard EULA — App Review (3.1.2) wants a Terms of Use link next to
@@ -83,6 +88,7 @@ function toPlan(product: StoreProduct): Plan | null {
       sku: product.id,
       price: product.displayPrice,
       hasTrial: product.introductoryPricePaymentModeIOS === 'free-trial',
+      amount: product.price,
     };
   }
   const offers = (product.subscriptionOfferDetailsAndroid ?? []) as Offer[];
@@ -100,6 +106,9 @@ function toPlan(product: StoreProduct): Plan | null {
     price: phases[phases.length - 1]?.formattedPrice ?? product.displayPrice,
     offerToken: offer?.offerToken,
     hasTrial: !!trial,
+    amount: phases.length
+      ? Number(phases[phases.length - 1].priceAmountMicros) / 1_000_000
+      : product.price,
   };
 }
 
@@ -119,7 +128,7 @@ export default function PaywallScreen() {
   // The real locked sounds, with their own art — "the full library" is an
   // abstraction; six named scenes with a lock on them are not.
   const lockedPreview = useMemo(
-    () => allPresets.filter((p) => isLockedPreset(p.id) && presetArt(p.id)).slice(0, PREVIEW_COUNT),
+    () => PREVIEW_IDS.map((id) => getPresetById(id)).filter((p): p is FrequencyPreset => !!p && isLockedPreset(p.id)),
     []
   );
   const lockedCount = useMemo(() => allPresets.filter((p) => isLockedPreset(p.id)).length, []);
@@ -157,6 +166,11 @@ export default function PaywallScreen() {
   }, [isPremium]);
 
   const plan = plans?.find((p) => p.key === selected);
+
+  // "Best value" with no reason is a claim; the number is the reason.
+  const yearly = plans?.find((p) => p.key === 'yearly')?.amount;
+  const monthly = plans?.find((p) => p.key === 'monthly')?.amount;
+  const yearlySaving = yearly && monthly ? 1 - yearly / (monthly * 12) : 0;
 
   const handleBuy = async () => {
     if (!plan || busy) return;
@@ -250,6 +264,70 @@ export default function PaywallScreen() {
           </View>
         </ArtBackground>
 
+        {/* What it costs first: the plans used to start below the fold, after
+            a sky and a gallery. */}
+        <View style={[styles.body, styles.plansBody, contentColumn]}>
+          {plans === null ? (
+            <ActivityIndicator color={colors.accent} style={styles.loader} />
+          ) : plans.length === 0 ? (
+            <Text style={[styles.unavailable, { color: colors.textSecondary }]}>{t('paywall.unavailable')}</Text>
+          ) : (
+            <View style={styles.plans} accessibilityRole="radiogroup">
+              {plans.map((p) => {
+                const active = p.key === selected;
+                const featured = p.key === 'yearly';
+                return (
+                  <TouchableOpacity
+                    key={p.key}
+                    onPress={() => {
+                      haptics.select();
+                      setSelected(p.key);
+                    }}
+                    activeOpacity={0.7}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: active }}
+                    style={[
+                      styles.plan,
+                      {
+                        borderColor: active ? colors.accent : colors.cardBorder,
+                        backgroundColor: active ? withAlpha(colors.accent, 0.1) : colors.card,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name={active ? 'radio-button-on' : 'radio-button-off'}
+                      size={22}
+                      color={active ? colors.accent : colors.textSecondary}
+                    />
+                    <View style={styles.planText}>
+                      <View style={styles.planNameRow}>
+                        <Text style={[styles.planName, { color: colors.text }]}>{t(`paywall.plan.${p.key}`)}</Text>
+                        {featured && (
+                          <View style={[styles.bestValue, { backgroundColor: colors.accent }]}>
+                            <Text style={[styles.bestValueText, { color: colors.onPrimary }]}>
+                              {upper(
+                                yearlySaving > 0.05
+                                  ? t('paywall.savePercent', { percent: formatPercent(yearlySaving) })
+                                  : t('paywall.bestValue'),
+                              )}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      {p.hasTrial && (
+                        <Text style={[styles.planBadge, { color: colors.accent }]}>{t('paywall.trialBadge')}</Text>
+                      )}
+                    </View>
+                    <Text style={[styles.planPrice, { color: colors.text }]}>
+                      {t(`paywall.price.${p.key}`, { price: p.price })}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </View>
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -296,62 +374,6 @@ export default function PaywallScreen() {
               </View>
             ))}
           </View>
-
-          {plans === null ? (
-            <ActivityIndicator color={colors.accent} style={styles.loader} />
-          ) : plans.length === 0 ? (
-            <Text style={[styles.unavailable, { color: colors.textSecondary }]}>{t('paywall.unavailable')}</Text>
-          ) : (
-            <View style={styles.plans} accessibilityRole="radiogroup">
-              {plans.map((p) => {
-                const active = p.key === selected;
-                const featured = p.key === 'yearly';
-                return (
-                  <TouchableOpacity
-                    key={p.key}
-                    onPress={() => {
-                      haptics.select();
-                      setSelected(p.key);
-                    }}
-                    activeOpacity={0.7}
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected: active }}
-                    style={[
-                      styles.plan,
-                      {
-                        borderColor: active ? colors.accent : colors.cardBorder,
-                        backgroundColor: active ? withAlpha(colors.accent, 0.1) : colors.card,
-                      },
-                    ]}
-                  >
-                    <Ionicons
-                      name={active ? 'radio-button-on' : 'radio-button-off'}
-                      size={22}
-                      color={active ? colors.accent : colors.textSecondary}
-                    />
-                    <View style={styles.planText}>
-                      <View style={styles.planNameRow}>
-                        <Text style={[styles.planName, { color: colors.text }]}>{t(`paywall.plan.${p.key}`)}</Text>
-                        {featured && (
-                          <View style={[styles.bestValue, { backgroundColor: colors.accent }]}>
-                            <Text style={[styles.bestValueText, { color: colors.onPrimary }]}>
-                              {upper(t('paywall.bestValue'))}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                      {p.hasTrial && (
-                        <Text style={[styles.planBadge, { color: colors.accent }]}>{t('paywall.trialBadge')}</Text>
-                      )}
-                    </View>
-                    <Text style={[styles.planPrice, { color: colors.text }]}>
-                      {t(`paywall.price.${p.key}`, { price: p.price })}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
 
           <TouchableOpacity
             onPress={handleRestore}
@@ -429,7 +451,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   hero: {
-    minHeight: 340,
+    minHeight: 220,
     justifyContent: 'space-between',
   },
   heroHeader: {
@@ -493,6 +515,9 @@ const styles = StyleSheet.create({
   },
   body: {
     paddingHorizontal: Spacing.lg,
+  },
+  plansBody: {
+    paddingTop: Spacing.md,
   },
   benefits: {
     gap: Spacing.sm,

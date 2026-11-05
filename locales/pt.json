@@ -19,7 +19,8 @@
     "showLess": "Ver menos",
     "rename": "Renomear",
     "close": "Fechar",
-    "nowPlaying": "tocando agora"
+    "nowPlaying": "tocando agora",
+    "undo": "Desfazer"
   },
   "tabs": {
     "home": "Início",
@@ -48,10 +49,10 @@
     "otherIntents": "Ou outra coisa",
     "recommendedMinutes": "{{minutes}} min recomendados",
     "recommendedMinutesSuffix": " min",
-    "soundCount": "{{n}} sons"
+    "allSounds": "Todos os sons"
   },
   "explore": {
-    "title": "Explorar frequências",
+    "title": "Explorar sons",
     "categories": {
       "binaural": "Batidas binaurais",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Adicionar ao mixer",
     "addedToMixer": "Adicionado ao mixer",
     "emptyTitle": "Crie sua própria mistura",
-    "emptyDesc": "Combine até 4 sons — chuva, ruído e frequências — e salve a mistura."
+    "emptyDesc": "Combine até 4 sons — chuva, ruído e frequências — e salve a mistura.",
+    "removed": "{{name}} removido"
   },
   "player": {
     "nowPlaying": "Tocando agora",
@@ -174,11 +176,11 @@
     "beatFrequency": "Frequência da batida",
     "playbackError": "Não foi possível iniciar o áudio. Tente novamente.",
     "headphonesRequired": "São necessários fones de ouvido: o alto-falante do telefone não reproduz estas frequências.",
-    "volumeCapped": "Volume limitado a {{percent}}%",
+    "volumeCapped": "Proteção auditiva: o controle vai até {{percent}}. Toque para alterar.",
     "untilFade": "até diminuir",
-    "noTimer": "Não vai parar",
     "noTimerHint": "Toca até você parar",
-    "setTimer": "Definir timer"
+    "setTimer": "Definir timer",
+    "headphonesBinaural": "Fones necessários: cada ouvido precisa ouvir seu próprio som."
   },
   "settings": {
     "title": "Ajustes",
@@ -193,15 +195,13 @@
     "reduceMotion": "Reduzir movimento",
     "lowContrast": "Contraste mais suave",
     "language": "Idioma",
-    "audio": "Áudio",
+    "audio": "Som e vibração",
     "maxVolume": "Volume máximo",
     "about": "Sobre",
     "version": "Versão",
-    "epilepsyWarning": "Aviso sobre epilepsia",
-    "epilepsyText": "Este app pode conter efeitos visuais. Use com cautela se você tiver epilepsia.",
     "haptics": "Vibração",
-    "lowContrastHint": "Suaviza o contraste entre texto e fundo. Não se aplica no modo noite.",
-    "reduceMotionHint": "Para o anel que respira e as transições de tela.",
+    "lowContrastHint": "Suaviza o texto brilhante na tela.",
+    "reduceMotionHint": "Desativa as transições de tela e as animações de listas.",
     "hapticsHint": "Um toque leve como resposta.",
     "reset": "Apagar dados",
     "resetTitle": "Apagar dados",
@@ -212,7 +212,12 @@
     "totalListening": "Tempo total de escuta",
     "sessions": "Sessões",
     "listenedHours": "{{h}} h {{m}} min",
-    "listenedMinutes": "{{m}} min"
+    "listenedMinutes": "{{m}} min",
+    "premiumActive": "Premium está ativo",
+    "premiumGet": "Desbloquear todos os sons",
+    "premiumManage": "Gerenciar assinatura",
+    "support": "Ajuda e suporte",
+    "stats": "Sua escuta"
   },
   "privacy": {
     "title": "Política de Privacidade",
@@ -259,9 +264,7 @@
     "step1Title": "Sintonize-se no som",
     "step1Desc": "Durma, concentre-se e relaxe com batidas binaurais, tons puros e sons ambientes.",
     "step2Title": "Use fones de ouvido",
-    "step2Desc": "As batidas binaurais enviam uma frequência diferente para cada ouvido; sem fones o efeito não é audível.",
-    "step3Title": "Proteja sua audição",
-    "step3Desc": "Mantenha o volume em um nível confortável e faça pausas se sentir desconforto. Este app não é um produto médico.",
+    "step2Desc": "As batidas binaurais enviam um som diferente para cada ouvido, por isso precisam de fones. Mantenha o volume confortável e faça pausas. Este app não é um produto médico.",
     "next": "Avançar",
     "start": "Começar",
     "skip": "Pular"
@@ -296,6 +299,7 @@
     "legal_ios": "As assinaturas são renovadas automaticamente, a menos que sejam canceladas pelo menos 24 horas antes do fim do período atual. O pagamento é cobrado no seu ID Apple. Gerencie ou cancele quando quiser nos ajustes da sua conta da App Store.",
     "termsOfUse": "Termos de Uso",
     "bestValue": "Melhor preço",
-    "trialTerms": "7 dias grátis, depois {{price}}"
+    "trialTerms": "7 dias grátis, depois {{price}}",
+    "savePercent": "Economize {{percent}}"
   }
 }

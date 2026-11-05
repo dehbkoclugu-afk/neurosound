@@ -3,7 +3,7 @@
  * Modern card-based design with clean UI
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -37,6 +37,7 @@ import { Icon } from '@/components/ui/Icon';
 import { presetIcon } from '@/components/ui/PresetRow';
 import { Button } from '@/components/ui/Button';
 import { TransportButton } from '@/components/ui/TransportButton';
+import { EqualizerBars } from '@/components/ui/EqualizerBars';
 import { Sheet } from '@/components/ui/Sheet';
 import { TimerModal, formatTimerValue } from '@/components/ui/TimerModal';
 import { useToastStore } from '@/stores/toastStore';
@@ -55,7 +56,7 @@ import * as playerController from '@/lib/audio/playerController';
 import { isLockedPreset } from '@/lib/premium';
 import { useIsPremium } from '@/stores/premiumStore';
 import { ArtBackground } from '@/components/ui/ArtBackground';
-import { presetArt } from '@/lib/artAssets';
+import { presetArt, presetThumb } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import { upper, foldForSearch } from '@/lib/upper';
 
@@ -133,6 +134,20 @@ export default function MixerScreen() {
   const artwork = useArtwork();
   const miniPlayerInset = useMiniPlayerInset();
 
+  // Removing a channel throws away a level the user set by ear, and it sits
+  // next to the mute button in a dark room. So it can be taken back for a moment.
+  const [lastRemoved, setLastRemoved] = useState<{
+    preset: FrequencyPreset;
+    volume: number;
+  } | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (undoTimer.current) clearTimeout(undoTimer.current);
+    },
+    [],
+  );
+
   const isEmpty = channels.length === 0;
   const isFull = channels.length >= playerController.MAX_MIXER_CHANNELS;
 
@@ -177,9 +192,27 @@ export default function MixerScreen() {
     [t, isPremium, router],
   );
 
-  const handleRemoveChannel = useCallback((channelId: string) => {
-    playerController.mixerRemoveChannel(channelId);
-  }, []);
+  const handleRemoveChannel = useCallback(
+    (channel: (typeof channels)[number]) => {
+      haptics.select();
+      playerController.mixerRemoveChannel(channel.id);
+      setLastRemoved({ preset: channel.preset, volume: channel.volume });
+      if (undoTimer.current) clearTimeout(undoTimer.current);
+      undoTimer.current = setTimeout(() => setLastRemoved(null), 5000);
+    },
+    [],
+  );
+
+  const handleUndoRemove = useCallback(async () => {
+    if (!lastRemoved) return;
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    const added = await playerController.mixerAddChannel(lastRemoved.preset);
+    if (added) {
+      const restored = useAudioStore.getState().mixerChannels.at(-1);
+      if (restored) playerController.mixerSetChannelVolume(restored.id, lastRemoved.volume);
+    }
+    setLastRemoved(null);
+  }, [lastRemoved]);
 
   const handleVolumeChange = useCallback(
     (channelId: string, volume: number) => {
@@ -314,7 +347,7 @@ export default function MixerScreen() {
         contentContainerStyle={[
           styles.content,
           contentColumn,
-          { paddingBottom: miniPlayerInset + Spacing.lg },
+          { paddingBottom: (isEmpty ? miniPlayerInset : 0) + Spacing.lg },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -330,16 +363,19 @@ export default function MixerScreen() {
 
         {/* Active Channels */}
         <View style={styles.section}>
-          <CategoryHeader
-            title={t('mixer.activeChannels')}
-            counter={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
-          />
+          {!isEmpty && (
+            <CategoryHeader
+              title={t('mixer.activeChannels')}
+              counter={`${channels.length}/${playerController.MAX_MIXER_CHANNELS}`}
+            />
+          )}
 
           {/* One invitation, not four ghost strips: "Empty channel" ×3 under
               a greyed play button read as a broken screen. */}
           {isEmpty && (
             <ArtBackground
               source={artwork.source(presetArt('noise-rain'))}
+              placeholder={artwork.source(presetThumb('noise-rain'))}
               style={styles.emptyCard}
               variant="card"
             >
@@ -365,10 +401,12 @@ export default function MixerScreen() {
 
           {isEmpty && (
             <View style={styles.suggested}>
-              <CategoryHeader title={t('mixer.suggested')} />
+              <Text style={[styles.suggestedHeading, { color: colors.text }]}>
+                {t('mixer.suggested')}
+              </Text>
               {SUGGESTED_MIXES.map((mix) => {
                 const presets = mixPresets(mix);
-                const title = presets.map((p) => t(p.nameKey)).join(' + ');
+                const contents = presets.map((p) => t(p.nameKey).split(' (')[0]).join(' + ');
                 return (
                   <TouchableOpacity
                     key={mix.intentKey}
@@ -382,10 +420,10 @@ export default function MixerScreen() {
                       { borderBottomColor: colors.cardBorder },
                     ]}
                     accessibilityRole="button"
-                    accessibilityLabel={`${title}, ${t(mix.intentKey)}`}
+                    accessibilityLabel={`${t(mix.intentKey)}, ${contents}`}
                   >
                     <Image
-                      source={artwork.source(presetArt(mix.channels[0].presetId))}
+                      source={artwork.source(presetThumb(mix.channels[0].presetId))}
                       cachePolicy="memory-disk"
                       transition={150}
                       style={[
@@ -394,19 +432,14 @@ export default function MixerScreen() {
                       ]}
                     />
                     <View style={styles.mixTextContainer}>
-                      <Text
-                        style={[styles.mixName, { color: colors.text }]}
-                        numberOfLines={2}
-                      >
-                        {title}
+                      <Text style={[styles.mixName, { color: colors.text }]}>
+                        {t(mix.intentKey)}
                       </Text>
                       <Text
-                        style={[
-                          styles.suggestedIntent,
-                          { color: colors.textSecondary },
-                        ]}
+                        style={[styles.suggestedIntent, { color: colors.textSecondary }]}
+                        numberOfLines={2}
                       >
-                        {t(mix.intentKey)}
+                        {contents}
                       </Text>
                     </View>
                     <Ionicons name="play" size={20} color={colors.accent} />
@@ -416,78 +449,57 @@ export default function MixerScreen() {
             </View>
           )}
 
+          {/* Thin rows, not photo cards: at four sounds the cards pushed play off
+              the screen, and a slider over a photograph is hard to see in a dark
+              room. The photo is still there, as the thumbnail. */}
           {channels.map((channel) => (
-            <ArtBackground
+            <View
               key={channel.id}
-              source={artwork.source(presetArt(channel.preset.id))}
-              style={styles.channelRow}
-              variant="channel"
+              style={[styles.channelRow, { borderBottomColor: colors.cardBorder }]}
             >
-              <View
+              <Image
+                source={artwork.source(presetThumb(channel.preset.id))}
+                cachePolicy="memory-disk"
                 style={[
-                  styles.channelIcon,
-                  {
-                    backgroundColor: artwork.foreground.badge,
-                    opacity: channel.muted ? 0.5 : 1,
-                  },
+                  styles.channelThumb,
+                  { backgroundColor: colors.cardBorder, opacity: channel.muted ? 0.4 : 1 },
                 ]}
-              >
-                <Icon
-                  icon={presetIcon(channel.preset)}
-                  size={18}
-                  color={artwork.foreground.primary}
-                />
-              </View>
+              />
               <View style={styles.channelBody}>
                 <View style={styles.channelHeader}>
                   <Text
                     style={[
                       styles.channelName,
-                      {
-                        color: channel.muted
-                          ? artwork.foreground.tertiary
-                          : artwork.foreground.primary,
-                      },
+                      { color: channel.muted ? colors.textSecondary : colors.text },
                     ]}
                     numberOfLines={1}
                   >
-                    {t(channel.preset.nameKey)}
+                    {t(channel.preset.nameKey).split(' (')[0]}
                   </Text>
+                  {isPlaying && !channel.muted && (
+                    <EqualizerBars color={colors.accent} size={12} />
+                  )}
                   <View style={styles.channelActions}>
                     <TouchableOpacity
-                      onPress={() =>
-                        handleToggleMute(channel.id, !channel.muted)
-                      }
+                      onPress={() => handleToggleMute(channel.id, !channel.muted)}
                       style={styles.channelActionButton}
                       accessibilityRole="button"
                       accessibilityState={{ selected: channel.muted }}
                       accessibilityLabel={`${t('mixer.mute')} ${t(channel.preset.nameKey)}`}
                     >
                       <Ionicons
-                        name={
-                          channel.muted
-                            ? 'volume-mute'
-                            : 'volume-medium-outline'
-                        }
+                        name={channel.muted ? 'volume-mute' : 'volume-medium-outline'}
                         size={20}
-                        color={
-                          channel.muted
-                            ? artwork.foreground.tertiary
-                            : artwork.foreground.primary
-                        }
+                        color={channel.muted ? colors.textSecondary : colors.text}
                       />
                     </TouchableOpacity>
                     <TouchableOpacity
-                      onPress={() => handleRemoveChannel(channel.id)}
+                      onPress={() => handleRemoveChannel(channel)}
                       style={styles.channelActionButton}
                       accessibilityRole="button"
                       accessibilityLabel={`${t('common.delete')} ${t(channel.preset.nameKey)}`}
                     >
-                      <Ionicons
-                        name="close"
-                        size={20}
-                        color={artwork.foreground.secondary}
-                      />
+                      <Ionicons name="close" size={20} color={colors.textSecondary} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -497,16 +509,27 @@ export default function MixerScreen() {
                     onValueChange={(v) => handleVolumeChange(channel.id, v)}
                     max={1}
                     showValue={false}
-                    // Four stacked sliders in one accent colour read as one
-                    // control repeated; tinting each track with its own
-                    // category colour makes the strip legible at a glance.
-                    fillColor={categoryColors[channel.preset.type]}
                     accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
                   />
                 </View>
               </View>
-            </ArtBackground>
+            </View>
           ))}
+
+          {lastRemoved && (
+            <View style={styles.undoRow} accessibilityLiveRegion="polite">
+              <Text style={[styles.undoText, { color: colors.textSecondary }]} numberOfLines={1}>
+                {t('mixer.removed', { name: t(lastRemoved.preset.nameKey).split(' (')[0] })}
+              </Text>
+              <TouchableOpacity
+                onPress={handleUndoRemove}
+                style={styles.undoButton}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.undoAction, { color: colors.accent }]}>{t('common.undo')}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Add Channel — rendered whenever there is at least one channel,
               including at 4/4 where it turns into the "full" notice. Letting
@@ -553,76 +576,10 @@ export default function MixerScreen() {
               onValueChange={handleMasterVolume}
               max={1}
               label={t('mixer.master')}
+              showValue={false}
               accessibilityLabel={t('mixer.master')}
             />
           </View>
-        )}
-
-        {/* Transport — hidden while empty. Three disabled controls plus a
-            sentence explaining why they were disabled was most of the empty
-            screen; the empty card above already says what to do first. */}
-        {!isEmpty && (
-        <View style={styles.transport}>
-          <View style={styles.transportRow}>
-            {/* A mix is what people actually fall asleep to, and it had no
-                timer at all — it played until the battery died. */}
-            <TouchableOpacity
-              onPress={() => setShowTimerModal(true)}
-              disabled={isEmpty}
-              style={styles.timerButton}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: isEmpty }}
-              accessibilityLabel={
-                timerRemaining !== null && timerRemaining > 0
-                  ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
-                  : t('player.timer')
-              }
-            >
-              <Ionicons
-                name="timer-outline"
-                size={24}
-                color={
-                  isEmpty
-                    ? colors.tabIconDefault
-                    : timerDuration
-                      ? colors.primary
-                      : colors.textSecondary
-                }
-              />
-              {timerRemaining !== null && timerRemaining > 0 && (
-                <Text
-                  style={[styles.timerBadge, { color: colors.accent }]}
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                >
-                  {formatTimerValue(timerRemaining)}
-                </Text>
-              )}
-            </TouchableOpacity>
-
-            <TransportButton
-              playing={isPlaying}
-              onPress={handlePlayPause}
-              disabled={isEmpty}
-              size={72}
-              accessibilityLabel={
-                isPlaying ? t('common.pause') : t('common.play')
-              }
-              accessibilityHint={
-                isEmpty ? t('mixer.transportDisabled') : undefined
-              }
-            />
-
-            {/* Balances the timer slot so play stays centred. */}
-            <View style={styles.timerButton} />
-          </View>
-
-          <Button
-            title={t('mixer.savePreset')}
-            onPress={openSaveDialog}
-            variant="secondary"
-          />
-        </View>
         )}
 
         {/* Saved Mixes */}
@@ -750,6 +707,67 @@ export default function MixerScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Fixed, so play is on screen however many sounds are stacked above it.
+          It used to scroll away below the fourth channel. The timer gets a word
+          as well as an icon: it is why people use this app at night. */}
+      {!isEmpty && (
+        <View
+          style={[
+            styles.controlBar,
+            contentColumn,
+            {
+              borderTopColor: colors.cardBorder,
+              backgroundColor: colors.background,
+              marginBottom: miniPlayerInset,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            onPress={() => setShowTimerModal(true)}
+            style={styles.controlSide}
+            accessibilityRole="button"
+            accessibilityLabel={
+              timerRemaining !== null && timerRemaining > 0
+                ? `${t('player.timer')}, ${formatTimerValue(timerRemaining)}`
+                : t('player.timer')
+            }
+          >
+            <Ionicons
+              name="timer-outline"
+              size={24}
+              color={timerDuration ? colors.accent : colors.text}
+            />
+            <Text
+              style={[styles.controlLabel, { color: timerDuration ? colors.accent : colors.textSecondary }]}
+              numberOfLines={1}
+            >
+              {timerRemaining !== null && timerRemaining > 0
+                ? formatTimerValue(timerRemaining)
+                : t('player.timer')}
+            </Text>
+          </TouchableOpacity>
+
+          <TransportButton
+            playing={isPlaying}
+            onPress={handlePlayPause}
+            size={64}
+            accessibilityLabel={isPlaying ? t('common.pause') : t('common.play')}
+          />
+
+          <TouchableOpacity
+            onPress={openSaveDialog}
+            style={styles.controlSide}
+            accessibilityRole="button"
+            accessibilityLabel={t('mixer.savePreset')}
+          >
+            <Ionicons name="bookmark-outline" size={24} color={colors.text} />
+            <Text style={[styles.controlLabel, { color: colors.textSecondary }]} numberOfLines={1}>
+              {t('common.save')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <TimerModal
         visible={showTimerModal}
@@ -879,8 +897,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
   header: {
-    marginTop: Spacing.xxl,
-    marginBottom: Spacing.xl,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.lg,
   },
   title: {
     ...Typography.largeTitle,
@@ -890,35 +908,52 @@ const styles = StyleSheet.create({
   },
   channelRow: {
     flexDirection: 'row',
-    padding: Spacing.md,
     gap: Spacing.md,
-    borderRadius: Radius.card,
-    marginBottom: Spacing.sm,
-    overflow: 'hidden',
+    paddingVertical: Spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  channelIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+  channelThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     marginTop: 2,
   },
   channelBody: {
     flex: 1,
-    gap: Spacing.sm,
   },
   channelHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: Spacing.sm,
   },
   channelName: {
     ...Typography.headline,
+    flexShrink: 1,
   },
   channelActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 'auto',
+  },
+  undoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+    minHeight: AccessibilitySize.minTouchTarget,
+  },
+  undoText: {
+    ...Typography.footnote,
+    flexShrink: 1,
+  },
+  undoButton: {
+    minHeight: AccessibilitySize.minTouchTarget,
+    minWidth: AccessibilitySize.minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  undoAction: {
+    ...Typography.headline,
   },
   channelActionButton: {
     width: AccessibilitySize.minTouchTarget,
@@ -950,28 +985,24 @@ const styles = StyleSheet.create({
     // a fifth channel that happens to be a different colour.
     borderTopWidth: StyleSheet.hairlineWidth,
   },
-  transport: {
-    alignItems: 'center',
-    gap: Spacing.md,
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.xl,
-  },
-  transportRow: {
+  controlBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.xl,
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
-  timerButton: {
-    width: 56,
-    height: 56,
+  controlSide: {
+    width: 88,
+    minHeight: AccessibilitySize.minTouchTarget,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 2,
   },
-  timerBadge: {
+  controlLabel: {
     ...Typography.caption,
     fontVariant: ['tabular-nums'],
-    marginTop: 2,
   },
   mixRow: {
     flexDirection: 'row',
@@ -1062,6 +1093,10 @@ const styles = StyleSheet.create({
   },
   suggested: {
     marginTop: Spacing.xl,
+  },
+  suggestedHeading: {
+    ...Typography.headline,
+    marginBottom: Spacing.xs,
   },
   suggestedRow: {
     flexDirection: 'row',

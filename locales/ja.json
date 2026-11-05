@@ -19,7 +19,8 @@
     "showLess": "折りたたむ",
     "rename": "名前を変更",
     "close": "閉じる",
-    "nowPlaying": "再生中"
+    "nowPlaying": "再生中",
+    "undo": "元に戻す"
   },
   "tabs": {
     "home": "ホーム",
@@ -48,10 +49,10 @@
     "otherIntents": "ほかの目的",
     "recommendedMinutes": "おすすめ {{minutes}} 分",
     "recommendedMinutesSuffix": " 分",
-    "soundCount": "{{n}} 音"
+    "allSounds": "すべてのサウンド"
   },
   "explore": {
-    "title": "周波数をさがす",
+    "title": "サウンドを探す",
     "categories": {
       "binaural": "バイノーラルビート",
       "solfeggio": "ソルフェジオ",
@@ -154,7 +155,8 @@
     "addToMixer": "ミキサーに追加",
     "addedToMixer": "ミキサーに追加しました",
     "emptyTitle": "自分だけのサウンドミックス",
-    "emptyDesc": "雨音・ノイズ・周波数を最大4つ重ねて、ミックスを保存できます。"
+    "emptyDesc": "雨音・ノイズ・周波数を最大4つ重ねて、ミックスを保存できます。",
+    "removed": "{{name}}を削除しました"
   },
   "player": {
     "nowPlaying": "再生中",
@@ -174,11 +176,11 @@
     "beatFrequency": "ビート周波数",
     "playbackError": "音を再生できませんでした。もう一度お試しください。",
     "headphonesRequired": "イヤホンが必要です。スマートフォンのスピーカーではこの周波数を再生できません。",
-    "volumeCapped": "音量は {{percent}}% に制限されています",
+    "volumeCapped": "聴覚保護：スライダーの上限は{{percent}}です。タップして変更。",
     "untilFade": "後にフェードアウト",
-    "noTimer": "止まりません",
     "noTimerHint": "停止するまで再生",
-    "setTimer": "タイマーを設定"
+    "setTimer": "タイマーを設定",
+    "headphonesBinaural": "ヘッドホンが必要です：左右の耳でそれぞれ別の音を聴きます。"
   },
   "settings": {
     "title": "設定",
@@ -193,15 +195,13 @@
     "reduceMotion": "視差効果を減らす",
     "lowContrast": "コントラストをやわらげる",
     "language": "言語",
-    "audio": "オーディオ",
+    "audio": "サウンドと触覚",
     "maxVolume": "最大音量",
     "about": "このアプリについて",
     "version": "バージョン",
-    "epilepsyWarning": "てんかんに関する注意",
-    "epilepsyText": "このアプリには視覚効果が含まれる場合があります。てんかんのある方はご注意ください。",
     "haptics": "触覚フィードバック",
-    "lowContrastHint": "文字と背景の差をやわらげます。ナイトモードでは適用されません。",
-    "reduceMotionHint": "呼吸するリングと画面遷移を止めます。",
+    "lowContrastHint": "画面の明るい文字をやわらげます。",
+    "reduceMotionHint": "画面の切り替えとリストのアニメーションをオフにします。",
     "hapticsHint": "操作に軽い振動で応えます。",
     "reset": "データを消去",
     "resetTitle": "データを消去",
@@ -212,7 +212,12 @@
     "totalListening": "総再生時間",
     "sessions": "セッション数",
     "listenedHours": "{{h}}時間{{m}}分",
-    "listenedMinutes": "{{m}}分"
+    "listenedMinutes": "{{m}}分",
+    "premiumActive": "プレミアム有効",
+    "premiumGet": "すべてのサウンドを解放",
+    "premiumManage": "サブスクリプションを管理",
+    "support": "ヘルプとサポート",
+    "stats": "リスニング記録"
   },
   "privacy": {
     "title": "プライバシーポリシー",
@@ -259,9 +264,7 @@
     "step1Title": "音に耳を合わせる",
     "step1Desc": "バイノーラルビート、純音、環境音で、眠り、集中し、くつろぐ。",
     "step2Title": "ヘッドホンを使う",
-    "step2Desc": "バイノーラルビートは左右の耳に異なる周波数を送ります。ヘッドホンがないと効果は聞こえません。",
-    "step3Title": "聴覚を守る",
-    "step3Desc": "音量は心地よい範囲に保ち、違和感があれば休憩してください。このアプリは医療機器ではありません。",
+    "step2Desc": "バイノーラルビートは左右の耳に異なる音を届けるため、ヘッドホンが必要です。音量は快適なレベルに保ち、適度に休憩してください。このアプリは医療製品ではありません。",
     "next": "次へ",
     "start": "はじめる",
     "skip": "スキップ"
@@ -296,6 +299,7 @@
     "legal_ios": "サブスクリプションは、現在の期間終了の24時間前までに解約しない限り自動更新されます。お支払いはApple IDに請求されます。管理・解約はApp Storeのアカウント設定からいつでも行えます。",
     "termsOfUse": "利用規約",
     "bestValue": "いちばんお得",
-    "trialTerms": "7日間無料、その後 {{price}}"
+    "trialTerms": "7日間無料、その後 {{price}}",
+    "savePercent": "{{percent}}お得"
   }
 }

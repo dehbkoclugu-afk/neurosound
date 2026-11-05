@@ -43,9 +43,11 @@ import { usePresetsStore } from '@/stores/presetsStore';
 import { Slider } from '@/components/ui/Slider';
 import { TimerModal, formatTimerValue, TIMER_OPTIONS } from '@/components/ui/TimerModal';
 import { TransportButton } from '@/components/ui/TransportButton';
+import { EqualizerBars } from '@/components/ui/EqualizerBars';
+import { formatPercent } from '@/lib/upper';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { useToastStore } from '@/stores/toastStore';
-import { presetArt } from '@/lib/artAssets';
+import { presetArt, presetThumb } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import * as haptics from '@/lib/haptics';
 import { getPresetById, FrequencyPreset } from '@/lib/frequencies';
@@ -197,15 +199,15 @@ export default function PlayerScreen() {
 
   const heroHeight = Math.max(360, Math.min(500, height * 0.54));
 
-  // The one oversized line: the frequency for tones, the name for everything
-  // else ("Rain" has no Hz to show). Binaural shows its band name, since
-  // "200 Hz" would be the carrier, not the effect.
-  const hero =
+  // One layout for every sound: its name is the headline, the measurement sits
+  // under it. Binaural shows the beat, since "200 Hz" would be the carrier.
+  const heroName = t(preset.nameKey).split(' (')[0];
+  const heroMeta =
     preset.type === 'solfeggio' && preset.frequency
-      ? { big: String(preset.frequency), unit: 'Hz', meta: `${t(preset.nameKey)} · ${t('explore.categories.solfeggio')}` }
+      ? `${preset.frequency} Hz · ${t('explore.categories.solfeggio')}`
       : preset.type === 'binaural'
-        ? { big: t(preset.nameKey).split(' ')[0], unit: `${preset.beatFrequency} Hz`, meta: t('explore.categories.binaural') }
-        : { big: t(preset.nameKey), unit: null, meta: t(preset.descriptionKey) };
+        ? `${preset.beatFrequency} Hz · ${t('explore.categories.binaural')}`
+        : t(preset.descriptionKey);
   const timerLabel = TIMER_OPTIONS.find((o) => o.value === timerDuration)?.labelKey;
 
   return (
@@ -217,6 +219,7 @@ export default function PlayerScreen() {
         <Animated.View style={{ height: heroHeight, transform: [{ scale: heroScale }] }}>
           <ArtBackground
             source={artwork.source(presetArt(preset.id))}
+            placeholder={artwork.source(presetThumb(preset.id))}
             style={styles.hero}
             variant="hero"
           >
@@ -260,21 +263,29 @@ export default function PlayerScreen() {
         >
           <View style={styles.titleRow}>
             <Text
-              style={[styles.bigTitle, { color: colors.text }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
+              // Long names ("Love Frequency", "Cosmic Consciousness") wrap at a
+              // smaller size; shrink-to-fit made them tiny or cut them off.
+              style={[styles.bigTitle, heroName.length > 8 && styles.bigTitleLong, { color: colors.text }]}
+              numberOfLines={2}
               accessibilityRole="header"
               accessibilityLabel={t(preset.nameKey)}
             >
-              {hero.big}
+              {heroName}
             </Text>
-            {hero.unit && (
-              <Text style={[styles.bigUnit, { color: colors.accent }]}>{hero.unit}</Text>
-            )}
           </View>
-          <Text style={[styles.meta, { color: colors.textSecondary }]} numberOfLines={2}>
-            {hero.meta}
-          </Text>
+          <View style={styles.metaRow}>
+            {isPlaying && !isLoading && <EqualizerBars color={colors.accent} size={14} />}
+            <Text style={[styles.meta, { color: colors.textSecondary }]} numberOfLines={2}>
+              {heroMeta}
+            </Text>
+          </View>
+          {/* Above the fold: this is the sentence that keeps a tone honest, and
+              below the volume slider nobody reached it. */}
+          {preset.type !== 'noise' && (
+            <Text style={[styles.description, { color: colors.textSecondary }]}>
+              {t(preset.descriptionKey)}
+            </Text>
+          )}
 
           {/* Play, with the sleep timer's state beside it in words: the
               countdown when one is set, "won't stop" when not. */}
@@ -306,14 +317,9 @@ export default function PlayerScreen() {
                   </Text>
                 </>
               ) : (
-                <>
-                  <Text style={[styles.noTimer, { color: colors.text }]}>
-                    {t('player.noTimer')}
-                  </Text>
-                  <Text style={[styles.ctrlHint, { color: colors.textSecondary }]}>
-                    {t('player.noTimerHint')}
-                  </Text>
-                </>
+                <Text style={[styles.ctrlHint, { color: colors.textSecondary }]}>
+                  {t('player.noTimerHint')}
+                </Text>
               )}
             </View>
           </View>
@@ -352,7 +358,9 @@ export default function PlayerScreen() {
             <View style={styles.note}>
               <Ionicons name="headset-outline" size={18} color={colors.warning} />
               <Text style={[styles.noteText, { color: colors.warning }]}>
-                {t('player.headphonesRequired')}
+                {preset.type === 'binaural'
+                  ? t('player.headphonesBinaural')
+                  : t('player.headphonesRequired')}
               </Text>
             </View>
           )}
@@ -392,17 +400,11 @@ export default function PlayerScreen() {
                 accessibilityRole="button"
               >
                 <Text style={[styles.volumeCapText, { color: colors.textSecondary }]}>
-                  {t('player.volumeCapped', { percent: Math.round(maxVolume * 100) })}
+                  {t('player.volumeCapped', { percent: formatPercent(maxVolume) })}
                 </Text>
               </TouchableOpacity>
             )}
           </View>
-
-          {preset.type !== 'noise' && (
-            <Text style={[styles.description, { color: colors.textSecondary }]}>
-              {t(preset.descriptionKey)}
-            </Text>
-          )}
         </View>
       </ScrollView>
 
@@ -445,13 +447,19 @@ const styles = StyleSheet.create({
     ...Typography.display,
     flexShrink: 1,
   },
-  bigUnit: {
-    fontFamily: FontFamily.mono,
-    fontSize: 22,
+  bigTitleLong: {
+    fontSize: 44,
+    lineHeight: 50,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
   },
   meta: {
     ...Typography.body,
-    marginTop: Spacing.xs,
+    flexShrink: 1,
   },
   ctrl: {
     flexDirection: 'row',
@@ -474,9 +482,6 @@ const styles = StyleSheet.create({
     ...Typography.numeral,
     fontSize: 28,
     lineHeight: 34,
-  },
-  noTimer: {
-    ...Typography.title,
   },
   ctrlHint: {
     ...Typography.footnote,
@@ -546,7 +551,7 @@ const styles = StyleSheet.create({
   },
   description: {
     ...Typography.footnote,
-    marginTop: Spacing.lg,
+    marginTop: Spacing.xs,
   },
   missingText: {
     ...Typography.body,

@@ -97,6 +97,13 @@ export default function ExploreScreen() {
   const miniPlayerInset = useMiniPlayerInset();
   const isPresetPlaying = useIsPresetPlaying();
   const pagerRef = useRef<ScrollView>(null);
+  // Only the visible page mounts with the screen; the other two follow once the
+  // tab has settled. All 33 rows at once were what janked entering this tab.
+  const [offscreenPagesReady, setOffscreenPagesReady] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setOffscreenPagesReady(true), 350);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Deep link / param changes (and the initial layout pass) move the pager
   // without animating — this isn't the user's own swipe finishing, so it
@@ -307,7 +314,7 @@ export default function ExploreScreen() {
           accessibilityLabel={t('explore.sortByName')}
         >
           <Ionicons
-            name="text-outline"
+            name="swap-vertical"
             size={19}
             color={sortBy === 'name' ? colors.accent : colors.textSecondary}
           />
@@ -345,6 +352,9 @@ export default function ExploreScreen() {
         scrollEventThrottle={16}
       >
         {categories.map((category) => {
+          if (!offscreenPagesReady && category.key !== activeCategory) {
+            return <View key={category.key} style={{ width: pagerWidth || undefined }} />;
+          }
           const presets = filteredPresetsByCategory[category.key];
           const showDescription =
             !seenCategoryDescriptions[category.key] || expandedDescriptions[category.key];
@@ -382,17 +392,19 @@ export default function ExploreScreen() {
                 </View>
                 {/* 33 sounds behind a search box and a filter, and the list
                     never said how many survived either one. */}
-                <Text style={[styles.resultCount, { color: colors.textSecondary }]}>
-                  <Text style={styles.resultCountNumber}>{presets.length}</Text>
-                  {presets.length === category.presets.length
-                    ? ''
-                    : `/${category.presets.length}`}
-                </Text>
+                {/* Only when a filter is hiding something: an unfiltered "5" was
+                    a number with no label and no question it answered. */}
+                {presets.length !== category.presets.length && (
+                  <Text style={[styles.resultCount, { color: colors.textSecondary }]}>
+                    <Text style={styles.resultCountNumber}>{presets.length}</Text>
+                    {`/${category.presets.length}`}
+                  </Text>
+                )}
               </View>
 
               <View>
                 {presets.length > 0 ? (
-                  presets.map((preset, i) => (
+                  presets.map((preset) => (
                     <PresetRow
                       key={preset.id}
                       preset={preset}
@@ -400,7 +412,6 @@ export default function ExploreScreen() {
                       isFavorite={isFavorite(preset.id)}
                       isPlaying={isPresetPlaying(preset.id)}
                       highlight={normalizedQuery}
-                      index={i}
                     />
                   ))
                 ) : (

@@ -19,7 +19,8 @@
     "showLess": "Minder tonen",
     "rename": "Naam wijzigen",
     "close": "Sluiten",
-    "nowPlaying": "speelt nu"
+    "nowPlaying": "speelt nu",
+    "undo": "Ongedaan maken"
   },
   "tabs": {
     "home": "Start",
@@ -48,10 +49,10 @@
     "otherIntents": "Of iets anders",
     "recommendedMinutes": "{{minutes}} min aanbevolen",
     "recommendedMinutesSuffix": " min",
-    "soundCount": "{{n}} geluiden"
+    "allSounds": "Alle geluiden"
   },
   "explore": {
-    "title": "Frequenties ontdekken",
+    "title": "Geluiden ontdekken",
     "categories": {
       "binaural": "Binaurale beats",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Aan mixer toevoegen",
     "addedToMixer": "Toegevoegd aan mixer",
     "emptyTitle": "Maak je eigen geluidsmix",
-    "emptyDesc": "Combineer tot 4 geluiden — regen, ruis en frequenties — en bewaar de mix."
+    "emptyDesc": "Combineer tot 4 geluiden — regen, ruis en frequenties — en bewaar de mix.",
+    "removed": "{{name}} verwijderd"
   },
   "player": {
     "nowPlaying": "Speelt nu",
@@ -174,11 +176,11 @@
     "beatFrequency": "Beatfrequentie",
     "playbackError": "Kon het geluid niet starten. Probeer het opnieuw.",
     "headphonesRequired": "Koptelefoon nodig — een telefoonspeaker kan deze frequenties niet weergeven.",
-    "volumeCapped": "Volume begrensd op {{percent}}%",
+    "volumeCapped": "Gehoorbescherming: de schuif stopt bij {{percent}}. Tik om te wijzigen.",
     "untilFade": "tot het uitfadet",
-    "noTimer": "Stopt niet",
     "noTimerHint": "Speelt tot je stopt",
-    "setTimer": "Slaaptimer instellen"
+    "setTimer": "Slaaptimer instellen",
+    "headphonesBinaural": "Koptelefoon nodig: elk oor moet een eigen geluid horen."
   },
   "settings": {
     "title": "Instellingen",
@@ -193,15 +195,13 @@
     "reduceMotion": "Minder beweging",
     "lowContrast": "Zachter contrast",
     "language": "Taal",
-    "audio": "Audio",
+    "audio": "Geluid en trillingen",
     "maxVolume": "Maximaal volume",
     "about": "Over",
     "version": "Versie",
-    "epilepsyWarning": "Waarschuwing epilepsie",
-    "epilepsyText": "Deze app kan visuele effecten bevatten. Wees voorzichtig als je epilepsie hebt.",
     "haptics": "Trillingen",
-    "lowContrastHint": "Verzacht het scherpe verschil tussen tekst en achtergrond. Niet in nachtmodus.",
-    "reduceMotionHint": "Stopt de ademende ring en de schermovergangen.",
+    "lowContrastHint": "Maakt felle tekst op het scherm zachter.",
+    "reduceMotionHint": "Schakelt schermovergangen en lijstanimaties uit.",
     "hapticsHint": "Een lichte tik als reactie op aanraking.",
     "reset": "Gegevens wissen",
     "resetTitle": "Gegevens wissen",
@@ -212,7 +212,12 @@
     "totalListening": "Totale luistertijd",
     "sessions": "Sessies",
     "listenedHours": "{{h}} u {{m}} min",
-    "listenedMinutes": "{{m}} min"
+    "listenedMinutes": "{{m}} min",
+    "premiumActive": "Premium is actief",
+    "premiumGet": "Alle geluiden ontgrendelen",
+    "premiumManage": "Abonnement beheren",
+    "support": "Hulp en ondersteuning",
+    "stats": "Jouw luistertijd"
   },
   "privacy": {
     "title": "Privacybeleid",
@@ -259,9 +264,7 @@
     "step1Title": "Stem af op geluid",
     "step1Desc": "Slaap, focus en ontspan met binaurale beats, zuivere tonen en omgevingsgeluiden.",
     "step2Title": "Gebruik een koptelefoon",
-    "step2Desc": "Binaurale beats sturen elk oor een andere frequentie; zonder koptelefoon hoor je het effect niet.",
-    "step3Title": "Bescherm je gehoor",
-    "step3Desc": "Houd het volume op een prettig niveau en neem pauze als het onaangenaam wordt. Deze app is geen medisch product.",
+    "step2Desc": "Binaurale beats sturen een ander geluid naar elk oor en hebben dus een koptelefoon nodig. Houd het volume aangenaam en neem pauzes. Deze app is geen medisch product.",
     "next": "Volgende",
     "start": "Beginnen",
     "skip": "Overslaan"
@@ -296,6 +299,7 @@
     "legal_ios": "Abonnementen worden automatisch verlengd, tenzij ze ten minste 24 uur voor het einde van de huidige periode worden opgezegd. De betaling wordt via je Apple ID afgerekend. Beheer of zeg op wanneer je wilt in je App Store-accountinstellingen.",
     "termsOfUse": "Gebruiksvoorwaarden",
     "bestValue": "Beste prijs",
-    "trialTerms": "7 dagen gratis, daarna {{price}}"
+    "trialTerms": "7 dagen gratis, daarna {{price}}",
+    "savePercent": "Bespaar {{percent}}"
   }
 }

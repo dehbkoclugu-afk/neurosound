@@ -19,7 +19,8 @@
     "showLess": "Weniger anzeigen",
     "rename": "Umbenennen",
     "close": "Schließen",
-    "nowPlaying": "läuft gerade"
+    "nowPlaying": "läuft gerade",
+    "undo": "Rückgängig"
   },
   "tabs": {
     "home": "Start",
@@ -48,10 +49,10 @@
     "otherIntents": "Oder etwas anderes",
     "recommendedMinutes": "{{minutes}} Min. empfohlen",
     "recommendedMinutesSuffix": " Min.",
-    "soundCount": "{{n}} Klänge"
+    "allSounds": "Alle Sounds"
   },
   "explore": {
-    "title": "Frequenzen entdecken",
+    "title": "Sounds entdecken",
     "categories": {
       "binaural": "Binaurale Beats",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Zum Mixer",
     "addedToMixer": "Zum Mixer hinzugefügt",
     "emptyTitle": "Gestalte deinen eigenen Klangmix",
-    "emptyDesc": "Kombiniere bis zu 4 Sounds – Regen, Rauschen, Frequenzen – und speichere den Mix."
+    "emptyDesc": "Kombiniere bis zu 4 Sounds – Regen, Rauschen, Frequenzen – und speichere den Mix.",
+    "removed": "{{name}} entfernt"
   },
   "player": {
     "nowPlaying": "Läuft gerade",
@@ -174,11 +176,11 @@
     "beatFrequency": "Beat-Frequenz",
     "playbackError": "Audio konnte nicht gestartet werden. Bitte versuche es erneut.",
     "headphonesRequired": "Kopfhörer nötig — ein Handylautsprecher kann diese Frequenzen nicht wiedergeben.",
-    "volumeCapped": "Lautstärke auf {{percent}} % begrenzt",
+    "volumeCapped": "Gehörschutz: Der Regler endet bei {{percent}}. Zum Ändern tippen.",
     "untilFade": "bis zum sanften Ausblenden",
-    "noTimer": "Läuft weiter",
     "noTimerHint": "Spielt, bis du stoppst",
-    "setTimer": "Sleep-Timer stellen"
+    "setTimer": "Sleep-Timer stellen",
+    "headphonesBinaural": "Kopfhörer nötig: Jedes Ohr muss seinen eigenen Ton hören."
   },
   "settings": {
     "title": "Einstellungen",
@@ -193,15 +195,13 @@
     "reduceMotion": "Bewegung reduzieren",
     "lowContrast": "Weicherer Kontrast",
     "language": "Sprache",
-    "audio": "Audio",
+    "audio": "Sound und Haptik",
     "maxVolume": "Maximale Lautstärke",
     "about": "Über",
     "version": "Version",
-    "epilepsyWarning": "Epilepsie-Warnung",
-    "epilepsyText": "Diese App kann visuelle Effekte enthalten. Bei Epilepsie mit Vorsicht verwenden.",
     "haptics": "Haptik",
-    "lowContrastHint": "Mildert den harten Übergang zwischen Text und Hintergrund. Im Nachtmodus nicht aktiv.",
-    "reduceMotionHint": "Stoppt den atmenden Ring und die Bildschirmübergänge.",
+    "lowContrastHint": "Macht helle Texte auf dem Bildschirm sanfter.",
+    "reduceMotionHint": "Schaltet Bildschirmübergänge und Listenanimationen aus.",
     "hapticsHint": "Ein leichtes Tippen als Rückmeldung.",
     "reset": "Daten zurücksetzen",
     "resetTitle": "Daten zurücksetzen",
@@ -212,7 +212,12 @@
     "totalListening": "Gesamte Hörzeit",
     "sessions": "Sitzungen",
     "listenedHours": "{{h}} Std. {{m}} Min.",
-    "listenedMinutes": "{{m}} Min."
+    "listenedMinutes": "{{m}} Min.",
+    "premiumActive": "Premium ist aktiv",
+    "premiumGet": "Alle Sounds freischalten",
+    "premiumManage": "Abo verwalten",
+    "support": "Hilfe und Support",
+    "stats": "Dein Hörverlauf"
   },
   "privacy": {
     "title": "Datenschutzerklärung",
@@ -259,9 +264,7 @@
     "step1Title": "Stimm dich ein",
     "step1Desc": "Schlafen, fokussieren und entspannen mit binauralen Beats, reinen Tönen und Umgebungsklängen.",
     "step2Title": "Kopfhörer verwenden",
-    "step2Desc": "Binaurale Beats senden jedem Ohr eine andere Frequenz; ohne Kopfhörer ist der Effekt nicht hörbar.",
-    "step3Title": "Schütze dein Gehör",
-    "step3Desc": "Halte die Lautstärke angenehm und mach Pausen, wenn dir etwas unangenehm ist. Diese App ist kein Medizinprodukt.",
+    "step2Desc": "Binaurale Beats senden an jedes Ohr einen anderen Ton und brauchen daher Kopfhörer. Halte die Lautstärke angenehm und mach Pausen. Diese App ist kein Medizinprodukt.",
     "next": "Weiter",
     "start": "Los geht's",
     "skip": "Überspringen"
@@ -296,6 +299,7 @@
     "legal_ios": "Abonnements verlängern sich automatisch, sofern sie nicht mindestens 24 Stunden vor Ende des aktuellen Zeitraums gekündigt werden. Die Zahlung wird über deine Apple-ID abgerechnet. Verwalten oder kündigen kannst du jederzeit in deinen App Store-Kontoeinstellungen.",
     "termsOfUse": "Nutzungsbedingungen",
     "bestValue": "Bester Preis",
-    "trialTerms": "7 Tage gratis, danach {{price}}"
+    "trialTerms": "7 Tage gratis, danach {{price}}",
+    "savePercent": "{{percent}} sparen"
   }
 }

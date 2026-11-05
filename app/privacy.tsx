@@ -11,7 +11,7 @@ import { contentColumn } from '@/constants/layout';
 
 // App never leaves 1.0.0 without a version bump, so this doubles as the
 // policy's own "last updated" date without a second constant to keep in sync.
-const LAST_UPDATED = '2026-11-01';
+const LAST_UPDATED = '2026-11-04T12:00:00';
 
 // Bodies are read with { context: Platform.OS }: `dataBody_ios` and
 // `networkBody_ios` name Apple and iCloud; any platform without its own
@@ -27,9 +27,10 @@ const SECTIONS = [
 ] as const;
 
 export default function PrivacyScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const colors = useThemeColors();
+  const updated = new Date(LAST_UPDATED).toLocaleDateString(i18n.language, { dateStyle: 'long' });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -49,13 +50,21 @@ export default function PrivacyScreen() {
 
       <ScrollView contentContainerStyle={[styles.content, contentColumn]} showsVerticalScrollIndicator={false}>
         <Text style={[styles.updated, { color: colors.textSecondary }]}>
-          {t('privacy.updated', { date: LAST_UPDATED })}
+          {t('privacy.updated', { date: updated })}
         </Text>
 
-        {SECTIONS.map(([titleKey, bodyKey]) => (
+        {SECTIONS.map(([titleKey, bodyKey], index) => (
           <View key={titleKey} style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{t(`privacy.${titleKey}`)}</Text>
-            <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>{t(`privacy.${bodyKey}`, { context: Platform.OS })}</Text>
+            {/* The summary is the page's whole message; the rest is the detail. */}
+            <Text
+              style={[
+                index === 0 ? styles.summaryBody : styles.sectionBody,
+                { color: index === 0 ? colors.text : colors.textSecondary },
+              ]}
+            >
+              {t(`privacy.${bodyKey}`, { context: Platform.OS })}
+            </Text>
           </View>
         ))}
       </ScrollView>
@@ -101,6 +110,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...Typography.headline,
     fontFamily: FontFamily.semibold,
+  },
+  summaryBody: {
+    ...Typography.headline,
+    lineHeight: 24,
   },
   sectionBody: {
     ...Typography.body,

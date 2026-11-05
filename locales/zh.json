@@ -19,7 +19,8 @@
     "showLess": "收起",
     "rename": "重命名",
     "close": "关闭",
-    "nowPlaying": "正在播放"
+    "nowPlaying": "正在播放",
+    "undo": "撤销"
   },
   "tabs": {
     "home": "首页",
@@ -48,10 +49,10 @@
     "otherIntents": "或者别的",
     "recommendedMinutes": "建议 {{minutes}} 分钟",
     "recommendedMinutesSuffix": " 分钟",
-    "soundCount": "{{n}} 种声音"
+    "allSounds": "所有声音"
   },
   "explore": {
-    "title": "探索频率",
+    "title": "探索声音",
     "categories": {
       "binaural": "双耳节拍",
       "solfeggio": "索尔菲吉欧",
@@ -154,7 +155,8 @@
     "addToMixer": "加入混音器",
     "addedToMixer": "已加入混音器",
     "emptyTitle": "打造专属混音",
-    "emptyDesc": "最多叠加 4 种声音——雨声、噪音与频率——并保存混音。"
+    "emptyDesc": "最多叠加 4 种声音——雨声、噪音与频率——并保存混音。",
+    "removed": "已移除{{name}}"
   },
   "player": {
     "nowPlaying": "正在播放",
@@ -174,11 +176,11 @@
     "beatFrequency": "节拍频率",
     "playbackError": "无法开始播放，请重试。",
     "headphonesRequired": "需要耳机——手机扬声器无法播放这些频率。",
-    "volumeCapped": "音量已限制为 {{percent}}%",
+    "volumeCapped": "听力保护：滑块上限为 {{percent}}。点按可更改。",
     "untilFade": "后渐弱",
-    "noTimer": "不会停止",
     "noTimerHint": "播放直到你停止",
-    "setTimer": "设置定时"
+    "setTimer": "设置定时",
+    "headphonesBinaural": "需要耳机：两只耳朵必须分别听到各自的声音。"
   },
   "settings": {
     "title": "设置",
@@ -193,15 +195,13 @@
     "reduceMotion": "减弱动态效果",
     "lowContrast": "更柔和的对比",
     "language": "语言",
-    "audio": "音频",
+    "audio": "声音与触感",
     "maxVolume": "最大音量",
     "about": "关于",
     "version": "版本",
-    "epilepsyWarning": "癫痫提示",
-    "epilepsyText": "本应用可能包含视觉效果。如有癫痫病史请谨慎使用。",
     "haptics": "触感反馈",
-    "lowContrastHint": "减弱文字与背景之间的反差。夜间模式下不生效。",
-    "reduceMotionHint": "停止呼吸光环与界面切换动画。",
+    "lowContrastHint": "柔化屏幕上明亮的文字。",
+    "reduceMotionHint": "关闭屏幕切换和列表动画。",
     "hapticsHint": "轻触时给予细微振动反馈。",
     "reset": "清除数据",
     "resetTitle": "清除数据",
@@ -212,7 +212,12 @@
     "totalListening": "累计收听",
     "sessions": "次数",
     "listenedHours": "{{h}}小时{{m}}分钟",
-    "listenedMinutes": "{{m}}分钟"
+    "listenedMinutes": "{{m}}分钟",
+    "premiumActive": "高级版已启用",
+    "premiumGet": "解锁所有声音",
+    "premiumManage": "管理订阅",
+    "support": "帮助与支持",
+    "stats": "你的收听记录"
   },
   "privacy": {
     "title": "隐私政策",
@@ -259,9 +264,7 @@
     "step1Title": "把自己调到声音上",
     "step1Desc": "用双耳节拍、纯音和环境音来入睡、专注和放松。",
     "step2Title": "请戴上耳机",
-    "step2Desc": "双耳节拍会向左右耳送出不同频率；不戴耳机听不到这个效果。",
-    "step3Title": "保护你的听力",
-    "step3Desc": "把音量保持在舒适的范围，感到不适时请休息。本应用不是医疗产品。",
+    "step2Desc": "双耳节拍会向两只耳朵发送不同的声音，因此需要耳机。请保持舒适的音量并适当休息。本应用不是医疗产品。",
     "next": "下一步",
     "start": "开始使用",
     "skip": "跳过"
@@ -296,6 +299,7 @@
     "legal_ios": "除非在当前周期结束前至少 24 小时取消，订阅将自动续订。费用将从你的 Apple ID 扣除。你可以随时在 App Store 账户设置中管理或取消订阅。",
     "termsOfUse": "使用条款",
     "bestValue": "最划算",
-    "trialTerms": "免费 7 天，之后 {{price}}"
+    "trialTerms": "免费 7 天，之后 {{price}}",
+    "savePercent": "节省 {{percent}}"
   }
 }

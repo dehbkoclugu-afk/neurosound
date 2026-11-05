@@ -19,7 +19,8 @@
     "showLess": "Visa mindre",
     "rename": "Byt namn",
     "close": "Stäng",
-    "nowPlaying": "spelas nu"
+    "nowPlaying": "spelas nu",
+    "undo": "Ångra"
   },
   "tabs": {
     "home": "Hem",
@@ -48,10 +49,10 @@
     "otherIntents": "Eller något annat",
     "recommendedMinutes": "{{minutes}} min rekommenderas",
     "recommendedMinutesSuffix": " min",
-    "soundCount": "{{n}} ljud"
+    "allSounds": "Alla ljud"
   },
   "explore": {
-    "title": "Utforska frekvenser",
+    "title": "Utforska ljud",
     "categories": {
       "binaural": "Binaurala beats",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Lägg till i mixern",
     "addedToMixer": "Tillagd i mixern",
     "emptyTitle": "Skapa din egen ljudmix",
-    "emptyDesc": "Blanda upp till 4 ljud — regn, brus och frekvenser — och spara mixen."
+    "emptyDesc": "Blanda upp till 4 ljud — regn, brus och frekvenser — och spara mixen.",
+    "removed": "{{name}} borttaget"
   },
   "player": {
     "nowPlaying": "Spelas nu",
@@ -174,11 +176,11 @@
     "beatFrequency": "Beatfrekvens",
     "playbackError": "Kunde inte starta ljudet. Försök igen.",
     "headphonesRequired": "Hörlurar krävs — en mobilhögtalare klarar inte de här frekvenserna.",
-    "volumeCapped": "Volymen begränsad till {{percent}}%",
+    "volumeCapped": "Hörselskydd: reglaget slutar vid {{percent}}. Tryck för att ändra.",
     "untilFade": "tills det tonas ut",
-    "noTimer": "Stannar inte",
     "noTimerHint": "Spelar tills du stoppar",
-    "setTimer": "Ställ in timer"
+    "setTimer": "Ställ in timer",
+    "headphonesBinaural": "Hörlurar krävs: varje öra måste höra sitt eget ljud."
   },
   "settings": {
     "title": "Inställningar",
@@ -193,15 +195,13 @@
     "reduceMotion": "Minska rörelse",
     "lowContrast": "Mjukare kontrast",
     "language": "Språk",
-    "audio": "Ljud",
+    "audio": "Ljud och vibration",
     "maxVolume": "Maxvolym",
     "about": "Om",
     "version": "Version",
-    "epilepsyWarning": "Epilepsivarning",
-    "epilepsyText": "Appen kan innehålla visuella effekter. Var försiktig om du har epilepsi.",
     "haptics": "Vibration",
-    "lowContrastHint": "Mjukar upp skärpan mellan text och bakgrund. Används inte i nattläge.",
-    "reduceMotionHint": "Stoppar den andande ringen och skärmövergångarna.",
+    "lowContrastHint": "Mjukar upp ljus text på skärmen.",
+    "reduceMotionHint": "Stänger av skärmövergångar och listanimationer.",
     "hapticsHint": "En lätt knackning som svar på beröring.",
     "reset": "Nollställ data",
     "resetTitle": "Nollställ data",
@@ -212,7 +212,12 @@
     "totalListening": "Total lyssningstid",
     "sessions": "Sessioner",
     "listenedHours": "{{h}} tim {{m}} min",
-    "listenedMinutes": "{{m}} min"
+    "listenedMinutes": "{{m}} min",
+    "premiumActive": "Premium är aktivt",
+    "premiumGet": "Lås upp alla ljud",
+    "premiumManage": "Hantera prenumeration",
+    "support": "Hjälp och support",
+    "stats": "Ditt lyssnande"
   },
   "privacy": {
     "title": "Integritetspolicy",
@@ -259,9 +264,7 @@
     "step1Title": "Ställ in dig på ljudet",
     "step1Desc": "Sov, fokusera och varva ner med binaurala beats, rena toner och omgivningsljud.",
     "step2Title": "Använd hörlurar",
-    "step2Desc": "Binaurala beats skickar olika frekvens till vartdera örat; utan hörlurar hörs inte effekten.",
-    "step3Title": "Skydda din hörsel",
-    "step3Desc": "Håll volymen på en behaglig nivå och ta paus om det känns obehagligt. Appen är inte en medicinsk produkt.",
+    "step2Desc": "Binaurala beats skickar olika ljud till varje öra och kräver därför hörlurar. Håll en behaglig volym och ta pauser. Den här appen är ingen medicinsk produkt.",
     "next": "Nästa",
     "start": "Kom igång",
     "skip": "Hoppa över"
@@ -296,6 +299,7 @@
     "legal_ios": "Prenumerationer förnyas automatiskt om de inte sägs upp minst 24 timmar före den aktuella periodens slut. Betalningen debiteras ditt Apple-ID. Hantera eller säg upp när som helst i inställningarna för ditt App Store-konto.",
     "termsOfUse": "Användarvillkor",
     "bestValue": "Bästa pris",
-    "trialTerms": "7 dagar gratis, sedan {{price}}"
+    "trialTerms": "7 dagar gratis, sedan {{price}}",
+    "savePercent": "Spara {{percent}}"
   }
 }

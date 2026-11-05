@@ -24,7 +24,7 @@ import { getPresetIcon, IconConfig } from './Icon';
 import { EqualizerBars } from './EqualizerBars';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { usePresetsStore } from '@/stores/presetsStore';
-import { presetArt } from '@/lib/artAssets';
+import { presetThumb } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
 import { isLockedPreset } from '@/lib/premium';
 import { foldForSearch } from '@/lib/upper';
@@ -60,12 +60,12 @@ interface PresetRowProps {
 
 function getSubline(preset: FrequencyPreset, t: (k: string) => string): string {
   if (preset.type === 'binaural' && preset.beatFrequency) {
-    return `${t('explore.categories.binaural')} · ${preset.beatFrequency} Hz`;
+    return `${preset.beatFrequency} Hz`;
   }
   if (preset.type === 'solfeggio' && preset.frequency) {
     return `${preset.frequency} Hz`;
   }
-  return t('explore.categories.noise');
+  return t(preset.descriptionKey);
 }
 
 // Same content as getSubline(), but with the *number alone* in the
@@ -85,7 +85,6 @@ function Subline({
   if (preset.type === 'binaural' && preset.beatFrequency) {
     return (
       <Text style={[styles.subline, { color }]} numberOfLines={1}>
-        {t('explore.categories.binaural')} ·{' '}
         <Text style={styles.sublineFreq}>{preset.beatFrequency}</Text> Hz
       </Text>
     );
@@ -99,52 +98,12 @@ function Subline({
   }
   return (
     <Text style={[styles.subline, { color }]} numberOfLines={1}>
-      {t('explore.categories.noise')}
+      {t(preset.descriptionKey)}
     </Text>
   );
 }
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
-/** The five binaural bands, in the order the ear climbs them. */
-const BINAURAL_BANDS = ['delta', 'theta', 'alpha', 'beta', 'gamma'] as const;
-
-/**
- * Delta → Gamma is a real progression and the list was presenting it as five
- * unrelated names. Five ticks with the current one raised put the row on a
- * scale: you can see at a glance that Theta is near the bottom and Beta near
- * the top without knowing what 6 Hz means.
- */
-function BandScale({
-  preset,
-  color,
-}: {
-  preset: FrequencyPreset;
-  color: string;
-}) {
-  const index = BINAURAL_BANDS.indexOf(
-    preset.binauralType as (typeof BINAURAL_BANDS)[number],
-  );
-  if (index < 0) return null;
-  return (
-    <View
-      style={styles.bandScale}
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-    >
-      {BINAURAL_BANDS.map((band, i) => (
-        <View
-          key={band}
-          style={[
-            styles.bandTick,
-            { backgroundColor: color, opacity: i === index ? 1 : 0.3 },
-            i === index && styles.bandTickActive,
-          ]}
-        />
-      ))}
-    </View>
-  );
-}
 
 /** Splits `text` on the first occurrence of an already-folded `term`
  *  (see foldForSearch). Folded one character at a time so indices into the
@@ -221,7 +180,7 @@ export function PresetRow({
           row made 33 rows of the same visual weight. */}
       <View style={[styles.row, { borderBottomColor: colors.cardBorder }]}>
         <Image
-          source={artwork.source(presetArt(preset.id))}
+          source={artwork.source(presetThumb(preset.id))}
           cachePolicy="memory-disk"
           transition={150}
           style={[
@@ -251,7 +210,6 @@ export function PresetRow({
           <View style={styles.sublineRow}>
             {isPlaying && <EqualizerBars color={colors.accent} size={12} />}
             <Subline preset={preset} color={colors.textSecondary} t={t} />
-            <BandScale preset={preset} color={colors.textSecondary} />
           </View>
         </View>
         {locked ? (
@@ -329,20 +287,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     minWidth: 0,
-  },
-  bandScale: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 2,
-    height: 8,
-  },
-  bandTick: {
-    width: 2,
-    height: 4,
-    borderRadius: 1,
-  },
-  bandTickActive: {
-    height: 8,
   },
   subline: {
     ...Typography.footnote,

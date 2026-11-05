@@ -19,7 +19,8 @@
     "showLess": "Voir moins",
     "rename": "Renommer",
     "close": "Fermer",
-    "nowPlaying": "en cours de lecture"
+    "nowPlaying": "en cours de lecture",
+    "undo": "Annuler"
   },
   "tabs": {
     "home": "Accueil",
@@ -48,10 +49,10 @@
     "otherIntents": "Ou autre chose",
     "recommendedMinutes": "{{minutes}} min recommandées",
     "recommendedMinutesSuffix": " min",
-    "soundCount": "{{n}} sons"
+    "allSounds": "Tous les sons"
   },
   "explore": {
-    "title": "Explorer les fréquences",
+    "title": "Explorer les sons",
     "categories": {
       "binaural": "Battements binauraux",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Ajouter au mixeur",
     "addedToMixer": "Ajouté au mixeur",
     "emptyTitle": "Créez votre propre ambiance",
-    "emptyDesc": "Superposez jusqu'à 4 sons — pluie, bruit, fréquences — et enregistrez le mix."
+    "emptyDesc": "Superposez jusqu'à 4 sons — pluie, bruit, fréquences — et enregistrez le mix.",
+    "removed": "{{name}} retiré"
   },
   "player": {
     "nowPlaying": "En cours de lecture",
@@ -174,11 +176,11 @@
     "beatFrequency": "Fréquence du battement",
     "playbackError": "Impossible de démarrer l'audio. Veuillez réessayer.",
     "headphonesRequired": "Un casque est nécessaire : le haut-parleur du téléphone ne reproduit pas ces fréquences.",
-    "volumeCapped": "Volume limité à {{percent}} %",
+    "volumeCapped": "Protection auditive : le curseur s'arrête à {{percent}}. Touchez pour modifier.",
     "untilFade": "avant le fondu",
-    "noTimer": "Ne s'arrêtera pas",
     "noTimerHint": "Joue jusqu'à ce que tu l'arrêtes",
-    "setTimer": "Régler la minuterie"
+    "setTimer": "Régler la minuterie",
+    "headphonesBinaural": "Casque nécessaire : chaque oreille doit entendre son propre son."
   },
   "settings": {
     "title": "Réglages",
@@ -193,15 +195,13 @@
     "reduceMotion": "Réduire les animations",
     "lowContrast": "Contraste plus doux",
     "language": "Langue",
-    "audio": "Audio",
+    "audio": "Son et vibrations",
     "maxVolume": "Volume maximal",
     "about": "À propos",
     "version": "Version",
-    "epilepsyWarning": "Avertissement épilepsie",
-    "epilepsyText": "Cette application peut contenir des effets visuels. À utiliser avec prudence en cas d'épilepsie.",
     "haptics": "Retour haptique",
-    "lowContrastHint": "Adoucit l'écart entre le texte et le fond. Inactif en mode nuit.",
-    "reduceMotionHint": "Arrête l'anneau respirant et les transitions d'écran.",
+    "lowContrastHint": "Adoucit le texte lumineux à l'écran.",
+    "reduceMotionHint": "Désactive les transitions d'écran et les animations de liste.",
     "hapticsHint": "Une légère vibration en réponse au toucher.",
     "reset": "Réinitialiser les données",
     "resetTitle": "Réinitialiser les données",
@@ -212,7 +212,12 @@
     "totalListening": "Écoute totale",
     "sessions": "Sessions",
     "listenedHours": "{{h}} h {{m}} min",
-    "listenedMinutes": "{{m}} min"
+    "listenedMinutes": "{{m}} min",
+    "premiumActive": "Premium est actif",
+    "premiumGet": "Débloquer tous les sons",
+    "premiumManage": "Gérer l'abonnement",
+    "support": "Aide et assistance",
+    "stats": "Votre écoute"
   },
   "privacy": {
     "title": "Politique de confidentialité",
@@ -259,9 +264,7 @@
     "step1Title": "Accordez-vous au son",
     "step1Desc": "Dormez, concentrez-vous et détendez-vous avec des battements binauraux, des tons purs et des sons d'ambiance.",
     "step2Title": "Utilisez un casque",
-    "step2Desc": "Les battements binauraux envoient une fréquence différente à chaque oreille ; sans casque, l'effet est inaudible.",
-    "step3Title": "Protégez votre audition",
-    "step3Desc": "Gardez un volume confortable et faites des pauses en cas de gêne. Cette application n'est pas un dispositif médical.",
+    "step2Desc": "Les battements binauraux envoient un son différent à chaque oreille et nécessitent donc un casque. Gardez un volume confortable et faites des pauses. Cette app n'est pas un produit médical.",
     "next": "Suivant",
     "start": "Commencer",
     "skip": "Passer"
@@ -296,6 +299,7 @@
     "legal_ios": "Les abonnements se renouvellent automatiquement sauf résiliation au moins 24 heures avant la fin de la période en cours. Le paiement est débité sur votre identifiant Apple. Gérez ou résiliez à tout moment dans les réglages de votre compte App Store.",
     "termsOfUse": "Conditions d’utilisation",
     "bestValue": "Meilleur prix",
-    "trialTerms": "7 jours gratuits, puis {{price}}"
+    "trialTerms": "7 jours gratuits, puis {{price}}",
+    "savePercent": "Économisez {{percent}}"
   }
 }

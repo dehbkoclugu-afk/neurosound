@@ -209,10 +209,10 @@ export default function HomeScreen() {
                 onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
                 style={styles.leadLink}
                 accessibilityRole="link"
-                accessibilityLabel={`${t(suggestedIntent.nameKey)}: ${t('common.seeAll')}`}
+                accessibilityLabel={`${t(suggestedIntent.nameKey)}: ${t('home.allSounds')}`}
               >
                 <Text style={[styles.leadLinkText, { color: artwork.foreground.primary }]}>
-                  {t('common.seeAll')}
+                  {t('home.allSounds')}
                 </Text>
                 <Ionicons name="chevron-forward" size={16} color={artwork.foreground.primary} />
               </TouchableOpacity>
@@ -226,7 +226,6 @@ export default function HomeScreen() {
             </Text>
             <Text style={[styles.leadMeta, { color: artwork.foreground.secondary }]} numberOfLines={2}>
               {t(suggestedIntent.descKey)}
-              {suggestedSound ? ` · ${t(suggestedSound.nameKey)}` : ''}
             </Text>
             <PressableScale
               onPress={handleStartSession}
@@ -466,7 +465,8 @@ const styles = StyleSheet.create({
   emptyStateText: {
     ...Typography.body,
     lineHeight: 21,
-    maxWidth: '72%',
+    // The artwork sits on the right half; copy stops before it.
+    maxWidth: '56%',
   },
   headphoneNote: {
     ...Typography.footnote,

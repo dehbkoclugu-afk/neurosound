@@ -19,7 +19,8 @@
     "showLess": "Mostra meno",
     "rename": "Rinomina",
     "close": "Chiudi",
-    "nowPlaying": "in riproduzione"
+    "nowPlaying": "in riproduzione",
+    "undo": "Annulla"
   },
   "tabs": {
     "home": "Home",
@@ -48,10 +49,10 @@
     "otherIntents": "Oppure altro",
     "recommendedMinutes": "{{minutes}} min consigliati",
     "recommendedMinutesSuffix": " min",
-    "soundCount": "{{n}} suoni"
+    "allSounds": "Tutti i suoni"
   },
   "explore": {
-    "title": "Esplora le frequenze",
+    "title": "Esplora i suoni",
     "categories": {
       "binaural": "Battiti binaurali",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Aggiungi al mixer",
     "addedToMixer": "Aggiunto al mixer",
     "emptyTitle": "Crea il tuo mix di suoni",
-    "emptyDesc": "Sovrapponi fino a 4 suoni — pioggia, rumore e frequenze — e salva il mix."
+    "emptyDesc": "Sovrapponi fino a 4 suoni — pioggia, rumore e frequenze — e salva il mix.",
+    "removed": "{{name}} rimosso"
   },
   "player": {
     "nowPlaying": "In riproduzione",
@@ -174,11 +176,11 @@
     "beatFrequency": "Frequenza del battito",
     "playbackError": "Impossibile avviare l'audio. Riprova.",
     "headphonesRequired": "Servono le cuffie: l’altoparlante del telefono non riproduce queste frequenze.",
-    "volumeCapped": "Volume limitato al {{percent}} %",
+    "volumeCapped": "Protezione uditiva: il cursore arriva a {{percent}}. Tocca per cambiare.",
     "untilFade": "prima della dissolvenza",
-    "noTimer": "Non si fermerà",
     "noTimerHint": "Suona finché non lo fermi",
-    "setTimer": "Imposta il timer"
+    "setTimer": "Imposta il timer",
+    "headphonesBinaural": "Servono le cuffie: ogni orecchio deve sentire il proprio suono."
   },
   "settings": {
     "title": "Impostazioni",
@@ -193,15 +195,13 @@
     "reduceMotion": "Riduci le animazioni",
     "lowContrast": "Contrasto più morbido",
     "language": "Lingua",
-    "audio": "Audio",
+    "audio": "Suono e vibrazione",
     "maxVolume": "Volume massimo",
     "about": "Info",
     "version": "Versione",
-    "epilepsyWarning": "Avviso epilessia",
-    "epilepsyText": "Questa app può contenere effetti visivi. Usala con cautela in caso di epilessia.",
     "haptics": "Feedback aptico",
-    "lowContrastHint": "Attenua lo stacco tra testo e sfondo. Non attivo in modalità notte.",
-    "reduceMotionHint": "Ferma l'anello che respira e le transizioni tra schermate.",
+    "lowContrastHint": "Attenua il testo luminoso sullo schermo.",
+    "reduceMotionHint": "Disattiva le transizioni dello schermo e le animazioni degli elenchi.",
     "hapticsHint": "Un tocco leggero come risposta.",
     "reset": "Azzera i dati",
     "resetTitle": "Azzera i dati",
@@ -212,7 +212,12 @@
     "totalListening": "Ascolto totale",
     "sessions": "Sessioni",
     "listenedHours": "{{h}} h {{m}} min",
-    "listenedMinutes": "{{m}} min"
+    "listenedMinutes": "{{m}} min",
+    "premiumActive": "Premium è attivo",
+    "premiumGet": "Sblocca tutti i suoni",
+    "premiumManage": "Gestisci abbonamento",
+    "support": "Aiuto e assistenza",
+    "stats": "I tuoi ascolti"
   },
   "privacy": {
     "title": "Informativa sulla privacy",
@@ -259,9 +264,7 @@
     "step1Title": "Sintonizzati sul suono",
     "step1Desc": "Dormi, concentrati e rilassati con battiti binaurali, toni puri e suoni ambientali.",
     "step2Title": "Usa le cuffie",
-    "step2Desc": "I battiti binaurali inviano una frequenza diversa a ciascun orecchio; senza cuffie l'effetto non si sente.",
-    "step3Title": "Proteggi il tuo udito",
-    "step3Desc": "Tieni il volume a un livello confortevole e fai delle pause se avverti fastidio. Questa app non è un dispositivo medico.",
+    "step2Desc": "I battiti binaurali inviano un suono diverso a ciascun orecchio, quindi servono le cuffie. Tieni un volume confortevole e fai delle pause. Questa app non è un prodotto medico.",
     "next": "Avanti",
     "start": "Inizia",
     "skip": "Salta"
@@ -296,6 +299,7 @@
     "legal_ios": "Gli abbonamenti si rinnovano automaticamente se non disdetti almeno 24 ore prima della fine del periodo in corso. Il pagamento viene addebitato sul tuo ID Apple. Gestisci o disdici in qualsiasi momento nelle impostazioni del tuo account App Store.",
     "termsOfUse": "Condizioni d’uso",
     "bestValue": "Più conveniente",
-    "trialTerms": "7 giorni gratis, poi {{price}}"
+    "trialTerms": "7 giorni gratis, poi {{price}}",
+    "savePercent": "Risparmia {{percent}}"
   }
 }

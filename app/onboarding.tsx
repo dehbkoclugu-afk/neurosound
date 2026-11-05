@@ -1,5 +1,6 @@
 /**
- * Onboarding — 3 steps: what the app does, why headphones, sound safety.
+ * Onboarding — 3 steps: what the app does, headphones and safety, then what
+ * the user came for. Answering that last one starts the sound.
  * Sets hasSeenOnboarding + hasSeenEpilepsyWarning on completion.
  */
 
@@ -20,6 +21,10 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { useArtwork } from '@/hooks/use-artwork';
+import { intents, Intent } from '@/lib/intents';
+import { getPresetById } from '@/lib/frequencies';
+import * as playerController from '@/lib/audio/playerController';
+import * as haptics from '@/lib/haptics';
 import { intentArt, presetArt } from '@/lib/artAssets';
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { Spacing, Typography, AccessibilitySize, FontFamily, Radius, ControlSize, BADGE_ALPHA, withAlpha } from '@/constants/theme';
@@ -45,8 +50,8 @@ const STEPS = [
   },
   {
     art: intentArt('relax'),
-    titleKey: 'onboarding.step3Title',
-    descKey: 'onboarding.step3Desc',
+    titleKey: 'home.intentsTitle',
+    descKey: null,
   },
 ];
 
@@ -146,16 +151,28 @@ export default function OnboardingScreen() {
   ).current;
 
   const handleNext = () => {
-    if (isLast) {
-      setHasSeenOnboarding(true);
-      setHasSeenEpilepsyWarning(true);
-      // Step 2 already covered headphones; repeating it in an alert on the
-      // first binaural tap is the same sentence three times in two minutes.
-      setHasSeenHeadphoneWarning(true);
+    if (!isLast) setStep(step + 1);
+  };
+
+  // The product's whole premise is that people arrive with a goal, so the
+  // introduction ends by asking for it and playing the answer. Every intent's
+  // lead sound is free, so this can never land on the paywall.
+  const handlePickIntent = (intent: Intent) => {
+    const preset = getPresetById(intent.presetIds[0]);
+    setHasSeenOnboarding(true);
+    setHasSeenEpilepsyWarning(true);
+    // Step 2 already covered headphones; repeating it in an alert on the
+    // first binaural tap is the same sentence three times in two minutes.
+    setHasSeenHeadphoneWarning(true);
+    if (!preset) {
       closeOnboarding();
-    } else {
-      setStep(step + 1);
+      return;
     }
+    haptics.commit();
+    playerController.loadPreset(preset);
+    playerController.startTimer(intent.recommendedMinutes);
+    playerController.play();
+    router.replace(`/player/${preset.id}`);
   };
 
   stepRef.current = { next: handleNext, back: handleBack };
@@ -224,9 +241,31 @@ export default function OnboardingScreen() {
         >
           {t(current.titleKey)}
         </Text>
-        <Text style={[styles.description, { color: artwork.foreground.secondary }]}>
-          {t(current.descKey)}
-        </Text>
+        {current.descKey && (
+          <Text style={[styles.description, { color: artwork.foreground.secondary }]}>
+            {t(current.descKey)}
+          </Text>
+        )}
+        {isLast && (
+          <View style={styles.intents}>
+            {intents.map((intent) => (
+              <PressableScale
+                key={intent.id}
+                onPress={() => handlePickIntent(intent)}
+                style={[styles.intent, { backgroundColor: colors.primary }]}
+                accessibilityRole="button"
+                accessibilityLabel={`${t(intent.nameKey)}. ${t(intent.descKey)}`}
+              >
+                <Text style={[styles.intentName, { color: colors.onPrimary }]}>
+                  {t(intent.nameKey)}
+                </Text>
+                <Text style={[styles.intentDesc, { color: colors.onPrimary }]} numberOfLines={2}>
+                  {t(intent.descKey)}
+                </Text>
+              </PressableScale>
+            ))}
+          </View>
+        )}
       </Animated.View>
 
       <View style={[styles.footer, contentColumn]}>
@@ -261,16 +300,18 @@ export default function OnboardingScreen() {
               <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           )}
-          <PressableScale
-            onPress={handleNext}
-            style={[styles.button, { backgroundColor: colors.primary }]}
-            accessibilityRole="button"
-            accessibilityLabel={isLast ? t('onboarding.start') : t('onboarding.next')}
-          >
-            <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
-              {isLast ? t('onboarding.start') : t('onboarding.next')}
-            </Text>
-          </PressableScale>
+          {!isLast && (
+            <PressableScale
+              onPress={handleNext}
+              style={[styles.button, { backgroundColor: colors.primary }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('onboarding.next')}
+            >
+              <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
+                {t('onboarding.next')}
+              </Text>
+            </PressableScale>
+          )}
         </View>
       </View>
 
@@ -334,6 +375,24 @@ const styles = StyleSheet.create({
     ...Typography.body,
     lineHeight: 24,
     maxWidth: 360,
+  },
+  intents: {
+    alignSelf: 'stretch',
+    gap: Spacing.sm,
+  },
+  intent: {
+    minHeight: ControlSize.cta,
+    borderRadius: Radius.card,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    justifyContent: 'center',
+  },
+  intentName: {
+    ...Typography.headline,
+  },
+  intentDesc: {
+    ...Typography.footnote,
+    opacity: 0.8,
   },
   footer: {
     paddingHorizontal: Spacing.xl,

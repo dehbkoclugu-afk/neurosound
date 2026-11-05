@@ -11,6 +11,8 @@ import {
   Switch,
   TouchableOpacity,
   Alert,
+  Linking,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +43,14 @@ import { useMiniPlayerInset } from '@/hooks/use-mini-player';
 import { contentColumn } from '@/constants/layout';
 import i18n from '@/i18n';
 import * as playerController from '@/lib/audio/playerController';
+import { useIsPremium } from '@/stores/premiumStore';
+
+const SUPPORT_URL = 'https://dehbkoclugu-afk.github.io/neurosound/support.html';
+const TERMS_URL = 'https://dehbkoclugu-afk.github.io/neurosound/terms.html';
+const MANAGE_SUBSCRIPTION_URL =
+  Platform.OS === 'ios'
+    ? 'https://apps.apple.com/account/subscriptions'
+    : 'https://play.google.com/store/account/subscriptions';
 
 /** Each theme shows what it looks like: surface colour on the left half,
  *  accent on the right. `auto` shows both light and dark surfaces. */
@@ -101,6 +111,7 @@ export default function SettingsScreen() {
   } = usePresetsStore();
 
   const colors = useThemeColors();
+  const isPremium = useIsPremium();
 
   const showToast = useToastStore((st) => st.show);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
@@ -161,6 +172,41 @@ export default function SettingsScreen() {
           >
             {t('settings.title')}
           </Text>
+        </View>
+
+        {/* Premium: someone who paid had no way to see that it worked, or to find
+            their subscription. */}
+        <View style={styles.section}>
+          <CategoryHeader title="Premium" style={styles.sectionHeader} />
+          <View
+            style={[
+              styles.group,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+          >
+            <TouchableOpacity
+              onPress={() =>
+                isPremium ? Linking.openURL(MANAGE_SUBSCRIPTION_URL) : router.push('/paywall')
+              }
+              style={[styles.card, styles.lastCard, styles.valueRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole={isPremium ? 'link' : 'button'}
+            >
+              <View style={styles.switchText}>
+                <Text style={[styles.cardTitle, { color: colors.text }]}>
+                  {isPremium ? t('settings.premiumActive') : t('settings.premiumGet')}
+                </Text>
+                {isPremium && (
+                  <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
+                    {t('settings.premiumManage')}
+                  </Text>
+                )}
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Appearance Section */}
@@ -236,7 +282,7 @@ export default function SettingsScreen() {
 
             {/* Low Contrast */}
             <View
-              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
+              style={[styles.card, styles.lastCard, { borderBottomColor: colors.cardBorder }]}
             >
               <View style={styles.switchRow}>
                 <View style={styles.switchLabel}>
@@ -264,47 +310,6 @@ export default function SettingsScreen() {
               </View>
             </View>
 
-            {/* Haptics */}
-            <View
-              style={[
-                styles.card,
-                styles.lastCard,
-                { borderBottomColor: colors.cardBorder },
-              ]}
-            >
-              <View style={styles.switchRow}>
-                <View style={styles.switchLabel}>
-                  <View style={styles.switchText}>
-                    <Text style={[styles.cardTitle, { color: colors.text }]}>
-                      {t('settings.haptics')}
-                    </Text>
-                    <Text
-                      style={[styles.cardHint, { color: colors.textSecondary }]}
-                    >
-                      {t('settings.hapticsHint')}
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={haptics}
-                  onValueChange={setHaptics}
-                  trackColor={{ false: colors.slider, true: colors.accent }}
-                  thumbColor="#fff"
-                  {...({
-                    activeThumbColor: '#fff',
-                    activeTrackColor: colors.accent,
-                  } as any)}
-                />
-              </View>
-            </View>
-          </View>
-          {/* A footnote under the group it concerns, not a tinted row in the
-              middle of it: it informs, it is not a setting. */}
-          <View style={styles.footnoteRow}>
-            <Ionicons name="warning-outline" size={15} color={colors.textSecondary} />
-            <Text style={[styles.footnote, { color: colors.textSecondary }]}>
-              {t('settings.epilepsyWarning')}: {t('settings.epilepsyText')}
-            </Text>
           </View>
         </View>
 
@@ -356,13 +361,7 @@ export default function SettingsScreen() {
               },
             ]}
           >
-            <View
-              style={[
-                styles.card,
-                styles.lastCard,
-                { borderBottomColor: colors.cardBorder },
-              ]}
-            >
+            <View style={[styles.card, { borderBottomColor: colors.cardBorder }]}>
               <Slider
                 value={maxVolume}
                 onValueChange={handleMaxVolumeChange}
@@ -370,116 +369,9 @@ export default function SettingsScreen() {
                 max={1}
                 step={0.1}
                 label={t('settings.maxVolume')}
-                formatValue={(v) => `${Math.round(v * 100)}%`}
               />
             </View>
-          </View>
-        </View>
-
-        {/* About Section */}
-        <View style={styles.section}>
-          <CategoryHeader
-            title={t('settings.about')}
-            style={styles.sectionHeader}
-          />
-
-          <View
-            style={[
-              styles.group,
-              {
-                backgroundColor: colors.backgroundSecondary,
-                borderColor: colors.cardBorder,
-              },
-            ]}
-          >
-            {/* The one irreversible control in Settings, and the only thing
-              separating it from "Privacy policy" was the colour of four
-              words. It carries the destructive icon in a tinted badge, the
-              same language the mixer's delete uses. */}
-            <TouchableOpacity
-              onPress={handleReset}
-              style={[
-                styles.card,
-                styles.resetRow,
-                { borderBottomColor: colors.cardBorder },
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t('settings.reset')}
-            >
-              <View
-                style={[
-                  styles.resetBadge,
-                  { backgroundColor: withAlpha(colors.error, BADGE_ALPHA) },
-                ]}
-                accessibilityElementsHidden
-                importantForAccessibility="no-hide-descendants"
-              >
-                <Ionicons name="trash-outline" size={18} color={colors.error} />
-              </View>
-              <View style={styles.switchText}>
-                <Text style={[styles.cardTitle, { color: colors.error }]}>
-                  {t('settings.reset')}
-                </Text>
-                <Text
-                  style={[styles.cardHint, { color: colors.textSecondary }]}
-                >
-                  {t('settings.resetHint', {
-                    favorites: favoriteIds.length,
-                    mixes: customMixes.length,
-                  })}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.push('/privacy')}
-              style={[
-                styles.card,
-                styles.aboutRow,
-                { borderBottomColor: colors.cardBorder },
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t('settings.privacyPolicy')}
-            >
-              <Text style={[styles.aboutLabel, { color: colors.text }]}>
-                {t('settings.privacyPolicy')}
-              </Text>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={colors.textSecondary}
-              />
-            </TouchableOpacity>
-
-            {/* The deck's own counter. The app kept a ten-item history and
-              otherwise had no idea how much it had been used — in a
-              catalogue-and-tape world that is the one number the metaphor was
-              already promising. */}
-            <View
-              style={[styles.card, { borderBottomColor: colors.cardBorder }]}
-            >
-              <View style={styles.aboutRow}>
-                <Text
-                  style={[styles.aboutLabel, { color: colors.textSecondary }]}
-                >
-                  {t('settings.totalListening')}
-                </Text>
-                <Text style={[styles.aboutValue, { color: colors.text }]}>
-                  {formatListened(listenedSeconds, t)}
-                </Text>
-              </View>
-              <View style={styles.aboutRow}>
-                <Text
-                  style={[styles.aboutLabel, { color: colors.textSecondary }]}
-                >
-                  {t('settings.sessions')}
-                </Text>
-                <Text style={[styles.aboutValue, { color: colors.text }]}>
-                  {sessionCount}
-                </Text>
-              </View>
-            </View>
-
+            {/* Haptics */}
             <View
               style={[
                 styles.card,
@@ -487,10 +379,99 @@ export default function SettingsScreen() {
                 { borderBottomColor: colors.cardBorder },
               ]}
             >
+              <View style={styles.switchRow}>
+                <View style={styles.switchLabel}>
+                  <View style={styles.switchText}>
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>
+                      {t('settings.haptics')}
+                    </Text>
+                    <Text
+                      style={[styles.cardHint, { color: colors.textSecondary }]}
+                    >
+                      {t('settings.hapticsHint')}
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={haptics}
+                  onValueChange={setHaptics}
+                  trackColor={{ false: colors.slider, true: colors.accent }}
+                  thumbColor="#fff"
+                  {...({
+                    activeThumbColor: '#fff',
+                    activeTrackColor: colors.accent,
+                  } as any)}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* The deck's own counter: how much the app has actually been used. */}
+        <View style={styles.section}>
+          <CategoryHeader title={t('settings.stats')} style={styles.sectionHeader} />
+          <View style={[
+              styles.group,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}>
+            <View style={[styles.card, styles.lastCard, styles.statRows, { borderBottomColor: colors.cardBorder }]}>
               <View style={styles.aboutRow}>
-                <Text
-                  style={[styles.aboutLabel, { color: colors.textSecondary }]}
-                >
+                <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
+                  {t('settings.totalListening')}
+                </Text>
+                <Text style={[styles.aboutValue, { color: colors.text }]}>
+                  {formatListened(listenedSeconds, t)}
+                </Text>
+              </View>
+              <View style={styles.aboutRow}>
+                <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
+                  {t('settings.sessions')}
+                </Text>
+                <Text style={[styles.aboutValue, { color: colors.text }]}>{sessionCount}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <CategoryHeader title={t('settings.about')} style={styles.sectionHeader} />
+          <View style={[
+              styles.group,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL(SUPPORT_URL)}
+              style={[styles.card, styles.valueRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole="link"
+            >
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{t('settings.support')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push('/privacy')}
+              style={[styles.card, styles.valueRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole="link"
+            >
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{t('settings.privacyPolicy')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => Linking.openURL(TERMS_URL)}
+              style={[styles.card, styles.valueRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole="link"
+            >
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{t('paywall.termsOfUse')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+            <View style={[styles.card, styles.lastCard, { borderBottomColor: colors.cardBorder }]}>
+              <View style={styles.aboutRow}>
+                <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
                   {t('settings.version')}
                 </Text>
                 <Text style={[styles.aboutValue, { color: colors.text }]}>
@@ -498,6 +479,42 @@ export default function SettingsScreen() {
                 </Text>
               </View>
             </View>
+          </View>
+        </View>
+
+        {/* Last and on its own: the one irreversible control here should not sit
+            in a list between things people tap without thinking. */}
+        <View style={styles.section}>
+          <View style={[
+              styles.group,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: colors.cardBorder,
+              },
+            ]}>
+            <TouchableOpacity
+              onPress={handleReset}
+              style={[styles.card, styles.lastCard, styles.resetRow, { borderBottomColor: colors.cardBorder }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('settings.reset')}
+            >
+              <View
+                style={[styles.resetBadge, { backgroundColor: withAlpha(colors.error, BADGE_ALPHA) }]}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
+                <Ionicons name="trash-outline" size={18} color={colors.error} />
+              </View>
+              <View style={styles.switchText}>
+                <Text style={[styles.cardTitle, { color: colors.error }]}>{t('settings.reset')}</Text>
+                <Text style={[styles.cardHint, { color: colors.textSecondary }]}>
+                  {t('settings.resetHint', {
+                    favorites: favoriteIds.length,
+                    mixes: customMixes.length,
+                  })}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -627,6 +644,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  statRows: {
+    gap: Spacing.sm,
+  },
   aboutLabel: {
     ...Typography.footnote,
   },
@@ -647,16 +667,6 @@ const styles = StyleSheet.create({
   },
   valueText: {
     ...Typography.body,
-  },
-  footnoteRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    paddingHorizontal: Spacing.xs,
-    marginTop: Spacing.sm,
-  },
-  footnote: {
-    ...Typography.caption,
-    flex: 1,
   },
   sheetRow: {
     flexDirection: 'row',

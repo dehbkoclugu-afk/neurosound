@@ -19,7 +19,8 @@
     "showLess": "Pokaż mniej",
     "rename": "Zmień nazwę",
     "close": "Zamknij",
-    "nowPlaying": "teraz odtwarzane"
+    "nowPlaying": "teraz odtwarzane",
+    "undo": "Cofnij"
   },
   "tabs": {
     "home": "Start",
@@ -48,10 +49,10 @@
     "otherIntents": "Albo coś innego",
     "recommendedMinutes": "Zalecane {{minutes}} min",
     "recommendedMinutesSuffix": " min",
-    "soundCount": "{{n}} dźwięków"
+    "allSounds": "Wszystkie dźwięki"
   },
   "explore": {
-    "title": "Odkrywaj częstotliwości",
+    "title": "Odkrywaj dźwięki",
     "categories": {
       "binaural": "Dudnienia binauralne",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Dodaj do miksera",
     "addedToMixer": "Dodano do miksera",
     "emptyTitle": "Stwórz własny miks dźwięków",
-    "emptyDesc": "Połącz do 4 dźwięków — deszcz, szum i częstotliwości — i zapisz miks."
+    "emptyDesc": "Połącz do 4 dźwięków — deszcz, szum i częstotliwości — i zapisz miks.",
+    "removed": "Usunięto: {{name}}"
   },
   "player": {
     "nowPlaying": "Teraz odtwarzane",
@@ -174,11 +176,11 @@
     "beatFrequency": "Częstotliwość dudnienia",
     "playbackError": "Nie udało się uruchomić dźwięku. Spróbuj ponownie.",
     "headphonesRequired": "Potrzebne słuchawki — głośnik telefonu nie odtworzy tych częstotliwości.",
-    "volumeCapped": "Głośność ograniczona do {{percent}}%",
+    "volumeCapped": "Ochrona słuchu: suwak kończy się na {{percent}}. Dotknij, aby zmienić.",
     "untilFade": "do wyciszenia",
-    "noTimer": "Nie zatrzyma się",
     "noTimerHint": "Gra, dopóki nie zatrzymasz",
-    "setTimer": "Ustaw minutnik"
+    "setTimer": "Ustaw minutnik",
+    "headphonesBinaural": "Potrzebne słuchawki: każde ucho musi słyszeć własny dźwięk."
   },
   "settings": {
     "title": "Ustawienia",
@@ -193,15 +195,13 @@
     "reduceMotion": "Ogranicz ruch",
     "lowContrast": "Łagodniejszy kontrast",
     "language": "Język",
-    "audio": "Dźwięk",
+    "audio": "Dźwięk i wibracje",
     "maxVolume": "Maksymalna głośność",
     "about": "O aplikacji",
     "version": "Wersja",
-    "epilepsyWarning": "Ostrzeżenie o padaczce",
-    "epilepsyText": "Aplikacja może zawierać efekty wizualne. Zachowaj ostrożność, jeśli masz padaczkę.",
     "haptics": "Wibracje",
-    "lowContrastHint": "Zmiękcza ostrość między tekstem a tłem. Nie działa w trybie nocnym.",
-    "reduceMotionHint": "Zatrzymuje oddychający pierścień i przejścia ekranów.",
+    "lowContrastHint": "Łagodzi jasny tekst na ekranie.",
+    "reduceMotionHint": "Wyłącza przejścia ekranów i animacje list.",
     "hapticsHint": "Lekkie stuknięcie jako reakcja na dotyk.",
     "reset": "Zresetuj dane",
     "resetTitle": "Zresetuj dane",
@@ -212,7 +212,12 @@
     "totalListening": "Łączny czas słuchania",
     "sessions": "Sesje",
     "listenedHours": "{{h}} godz. {{m}} min",
-    "listenedMinutes": "{{m}} min"
+    "listenedMinutes": "{{m}} min",
+    "premiumActive": "Premium jest aktywne",
+    "premiumGet": "Odblokuj wszystkie dźwięki",
+    "premiumManage": "Zarządzaj subskrypcją",
+    "support": "Pomoc i wsparcie",
+    "stats": "Twoje słuchanie"
   },
   "privacy": {
     "title": "Polityka prywatności",
@@ -259,9 +264,7 @@
     "step1Title": "Nastrój się na dźwięk",
     "step1Desc": "Śpij, skupiaj się i odpoczywaj z dudnieniami binauralnymi, czystymi tonami i dźwiękami otoczenia.",
     "step2Title": "Załóż słuchawki",
-    "step2Desc": "Dudnienia binauralne wysyłają inną częstotliwość do każdego ucha; bez słuchawek efektu nie usłyszysz.",
-    "step3Title": "Chroń swój słuch",
-    "step3Desc": "Utrzymuj głośność na wygodnym poziomie i rób przerwy, jeśli poczujesz dyskomfort. Ta aplikacja nie jest wyrobem medycznym.",
+    "step2Desc": "Rytmy binauralne wysyłają inny dźwięk do każdego ucha, dlatego potrzebne są słuchawki. Utrzymuj komfortową głośność i rób przerwy. Ta aplikacja nie jest produktem medycznym.",
     "next": "Dalej",
     "start": "Zaczynajmy",
     "skip": "Pomiń"
@@ -296,6 +299,7 @@
     "legal_ios": "Subskrypcje odnawiają się automatycznie, jeśli nie zostaną anulowane co najmniej 24 godziny przed końcem bieżącego okresu. Płatność jest pobierana z Twojego Apple ID. Zarządzaj subskrypcją lub anuluj ją w dowolnej chwili w ustawieniach konta App Store.",
     "termsOfUse": "Warunki korzystania",
     "bestValue": "Najlepsza cena",
-    "trialTerms": "7 dni za darmo, potem {{price}}"
+    "trialTerms": "7 dni za darmo, potem {{price}}",
+    "savePercent": "Oszczędź {{percent}}"
   }
 }

@@ -19,7 +19,8 @@
     "showLess": "Thu gọn",
     "rename": "Đổi tên",
     "close": "Đóng",
-    "nowPlaying": "đang phát"
+    "nowPlaying": "đang phát",
+    "undo": "Hoàn tác"
   },
   "tabs": {
     "home": "Trang chủ",
@@ -48,10 +49,10 @@
     "otherIntents": "Hoặc thứ khác",
     "recommendedMinutes": "Nên nghe {{minutes}} phút",
     "recommendedMinutesSuffix": " phút",
-    "soundCount": "{{n}} âm thanh"
+    "allSounds": "Tất cả âm thanh"
   },
   "explore": {
-    "title": "Khám phá tần số",
+    "title": "Khám phá âm thanh",
     "categories": {
       "binaural": "Nhịp Binaural",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Thêm vào bàn trộn",
     "addedToMixer": "Đã thêm vào bàn trộn",
     "emptyTitle": "Tự tạo bản phối âm thanh",
-    "emptyDesc": "Kết hợp tối đa 4 âm thanh — mưa, tiếng ồn và tần số — rồi lưu lại."
+    "emptyDesc": "Kết hợp tối đa 4 âm thanh — mưa, tiếng ồn và tần số — rồi lưu lại.",
+    "removed": "Đã xóa {{name}}"
   },
   "player": {
     "nowPlaying": "Đang phát",
@@ -174,11 +176,11 @@
     "beatFrequency": "Tần số nhịp",
     "playbackError": "Không thể bắt đầu phát. Hãy thử lại.",
     "headphonesRequired": "Cần tai nghe — loa điện thoại không tái tạo được những tần số này.",
-    "volumeCapped": "Âm lượng giới hạn ở {{percent}}%",
+    "volumeCapped": "Bảo vệ thính giác: thanh trượt tối đa {{percent}}. Chạm để thay đổi.",
     "untilFade": "trước khi nhỏ dần",
-    "noTimer": "Sẽ không dừng",
     "noTimerHint": "Phát cho đến khi bạn dừng",
-    "setTimer": "Đặt hẹn giờ"
+    "setTimer": "Đặt hẹn giờ",
+    "headphonesBinaural": "Cần tai nghe: mỗi tai phải nghe âm thanh riêng."
   },
   "settings": {
     "title": "Cài đặt",
@@ -193,15 +195,13 @@
     "reduceMotion": "Giảm chuyển động",
     "lowContrast": "Tương phản dịu hơn",
     "language": "Ngôn ngữ",
-    "audio": "Âm thanh",
+    "audio": "Âm thanh và rung",
     "maxVolume": "Âm lượng tối đa",
     "about": "Giới thiệu",
     "version": "Phiên bản",
-    "epilepsyWarning": "Cảnh báo động kinh",
-    "epilepsyText": "Ứng dụng có thể chứa hiệu ứng hình ảnh. Hãy thận trọng nếu bạn bị động kinh.",
     "haptics": "Rung phản hồi",
-    "lowContrastHint": "Làm dịu độ gắt giữa chữ và nền. Không áp dụng ở chế độ ban đêm.",
-    "reduceMotionHint": "Dừng vòng tròn nhịp thở và các chuyển cảnh.",
+    "lowContrastHint": "Làm dịu chữ sáng trên màn hình.",
+    "reduceMotionHint": "Tắt hiệu ứng chuyển màn hình và hoạt ảnh danh sách.",
     "hapticsHint": "Một cú chạm nhẹ để phản hồi thao tác.",
     "reset": "Đặt lại dữ liệu",
     "resetTitle": "Đặt lại dữ liệu",
@@ -212,7 +212,12 @@
     "totalListening": "Tổng thời gian nghe",
     "sessions": "Phiên",
     "listenedHours": "{{h}} giờ {{m}} phút",
-    "listenedMinutes": "{{m}} phút"
+    "listenedMinutes": "{{m}} phút",
+    "premiumActive": "Premium đang bật",
+    "premiumGet": "Mở khóa mọi âm thanh",
+    "premiumManage": "Quản lý gói đăng ký",
+    "support": "Trợ giúp và hỗ trợ",
+    "stats": "Lịch sử nghe của bạn"
   },
   "privacy": {
     "title": "Chính sách bảo mật",
@@ -259,9 +264,7 @@
     "step1Title": "Hòa vào âm thanh",
     "step1Desc": "Ngủ, tập trung và thư giãn cùng nhịp binaural, nốt thuần và âm thanh môi trường.",
     "step2Title": "Hãy dùng tai nghe",
-    "step2Desc": "Nhịp binaural gửi tần số khác nhau vào từng tai; phải có tai nghe mới cảm nhận được.",
-    "step3Title": "Giữ gìn thính giác",
-    "step3Desc": "Hãy để âm lượng ở mức dễ chịu và nghỉ ngơi nếu thấy khó chịu. Ứng dụng này không phải sản phẩm y tế.",
+    "step2Desc": "Nhịp binaural gửi âm khác nhau đến mỗi tai nên cần tai nghe. Giữ âm lượng dễ chịu và nghỉ giải lao. Ứng dụng này không phải sản phẩm y tế.",
     "next": "Tiếp",
     "start": "Bắt đầu",
     "skip": "Bỏ qua"
@@ -296,6 +299,7 @@
     "legal_ios": "Gói đăng ký tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kỳ hiện tại kết thúc. Khoản thanh toán được tính vào Apple ID của bạn. Bạn có thể quản lý hoặc hủy bất cứ lúc nào trong cài đặt tài khoản App Store.",
     "termsOfUse": "Điều khoản sử dụng",
     "bestValue": "Tiết kiệm nhất",
-    "trialTerms": "Miễn phí 7 ngày, sau đó {{price}}"
+    "trialTerms": "Miễn phí 7 ngày, sau đó {{price}}",
+    "savePercent": "Tiết kiệm {{percent}}"
   }
 }

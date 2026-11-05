@@ -31,7 +31,6 @@ import {
   Radius,
   ControlSize,
 } from '@/constants/theme';
-import { upper } from '@/lib/upper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { PresetRow } from '@/components/ui/PresetRow';
@@ -188,14 +187,6 @@ export default function IntentScreen() {
           </TouchableOpacity>
           <View style={styles.heroText}>
             <Text
-              style={[
-                styles.heroCatalog,
-                { color: artwork.foreground.secondary },
-              ]}
-            >
-              {upper(t('home.soundCount', { n: intent.presetIds.length }))}
-            </Text>
-            <Text
               style={[styles.heroTitle, { color: artwork.foreground.primary }]}
               accessibilityRole="header"
             >
@@ -296,9 +287,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.md,
     gap: Spacing.xs,
-  },
-  heroCatalog: {
-    ...Typography.label,
   },
   heroTitle: {
     ...Typography.largeTitle,

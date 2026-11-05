@@ -19,12 +19,13 @@
     "showLess": "Daha az",
     "rename": "Yeniden adlandır",
     "close": "Kapat",
-    "nowPlaying": "çalıyor"
+    "nowPlaying": "çalıyor",
+    "undo": "Geri al"
   },
   "tabs": {
     "home": "Ana Sayfa",
     "explore": "Keşfet",
-    "mixer": "Karıştırıcı",
+    "mixer": "Mikser",
     "settings": "Ayarlar"
   },
   "home": {
@@ -48,16 +49,16 @@
     "otherIntents": "Ya da başka bir şey",
     "recommendedMinutes": "önerilen süre {{minutes}} dakika",
     "recommendedMinutesSuffix": " dk",
-    "soundCount": "{{n}} ses"
+    "allSounds": "Tüm sesler"
   },
   "explore": {
-    "title": "Frekansları Keşfet",
+    "title": "Sesleri Keşfet",
     "categories": {
       "binaural": "Binaural Ritimler",
       "solfeggio": "Solfeggio",
       "noise": "Ortam Sesleri"
     },
-    "binauralDescription": "Binaural beat'ler her kulağa hafif farklı frekanslar çalarak çalışır. Beyniniz fark frekansında üçüncü bir ton algılar.",
+    "binauralDescription": "Binaural ritimler her kulağa hafif farklı frekanslar çalarak çalışır. Beyniniz fark frekansında üçüncü bir ton algılar.",
     "solfeggioDescription": "Solfeggio frekansları, geleneksel olarak rahatlama ve ruhsal uyumla ilişkilendirilen tonlardır. Etkileri kişiseldir; bilimsel olarak kanıtlanmış tıbbi bir fayda iddia edilmez.",
     "noiseDescription": "Arka plan gürültüsü dikkat dağıtıcı sesleri maskeleyerek odaklanma veya uyku kalitesini artırabilir.",
     "binauralTypes": {
@@ -127,7 +128,7 @@
     "clearSearch": "Aramayı temizle"
   },
   "mixer": {
-    "title": "Ses Karıştırıcı",
+    "title": "Mikser",
     "addSound": "Ses Ekle",
     "volume": "Ses Seviyesi",
     "master": "Ana Ses",
@@ -151,10 +152,11 @@
     "loaded": "Yüklü",
     "renameMix": "Karışımı yeniden adlandır",
     "mixRenamed": "Karışım yeniden adlandırıldı",
-    "addToMixer": "Karıştırıcıya ekle",
-    "addedToMixer": "Karıştırıcıya eklendi",
+    "addToMixer": "Miksere ekle",
+    "addedToMixer": "Miksere eklendi",
     "emptyTitle": "Kendi ses karışımını oluştur",
-    "emptyDesc": "Yağmur, gürültü ve frekanslardan 4 sese kadar üst üste koy, karışımı kaydet."
+    "emptyDesc": "Yağmur, gürültü ve frekanslardan 4 sese kadar üst üste koy, karışımı kaydet.",
+    "removed": "{{name}} kaldırıldı"
   },
   "player": {
     "nowPlaying": "Şu an çalıyor",
@@ -174,11 +176,11 @@
     "beatFrequency": "Beat Frekansı",
     "playbackError": "Ses başlatılamadı. Tekrar deneyin.",
     "headphonesRequired": "Kulaklık gerekli — telefon hoparlörü bu frekansları üretemez.",
-    "volumeCapped": "Maksimum ses %{{percent}} ile sınırlı",
+    "volumeCapped": "Kulak koruması: kaydırıcının en üstü {{percent}}. Değiştirmek için dokun.",
     "untilFade": "sonra yavaşça kısılacak",
-    "noTimer": "Kapanmayacak",
     "noTimerHint": "Sen durdurana kadar çalar",
-    "setTimer": "Zamanlayıcı kur"
+    "setTimer": "Zamanlayıcı kur",
+    "headphonesBinaural": "Kulaklık gerekli: her kulak kendi sesini duymalı."
   },
   "settings": {
     "title": "Ayarlar",
@@ -193,15 +195,13 @@
     "reduceMotion": "Animasyonları Azalt",
     "lowContrast": "Yumuşak kontrast",
     "language": "Dil",
-    "audio": "Ses",
+    "audio": "Ses ve titreşim",
     "maxVolume": "Maksimum Ses",
     "about": "Hakkında",
     "version": "Sürüm",
-    "epilepsyWarning": "Epilepsi Uyarısı",
-    "epilepsyText": "Bu uygulama görsel efektler içerebilir. Epilepsiniz varsa dikkatli kullanın.",
     "haptics": "Titreşim",
-    "lowContrastHint": "Metin ve arka plan arasındaki sertliği azaltır. Gece modunda kullanılmaz.",
-    "reduceMotionHint": "Nefes alan halkayı ve ekran geçişlerini durdurur.",
+    "lowContrastHint": "Ekrandaki parlak yazıları yumuşatır.",
+    "reduceMotionHint": "Ekran geçişlerini ve liste animasyonlarını kapatır.",
     "hapticsHint": "Dokunma geri bildirimi için hafif titreşim.",
     "reset": "Verileri sıfırla",
     "resetTitle": "Verileri sıfırla",
@@ -212,7 +212,12 @@
     "totalListening": "Toplam dinleme",
     "sessions": "Oturum",
     "listenedHours": "{{h}} sa {{m}} dk",
-    "listenedMinutes": "{{m}} dk"
+    "listenedMinutes": "{{m}} dk",
+    "premiumActive": "Premium etkin",
+    "premiumGet": "Tüm sesleri aç",
+    "premiumManage": "Aboneliği yönet",
+    "support": "Yardım ve destek",
+    "stats": "Dinleme geçmişin"
   },
   "privacy": {
     "title": "Gizlilik Politikası",
@@ -259,9 +264,7 @@
     "step1Title": "Sese odaklan",
     "step1Desc": "Binaural ritimler, saf tonlar ve ortam sesleriyle uyu, odaklan, rahatla.",
     "step2Title": "Kulaklık tak",
-    "step2Desc": "Binaural ritimler her kulağa farklı bir frekans gönderir; etkiyi duymak için kulaklık gerekir.",
-    "step3Title": "Sesini koru",
-    "step3Desc": "Ses seviyesini rahat bir düzeyde tut, rahatsızlık hissedersen ara ver. Bu uygulama tıbbi bir ürün değildir.",
+    "step2Desc": "Binaural ritimler her kulağa farklı ses gönderir, bu yüzden kulaklık gerekir. Sesi rahat bir düzeyde tut, ara ver. Bu uygulama tıbbi bir ürün değildir.",
     "next": "İleri",
     "start": "Başla",
     "skip": "Atla"
@@ -296,6 +299,7 @@
     "legal_ios": "Abonelikler, mevcut dönemin bitiminden en az 24 saat önce iptal edilmezse otomatik olarak yenilenir. Ödeme Apple Kimliğinizden alınır. İstediğiniz zaman App Store hesap ayarlarından yönetebilir veya iptal edebilirsiniz.",
     "termsOfUse": "Kullanım Koşulları",
     "bestValue": "En avantajlı",
-    "trialTerms": "7 gün ücretsiz, sonra {{price}}"
+    "trialTerms": "7 gün ücretsiz, sonra {{price}}",
+    "savePercent": "{{percent}} tasarruf"
   }
 }

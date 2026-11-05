@@ -19,7 +19,8 @@
     "showLess": "간략히 보기",
     "rename": "이름 변경",
     "close": "닫기",
-    "nowPlaying": "재생 중"
+    "nowPlaying": "재생 중",
+    "undo": "실행 취소"
   },
   "tabs": {
     "home": "홈",
@@ -48,10 +49,10 @@
     "otherIntents": "다른 목적",
     "recommendedMinutes": "{{minutes}}분 권장",
     "recommendedMinutesSuffix": "분",
-    "soundCount": "소리 {{n}}개"
+    "allSounds": "모든 사운드"
   },
   "explore": {
-    "title": "주파수 탐색",
+    "title": "사운드 둘러보기",
     "categories": {
       "binaural": "바이노럴 비트",
       "solfeggio": "솔페지오",
@@ -154,7 +155,8 @@
     "addToMixer": "믹서에 추가",
     "addedToMixer": "믹서에 추가했습니다",
     "emptyTitle": "나만의 사운드 믹스 만들기",
-    "emptyDesc": "빗소리, 노이즈, 주파수를 최대 4개까지 겹치고 믹스를 저장하세요."
+    "emptyDesc": "빗소리, 노이즈, 주파수를 최대 4개까지 겹치고 믹스를 저장하세요.",
+    "removed": "{{name}} 제거됨"
   },
   "player": {
     "nowPlaying": "재생 중",
@@ -174,11 +176,11 @@
     "beatFrequency": "비트 주파수",
     "playbackError": "소리를 재생할 수 없습니다. 다시 시도해 주세요.",
     "headphonesRequired": "이어폰이 필요합니다. 휴대폰 스피커로는 이 주파수를 재생할 수 없습니다.",
-    "volumeCapped": "음량이 {{percent}}%로 제한됨",
+    "volumeCapped": "청력 보호: 슬라이더 최대치는 {{percent}}입니다. 눌러서 변경하세요.",
     "untilFade": "후 서서히 꺼짐",
-    "noTimer": "멈추지 않음",
     "noTimerHint": "멈출 때까지 재생",
-    "setTimer": "타이머 설정"
+    "setTimer": "타이머 설정",
+    "headphonesBinaural": "헤드폰이 필요합니다: 양쪽 귀가 각각 다른 소리를 들어야 합니다."
   },
   "settings": {
     "title": "설정",
@@ -193,15 +195,13 @@
     "reduceMotion": "동작 줄이기",
     "lowContrast": "대비 부드럽게",
     "language": "언어",
-    "audio": "오디오",
+    "audio": "사운드 및 햅틱",
     "maxVolume": "최대 음량",
     "about": "정보",
     "version": "버전",
-    "epilepsyWarning": "뇌전증 주의",
-    "epilepsyText": "이 앱에는 시각 효과가 포함될 수 있습니다. 뇌전증이 있다면 주의해서 사용하세요.",
     "haptics": "햅틱",
-    "lowContrastHint": "글자와 배경의 대비를 부드럽게 합니다. 나이트 모드에서는 적용되지 않습니다.",
-    "reduceMotionHint": "숨쉬는 링과 화면 전환을 멈춥니다.",
+    "lowContrastHint": "화면의 밝은 글자를 부드럽게 합니다.",
+    "reduceMotionHint": "화면 전환과 목록 애니메이션을 끕니다.",
     "hapticsHint": "터치에 가벼운 진동으로 반응합니다.",
     "reset": "데이터 초기화",
     "resetTitle": "데이터 초기화",
@@ -212,7 +212,12 @@
     "totalListening": "총 청취 시간",
     "sessions": "세션",
     "listenedHours": "{{h}}시간 {{m}}분",
-    "listenedMinutes": "{{m}}분"
+    "listenedMinutes": "{{m}}분",
+    "premiumActive": "프리미엄 사용 중",
+    "premiumGet": "모든 사운드 잠금 해제",
+    "premiumManage": "구독 관리",
+    "support": "도움말 및 지원",
+    "stats": "나의 청취 기록"
   },
   "privacy": {
     "title": "개인정보 처리방침",
@@ -259,9 +264,7 @@
     "step1Title": "소리에 주파수를 맞추세요",
     "step1Desc": "바이노럴 비트, 순음, 환경음으로 잠들고, 집중하고, 쉬어보세요.",
     "step2Title": "헤드폰을 사용하세요",
-    "step2Desc": "바이노럴 비트는 양쪽 귀에 서로 다른 주파수를 보냅니다. 헤드폰이 없으면 효과를 들을 수 없습니다.",
-    "step3Title": "청력을 보호하세요",
-    "step3Desc": "편안한 음량을 유지하고 불편하면 잠시 쉬세요. 이 앱은 의료기기가 아닙니다.",
+    "step2Desc": "바이노럴 비트는 양쪽 귀에 서로 다른 소리를 보내므로 헤드폰이 필요합니다. 편안한 볼륨을 유지하고 쉬어 가며 들으세요. 이 앱은 의료 제품이 아닙니다.",
     "next": "다음",
     "start": "시작하기",
     "skip": "건너뛰기"
@@ -296,6 +299,7 @@
     "legal_ios": "구독은 현재 기간이 끝나기 최소 24시간 전에 취소하지 않으면 자동으로 갱신됩니다. 결제는 Apple ID로 청구됩니다. App Store 계정 설정에서 언제든지 관리하거나 취소할 수 있습니다.",
     "termsOfUse": "이용 약관",
     "bestValue": "가장 저렴",
-    "trialTerms": "7일 무료, 이후 {{price}}"
+    "trialTerms": "7일 무료, 이후 {{price}}",
+    "savePercent": "{{percent}} 절약"
   }
 }

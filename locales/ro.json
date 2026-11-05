@@ -19,7 +19,8 @@
     "showLess": "Arată mai puțin",
     "rename": "Redenumește",
     "close": "Închide",
-    "nowPlaying": "se redă acum"
+    "nowPlaying": "se redă acum",
+    "undo": "Anulează"
   },
   "tabs": {
     "home": "Acasă",
@@ -48,10 +49,10 @@
     "otherIntents": "Sau altceva",
     "recommendedMinutes": "{{minutes}} min recomandate",
     "recommendedMinutesSuffix": " min",
-    "soundCount": "{{n}} sunete"
+    "allSounds": "Toate sunetele"
   },
   "explore": {
-    "title": "Explorează frecvențele",
+    "title": "Explorează sunetele",
     "categories": {
       "binaural": "Ritmuri binaurale",
       "solfeggio": "Solfeggio",
@@ -154,7 +155,8 @@
     "addToMixer": "Adaugă în mixer",
     "addedToMixer": "Adăugat în mixer",
     "emptyTitle": "Creează-ți propriul mix",
-    "emptyDesc": "Combină până la 4 sunete — ploaie, zgomot și frecvențe — și salvează mixul."
+    "emptyDesc": "Combină până la 4 sunete — ploaie, zgomot și frecvențe — și salvează mixul.",
+    "removed": "{{name}} eliminat"
   },
   "player": {
     "nowPlaying": "Se redă acum",
@@ -174,11 +176,11 @@
     "beatFrequency": "Frecvența ritmului",
     "playbackError": "Sunetul nu a putut porni. Încearcă din nou.",
     "headphonesRequired": "Sunt necesare căști — difuzorul telefonului nu redă aceste frecvențe.",
-    "volumeCapped": "Volum limitat la {{percent}}%",
+    "volumeCapped": "Protecția auzului: glisorul ajunge la {{percent}}. Atinge pentru a schimba.",
     "untilFade": "până la stingere",
-    "noTimer": "Nu se oprește",
     "noTimerHint": "Cântă până îl oprești",
-    "setTimer": "Setează temporizatorul"
+    "setTimer": "Setează temporizatorul",
+    "headphonesBinaural": "Sunt necesare căști: fiecare ureche trebuie să audă propriul sunet."
   },
   "settings": {
     "title": "Setări",
@@ -193,15 +195,13 @@
     "reduceMotion": "Redu mișcarea",
     "lowContrast": "Contrast mai blând",
     "language": "Limbă",
-    "audio": "Audio",
+    "audio": "Sunet și vibrații",
     "maxVolume": "Volum maxim",
     "about": "Despre",
     "version": "Versiune",
-    "epilepsyWarning": "Avertisment epilepsie",
-    "epilepsyText": "Aplicația poate conține efecte vizuale. Folosește-o cu grijă dacă ai epilepsie.",
     "haptics": "Vibrații",
-    "lowContrastHint": "Atenuează duritatea dintre text și fundal. Nu se aplică în modul de noapte.",
-    "reduceMotionHint": "Oprește inelul care respiră și tranzițiile dintre ecrane.",
+    "lowContrastHint": "Atenuează textul luminos de pe ecran.",
+    "reduceMotionHint": "Dezactivează tranzițiile ecranului și animațiile listelor.",
     "hapticsHint": "O atingere ușoară ca răspuns la apăsare.",
     "reset": "Resetează datele",
     "resetTitle": "Resetează datele",
@@ -212,7 +212,12 @@
     "totalListening": "Timp total de ascultare",
     "sessions": "Sesiuni",
     "listenedHours": "{{h}} h {{m}} min",
-    "listenedMinutes": "{{m}} min"
+    "listenedMinutes": "{{m}} min",
+    "premiumActive": "Premium este activ",
+    "premiumGet": "Deblochează toate sunetele",
+    "premiumManage": "Gestionează abonamentul",
+    "support": "Ajutor și asistență",
+    "stats": "Ascultările tale"
   },
   "privacy": {
     "title": "Politica de confidențialitate",
@@ -259,9 +264,7 @@
     "step1Title": "Acordează-te la sunet",
     "step1Desc": "Dormi, concentrează-te și relaxează-te cu ritmuri binaurale, tonuri pure și sunete de fundal.",
     "step2Title": "Folosește căști",
-    "step2Desc": "Ritmurile binaurale trimit o frecvență diferită în fiecare ureche; fără căști efectul nu se aude.",
-    "step3Title": "Protejează-ți auzul",
-    "step3Desc": "Ține volumul la un nivel confortabil și ia pauze dacă simți disconfort. Aplicația nu este un produs medical.",
+    "step2Desc": "Ritmurile binaurale trimit un sunet diferit în fiecare ureche, așa că necesită căști. Păstrează un volum confortabil și ia pauze. Această aplicație nu este un produs medical.",
     "next": "Înainte",
     "start": "Începe",
     "skip": "Omite"
@@ -296,6 +299,7 @@
     "legal_ios": "Abonamentele se reînnoiesc automat dacă nu sunt anulate cu cel puțin 24 de ore înainte de sfârșitul perioadei curente. Plata se face din contul tău Apple ID. Gestionează sau anulează oricând din setările contului App Store.",
     "termsOfUse": "Termeni de utilizare",
     "bestValue": "Cel mai avantajos",
-    "trialTerms": "7 zile gratuit, apoi {{price}}"
+    "trialTerms": "7 zile gratuit, apoi {{price}}",
+    "savePercent": "Economisești {{percent}}"
   }
 }

@@ -5,6 +5,7 @@
  * - Accessibility support
  */
 
+import { formatPercent } from '@/lib/upper';
 import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
@@ -48,7 +49,7 @@ export function Slider({
   step = 0.01,
   label,
   showValue = true,
-  formatValue = (v) => `${Math.round(v * 100)}%`,
+  formatValue = formatPercent,
   accessibilityLabel,
   fillColor,
   cap,
