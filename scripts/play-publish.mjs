@@ -30,6 +30,9 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const STORE = join(ROOT, 'store/google-play');
 const PACKAGE = process.env.PACKAGE_NAME || 'com.dehbkoclugu.neurosound';
 const DRY_RUN = process.env.DRY_RUN !== '0';
+// Leaves the listing text, contact details, icon and feature graphic as they
+// are on Play, which may have been edited in the Console since.
+const SCREENSHOTS_ONLY = process.env.SCREENSHOTS_ONLY === '1';
 const API = 'https://androidpublisher.googleapis.com/androidpublisher/v3';
 const UPLOAD = 'https://androidpublisher.googleapis.com/upload/androidpublisher/v3';
 
@@ -117,7 +120,7 @@ function collectLocales() {
 }
 
 function screenshotsFor(locale) {
-  const dir = join(STORE, 'assets/phone', locale);
+  const dir = join(STORE, 'assets/captioned', locale);
   if (!existsSync(dir)) return [];
   return readdirSync(dir).filter((f) => /\.(png|jpe?g)$/i.test(f)).sort()
     .map((f) => join(dir, f));
@@ -263,7 +266,7 @@ A grant can take a few minutes to take effect.`);
   // for your application is not currently supported" — after every listing and
   // image in the edit had already uploaded. Nothing was applied, because the
   // edit is a transaction, which is the whole reason for working inside one.
-  try {
+  if (!SCREENSHOTS_ONLY) try {
     await call(token, 'PATCH', `${API}/applications/${PACKAGE}/edits/${edit.id}/details`, {
       json: { contactEmail: CONTACT.email, contactWebsite: CONTACT.website },
     });
@@ -276,7 +279,7 @@ A grant can take a few minutes to take effect.`);
   const imageFailures = [];
   try {
     for (const locale of locales) {
-      try {
+      if (!SCREENSHOTS_ONLY) try {
         await call(token, 'PUT',
           `${API}/applications/${PACKAGE}/edits/${edit.id}/listings/${locale}`,
           { json: { language: locale, ...listings[locale] } });
@@ -310,7 +313,7 @@ A grant can take a few minutes to take effect.`);
     // listing, so one upload covers every language.
     // The store icon is not taken from the bundle — Play wants its own 512x512
     // upload, and without it the listing shows no icon at all.
-    for (const [type, file] of [
+    for (const [type, file] of SCREENSHOTS_ONLY ? [] : [
       ['featureGraphic', 'assets/feature-graphic.png'],
       ['icon', 'assets/icon-512.png'],
     ]) {
@@ -336,6 +339,9 @@ store/google-play/assets/.`);
     }
 
     if (failures.length) throw new Error(`${failures.length} listing(s) failed`);
+    // A failed locale has already had its images cleared; committing would
+    // leave it with none. Screenshots are the whole job here, so all or nothing.
+    if (SCREENSHOTS_ONLY && imageFailures.length) throw new Error('screenshots failed; edit discarded');
 
     if (DRY_RUN) {
       await call(token, 'DELETE', `${API}/applications/${PACKAGE}/edits/${edit.id}`);

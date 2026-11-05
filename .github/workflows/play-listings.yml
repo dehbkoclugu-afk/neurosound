@@ -17,6 +17,11 @@ on:
         required: true
         default: true
         type: boolean
+      screenshots_only:
+        description: 'Upload only the phone screenshots; leave listing text and other graphics alone'
+        required: true
+        default: false
+        type: boolean
 
 concurrency:
   group: play-listings
@@ -40,4 +45,5 @@ jobs:
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+          SCREENSHOTS_ONLY: ${{ inputs.screenshots_only && '1' || '0' }}
         run: node scripts/play-publish.mjs
