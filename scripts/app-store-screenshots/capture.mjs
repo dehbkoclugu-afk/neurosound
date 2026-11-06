@@ -19,6 +19,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
 const play = process.argv.includes('--play');
+const onlyShot = process.argv.find((a) => a.startsWith('--shot='))?.slice(7);
+const onlyLocale = process.argv.find((a) => a.startsWith('--locale='))?.slice(9);
 const origin = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? 'http://localhost:8091';
 const edge = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const captions = JSON.parse(
@@ -120,7 +122,7 @@ try {
   };
   const playPhone = path.join(root, 'store/google-play/assets/phone');
   const locales = play
-    ? fs.readdirSync(playPhone).map((dir) => ({ dir, lang: dir.split('-')[0] }))
+    ? fs.readdirSync(playPhone).filter((d) => !onlyLocale || d === onlyLocale).map((dir) => ({ dir, lang: dir.split('-')[0] }))
     : LOCALES;
   for (const loc of locales) {
     if (play) {
@@ -134,9 +136,9 @@ try {
       await send('Runtime.evaluate', {
         expression: `localStorage.clear(); localStorage.setItem('neurosound-settings', ${JSON.stringify(JSON.stringify(settings))})`,
       });
-      for (const s of SHOTS) {
+      for (const s of SHOTS.filter((x) => !onlyShot || x.shot === onlyShot)) {
         await send('Page.navigate', { url: origin + s.route });
-        await sleep(5000);
+        await sleep(8000);
         if (s.act) {
           await send('Runtime.evaluate', { expression: s.act });
           await sleep(2500);

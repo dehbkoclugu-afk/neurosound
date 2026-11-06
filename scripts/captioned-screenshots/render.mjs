@@ -63,9 +63,10 @@ async function render(locale, shot, title, subtitle) {
   console.log(out);
 }
 
+// 'all' as the locale renders one shot across every language.
 const [onlyLocale, onlyShot] = process.argv.slice(2);
 const jobs = Object.entries(captions)
-  .filter(([locale]) => !onlyLocale || locale === onlyLocale)
+  .filter(([locale]) => !onlyLocale || onlyLocale === 'all' || locale === onlyLocale)
   .flatMap(([locale, shots]) => Object.entries(shots)
     .filter(([shot]) => !onlyShot || shot === onlyShot)
     .map(([shot, [title, subtitle]]) => () => render(locale, shot, title, subtitle)));

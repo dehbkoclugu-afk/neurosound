@@ -38,7 +38,8 @@ import {
   Radius,
   ControlSize,
 } from '@/constants/theme';
-import { contentColumn } from '@/constants/layout';
+import { contentColumn, CONTENT_MAX_WIDTH } from '@/constants/layout';
+import { fitTitleSize } from '@/lib/titleSize';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAudioStore } from '@/stores/audioStore';
 import { usePresetsStore } from '@/stores/presetsStore';
@@ -79,7 +80,7 @@ export default function PlayerScreen() {
   const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { t } = useTranslation();
   const colors = useThemeColors();
   const artwork = useArtwork();
@@ -245,6 +246,7 @@ export default function PlayerScreen() {
   // One layout for every sound: its name is the headline, the measurement sits
   // under it. Binaural shows the beat, since "200 Hz" would be the carrier.
   const heroName = t(preset.nameKey).split(' (')[0];
+  const titleSize = fitTitleSize(heroName, Math.min(width, CONTENT_MAX_WIDTH) - Spacing.lg * 2);
   const heroMeta =
     preset.type === 'solfeggio' && preset.frequency
       ? `${preset.frequency} Hz · ${t('explore.categories.solfeggio')}`
@@ -348,9 +350,13 @@ export default function PlayerScreen() {
         >
           <View style={styles.titleRow}>
             <Text
-              // Long names ("Love Frequency", "Cosmic Consciousness") wrap at a
-              // smaller size; shrink-to-fit made them tiny or cut them off.
-              style={[styles.bigTitle, heroName.length > 8 && styles.bigTitleLong, { color: colors.text }]}
+              // Sized from the screen and the longest word (lib/titleSize); no
+              // shrink-to-fit, which made long names tiny or cut them off.
+              style={[
+                styles.bigTitle,
+                { fontSize: titleSize, lineHeight: Math.round(titleSize * 1.1), color: colors.text },
+              ]}
+              maxFontSizeMultiplier={1}
               numberOfLines={2}
               accessibilityRole="header"
               accessibilityLabel={t(preset.nameKey)}
@@ -562,10 +568,6 @@ const styles = StyleSheet.create({
   bigTitle: {
     ...Typography.display,
     flexShrink: 1,
-  },
-  bigTitleLong: {
-    fontSize: 44,
-    lineHeight: 50,
   },
   metaRow: {
     flexDirection: 'row',
