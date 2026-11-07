@@ -1,0 +1,27 @@
+name: Play upload v8
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: play-release
+  cancel-in-progress: false
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download signed bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download android-v8-bcede01 --pattern '852Hz-v8-bcede01.aab'
+      - name: Upload to production
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          BUNDLE_PATH: 852Hz-v8-bcede01.aab
+          BUNDLE_SHA256: 46f086d65de225f3b7ab883aa9b62bc7ec2530819ad34b4a46a124286b5d57d5
+        run: node scripts/play-upload-v8.mjs
