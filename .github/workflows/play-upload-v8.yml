@@ -2,7 +2,7 @@ name: Play upload v8
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: play-release
   cancel-in-progress: false
