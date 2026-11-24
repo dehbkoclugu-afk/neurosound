@@ -1,0 +1,60 @@
+# Builds the signed Android App Bundle on a GitHub runner with `eas build --local`.
+# The keystore still comes from EAS (EXPO_TOKEN), but the build runs here, so it
+# does not use the EAS cloud build quota. Optionally submits to the Play track in
+# eas.json (internal); promoting to production stays a manual step in Play Console.
+name: Android build (runner)
+
+on:
+  workflow_dispatch:
+    inputs:
+      submit:
+        description: 'Submit the AAB to the Play internal track after building'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm ci
+
+      - name: Build signed AAB
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
+        run: npx eas-cli build --platform android --profile production --local --non-interactive --output 852hz.aab
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 852hz-aab
+          path: 852hz.aab
+          retention-days: 14
+
+      - name: Submit to Play internal track
+        if: ${{ inputs.submit }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" > play-service-account.json
+          chmod 600 play-service-account.json
+          npx eas-cli submit --platform android --profile production --path 852hz.aab --non-interactive
+
+      - name: Remove temporary Play credential
+        if: always()
+        run: rm -f play-service-account.json
