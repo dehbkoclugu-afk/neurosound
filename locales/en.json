@@ -20,7 +20,8 @@
     "rename": "Rename",
     "close": "Close",
     "nowPlaying": "now playing",
-    "undo": "Undo"
+    "undo": "Undo",
+    "retry": "Try again"
   },
   "tabs": {
     "home": "Home",
@@ -313,6 +314,7 @@
     "savePercent": "Save {{percent}}",
     "timelineToday": "Today: free",
     "timelineLater": "In 7 days: {{price}}",
-    "previewHint": "Tap to hear 15 seconds"
+    "previewHint": "Tap to hear 15 seconds",
+    "pending": "Your payment is pending. Premium unlocks once it's confirmed."
   }
 }

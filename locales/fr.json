@@ -20,7 +20,8 @@
     "rename": "Renommer",
     "close": "Fermer",
     "nowPlaying": "en cours de lecture",
-    "undo": "Annuler"
+    "undo": "Annuler",
+    "retry": "Réessayer"
   },
   "tabs": {
     "home": "Accueil",
@@ -313,6 +314,7 @@
     "savePercent": "Économisez {{percent}}",
     "timelineToday": "Aujourd’hui : gratuit",
     "timelineLater": "Dans 7 jours : {{price}}",
-    "previewHint": "Touchez pour écouter 15 secondes"
+    "previewHint": "Touchez pour écouter 15 secondes",
+    "pending": "Ton paiement est en attente. Premium sera débloqué une fois confirmé."
   }
 }

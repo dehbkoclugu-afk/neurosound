@@ -20,7 +20,8 @@
     "rename": "Zmień nazwę",
     "close": "Zamknij",
     "nowPlaying": "teraz odtwarzane",
-    "undo": "Cofnij"
+    "undo": "Cofnij",
+    "retry": "Spróbuj ponownie"
   },
   "tabs": {
     "home": "Start",
@@ -313,6 +314,7 @@
     "savePercent": "Oszczędź {{percent}}",
     "timelineToday": "Dziś: za darmo",
     "timelineLater": "Za 7 dni: {{price}}",
-    "previewHint": "Dotknij, aby posłuchać 15 sekund"
+    "previewHint": "Dotknij, aby posłuchać 15 sekund",
+    "pending": "Płatność oczekuje na potwierdzenie. Premium odblokuje się po jej zatwierdzeniu."
   }
 }

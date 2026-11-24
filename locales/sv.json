@@ -20,7 +20,8 @@
     "rename": "Byt namn",
     "close": "Stäng",
     "nowPlaying": "spelas nu",
-    "undo": "Ångra"
+    "undo": "Ångra",
+    "retry": "Försök igen"
   },
   "tabs": {
     "home": "Hem",
@@ -313,6 +314,7 @@
     "savePercent": "Spara {{percent}}",
     "timelineToday": "Idag: gratis",
     "timelineLater": "Om 7 dagar: {{price}}",
-    "previewHint": "Tryck för att höra 15 sekunder"
+    "previewHint": "Tryck för att höra 15 sekunder",
+    "pending": "Din betalning väntar. Premium låses upp när den har bekräftats."
   }
 }

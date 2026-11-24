@@ -20,7 +20,8 @@
     "rename": "Rinomina",
     "close": "Chiudi",
     "nowPlaying": "in riproduzione",
-    "undo": "Annulla"
+    "undo": "Annulla",
+    "retry": "Riprova"
   },
   "tabs": {
     "home": "Home",
@@ -313,6 +314,7 @@
     "savePercent": "Risparmia {{percent}}",
     "timelineToday": "Oggi: gratis",
     "timelineLater": "Tra 7 giorni: {{price}}",
-    "previewHint": "Tocca per ascoltare 15 secondi"
+    "previewHint": "Tocca per ascoltare 15 secondi",
+    "pending": "Il pagamento è in attesa. Premium si sbloccherà appena confermato."
   }
 }

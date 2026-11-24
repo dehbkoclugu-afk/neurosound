@@ -20,7 +20,8 @@
     "rename": "Đổi tên",
     "close": "Đóng",
     "nowPlaying": "đang phát",
-    "undo": "Hoàn tác"
+    "undo": "Hoàn tác",
+    "retry": "Thử lại"
   },
   "tabs": {
     "home": "Trang chủ",
@@ -313,6 +314,7 @@
     "savePercent": "Tiết kiệm {{percent}}",
     "timelineToday": "Hôm nay: miễn phí",
     "timelineLater": "Sau 7 ngày: {{price}}",
-    "previewHint": "Chạm để nghe 15 giây"
+    "previewHint": "Chạm để nghe 15 giây",
+    "pending": "Thanh toán của bạn đang chờ xử lý. Premium sẽ mở khóa khi được xác nhận."
   }
 }

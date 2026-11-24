@@ -20,7 +20,8 @@
     "rename": "重命名",
     "close": "关闭",
     "nowPlaying": "正在播放",
-    "undo": "撤销"
+    "undo": "撤销",
+    "retry": "重试"
   },
   "tabs": {
     "home": "首页",
@@ -313,6 +314,7 @@
     "savePercent": "节省 {{percent}}",
     "timelineToday": "今天：免费",
     "timelineLater": "7 天后：{{price}}",
-    "previewHint": "轻触试听 15 秒"
+    "previewHint": "轻触试听 15 秒",
+    "pending": "你的付款正在处理中。确认后将解锁 Premium。"
   }
 }

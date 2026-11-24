@@ -20,7 +20,8 @@
     "rename": "Naam wijzigen",
     "close": "Sluiten",
     "nowPlaying": "speelt nu",
-    "undo": "Ongedaan maken"
+    "undo": "Ongedaan maken",
+    "retry": "Opnieuw proberen"
   },
   "tabs": {
     "home": "Start",
@@ -313,6 +314,7 @@
     "savePercent": "Bespaar {{percent}}",
     "timelineToday": "Vandaag: gratis",
     "timelineLater": "Over 7 dagen: {{price}}",
-    "previewHint": "Tik om 15 seconden te horen"
+    "previewHint": "Tik om 15 seconden te horen",
+    "pending": "Je betaling is in behandeling. Premium wordt ontgrendeld zodra deze is bevestigd."
   }
 }

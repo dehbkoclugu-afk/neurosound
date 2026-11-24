@@ -20,7 +20,8 @@
     "rename": "Renombrar",
     "close": "Cerrar",
     "nowPlaying": "sonando ahora",
-    "undo": "Deshacer"
+    "undo": "Deshacer",
+    "retry": "Reintentar"
   },
   "tabs": {
     "home": "Inicio",
@@ -313,6 +314,7 @@
     "savePercent": "Ahorra {{percent}}",
     "timelineToday": "Hoy: gratis",
     "timelineLater": "En 7 días: {{price}}",
-    "previewHint": "Toca para oír 15 segundos"
+    "previewHint": "Toca para oír 15 segundos",
+    "pending": "Tu pago está pendiente. Premium se activará cuando se confirme."
   }
 }

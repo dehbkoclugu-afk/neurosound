@@ -31,8 +31,13 @@ export const useToastStore = create<ToastState>((set, get) => ({
   message: '',
   variant: 'info',
   id: 0,
-  show: (message, variant = 'info') =>
-    set((s) => ({ visible: true, message, variant, id: s.id + 1 })),
+  show: (message, variant = 'info') => {
+    // A failed purchase is reported by both requestPurchase's rejection and
+    // expo-iap's error listener; one identical toast already up is enough.
+    const s = get();
+    if (s.visible && s.message === message && s.variant === variant) return;
+    set({ visible: true, message, variant, id: s.id + 1 });
+  },
   // A stale fade-out finishing must not hide the toast that replaced it.
   hide: (id) => {
     if (id !== undefined && id !== get().id) return;

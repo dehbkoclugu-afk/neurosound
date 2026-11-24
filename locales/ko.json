@@ -20,7 +20,8 @@
     "rename": "이름 변경",
     "close": "닫기",
     "nowPlaying": "재생 중",
-    "undo": "실행 취소"
+    "undo": "실행 취소",
+    "retry": "다시 시도"
   },
   "tabs": {
     "home": "홈",
@@ -313,6 +314,7 @@
     "savePercent": "{{percent}} 절약",
     "timelineToday": "오늘: 무료",
     "timelineLater": "7일 후: {{price}}",
-    "previewHint": "탭하여 15초 듣기"
+    "previewHint": "탭하여 15초 듣기",
+    "pending": "결제가 대기 중입니다. 확인되면 Premium이 잠금 해제됩니다."
   }
 }

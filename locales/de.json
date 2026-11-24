@@ -20,7 +20,8 @@
     "rename": "Umbenennen",
     "close": "Schließen",
     "nowPlaying": "läuft gerade",
-    "undo": "Rückgängig"
+    "undo": "Rückgängig",
+    "retry": "Erneut versuchen"
   },
   "tabs": {
     "home": "Start",
@@ -313,6 +314,7 @@
     "savePercent": "{{percent}} sparen",
     "timelineToday": "Heute: kostenlos",
     "timelineLater": "In 7 Tagen: {{price}}",
-    "previewHint": "Tippen für 15 Sekunden Hörprobe"
+    "previewHint": "Tippen für 15 Sekunden Hörprobe",
+    "pending": "Deine Zahlung steht noch aus. Premium wird nach der Bestätigung freigeschaltet."
   }
 }

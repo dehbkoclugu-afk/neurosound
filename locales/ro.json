@@ -20,7 +20,8 @@
     "rename": "Redenumește",
     "close": "Închide",
     "nowPlaying": "se redă acum",
-    "undo": "Anulează"
+    "undo": "Anulează",
+    "retry": "Încearcă din nou"
   },
   "tabs": {
     "home": "Acasă",
@@ -313,6 +314,7 @@
     "savePercent": "Economisești {{percent}}",
     "timelineToday": "Azi: gratuit",
     "timelineLater": "Peste 7 zile: {{price}}",
-    "previewHint": "Atinge pentru a asculta 15 secunde"
+    "previewHint": "Atinge pentru a asculta 15 secunde",
+    "pending": "Plata este în așteptare. Premium se deblochează după confirmare."
   }
 }

@@ -152,9 +152,14 @@ export default function PaywallScreen() {
       setPlans([]);
       return;
     }
-    if (!iapConnected) return;
-    let cancelled = false;
     setPlans(null);
+    if (!iapConnected) {
+      // Store never connects offline or without Play Services: fall back to
+      // "unavailable" + retry instead of spinning forever.
+      const timeout = setTimeout(() => setPlans([]), 8000);
+      return () => clearTimeout(timeout);
+    }
+    let cancelled = false;
     Promise.all([
       fetchProducts({ skus: SUBSCRIPTION_SKUS, type: 'subs' }),
       fetchProducts({ skus: [PREMIUM_SKUS.lifetime], type: 'in-app' }),
@@ -392,7 +397,7 @@ export default function PaywallScreen() {
                   style={styles.restore}
                   accessibilityRole="button"
                 >
-                  <Text style={[styles.restoreText, { color: colors.accent }]}>{t('common.ok')}</Text>
+                  <Text style={[styles.restoreText, { color: colors.accent }]}>{t('common.retry')}</Text>
                 </TouchableOpacity>
               )}
             </View>

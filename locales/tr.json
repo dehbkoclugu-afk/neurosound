@@ -20,7 +20,8 @@
     "rename": "Yeniden adlandır",
     "close": "Kapat",
     "nowPlaying": "çalıyor",
-    "undo": "Geri al"
+    "undo": "Geri al",
+    "retry": "Tekrar dene"
   },
   "tabs": {
     "home": "Ana Sayfa",
@@ -313,6 +314,7 @@
     "savePercent": "{{percent}} tasarruf",
     "timelineToday": "Bugün: ücretsiz",
     "timelineLater": "7 gün sonra: {{price}}",
-    "previewHint": "15 saniye dinlemek için dokun"
+    "previewHint": "15 saniye dinlemek için dokun",
+    "pending": "Ödemen onay bekliyor. Onaylanınca Premium açılacak."
   }
 }

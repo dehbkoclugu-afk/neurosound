@@ -60,7 +60,7 @@ function PremiumSyncNative() {
     onPurchaseSuccess: (purchase) => {
       if (!ALL_SKUS.includes(purchase.productId)) return;
       if (purchase.purchaseState === 'pending') {
-        useToastStore.getState().show(i18n.t('paywall.restoreNone'), 'info');
+        useToastStore.getState().show(i18n.t('paywall.pending'), 'info');
         return;
       }
       if (!isPremiumPurchase(purchase)) return;

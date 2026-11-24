@@ -20,7 +20,8 @@
     "rename": "Ganti nama",
     "close": "Tutup",
     "nowPlaying": "sedang diputar",
-    "undo": "Urungkan"
+    "undo": "Urungkan",
+    "retry": "Coba lagi"
   },
   "tabs": {
     "home": "Beranda",
@@ -313,6 +314,7 @@
     "savePercent": "Hemat {{percent}}",
     "timelineToday": "Hari ini: gratis",
     "timelineLater": "7 hari lagi: {{price}}",
-    "previewHint": "Ketuk untuk mendengar 15 detik"
+    "previewHint": "Ketuk untuk mendengar 15 detik",
+    "pending": "Pembayaranmu masih tertunda. Premium akan terbuka setelah dikonfirmasi."
   }
 }

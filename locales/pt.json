@@ -20,7 +20,8 @@
     "rename": "Renomear",
     "close": "Fechar",
     "nowPlaying": "tocando agora",
-    "undo": "Desfazer"
+    "undo": "Desfazer",
+    "retry": "Tentar novamente"
   },
   "tabs": {
     "home": "Início",
@@ -313,6 +314,7 @@
     "savePercent": "Economize {{percent}}",
     "timelineToday": "Hoje: grátis",
     "timelineLater": "Em 7 dias: {{price}}",
-    "previewHint": "Toque para ouvir 15 segundos"
+    "previewHint": "Toque para ouvir 15 segundos",
+    "pending": "Seu pagamento está pendente. O Premium será liberado quando for confirmado."
   }
 }

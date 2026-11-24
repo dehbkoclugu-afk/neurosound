@@ -20,7 +20,8 @@
     "rename": "名前を変更",
     "close": "閉じる",
     "nowPlaying": "再生中",
-    "undo": "元に戻す"
+    "undo": "元に戻す",
+    "retry": "再試行"
   },
   "tabs": {
     "home": "ホーム",
@@ -313,6 +314,7 @@
     "savePercent": "{{percent}}お得",
     "timelineToday": "本日：無料",
     "timelineLater": "7日後：{{price}}",
-    "previewHint": "タップして15秒試聴"
+    "previewHint": "タップして15秒試聴",
+    "pending": "お支払いは保留中です。確認され次第、Premiumが解除されます。"
   }
 }
