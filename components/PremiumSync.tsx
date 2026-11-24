@@ -10,6 +10,7 @@ import { Platform } from 'react-native';
 import { useIAP, getAvailablePurchases, finishTransaction, type Purchase } from 'expo-iap';
 
 import { ALL_SKUS } from '@/lib/premium';
+import { recordPurchase, startRevenueCat } from '@/lib/revenuecat';
 import { usePremiumStore } from '@/stores/premiumStore';
 
 function isPremiumPurchase(p: Purchase): boolean {
@@ -32,11 +33,16 @@ export async function syncPremium(): Promise<boolean> {
 }
 
 function PremiumSyncNative() {
+  useEffect(startRevenueCat, []);
+
   const { connected } = useIAP({
     onPurchaseSuccess: (purchase) => {
       if (!isPremiumPurchase(purchase)) return;
       usePremiumStore.getState().setOwned(true);
-      finishTransaction({ purchase, isConsumable: false }).catch(() => {});
+      // RevenueCat has to see an iOS transaction before it is finished.
+      recordPurchase(purchase.productId)
+        .then(() => finishTransaction({ purchase, isConsumable: false }))
+        .catch(() => {});
     },
   });
 
