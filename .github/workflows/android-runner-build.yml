@@ -5,6 +5,11 @@
 name: Android build (runner)
 
 on:
+  # workflow_dispatch only works once this file is on the default branch; until
+  # then, a push that touches it on a release branch builds and submits.
+  push:
+    branches: ['release/**']
+    paths: [.github/workflows/android-runner-build.yml]
   workflow_dispatch:
     inputs:
       submit:
@@ -45,7 +50,7 @@ jobs:
           retention-days: 14
 
       - name: Submit to Play internal track
-        if: ${{ inputs.submit }}
+        if: ${{ inputs.submit || github.event_name == 'push' }}
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
