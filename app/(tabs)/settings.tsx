@@ -461,28 +461,30 @@ export default function SettingsScreen() {
         {/* The deck's own counter: how much the app has actually been used. */}
         <View style={styles.section}>
           <CategoryHeader title={t('settings.stats')} style={styles.sectionHeader} />
-          <View style={[
+          <View
+            style={[
               styles.group,
+              styles.statsGrid,
               {
                 backgroundColor: colors.backgroundSecondary,
                 borderColor: colors.cardBorder,
               },
-            ]}>
-            <View style={[styles.card, styles.lastCard, styles.statRows, { borderBottomColor: colors.cardBorder }]}>
-              <View style={styles.aboutRow}>
-                <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
-                  {t('settings.totalListening')}
-                </Text>
-                <Text style={[styles.aboutValue, { color: colors.text }]}>
-                  {formatListened(listenedSeconds, t)}
-                </Text>
-              </View>
-              <View style={styles.aboutRow}>
-                <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
-                  {t('settings.sessions')}
-                </Text>
-                <Text style={[styles.aboutValue, { color: colors.text }]}>{sessionCount}</Text>
-              </View>
+            ]}
+          >
+            <View style={styles.statCell}>
+              <Text style={[styles.statNumber, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit>
+                {formatListened(listenedSeconds, t)}
+              </Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
+                {t('settings.totalListening')}
+              </Text>
+            </View>
+            <View style={[styles.statDivider, { backgroundColor: colors.cardBorder }]} />
+            <View style={styles.statCell}>
+              <Text style={[styles.statNumber, { color: colors.text }]}>{sessionCount}</Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>
+                {t('settings.sessions')}
+              </Text>
             </View>
           </View>
         </View>
@@ -593,14 +595,24 @@ export default function SettingsScreen() {
               accessibilityRole="radio"
               accessibilityState={{ selected }}
             >
-              <Text
-                style={[
-                  styles.sheetRowText,
-                  { color: selected ? colors.accent : colors.text },
-                ]}
-              >
-                {t(option.labelKey)}
-              </Text>
+              <View style={styles.themeOptionLeft}>
+                <View
+                  style={[styles.themeSwatch, { borderColor: colors.cardBorder }]}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                >
+                  <View style={[styles.themeSwatchHalf, { backgroundColor: option.swatch[0] }]} />
+                  <View style={[styles.themeSwatchHalf, { backgroundColor: option.swatch[1] }]} />
+                </View>
+                <Text
+                  style={[
+                    styles.sheetRowText,
+                    { color: selected ? colors.accent : colors.text },
+                  ]}
+                >
+                  {t(option.labelKey)}
+                </Text>
+              </View>
               {selected && <Ionicons name="checkmark" size={20} color={colors.accent} />}
             </TouchableOpacity>
           );
@@ -720,6 +732,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.md,
     minHeight: ControlSize.row,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  statCell: {
+    flex: 1,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md + 2,
+    gap: 2,
+  },
+  statDivider: {
+    width: StyleSheet.hairlineWidth,
+    marginVertical: Spacing.md,
+  },
+  statNumber: {
+    ...Typography.title,
+    ...Typography.numeral,
+  },
+  themeOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm + 4,
+  },
+  themeSwatch: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1,
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
+  themeSwatchHalf: {
+    flex: 1,
   },
   aboutRow: {
     flexDirection: 'row',

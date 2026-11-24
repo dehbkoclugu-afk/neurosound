@@ -22,7 +22,7 @@ import { Spacing, Typography, FontFamily } from '@/constants/theme';
 import { FrequencyPreset } from '@/lib/frequencies';
 import { getPresetIcon, IconConfig } from './Icon';
 import { EqualizerBars } from './EqualizerBars';
-import { useThemeColors } from '@/hooks/use-theme-colors';
+import { useThemeColors, useCategoryColors } from '@/hooks/use-theme-colors';
 import { usePresetsStore } from '@/stores/presetsStore';
 import { presetThumb } from '@/lib/artAssets';
 import { useArtwork } from '@/hooks/use-artwork';
@@ -139,6 +139,7 @@ export function PresetRow({
   const { t } = useTranslation();
   const { reduceMotion } = useSettingsStore();
   const colors = useThemeColors();
+  const categoryColors = useCategoryColors();
   const artwork = useArtwork();
   const addFavorite = usePresetsStore((s) => s.addFavorite);
   const removeFavorite = usePresetsStore((s) => s.removeFavorite);
@@ -203,7 +204,16 @@ export function PresetRow({
               )}
             </Text>
             <View style={styles.sublineRow}>
-              {isPlaying && <EqualizerBars color={colors.accent} size={12} />}
+              {isPlaying ? (
+                <EqualizerBars color={colors.accent} size={12} />
+              ) : (
+                <View
+                  style={[
+                    styles.categoryDot,
+                    { backgroundColor: categoryColors[preset.type] },
+                  ]}
+                />
+              )}
               <Subline preset={preset} color={colors.textSecondary} t={t} />
             </View>
           </View>
@@ -288,8 +298,14 @@ const styles = StyleSheet.create({
   sublineRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
+    gap: Spacing.xs + 2,
     minWidth: 0,
+  },
+  categoryDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    flexShrink: 0,
   },
   subline: {
     ...Typography.footnote,

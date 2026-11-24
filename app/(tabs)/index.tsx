@@ -239,35 +239,40 @@ export default function HomeScreen() {
               cachePolicy="memory-disk"
             />
             <View style={styles.leadBody}>
-              <View style={styles.leadTop}>
+              <View style={styles.leadHeaderRow}>
+                <Text style={[styles.leadName, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit>
+                  {t(suggestedIntent.nameKey)}
+                </Text>
                 <TouchableOpacity
                   onPress={() => router.push(`/intent/${suggestedIntent.id}`)}
                   style={styles.leadLink}
                   accessibilityRole="link"
                   accessibilityLabel={`${t(suggestedIntent.nameKey)}: ${t('home.allSounds')}`}
                 >
-                  <Text style={[styles.leadLinkText, { color: colors.text }]}>
+                  <Text style={[styles.leadLinkText, { color: colors.accent }]}>
                     {t('home.allSounds')}
                   </Text>
-                  <Ionicons name="chevron-forward" size={16} color={colors.text} />
+                  <Ionicons name="chevron-forward" size={15} color={colors.accent} />
                 </TouchableOpacity>
               </View>
-              <Text style={[styles.leadName, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit>
-                {t(suggestedIntent.nameKey)}
-              </Text>
               <Text style={[styles.leadMeta, { color: colors.textSecondary }]} numberOfLines={2}>
                 {t(suggestedIntent.descKey)}
               </Text>
+              {suggestedSound && (
+                <Text style={[styles.leadSound, { color: colors.textSecondary }]} numberOfLines={1}>
+                  {t(suggestedSound.nameKey)}
+                </Text>
+              )}
               <PressableScale
                 onPress={handleStartSession}
-                style={[styles.leadButton, { backgroundColor: colors.text }]}
+                style={[styles.leadButton, { backgroundColor: colors.primary }]}
                 accessibilityRole="button"
                 accessibilityLabel={t('intents.startSession', {
                   minutes: suggestedIntent.recommendedMinutes,
                 })}
               >
-                <Ionicons name="play" size={18} color={colors.background} />
-                <Text style={[styles.leadButtonText, { color: colors.background }]}>
+                <Ionicons name="play" size={18} color={colors.onPrimary} />
+                <Text style={[styles.leadButtonText, { color: colors.onPrimary }]}>
                   {t('intents.startSession', { minutes: suggestedIntent.recommendedMinutes })}
                 </Text>
               </PressableScale>
@@ -298,7 +303,7 @@ export default function HomeScreen() {
                   {t(intent.nameKey)}
                 </Text>
                 <Text style={[styles.tileMeta, { color: colors.textSecondary }]}>
-                  {intent.recommendedMinutes}
+                  <Text style={styles.tileMetaNum}>{intent.recommendedMinutes}</Text>
                   {t('home.recommendedMinutesSuffix')}
                 </Text>
               </PressableScale>
@@ -439,17 +444,18 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   leadImage: {
-    height: 230,
+    height: 224,
     width: '100%',
   },
   leadBody: {
     padding: Spacing.md + 4,
-    paddingTop: Spacing.xs,
+    paddingTop: Spacing.md,
   },
-  leadTop: {
+  leadHeaderRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
   },
   leadLink: {
     flexDirection: 'row',
@@ -460,20 +466,26 @@ const styles = StyleSheet.create({
   },
   leadLinkText: {
     ...Typography.footnote,
+    fontFamily: Typography.headline.fontFamily,
   },
   leadName: {
     fontFamily: Typography.largeTitle.fontFamily,
-    fontSize: 44,
-    lineHeight: 50,
+    fontSize: 40,
+    lineHeight: 46,
+    flexShrink: 1,
   },
   leadMeta: {
     ...Typography.footnote,
     marginTop: Spacing.xs,
   },
+  leadSound: {
+    ...Typography.caption,
+    marginTop: Spacing.xs + 2,
+  },
   leadButton: {
     marginTop: Spacing.md,
-    height: 54,
-    borderRadius: 27,
+    height: 52,
+    borderRadius: Radius.card,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -501,6 +513,9 @@ const styles = StyleSheet.create({
   },
   tileMeta: {
     ...Typography.caption,
+  },
+  tileMetaNum: {
+    ...Typography.numeral,
   },
   recentSection: {
     marginTop: Spacing.xl,

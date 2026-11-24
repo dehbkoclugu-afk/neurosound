@@ -420,7 +420,10 @@ export default function PlayerScreen() {
             onPress={() => setShowTimerModal(true)}
             style={[
               styles.timerButton,
-              { backgroundColor: colors.backgroundSecondary, borderColor: colors.cardBorder },
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: timerActive ? colors.accent : colors.cardBorder,
+              },
             ]}
             accessibilityRole="button"
           >
@@ -433,27 +436,35 @@ export default function PlayerScreen() {
             <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleAddToMixer}
-            style={styles.addLink}
-            accessibilityRole="button"
-          >
-            <Ionicons name="add" size={20} color={colors.textSecondary} />
-            <Text style={[styles.addLinkText, { color: colors.textSecondary }]}>
-              {t('mixer.addToMixer')}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.secondaryActions}>
+            <TouchableOpacity
+              onPress={handleAddToMixer}
+              style={[
+                styles.secondaryAction,
+                { backgroundColor: colors.backgroundSecondary, borderColor: colors.cardBorder },
+              ]}
+              accessibilityRole="button"
+            >
+              <Ionicons name="layers-outline" size={18} color={colors.textSecondary} />
+              <Text style={[styles.secondaryActionText, { color: colors.text }]} numberOfLines={1}>
+                {t('mixer.addToMixer')}
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => setShowBedMode(true)}
-            style={styles.addLink}
-            accessibilityRole="button"
-          >
-            <Ionicons name="moon-outline" size={20} color={colors.textSecondary} />
-            <Text style={[styles.addLinkText, { color: colors.textSecondary }]}>
-              {t('player.bedMode')}
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowBedMode(true)}
+              style={[
+                styles.secondaryAction,
+                { backgroundColor: colors.backgroundSecondary, borderColor: colors.cardBorder },
+              ]}
+              accessibilityRole="button"
+            >
+              <Ionicons name="moon-outline" size={18} color={colors.textSecondary} />
+              <Text style={[styles.secondaryActionText, { color: colors.text }]} numberOfLines={1}>
+                {t('player.bedMode')}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           {/* A phone speaker cannot deliver a binaural pair or a very low
               tone: both play and are heard as nothing. Shown only for those. */}
@@ -606,8 +617,8 @@ const styles = StyleSheet.create({
   },
   timerButton: {
     marginTop: Spacing.lg,
-    height: 52,
-    borderRadius: 16,
+    height: ControlSize.cta,
+    borderRadius: Radius.card,
     borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -618,21 +629,32 @@ const styles = StyleSheet.create({
     ...Typography.body,
     flex: 1,
   },
-  addLink: {
+  secondaryActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  secondaryAction: {
+    flex: 1,
+    minHeight: ControlSize.row,
+    borderRadius: Radius.card,
+    borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
-    minHeight: 48,
-    marginTop: Spacing.xs,
+    justifyContent: 'center',
+    gap: Spacing.xs + 2,
+    paddingHorizontal: Spacing.sm,
   },
-  addLinkText: {
-    ...Typography.body,
+  secondaryActionText: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.medium,
+    flexShrink: 1,
   },
   note: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    marginTop: Spacing.xs,
+    marginTop: Spacing.md,
   },
   noteText: {
     ...Typography.footnote,

@@ -468,7 +468,14 @@ export default function MixerScreen() {
                         {contents}
                       </Text>
                     </View>
-                    <Ionicons name="play" size={20} color={colors.accent} />
+                    <View
+                      style={[
+                        styles.suggestedPlay,
+                        { backgroundColor: withAlpha(colors.accent, BADGE_ALPHA) },
+                      ]}
+                    >
+                      <Ionicons name="play" size={16} color={colors.accent} style={{ marginLeft: 2 }} />
+                    </View>
                   </TouchableOpacity>
                 );
               })}
@@ -535,6 +542,7 @@ export default function MixerScreen() {
                     onValueChange={(v) => handleVolumeChange(channel.id, v)}
                     max={1}
                     showValue={false}
+                    fillColor={categoryColors[channel.preset.type]}
                     accessibilityLabel={`${t('mixer.volume')} ${t(channel.preset.nameKey)}`}
                   />
                 </View>
@@ -1242,6 +1250,13 @@ const styles = StyleSheet.create({
   },
   suggestedIntent: {
     ...Typography.footnote,
+  },
+  suggestedPlay: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   presetItem: {
     flexDirection: 'row',
