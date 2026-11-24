@@ -9,7 +9,7 @@
 ## Full description
 Âm thanh ngủ ngon, tiếng mưa, tiếng ồn trắng, nâu và hồng, sóng binaural (delta, theta, alpha, beta, gamma) cùng tần số Solfeggio như 432 Hz, 528 Hz và 852 Hz: một ứng dụng êm dịu cho giấc ngủ, tập trung, thiền và thư giãn.
 
-852Hz là ứng dụng âm thanh hoạt động ngoại tuyến, dành cho giấc ngủ, sự tập trung, thiền và thư giãn.
+Thư giãn với tiếng mưa, trộn tối đa bốn âm thanh và lưu bản phối. Dùng hẹn giờ để dừng phát vào lúc bạn muốn.
 
 Phát một âm thanh riêng lẻ, hoặc trộn tối đa bốn âm thanh trong bàn trộn. Khi hết giờ, bộ hẹn giờ ngủ hạ dần âm lượng rồi dừng hẳn. Điều khiển trên màn hình khóa giúp bạn bật tắt mà không cần mở lại ứng dụng.
 

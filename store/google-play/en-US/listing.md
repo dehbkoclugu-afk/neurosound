@@ -9,7 +9,7 @@ Sleep sounds, white noise, binaural beats and 432 Hz tones. Works offline.
 ## Full description
 Sleep sounds, rain sounds, white noise, brown noise and pink noise, binaural beats (delta, theta, alpha, beta, gamma) and Solfeggio frequencies such as 432 Hz, 528 Hz and 852 Hz: one calm app for sleep, focus, meditation and relaxation.
 
-852Hz is an offline sound app for sleep, focus, meditation, and relaxation routines.
+Wind down with rain, layer up to four sounds, or find your rhythm with binaural beats. Save your favorite mix and set a sleep timer.
 
 Play a sound on its own or combine up to four sounds in the mixer. The sleep timer gently lowers playback when time runs out. Lock-screen controls let you manage playback without reopening the app.
 
