@@ -119,6 +119,7 @@ export default function MixerScreen() {
   const {
     mixerChannels: channels,
     isMixerPlaying: isPlaying,
+    playbackError,
     activeMixId,
     mixerMasterVolume,
     timerDuration,
@@ -215,13 +216,10 @@ export default function MixerScreen() {
 
   const handleUndoRemove = useCallback(async () => {
     if (!lastRemoved) return;
+    const item = lastRemoved;
     if (undoTimer.current) clearTimeout(undoTimer.current);
-    const added = await playerController.mixerAddChannel(lastRemoved.preset);
-    if (added) {
-      const restored = useAudioStore.getState().mixerChannels.at(-1);
-      if (restored) playerController.mixerSetChannelVolume(restored.id, lastRemoved.volume);
-    }
     setLastRemoved(null);
+    await playerController.mixerAddChannel(item.preset, item.volume);
   }, [lastRemoved]);
 
   const handleVolumeChange = useCallback(
@@ -349,6 +347,12 @@ export default function MixerScreen() {
 
   const handleDeleteMix = useCallback(
     (mixId: string, name: string) => {
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined' && window.confirm(`${t('mixer.deleteMix')} "${name}"?`)) {
+          deleteCustomMix(mixId);
+        }
+        return;
+      }
       Alert.alert(t('common.delete'), `${t('mixer.deleteMix')} "${name}"?`, [
         { text: t('common.cancel'), style: 'cancel' },
         {
@@ -558,6 +562,24 @@ export default function MixerScreen() {
               it vanish at the cap left the user hunting for a button that had
               silently removed itself. It is skipped only in the empty state,
               where the first ghost slot above already is this button. */}
+          {!isEmpty && playbackError && (
+            <View
+              style={[
+                styles.errorBanner,
+                {
+                  backgroundColor: withAlpha(colors.error, 0.08),
+                  borderColor: withAlpha(colors.error, 0.34),
+                },
+              ]}
+              accessibilityLiveRegion="assertive"
+            >
+              <Ionicons name="alert-circle-outline" size={18} color={colors.error} />
+              <Text style={[styles.errorBannerText, { color: colors.error }]}>
+                {t('player.playbackError')}
+              </Text>
+            </View>
+          )}
+
           {!isEmpty && (
             <TouchableOpacity
               onPress={() => setShowPresetPicker(true)}
@@ -1036,6 +1058,21 @@ const styles = StyleSheet.create({
   // Muted reads as "still here, just silent" — dimmed, not removed.
   mutedSlider: {
     opacity: 0.4,
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderWidth: 1,
+    borderRadius: Radius.card,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  errorBannerText: {
+    ...Typography.footnote,
+    fontFamily: FontFamily.semibold,
+    flex: 1,
   },
   addRow: {
     flexDirection: 'row',

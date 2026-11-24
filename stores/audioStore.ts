@@ -95,6 +95,8 @@ export interface MixerChannelState {
   muted: boolean;
 }
 
+const clamp01 = (v: number) => (Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 0);
+
 const initialState = {
   currentPreset: null,
   isPlaying: false,
@@ -123,7 +125,7 @@ export const useAudioStore = create<PlaybackState>()(
 
       setPlaybackError: (playbackError) => set({ playbackError }),
 
-      setVolume: (volume) => set({ volume: Math.max(0, Math.min(1, volume)) }),
+      setVolume: (volume) => set({ volume: clamp01(volume) }),
 
       setTimer: (duration) =>
         set({
@@ -137,7 +139,7 @@ export const useAudioStore = create<PlaybackState>()(
       setIsMixerPlaying: (isMixerPlaying) => set({ isMixerPlaying }),
 
       setMixerMasterVolume: (volume) =>
-        set({ mixerMasterVolume: Math.max(0, Math.min(1, volume)) }),
+        set({ mixerMasterVolume: clamp01(volume) }),
 
       addMixerChannel: (channel) =>
         set((state) => ({
@@ -152,7 +154,7 @@ export const useAudioStore = create<PlaybackState>()(
       updateMixerChannelVolume: (channelId, volume) =>
         set((state) => ({
           mixerChannels: state.mixerChannels.map((c) =>
-            c.id === channelId ? { ...c, volume: Math.max(0, Math.min(1, volume)) } : c
+            c.id === channelId ? { ...c, volume: clamp01(volume) } : c
           ),
         })),
 

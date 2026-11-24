@@ -3,7 +3,7 @@
  * Hairline top, typographic info, play/pause + dismiss.
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -38,32 +38,42 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
   const colors = useThemeColors();
   const artwork = useArtwork();
 
-  // The mixer is a second, independent source of playback. Without this branch
-  // it had no global control at all: leaving the Mixer tab mid-playback left
-  // the user with no way to pause and no sign that anything was playing.
+  // Retain the last non-empty snapshot while MiniPlayerHost plays its 160ms
+  // exit animation so the card visibly slides out instead of vanishing on frame 0.
   const isMixerSession = !currentPreset && mixerChannels.length > 0;
+  const active = Boolean(currentPreset || isMixerSession);
+  const lastSnapshot = useRef<{
+    title: string;
+    sublineHz: number | null;
+    sublineText: string | null;
+    thumbId: string;
+  } | null>(null);
 
-  if (!currentPreset && !isMixerSession) {
+  if (active) {
+    const sublineHz = currentPreset
+      ? currentPreset.type === 'binaural'
+        ? currentPreset.beatFrequency ?? null
+        : currentPreset.type === 'solfeggio'
+          ? currentPreset.frequency ?? null
+          : null
+      : null;
+    lastSnapshot.current = {
+      title: currentPreset ? t(currentPreset.nameKey) : t('mixer.title'),
+      sublineHz,
+      sublineText: currentPreset
+        ? sublineHz === null
+          ? t('explore.categories.noise')
+          : null
+        : `${mixerChannels.length} ${t('mixer.sounds')}`,
+      thumbId: currentPreset?.id ?? mixerChannels[0]?.preset.id ?? '',
+    };
+  }
+
+  if (!lastSnapshot.current) {
     return null;
   }
 
-  const title = currentPreset ? t(currentPreset.nameKey) : t('mixer.title');
-
-  // The number alone takes the tape-counter face; the unit and any prose
-  // stay in Nunito (see Typography.numeral).
-  const sublineHz = currentPreset
-    ? currentPreset.type === 'binaural'
-      ? currentPreset.beatFrequency
-      : currentPreset.type === 'solfeggio'
-        ? currentPreset.frequency
-        : null
-    : null;
-  const sublineText = currentPreset
-    ? sublineHz === null
-      ? t('explore.categories.noise')
-      : null
-    : `${mixerChannels.length} ${t('mixer.sounds')}`;
-
+  const { title, sublineHz, sublineText, thumbId } = lastSnapshot.current;
   const playing = currentPreset ? isPlaying : isMixerPlaying;
 
   // A sleep timer runs across every screen, and the one strip of chrome that
@@ -130,7 +140,7 @@ export function MiniPlayer({ onPress }: MiniPlayerProps) {
       <View style={styles.content}>
         {/* The sound's own artwork: the bar is recognisable before it is read. */}
         <Image
-          source={artwork.source(presetThumb(currentPreset?.id ?? mixerChannels[0]?.preset.id ?? ''))}
+          source={artwork.source(presetThumb(thumbId))}
           cachePolicy="memory-disk"
           style={[styles.thumb, { backgroundColor: colors.cardBorder }]}
         />

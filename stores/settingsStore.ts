@@ -142,6 +142,21 @@ export const useSettingsStore = create<SettingsState>()(
       name: 'neurosound-settings',
       storage: createJSONStorage(() => safeStorage),
       version: 2,
+      partialize: (state) => ({
+        theme: state.theme,
+        reduceMotion: state.reduceMotion,
+        lowContrast: state.lowContrast,
+        haptics: state.haptics,
+        language: state.language,
+        maxVolume: state.maxVolume,
+        defaultVolume: state.defaultVolume,
+        livingMix: state.livingMix,
+        hasSeenOnboarding: state.hasSeenOnboarding,
+        hasSeenHeadphoneWarning: state.hasSeenHeadphoneWarning,
+        hasSeenEpilepsyWarning: state.hasSeenEpilepsyWarning,
+        seenCategoryDescriptions: state.seenCategoryDescriptions,
+        legacyPremium: state.legacyPremium,
+      }),
       // Only runs for state saved by an older version, i.e. an existing
       // install; a fresh install starts from initialState with no grant.
       migrate: (persistedState, version) => {

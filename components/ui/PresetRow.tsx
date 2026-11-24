@@ -103,8 +103,6 @@ function Subline({
   );
 }
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
 /** Splits `text` on the first occurrence of an already-folded `term`
  *  (see foldForSearch). Folded one character at a time so indices into the
  *  folded string still line up with the original. */
@@ -150,67 +148,66 @@ export function PresetRow({
   const locked = !isPremium && isLockedPreset(preset.id);
 
   return (
-    <AnimatedTouchable
+    <Animated.View
       entering={
         reduceMotion || index === undefined
           ? undefined
           : FadeInDown.duration(220).delay(Math.min(index, 8) * 40)
       }
-      onPress={onPress}
-      activeOpacity={0.6}
       style={[styles.rowShell, style]}
-      accessibilityRole="button"
-      // The subline carries the category and the frequency, and the heart
-      // carries favourite state. Announcing the name alone dropped both, so a
-      // screen reader user could not tell 6 Hz from 40 Hz.
-      accessibilityLabel={[
-        name,
-        getSubline(preset, t),
-        // The equalizer is decorative to a screen reader, so the state it
-        // stands for has to be spoken here or it is simply missing.
-        isPlaying ? t('common.nowPlaying') : null,
-        isFavorite ? t('common.addedToFavorites') : null,
-        locked ? t('paywall.locked') : null,
-      ]
-        .filter(Boolean)
-        .join(', ')}
     >
-      {/* A list row, not a card: the sound's own art as a thumbnail, name and
-          frequency, then one trailing control. Full-bleed art behind every
-          row made 33 rows of the same visual weight. */}
+      {/* Sibling touchables (main row + favorite button) avoid nested buttons
+          in the accessibility tree and stop web clicks on the heart from
+          bubbling into row navigation. */}
       <View style={[styles.row, { borderBottomColor: colors.cardBorder }]}>
-        <Image
-          source={artwork.source(presetThumb(preset.id))}
-          cachePolicy="memory-disk"
-          style={[
-            styles.thumb,
-            { backgroundColor: colors.cardBorder },
-            locked && styles.thumbLocked,
-          ]}
-        />
-        <View style={styles.rowText}>
-          <Text
+        <TouchableOpacity
+          onPress={onPress}
+          activeOpacity={0.6}
+          style={styles.rowMain}
+          accessibilityRole="button"
+          accessibilityLabel={[
+            name,
+            getSubline(preset, t),
+            isPlaying ? t('common.nowPlaying') : null,
+            isFavorite ? t('common.addedToFavorites') : null,
+            locked ? t('paywall.locked') : null,
+          ]
+            .filter(Boolean)
+            .join(', ')}
+        >
+          <Image
+            source={artwork.source(presetThumb(preset.id))}
+            cachePolicy="memory-disk"
             style={[
-              styles.name,
-              { color: isPlaying ? colors.accent : locked ? colors.textSecondary : colors.text },
+              styles.thumb,
+              { backgroundColor: colors.cardBorder },
+              locked && styles.thumbLocked,
             ]}
-            numberOfLines={1}
-          >
-            {match ? (
-              <>
-                {match[0]}
-                <Text style={styles.nameMatch}>{match[1]}</Text>
-                {match[2]}
-              </>
-            ) : (
-              name
-            )}
-          </Text>
-          <View style={styles.sublineRow}>
-            {isPlaying && <EqualizerBars color={colors.accent} size={12} />}
-            <Subline preset={preset} color={colors.textSecondary} t={t} />
+          />
+          <View style={styles.rowText}>
+            <Text
+              style={[
+                styles.name,
+                { color: isPlaying ? colors.accent : locked ? colors.textSecondary : colors.text },
+              ]}
+              numberOfLines={1}
+            >
+              {match ? (
+                <>
+                  {match[0]}
+                  <Text style={styles.nameMatch}>{match[1]}</Text>
+                  {match[2]}
+                </>
+              ) : (
+                name
+              )}
+            </Text>
+            <View style={styles.sublineRow}>
+              {isPlaying && <EqualizerBars color={colors.accent} size={12} />}
+              <Subline preset={preset} color={colors.textSecondary} t={t} />
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
         {locked ? (
           <View style={styles.trailing}>
             <Ionicons name="lock-closed-outline" size={19} color={colors.textSecondary} />
@@ -233,7 +230,7 @@ export function PresetRow({
           </TouchableOpacity>
         )}
       </View>
-    </AnimatedTouchable>
+    </Animated.View>
   );
 }
 
@@ -245,10 +242,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    gap: Spacing.md,
+    gap: Spacing.sm,
     minHeight: 72,
     paddingVertical: Spacing.sm + 2,
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  rowMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    minWidth: 0,
   },
   thumb: {
     width: 52,

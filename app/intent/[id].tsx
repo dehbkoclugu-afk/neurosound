@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -64,9 +65,19 @@ export default function IntentScreen() {
     .map((presetId) => getPresetById(presetId))
     .filter((p): p is FrequencyPreset => p !== undefined);
 
+  const goBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)');
+  };
+
   const handlePresetPress = (presetId: string) => {
     const preset = getPresetById(presetId);
     if (preset?.type === 'binaural' && !hasSeenHeadphoneWarning) {
+      if (Platform.OS === 'web') {
+        setHasSeenHeadphoneWarning(true);
+        router.push(`/player/${presetId}`);
+        return;
+      }
       Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
         {
           text: t('common.ok'),
@@ -98,6 +109,11 @@ export default function IntentScreen() {
     };
 
     if (preset.type === 'binaural' && !hasSeenHeadphoneWarning) {
+      if (Platform.OS === 'web') {
+        setHasSeenHeadphoneWarning(true);
+        start();
+        return;
+      }
       Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
         {
           text: t('common.ok'),
@@ -117,6 +133,14 @@ export default function IntentScreen() {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
+        <TouchableOpacity
+          onPress={goBack}
+          style={[styles.backButton, { top: insets.top + Spacing.sm }]}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+        >
+          <Ionicons name="arrow-back" size={22} color={colors.text} />
+        </TouchableOpacity>
         <Text style={[styles.emptyText, { color: colors.text }]}>
           {t('common.error')}
         </Text>
@@ -167,7 +191,7 @@ export default function IntentScreen() {
           {/* The arrow was bare white over an image whose brightness is
               whatever the photograph happens to be at that corner. */}
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={goBack}
             style={[styles.backButton, { top: insets.top + Spacing.sm }]}
             accessibilityLabel={t('common.back')}
           >

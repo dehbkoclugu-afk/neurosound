@@ -14,6 +14,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   LayoutChangeEvent,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -78,10 +79,11 @@ export default function ExploreScreen() {
   const { isFavorite, favoriteIds } = usePresetsStore();
   const { seenCategoryDescriptions, markCategoryDescriptionSeen } = useSettingsStore();
 
-  // Initialize with params or default
-  const [activeCategory, setActiveCategory] = useState<CategoryType>(
-    (params.category as CategoryType) || 'binaural'
-  );
+  // Initialize with validated param or default
+  const [activeCategory, setActiveCategory] = useState<CategoryType>(() => {
+    const candidate = params.category as CategoryType | undefined;
+    return candidate && categories.some((c) => c.key === candidate) ? candidate : 'binaural';
+  });
   const [query, setQuery] = useState('');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Record<string, boolean>>({});
@@ -528,7 +530,7 @@ const styles = StyleSheet.create({
     // Kills the browser's own focus ring on web; the container's accent
     // border replaces it. `outlineStyle` is react-native-web only, hence the
     // cast — RN's own types have no such property.
-    ...({ outlineStyle: 'none' } as object),
+    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : {}),
   },
   toolbarToggle: {
     width: AccessibilitySize.minTouchTarget,

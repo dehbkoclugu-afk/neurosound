@@ -14,7 +14,7 @@ export function useColorScheme(): 'light' | 'dark' {
   }, []);
 
   const systemColorScheme = useRNColorScheme();
-  const { theme } = useSettingsStore();
+  const theme = useSettingsStore((s) => s.theme);
 
   if (!hasHydrated) {
     return 'dark';

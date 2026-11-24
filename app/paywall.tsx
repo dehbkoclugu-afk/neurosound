@@ -33,12 +33,12 @@ import { contentColumn } from '@/constants/layout';
 import { Button } from '@/components/ui/Button';
 import { ArtBackground } from '@/components/ui/ArtBackground';
 import { EqualizerBars } from '@/components/ui/EqualizerBars';
-import { syncPremium } from '@/components/PremiumSync';
+import { restorePremium } from '@/components/PremiumSync';
 import { PREMIUM_SKUS, SUBSCRIPTION_SKUS, isLockedPreset } from '@/lib/premium';
 import { allPresets, getPresetById, FrequencyPreset } from '@/lib/frequencies';
 import { presetArt } from '@/lib/artAssets';
 import { upper, formatPercent } from '@/lib/upper';
-import { useIsPremium } from '@/stores/premiumStore';
+import { useIsPremium, usePremiumStore } from '@/stores/premiumStore';
 import { useToastStore } from '@/stores/toastStore';
 import * as haptics from '@/lib/haptics';
 import * as playerController from '@/lib/audio/playerController';
@@ -128,11 +128,14 @@ export default function PaywallScreen() {
   const colors = useThemeColors();
   const artwork = useArtwork();
   const isPremium = useIsPremium();
+  const iapConnected = usePremiumStore((s) => s.connected);
   const showToast = useToastStore((s) => s.show);
 
   const [plans, setPlans] = useState<Plan[] | null>(null);
   const [selected, setSelected] = useState<PlanKey>('yearly');
   const [busy, setBusy] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
+  const purchaseInitiated = useRef(false);
 
   // The real locked sounds, with their own art — "the full library" is an
   // abstraction; six named scenes with a lock on them are not.
@@ -149,11 +152,15 @@ export default function PaywallScreen() {
       setPlans([]);
       return;
     }
+    if (!iapConnected) return;
+    let cancelled = false;
+    setPlans(null);
     Promise.all([
       fetchProducts({ skus: SUBSCRIPTION_SKUS, type: 'subs' }),
       fetchProducts({ skus: [PREMIUM_SKUS.lifetime], type: 'in-app' }),
     ])
       .then((lists) => {
+        if (cancelled) return;
         const found = lists
           .flatMap((list) => (list ?? []) as StoreProduct[])
           .map(toPlan)
@@ -162,8 +169,13 @@ export default function PaywallScreen() {
         setPlans(found);
         if (found.length && !found.some((p) => p.key === 'yearly')) setSelected(found[0].key);
       })
-      .catch(() => setPlans([]));
-  }, []);
+      .catch(() => {
+        if (!cancelled) setPlans([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [iapConnected, retryTick]);
 
   const [previewId, setPreviewId] = useState<string | null>(null);
   const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -194,7 +206,8 @@ export default function PaywallScreen() {
           playerController.loadPreset(currentPreset);
           if (isPlaying) playerController.play();
         } else {
-          playerController.unload();
+          // Tear down only the preview preset without clearing any active sleep timer.
+          playerController.disposePreset();
         }
       };
     }
@@ -223,6 +236,12 @@ export default function PaywallScreen() {
 
   useEffect(() => {
     if (!isPremium) return;
+    // Already-premium users (including hydration flips) close quietly without
+    // replaying the purchase celebration or toast.
+    if (!purchaseInitiated.current) {
+      close();
+      return;
+    }
     const finish = () => {
       haptics.save();
       showToast(t('paywall.welcome'), 'success');
@@ -262,6 +281,7 @@ export default function PaywallScreen() {
   const handleBuy = async () => {
     if (!plan || busy) return;
     haptics.commit();
+    purchaseInitiated.current = true;
     setBusy(true);
     try {
       if (plan.key === 'lifetime') {
@@ -293,12 +313,17 @@ export default function PaywallScreen() {
   };
 
   const handleRestore = async () => {
-    if (busy) return;
+    if (busy || Platform.OS === 'web') return;
+    purchaseInitiated.current = true;
     setBusy(true);
     try {
-      const owned = await syncPremium();
-      if (!owned) showToast(t('paywall.restoreNone'), 'info');
+      const owned = await restorePremium();
+      if (!owned) {
+        purchaseInitiated.current = false;
+        showToast(t('paywall.restoreNone'), 'info');
+      }
     } catch {
+      purchaseInitiated.current = false;
       showToast(t('paywall.error'), 'error');
     } finally {
       setBusy(false);
@@ -357,7 +382,20 @@ export default function PaywallScreen() {
           {plans === null ? (
             <ActivityIndicator color={colors.accent} style={styles.loader} />
           ) : plans.length === 0 ? (
-            <Text style={[styles.unavailable, { color: colors.textSecondary }]}>{t('paywall.unavailable')}</Text>
+            <View style={styles.unavailable}>
+              <Text style={[styles.unavailable, { color: colors.textSecondary, marginVertical: 0 }]}>
+                {t('paywall.unavailable')}
+              </Text>
+              {Platform.OS !== 'web' && (
+                <TouchableOpacity
+                  onPress={() => setRetryTick((n) => n + 1)}
+                  style={styles.restore}
+                  accessibilityRole="button"
+                >
+                  <Text style={[styles.restoreText, { color: colors.accent }]}>{t('common.ok')}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           ) : (
             <>
             <View style={styles.plans} accessibilityRole="radiogroup">

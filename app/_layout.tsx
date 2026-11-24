@@ -20,7 +20,6 @@ import { SplineSansMono_500Medium } from '@expo-google-fonts/spline-sans-mono';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ToastHost } from '@/components/ui/ToastHost';
 import { PremiumSync } from '@/components/PremiumSync';
-import { AppShortcuts } from '@/components/AppShortcuts';
 import { NightWarmth } from '@/components/ui/NightWarmth';
 import i18n from '@/i18n';
 
@@ -32,7 +31,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     SchibstedGrotesk_400Regular,
     SchibstedGrotesk_500Medium,
     SchibstedGrotesk_600SemiBold,
@@ -40,12 +39,13 @@ export default function RootLayout() {
     YoungSerif_400Regular,
     SplineSansMono_500Medium,
   });
+  const fontsReady = fontsLoaded || !!fontError;
 
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsReady) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [fontsReady]);
 
   // The scrim is gone (plugins/withoutNavigationBarScrim), so the buttons have to
   // follow the app's own theme or they vanish against the tab bar.
@@ -54,7 +54,7 @@ export default function RootLayout() {
     NavigationBar.setButtonStyleAsync(colorScheme === 'dark' ? 'light' : 'dark').catch(() => {});
   }, [colorScheme]);
 
-  if (!fontsLoaded) {
+  if (!fontsReady) {
     return null;
   }
 
@@ -93,7 +93,6 @@ export default function RootLayout() {
         </Stack>
         <NightWarmth />
         <PremiumSync />
-        <AppShortcuts />
         <ToastHost />
         {/* Follows the app's own theme, not the system's: "auto" drew dark
             status icons over the dark-default UI on light-mode phones. */}

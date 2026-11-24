@@ -12,6 +12,10 @@ import { hasRealSound, getLocalSound } from './ambientSounds';
 // Check if we're on web
 const isWeb = Platform.OS === 'web';
 
+function clampVolume(vol: number): number {
+  return Number.isFinite(vol) ? Math.max(0, Math.min(1, vol)) : 0;
+}
+
 // Initialize audio mode for native
 async function initAudioMode() {
   if (isWeb) return;
@@ -168,6 +172,7 @@ function createNoiseDataUrl(
 export class TonePlayer {
   private player: AudioPlayer | null = null;
   private isPlaying: boolean = false;
+  private disposed: boolean = false;
   private volume: number = 0.5;
   private frequency: number = 440;
   private isLoaded: boolean = false;
@@ -188,7 +193,7 @@ export class TonePlayer {
   }
 
   setVolume(vol: number) {
-    this.volume = Math.max(0, Math.min(1, vol));
+    this.volume = clampVolume(vol);
     if (isWeb && this.gainNode && this.audioContext) {
       this.gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
     }
@@ -198,13 +203,18 @@ export class TonePlayer {
   }
 
   async play(): Promise<void> {
-    if (this.isPlaying) return;
+    if (this.isPlaying || this.disposed) return;
 
     try {
       if (isWeb) {
         await this.playWeb();
       } else {
         await this.playNative();
+      }
+      if (this.disposed) {
+        this.isPlaying = true;
+        this.stop();
+        return;
       }
       this.isPlaying = true;
     } catch (e) {
@@ -220,6 +230,7 @@ export class TonePlayer {
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();
     }
+    if (this.disposed || !this.audioContext) return;
 
     this.oscillator = this.audioContext.createOscillator();
     this.gainNode = this.audioContext.createGain();
@@ -235,21 +246,20 @@ export class TonePlayer {
   }
 
   private async playNative(): Promise<void> {
-    try {
-      // Use shorter duration (2 seconds) for lower memory usage
-      const dataUrl = createToneDataUrl(this.frequency, 2);
+    // Use shorter duration (2 seconds) for lower memory usage
+    const dataUrl = createToneDataUrl(this.frequency, 2);
 
-      const player = createAudioPlayer({ uri: dataUrl });
-      player.loop = true;
-      player.volume = this.volume;
-      player.play();
-
-      this.player = player;
-      this.isLoaded = true;
-    } catch (e) {
-      console.log('Native tone error:', e);
-      console.log('Frequency was:', this.frequency);
+    const player = createAudioPlayer({ uri: dataUrl });
+    if (this.disposed) {
+      player.remove();
+      return;
     }
+    player.loop = true;
+    player.volume = this.volume;
+    player.play();
+
+    this.player = player;
+    this.isLoaded = true;
   }
 
   stop(): void {
@@ -293,6 +303,7 @@ export class TonePlayer {
   }
 
   dispose(): void {
+    this.disposed = true;
     this.stop();
     if (this.audioContext) {
       this.audioContext.close().catch(console.log);
@@ -307,6 +318,7 @@ export class TonePlayer {
 export class BinauralPlayer {
   private player: AudioPlayer | null = null;
   private isPlaying: boolean = false;
+  private disposed: boolean = false;
   private volume: number = 0.5;
   private baseFrequency: number = 200;
   private beatFrequency: number = 10;
@@ -346,7 +358,7 @@ export class BinauralPlayer {
   }
 
   setVolume(vol: number) {
-    this.volume = Math.max(0, Math.min(1, vol));
+    this.volume = clampVolume(vol);
 
     if (isWeb && this.masterGain && this.audioContext) {
       this.masterGain.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
@@ -357,13 +369,18 @@ export class BinauralPlayer {
   }
 
   async play(): Promise<void> {
-    if (this.isPlaying) return;
+    if (this.isPlaying || this.disposed) return;
 
     try {
       if (isWeb) {
         await this.playWeb();
       } else {
         await this.playNative();
+      }
+      if (this.disposed) {
+        this.isPlaying = true;
+        this.stop();
+        return;
       }
       this.isPlaying = true;
     } catch (e) {
@@ -379,6 +396,7 @@ export class BinauralPlayer {
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();
     }
+    if (this.disposed || !this.audioContext) return;
 
     this.leftOscillator = this.audioContext.createOscillator();
     this.rightOscillator = this.audioContext.createOscillator();
@@ -410,28 +428,28 @@ export class BinauralPlayer {
   }
 
   private async playNative(): Promise<void> {
-    try {
-      // 2 seconds, not 10. The buffer is built in JS and handed over as a
-      // base64 data URL, so ten seconds of 44.1 kHz stereo means a ~3.5 MB
-      // array, a ~3.5M-character binary string and a ~4.7 MB base64 string
-      // alive at once — on a mid-range phone that is a real allocation spike
-      // for a tone that repeats every cycle anyway.
-      //
-      // Seamless because both channels complete a whole number of cycles in
-      // the window: frequencies are clamped to 0.5 Hz steps, and 2 s of any
-      // multiple of 0.5 Hz is an integer cycle count. Asserted in the tests.
-      const dataUrl = createBinauralDataUrl(this.baseFrequency, this.beatFrequency, 2);
+    // 2 seconds, not 10. The buffer is built in JS and handed over as a
+    // base64 data URL, so ten seconds of 44.1 kHz stereo means a ~3.5 MB
+    // array, a ~3.5M-character binary string and a ~4.7 MB base64 string
+    // alive at once — on a mid-range phone that is a real allocation spike
+    // for a tone that repeats every cycle anyway.
+    //
+    // Seamless because both channels complete a whole number of cycles in
+    // the window: frequencies are clamped to 0.5 Hz steps, and 2 s of any
+    // multiple of 0.5 Hz is an integer cycle count. Asserted in the tests.
+    const dataUrl = createBinauralDataUrl(this.baseFrequency, this.beatFrequency, 2);
 
-      const player = createAudioPlayer({ uri: dataUrl });
-      player.loop = true;
-      player.volume = this.volume;
-      player.play();
-
-      this.player = player;
-      this.isLoaded = true;
-    } catch (e) {
-      console.log('Native binaural error:', e);
+    const player = createAudioPlayer({ uri: dataUrl });
+    if (this.disposed) {
+      player.remove();
+      return;
     }
+    player.loop = true;
+    player.volume = this.volume;
+    player.play();
+
+    this.player = player;
+    this.isLoaded = true;
   }
 
   stop(): void {
@@ -485,6 +503,7 @@ export class BinauralPlayer {
   }
 
   dispose(): void {
+    this.disposed = true;
     this.stop();
     if (this.audioContext) {
       this.audioContext.close().catch(console.log);
@@ -500,6 +519,7 @@ export class NoisePlayer {
   private player: AudioPlayer | null = null;
   private audioElement: HTMLAudioElement | null = null;
   private isPlaying: boolean = false;
+  private disposed: boolean = false;
   private volume: number = 0.5;
   private noiseType: string = 'white';
   private isLoaded: boolean = false;
@@ -545,7 +565,7 @@ export class NoisePlayer {
       // "create and play directly" fallback path. If that's already making
       // sound, swapping in this (unplayed) player would silently kill it
       // while isPlaying kept reporting true.
-      if (this.isPlaying) {
+      if (this.isPlaying || this.disposed) {
         player.remove();
         return;
       }
@@ -561,7 +581,7 @@ export class NoisePlayer {
   }
 
   setVolume(vol: number) {
-    this.volume = Math.max(0, Math.min(1, vol));
+    this.volume = clampVolume(vol);
 
     if (this.gainNode && this.audioContext) {
       this.gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
@@ -629,7 +649,7 @@ export class NoisePlayer {
   }
 
   async play(): Promise<void> {
-    if (this.isPlaying) return;
+    if (this.isPlaying || this.disposed) return;
 
     try {
       // Check if this noise type has a real audio file
@@ -648,6 +668,11 @@ export class NoisePlayer {
           await this.playProceduralNative();
         }
       }
+      if (this.disposed) {
+        this.isPlaying = true;
+        this.stop();
+        return;
+      }
       this.isPlaying = true;
     } catch (e) {
       console.log('Noise play error:', e);
@@ -664,11 +689,18 @@ export class NoisePlayer {
     }
 
     // For web, use HTMLAudioElement (window.Audio, not the audio engine classes)
-    this.audioElement = new (window as any).Audio() as HTMLAudioElement;
-    this.audioElement.src = soundAsset;
-    this.audioElement.loop = true;
-    this.audioElement.volume = this.volume;
-    await this.audioElement.play();
+    const audio = new (window as any).Audio() as HTMLAudioElement;
+    audio.src = soundAsset;
+    audio.loop = true;
+    audio.volume = this.volume;
+    this.audioElement = audio;
+    await audio.play();
+    if (this.disposed) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = '';
+      if (this.audioElement === audio) this.audioElement = null;
+    }
   }
 
   // Play real audio file on native using expo-audio
@@ -683,13 +715,19 @@ export class NoisePlayer {
     try {
       // If already preloaded, just play
       if (this.player && this.isLoaded) {
-        await this.player.seekTo(0);
-        this.player.play();
+        const preloaded = this.player;
+        await preloaded.seekTo(0);
+        if (this.disposed || this.player !== preloaded) return;
+        preloaded.play();
         return;
       }
 
       // Otherwise load and play
       const player = createAudioPlayer(soundAsset);
+      if (this.disposed) {
+        player.remove();
+        return;
+      }
       player.loop = true;
       player.volume = this.volume;
       player.play();
@@ -697,6 +735,7 @@ export class NoisePlayer {
       this.player = player;
       this.isLoaded = true;
     } catch (e) {
+      if (this.disposed) return;
       console.log('Native real audio error:', e);
       // Fallback to procedural
       await this.playProceduralNative();
@@ -722,6 +761,7 @@ export class NoisePlayer {
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();
     }
+    if (this.disposed || !this.audioContext) return;
 
     const sampleRate = this.audioContext.sampleRate;
     // Use 8 seconds for better looping quality
@@ -760,23 +800,23 @@ export class NoisePlayer {
 
   // Play procedural noise (native)
   private async playProceduralNative(): Promise<void> {
-    try {
-      let basicType: 'white' | 'pink' | 'brown' = 'white';
-      if (this.noiseType === 'pink') basicType = 'pink';
-      else if (this.noiseType === 'brown') basicType = 'brown';
+    let basicType: 'white' | 'pink' | 'brown' = 'white';
+    if (this.noiseType === 'pink') basicType = 'pink';
+    else if (this.noiseType === 'brown') basicType = 'brown';
 
-      const dataUrl = createNoiseDataUrl(basicType, 10);
+    const dataUrl = createNoiseDataUrl(basicType, 10);
 
-      const player = createAudioPlayer({ uri: dataUrl });
-      player.loop = true;
-      player.volume = this.volume;
-      player.play();
-
-      this.player = player;
-      this.isLoaded = true;
-    } catch (e) {
-      console.log('Native noise error:', e);
+    const player = createAudioPlayer({ uri: dataUrl });
+    if (this.disposed) {
+      player.remove();
+      return;
     }
+    player.loop = true;
+    player.volume = this.volume;
+    player.play();
+
+    this.player = player;
+    this.isLoaded = true;
   }
 
   stop(): void {
@@ -838,7 +878,18 @@ export class NoisePlayer {
   }
 
   dispose(): void {
+    this.disposed = true;
     this.stop();
+    if (this.audioElement) {
+      try {
+        this.audioElement.pause();
+        this.audioElement.currentTime = 0;
+        this.audioElement.src = '';
+      } catch (e) {
+        console.log('Noise audioElement dispose error:', e);
+      }
+      this.audioElement = null;
+    }
     // stop() is a no-op before the first play, but setNoiseType() has already
     // created a preloaded native player by then. Opening a noise preset and
     // backing out without pressing play leaked one native player per visit.

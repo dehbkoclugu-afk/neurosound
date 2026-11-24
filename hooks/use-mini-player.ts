@@ -32,11 +32,12 @@ export const TAB_BAR_HEIGHT_NIGHT = 42;
  *  The Mixer tab owns richer controls for the same session, so the bar stands
  *  down there rather than covering them. */
 export function useMiniPlayerVisible(): boolean {
-  const { currentPreset, mixerChannels } = useAudioStore();
+  const hasPreset = useAudioStore((s) => Boolean(s.currentPreset));
+  const hasMixer = useAudioStore((s) => s.mixerChannels.length > 0);
   const pathname = usePathname();
 
-  if (currentPreset) return true;
-  return mixerChannels.length > 0 && !pathname.startsWith('/mixer');
+  if (hasPreset) return true;
+  return hasMixer && !pathname.startsWith('/mixer');
 }
 
 /** Bottom padding a scrollable screen should add so its content clears the

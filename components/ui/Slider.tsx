@@ -75,9 +75,9 @@ export function Slider({
       const newNormalized = clampedX / sliderWidth;
       const newValue = min + newNormalized * (max - min);
 
-      // Apply step
+      // Apply step and normalize IEEE-754 drift (e.g. 0.30000000000000004)
       const steppedValue = Math.round(newValue / step) * step;
-      const clampedValue = Math.max(min, Math.min(max, steppedValue));
+      const clampedValue = Number(Math.max(min, Math.min(max, steppedValue)).toFixed(4));
 
       // A detent at each quarter of the track, so a level can be found by feel
       // in the dark. The first touch sets the baseline rather than ticking.
@@ -123,8 +123,9 @@ export function Slider({
   ).current;
 
   const handleAccessibilityAction = (direction: 'increment' | 'decrement') => {
-    const newValue = direction === 'increment' ? value + step * 10 : value - step * 10;
-    const clampedValue = Math.max(min, Math.min(max, newValue));
+    const a11yStep = Math.max(step, Math.round((max - min) / 10 / step) * step);
+    const newValue = direction === 'increment' ? value + a11yStep : value - a11yStep;
+    const clampedValue = Number(Math.max(min, Math.min(max, newValue)).toFixed(4));
     onValueChange(clampedValue);
     AccessibilityInfo.announceForAccessibility(formatValue(clampedValue));
   };

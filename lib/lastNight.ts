@@ -12,10 +12,12 @@ export function lastNightMinutes(
   if (!session) return null;
   const hour = now.getHours();
   if (hour < 5 || hour >= 12) return null;
-  if (now.getTime() - session.endedAt > MAX_AGE_MS) return null;
+  const age = now.getTime() - session.endedAt;
+  if (age < 0 || age > MAX_AGE_MS) return null;
   const endHour = new Date(session.endedAt).getHours();
-  if (endHour >= 12 && endHour < 20) return null;
-  if (endHour >= 8 && endHour < 12) return null;
+  if (endHour >= 8 && endHour < 20) return null;
+  const startHour = new Date(session.endedAt - session.seconds * 1000).getHours();
+  if (startHour >= 5 && startHour < 20) return null;
   const minutes = Math.round(session.seconds / 60);
   return minutes >= MIN_MINUTES ? minutes : null;
 }

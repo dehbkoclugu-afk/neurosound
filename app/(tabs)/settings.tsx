@@ -126,9 +126,14 @@ export default function SettingsScreen() {
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showThemeSheet, setShowThemeSheet] = useState(false);
   const [showIconSheet, setShowIconSheet] = useState(false);
-  const [appIcon, setAppIcon] = useState<string | null>(() =>
-    Platform.OS === 'web' ? null : getAppIconName(),
-  );
+  const [appIcon, setAppIcon] = useState<string | null>(() => {
+    if (Platform.OS === 'web') return null;
+    try {
+      return getAppIconName();
+    } catch {
+      return null;
+    }
+  });
 
   const handleSelectIcon = async (name: string | null) => {
     setShowIconSheet(false);

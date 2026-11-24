@@ -1,7 +1,8 @@
 /**
  * The sleep timer's digits roll over instead of swapping, like a flip clock
- * seen from a distance. Each character is its own cell, keyed by value, so only
- * the digit that changed moves.
+ * seen from a distance. Each character is its own cell, keyed from the right
+ * so length transitions (10:00 -> 9:59) don't remount every digit, and an
+ * invisible placeholder keeps cell height stable during the 200ms overlap.
  */
 
 import React from 'react';
@@ -17,15 +18,24 @@ export function RollingCountdown({ value, style }: { value: string; style?: Styl
   const reduceMotion = useSettingsStore((s) => s.reduceMotion);
   if (reduceMotion) return <Text style={style}>{value}</Text>;
 
+  const chars = value.split('');
+
   return (
     <View style={styles.row} accessible accessibilityLabel={value}>
-      {value.split('').map((char, index) => (
-        <View key={index} style={styles.cell} importantForAccessibility="no-hide-descendants">
+      {chars.map((char, index) => (
+        <View
+          key={chars.length - 1 - index}
+          style={styles.cell}
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Text style={[style, styles.placeholder]} accessibilityElementsHidden>
+            {char}
+          </Text>
           <Animated.Text
             key={char}
             entering={ENTER}
             exiting={EXIT}
-            style={style}
+            style={[style, styles.digit]}
             accessibilityElementsHidden
           >
             {char}
@@ -42,5 +52,14 @@ const styles = StyleSheet.create({
   },
   cell: {
     overflow: 'hidden',
+    position: 'relative',
+  },
+  placeholder: {
+    opacity: 0,
+  },
+  digit: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
 });

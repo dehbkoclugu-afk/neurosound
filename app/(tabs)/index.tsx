@@ -118,6 +118,11 @@ export default function HomeScreen() {
   const handlePresetPress = (presetId: string) => {
     const preset = getPresetById(presetId);
     if (preset?.type === 'binaural' && !hasSeenHeadphoneWarning) {
+      if (Platform.OS === 'web') {
+        setHasSeenHeadphoneWarning(true);
+        router.push(`/player/${presetId}`);
+        return;
+      }
       Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
         {
           text: t('common.ok'),
@@ -145,6 +150,11 @@ export default function HomeScreen() {
       router.push(`/player/${preset.id}`);
     };
     if (preset.type === 'binaural' && !hasSeenHeadphoneWarning) {
+      if (Platform.OS === 'web') {
+        setHasSeenHeadphoneWarning(true);
+        start();
+        return;
+      }
       Alert.alert(t('home.headphoneWarning'), t('home.headphoneWarningDesc'), [
         {
           text: t('common.ok'),

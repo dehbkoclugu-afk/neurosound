@@ -7,7 +7,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 
 export function useColorScheme(): 'light' | 'dark' {
   const systemColorScheme = useSystemColorScheme();
-  const { theme } = useSettingsStore();
+  const theme = useSettingsStore((s) => s.theme);
 
   if (theme === 'auto') {
     return systemColorScheme ?? 'dark';

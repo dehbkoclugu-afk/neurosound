@@ -20,6 +20,7 @@ export function fitTitleSize(name: string, availableWidth: number): number {
   const widestWord = Math.max(...name.split(/\s+/).map(wordEms));
   // Hangul can wrap between syllables even when the next word fits on its own.
   const requiredWidth = /[가-힣]/.test(name) ? wordEms(name) : widestWord;
+  if (requiredWidth <= 0 || availableWidth <= 0) return MIN_SIZE;
   const ceiling = Array.from(name).length > 8 ? LONG_NAME_MAX_SIZE : MAX_SIZE;
   return Math.max(MIN_SIZE, Math.min(ceiling, Math.floor(availableWidth / requiredWidth)));
 }

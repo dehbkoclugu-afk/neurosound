@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
+import { AppShortcuts } from '@/components/AppShortcuts';
 import { MiniPlayerHost } from '@/components/ui/MiniPlayerHost';
 import { FontFamily, Spacing } from '@/constants/theme';
 import { useThemeColors } from '@/hooks/use-theme-colors';
@@ -105,6 +106,7 @@ export default function TabLayout() {
         />
       </Tabs>
 
+      <AppShortcuts />
       {/* MiniPlayer overlay above tab bar */}
       <MiniPlayerHost
         visible={miniPlayerVisible}

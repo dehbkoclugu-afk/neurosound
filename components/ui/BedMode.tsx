@@ -27,8 +27,14 @@ function BedScreen({ onExit }: { onExit: () => void }) {
   // Not the useKeepAwake hook: it leaves a refused wake lock unhandled, and a
   // screen that may dim is no reason to take the app down.
   useEffect(() => {
-    activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => {});
+    let cancelled = false;
+    activateKeepAwakeAsync(KEEP_AWAKE_TAG)
+      .then(() => {
+        if (cancelled) deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => {});
+      })
+      .catch(() => {});
     return () => {
+      cancelled = true;
       deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => {});
     };
   }, []);

@@ -10,18 +10,22 @@ import { safeStorage, useSettingsStore } from './settingsStore';
 
 interface PremiumState {
   hasHydrated: boolean;
+  connected: boolean;
   owned: boolean;
   setOwned: (owned: boolean) => void;
   setHasHydrated: (hydrated: boolean) => void;
+  setConnected: (connected: boolean) => void;
 }
 
 export const usePremiumStore = create<PremiumState>()(
   persist(
     (set) => ({
       hasHydrated: false,
+      connected: false,
       owned: false,
       setOwned: (owned) => set({ owned }),
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+      setConnected: (connected) => set({ connected }),
     }),
     {
       name: 'neurosound-premium',

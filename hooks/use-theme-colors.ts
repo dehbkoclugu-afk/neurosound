@@ -19,8 +19,9 @@ import { resolvePaletteKey, type PaletteKey } from '@/lib/themeMode';
  *  different ways in two different components. */
 function usePaletteKey(): PaletteKey {
   const colorScheme = useColorScheme() ?? 'dark';
-  const { theme, lowContrast } = useSettingsStore();
-  return resolvePaletteKey(theme, colorScheme, lowContrast);
+  const lowContrast = useSettingsStore((s) => s.lowContrast);
+  // useColorScheme() already resolves theme + system scheme + web SSR hydration.
+  return resolvePaletteKey(colorScheme, colorScheme, lowContrast);
 }
 
 /** Whether the resolved palette sits on dark surfaces — the axis the

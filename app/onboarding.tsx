@@ -172,7 +172,9 @@ export default function OnboardingScreen() {
     playerController.loadPreset(preset);
     playerController.startTimer(intent.recommendedMinutes);
     playerController.play();
-    router.replace(`/player/${preset.id}`);
+    // Keep /(tabs) beneath the modal player so back navigation lands on Home.
+    router.replace('/(tabs)');
+    router.push(`/player/${preset.id}`);
   };
 
   stepRef.current = { next: handleNext, back: handleBack };

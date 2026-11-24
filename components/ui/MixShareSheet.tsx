@@ -3,8 +3,8 @@
  * link: the app has no accounts or server to resolve one against.
  */
 
-import React, { useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { captureRef } from 'react-native-view-shot';
@@ -28,24 +28,37 @@ export function MixShareSheet({ mix, onClose }: { mix: ShareableMix | null; onCl
   const { t } = useTranslation();
   const card = useRef<View>(null);
   const [busy, setBusy] = useState(false);
+  const mounted = useRef(true);
   const showToast = useToastStore((s) => s.show);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const presets = (mix?.channels ?? [])
     .map((c) => getPresetById(c.presetId))
     .filter((p) => p !== undefined);
 
   const share = async () => {
-    if (busy) return;
+    if (busy || Platform.OS === 'web') return;
     setBusy(true);
     haptics.commit();
     try {
+      const available = await Sharing.isAvailableAsync();
+      if (!available) {
+        showToast(t('common.error'), 'error');
+        return;
+      }
       const uri = await captureRef(card, { format: 'png', quality: 1, width: 1080, height: 1350 });
       await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: mix?.name });
-      onClose();
+      if (mounted.current) onClose();
     } catch {
       showToast(t('common.error'), 'error');
     } finally {
-      setBusy(false);
+      if (mounted.current) setBusy(false);
     }
   };
 

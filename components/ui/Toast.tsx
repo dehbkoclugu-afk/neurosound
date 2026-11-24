@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
   withSequence,
   withDelay,
+  cancelAnimation,
   runOnJS,
 } from 'react-native-reanimated';
 
@@ -51,7 +52,11 @@ export function Toast({ message, visible, showId, onHide, variant = 'info', styl
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) {
+      cancelAnimation(progress);
+      progress.value = 0;
+      return;
+    }
     progress.value = withSequence(
       withTiming(1, { duration: reduceMotion ? 0 : FADE_MS }),
       withDelay(
@@ -64,6 +69,9 @@ export function Toast({ message, visible, showId, onHide, variant = 'info', styl
         })
       )
     );
+    return () => {
+      cancelAnimation(progress);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, showId]);
 
