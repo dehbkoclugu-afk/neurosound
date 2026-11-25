@@ -9,7 +9,7 @@ Sonidos para dormir, ruido blanco, ondas binaurales y 432 Hz. Sin conexión.
 ## Full description
 Sonidos para dormir, sonido de lluvia, ruido blanco, marrón y rosa, ondas binaurales (delta, theta, alfa, beta, gamma) y frecuencias Solfeggio como 432 Hz, 528 Hz y 852 Hz: una app tranquila para dormir, concentrarte, meditar y relajarte.
 
-852Hz es una aplicación de sonidos sin conexión para dormir, concentrarte, meditar y relajarte.
+Relájate con la lluvia, mezcla hasta cuatro sonidos y guárdalos. Usa el temporizador para que el audio se detenga cuando quieras.
 
 Reproduce un sonido solo o combina hasta cuatro en el mezclador. Cuando se acaba el tiempo, el temporizador baja el volumen poco a poco y detiene la reproducción. Los controles de la pantalla de bloqueo te dejan pausar y reanudar sin volver a abrir la app.
 

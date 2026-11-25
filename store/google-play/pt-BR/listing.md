@@ -9,7 +9,7 @@ Sons para dormir, ruído branco, batidas binaurais e 432 Hz. Funciona offline.
 ## Full description
 Sons para dormir, som de chuva, ruído branco, marrom e rosa, batidas binaurais (delta, teta, alfa, beta, gama) e frequências Solfeggio como 432 Hz, 528 Hz e 852 Hz: um app tranquilo para sono, foco, meditação e relaxamento.
 
-O 852Hz é um aplicativo de sons offline para dormir, focar, meditar e relaxar.
+Relaxe com o som da chuva, combine até quatro sons e salve sua mixagem. Programe o temporizador para parar o áudio na hora que quiser.
 
 Toque um som sozinho ou combine até quatro sons no mixer. Quando o tempo acaba, o timer de sono baixa o volume aos poucos e encerra a reprodução. Os controles na tela de bloqueio permitem pausar e retomar sem abrir o app de novo.
 

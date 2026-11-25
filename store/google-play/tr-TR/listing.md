@@ -1,15 +1,15 @@
 # 852Hz
 
-## Uygulama adı
+## App name
 852Hz: Uyku, Binaural ve Odak
 
-## Kısa açıklama
+## Short description
 Uyku sesleri, beyaz gürültü, binaural ritimler, 432 Hz. Çevrimdışı çalışır.
 
-## Tam açıklama
+## Full description
 Uyku sesleri, yağmur sesi, beyaz gürültü, kahverengi ve pembe gürültü, binaural ritimler (delta, teta, alfa, beta, gama) ve 432 Hz, 528 Hz, 852 Hz gibi Solfeggio frekansları: uyku, odaklanma, meditasyon ve rahatlama için tek bir sakin uygulama.
 
-852Hz, uyku, odaklanma, meditasyon ve rahatlama rutinleri için hazırlanmış çevrimdışı bir ses uygulamasıdır.
+Yağmur sesini veya binaural ritimleri aç, dört sesi karıştır ve uyku zamanlayıcısını ayarla.
 
 Hazır sesleri tek başına dinleyebilir veya mikserde dört sesi bir araya getirip kendi karışımınızı oluşturabilirsiniz. Uyku zamanlayıcısı süre dolduğunda sesi yumuşakça azaltır. Kilit ekranı kontrolleri, uygulamayı yeniden açmadan oynatmayı yönetmenizi sağlar.
 

@@ -9,7 +9,7 @@ Suara tidur, white noise, binaural beats, dan 432 Hz. Berfungsi offline.
 ## Full description
 Suara tidur, suara hujan, white noise, brown noise, pink noise, binaural beats (delta, theta, alfa, beta, gamma), dan frekuensi Solfeggio seperti 432 Hz, 528 Hz, dan 852 Hz: satu aplikasi tenang untuk tidur, fokus, meditasi, dan relaksasi.
 
-852Hz adalah aplikasi suara luring untuk tidur, fokus, meditasi, dan rutinitas relaksasi.
+Tenangkan diri dengan suara hujan. Gabungkan hingga empat suara, simpan racikan, dan atur timer untuk menghentikan audio.
 
 Putar satu suara sendirian, atau gabungkan hingga empat suara di mixer. Timer tidur menurunkan volume perlahan lalu menghentikannya saat waktu habis. Kontrol di layar kunci memungkinkanmu mengatur pemutaran tanpa membuka aplikasi lagi.
 

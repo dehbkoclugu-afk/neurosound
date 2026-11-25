@@ -9,7 +9,7 @@ Suoni per dormire, rumore bianco, battiti binaurali e 432 Hz. Funziona offline.
 ## Full description
 Suoni per dormire, suono della pioggia, rumore bianco, marrone e rosa, battiti binaurali (delta, theta, alfa, beta, gamma) e frequenze Solfeggio come 432 Hz, 528 Hz e 852 Hz: un'app calma per sonno, concentrazione, meditazione e relax.
 
-852Hz è un'app di suoni offline per dormire, concentrarsi, meditare e rilassarsi.
+Rilassati con la pioggia, combina fino a quattro suoni e salva il mix. Imposta un timer per interrompere l’audio quando vuoi.
 
 Ascolta un suono da solo oppure unisci fino a quattro suoni nel mixer. Allo scadere del tempo il timer abbassa dolcemente il volume e ferma la riproduzione. I comandi sulla schermata di blocco ti lasciano mettere in pausa senza riaprire l'app.
 

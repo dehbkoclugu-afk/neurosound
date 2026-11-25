@@ -18,6 +18,7 @@ import {
 
 import i18n from '@/i18n';
 import { ALL_SKUS } from '@/lib/premium';
+import { recordPurchase, startRevenueCat } from '@/lib/revenuecat';
 import { usePremiumStore } from '@/stores/premiumStore';
 import { useToastStore } from '@/stores/toastStore';
 
@@ -56,6 +57,8 @@ export async function restorePremium(): Promise<boolean> {
 }
 
 function PremiumSyncNative() {
+  useEffect(startRevenueCat, []);
+
   const { connected } = useIAP({
     onPurchaseSuccess: (purchase) => {
       if (!ALL_SKUS.includes(purchase.productId)) return;
@@ -65,7 +68,10 @@ function PremiumSyncNative() {
       }
       if (!isPremiumPurchase(purchase)) return;
       usePremiumStore.getState().setOwned(true);
-      finishTransaction({ purchase, isConsumable: false }).catch(() => {});
+      // RevenueCat has to see an iOS transaction before it is finished.
+      recordPurchase(purchase.productId)
+        .then(() => finishTransaction({ purchase, isConsumable: false }))
+        .catch(() => {});
     },
     onPurchaseError: (error) => {
       if (error?.code === ErrorCode.UserCancelled) return;
