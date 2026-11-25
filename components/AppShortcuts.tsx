@@ -4,13 +4,14 @@
  * language, and because Android has no static form of these at all.
  */
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as QuickActions from 'expo-quick-actions';
 import { useQuickActionRouting, type RouterAction } from 'expo-quick-actions/router';
 
 import { intents } from '@/lib/intents';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 const SF_SYMBOLS: Record<string, string> = {
   sleep: 'symbol:moon.fill',
@@ -19,9 +20,15 @@ const SF_SYMBOLS: Record<string, string> = {
   meditate: 'symbol:circle.circle',
 };
 
+function QuickActionRouter() {
+  useQuickActionRouting();
+  return null;
+}
+
 export function AppShortcuts() {
   const { t, i18n } = useTranslation();
-  useQuickActionRouting();
+  const hasHydrated = useSettingsStore((s) => s.hasHydrated);
+  const hasSeenOnboarding = useSettingsStore((s) => s.hasSeenOnboarding);
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
@@ -36,5 +43,8 @@ export function AppShortcuts() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
-  return null;
+  // Defer shortcut routing until onboarding (and its safety notice) has been
+  // completed, so a cold-start shortcut on first install never bypasses it.
+  if (!hasHydrated || !hasSeenOnboarding) return null;
+  return <QuickActionRouter />;
 }

@@ -18,6 +18,8 @@ try {
   const locales = Localization.getLocales();
   if (locales && locales.length > 0 && locales[0]?.languageCode) {
     deviceLanguage = locales[0].languageCode;
+    // Legacy Android JVMs report Indonesian as "in" rather than ISO-639 "id".
+    if (deviceLanguage === 'in') deviceLanguage = 'id';
   }
 } catch (e) {
   console.log('Localization error:', e);

@@ -79,6 +79,12 @@ function watchLockScreenPlayer(player: AudioPlayer, owner: 'single' | 'mixer'): 
         if (status.playing) nativePlayer.play();
         else nativePlayer.pause();
       });
+      if (status.playing) {
+        const { maxVolume } = useSettingsStore.getState();
+        store.mixerChannels.forEach((ch) =>
+          mixerGenerators.get(ch.id)?.setVolume(channelVolume(ch, maxVolume))
+        );
+      }
       store.setIsMixerPlaying(status.playing);
       if (status.playing) beginListening();
       else endListening();
@@ -390,13 +396,13 @@ export async function play(): Promise<void> {
 /** Fade out then stop. `immediate` skips the fade (unload/switching). */
 export function pause(immediate: boolean = false): void {
   playToken += 1;
+  if (immediate) pausingSingle = false;
   const gen = generator;
   useAudioStore.getState().setIsPlaying(false);
   useAudioStore.getState().setIsLoading(false);
   endListening();
   if (!gen) return;
   if (immediate) {
-    pausingSingle = false;
     cancelRamp();
     gen.stop();
     return;

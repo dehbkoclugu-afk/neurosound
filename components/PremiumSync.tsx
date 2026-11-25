@@ -39,7 +39,11 @@ export async function syncPremium(): Promise<boolean> {
           Platform.OS === 'ios' ||
           ('isAcknowledgedAndroid' in p && p.isAcknowledgedAndroid === false)
       )
-      .map((purchase) => finishTransaction({ purchase, isConsumable: false }).catch(() => {}))
+      .map((purchase) =>
+        recordPurchase(purchase.productId)
+          .then(() => finishTransaction({ purchase, isConsumable: false }))
+          .catch(() => {})
+      )
   );
   const owned = purchases.length > 0;
   usePremiumStore.getState().setOwned(owned);

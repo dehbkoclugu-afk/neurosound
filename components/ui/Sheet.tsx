@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/hooks/use-theme-colors';
 import { AccessibilitySize, Radius, Spacing, Typography } from '@/constants/theme';
@@ -52,6 +53,7 @@ export function Sheet({
 }: SheetProps) {
   const { t } = useTranslation();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const { reduceMotion } = useSettingsStore();
 
   const body = (
@@ -64,7 +66,11 @@ export function Sheet({
         style={[
           styles.sheet,
           tall && styles.sheetTall,
-          { backgroundColor: colors.backgroundSecondary },
+          {
+            backgroundColor: colors.backgroundSecondary,
+            paddingBottom:
+              Math.max(insets.bottom, Platform.OS === 'android' ? 48 : 0) + Spacing.xl,
+          },
         ]}
         onPress={(e) => e.stopPropagation()}
       >

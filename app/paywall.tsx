@@ -152,14 +152,19 @@ export default function PaywallScreen() {
       setPlans([]);
       return;
     }
+    let cancelled = false;
     setPlans(null);
     if (!iapConnected) {
       // Store never connects offline or without Play Services: fall back to
       // "unavailable" + retry instead of spinning forever.
-      const timeout = setTimeout(() => setPlans([]), 8000);
-      return () => clearTimeout(timeout);
+      const timeout = setTimeout(() => {
+        if (!cancelled) setPlans([]);
+      }, 8000);
+      return () => {
+        cancelled = true;
+        clearTimeout(timeout);
+      };
     }
-    let cancelled = false;
     Promise.all([
       fetchProducts({ skus: SUBSCRIPTION_SKUS, type: 'subs' }),
       fetchProducts({ skus: [PREMIUM_SKUS.lifetime], type: 'in-app' }),
@@ -388,7 +393,7 @@ export default function PaywallScreen() {
             <ActivityIndicator color={colors.accent} style={styles.loader} />
           ) : plans.length === 0 ? (
             <View style={styles.unavailable}>
-              <Text style={[styles.unavailable, { color: colors.textSecondary, marginVertical: 0 }]}>
+              <Text style={[styles.unavailableText, { color: colors.textSecondary }]}>
                 {t('paywall.unavailable')}
               </Text>
               {Platform.OS !== 'web' && (
@@ -584,7 +589,8 @@ export default function PaywallScreen() {
         style={[
           styles.footer,
           {
-            paddingBottom: insets.bottom + Spacing.md,
+            paddingBottom:
+              Math.max(insets.bottom, Platform.OS === 'android' ? 48 : 0) + Spacing.md,
             backgroundColor: colors.background,
             borderTopColor: colors.cardBorder,
           },
@@ -783,9 +789,13 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.xl,
   },
   unavailable: {
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginVertical: Spacing.lg,
+  },
+  unavailableText: {
     ...Typography.body,
     textAlign: 'center',
-    marginVertical: Spacing.lg,
   },
   plans: {
     gap: Spacing.sm,

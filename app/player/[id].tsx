@@ -268,7 +268,12 @@ export default function PlayerScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
+        contentContainerStyle={{
+          // Modal screens have no tab bar below them; enforce generous clearance
+          // above Android's 3-button / gesture navigation bar.
+          paddingBottom:
+            Math.max(insets.bottom, Platform.OS === 'android' ? 56 : 24) + Spacing.xxl,
+        }}
         scrollEventThrottle={16}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: Platform.OS !== 'web',
@@ -416,6 +421,32 @@ export default function PlayerScreen() {
             </View>
           </View>
 
+          {/* Primary audio level lives right under Play/Pause in the safe
+              mid-screen thumb zone — never at the bottom edge near Android's
+              navigation bar. */}
+          <View style={[styles.volumePanel, { borderColor: colors.cardBorder }]}>
+            <Slider
+              value={volume}
+              onValueChange={setVolume}
+              max={1}
+              // No `cap`: the safety limit scales the whole range (volume ×
+              // maxVolume), it does not clip the top of it.
+              label={t('mixer.volume')}
+              accessibilityLabel={t('accessibility.volumeSlider')}
+            />
+            {maxVolume < 1 && (
+              <TouchableOpacity
+                onPress={() => router.push('/(tabs)/settings')}
+                style={styles.volumeCap}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.volumeCapText, { color: colors.textSecondary }]}>
+                  {t('player.volumeCapped', { percent: formatPercent(maxVolume) })}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
           <TouchableOpacity
             onPress={() => setShowTimerModal(true)}
             style={[
@@ -496,29 +527,6 @@ export default function PlayerScreen() {
               </Text>
             </View>
           )}
-
-          <View style={[styles.volumePanel, { borderTopColor: colors.cardBorder }]}>
-            <Slider
-              value={volume}
-              onValueChange={setVolume}
-              max={1}
-              // No `cap`: the safety limit scales the whole range (volume ×
-              // maxVolume), it does not clip the top of it.
-              label={t('mixer.volume')}
-              accessibilityLabel={t('accessibility.volumeSlider')}
-            />
-            {maxVolume < 1 && (
-              <TouchableOpacity
-                onPress={() => router.push('/(tabs)/settings')}
-                style={styles.volumeCap}
-                accessibilityRole="button"
-              >
-                <Text style={[styles.volumeCapText, { color: colors.textSecondary }]}>
-                  {t('player.volumeCapped', { percent: formatPercent(maxVolume) })}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
         </View>
       </Animated.ScrollView>
 
@@ -678,8 +686,10 @@ const styles = StyleSheet.create({
   },
   volumePanel: {
     marginTop: Spacing.lg,
-    paddingTop: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xs,
     borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   volumeCap: {
     minHeight: 40,

@@ -154,7 +154,12 @@ export default function IntentScreen() {
         style={styles.scrollView}
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: miniPlayerInset + Spacing.lg },
+          {
+            paddingBottom:
+              Math.max(insets.bottom, Platform.OS === 'android' ? 48 : 0) +
+              miniPlayerInset +
+              Spacing.xl,
+          },
         ]}
         showsVerticalScrollIndicator={false}
       >

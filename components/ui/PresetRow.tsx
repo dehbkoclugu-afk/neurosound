@@ -219,9 +219,15 @@ export function PresetRow({
           </View>
         </TouchableOpacity>
         {locked ? (
-          <View style={styles.trailing}>
+          <TouchableOpacity
+            onPress={onPress}
+            activeOpacity={0.6}
+            style={styles.trailing}
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+          >
             <Ionicons name="lock-closed-outline" size={19} color={colors.textSecondary} />
-          </View>
+          </TouchableOpacity>
         ) : (
           <TouchableOpacity
             onPress={() => (isFavorite ? removeFavorite(preset.id) : addFavorite(preset.id))}

@@ -499,3 +499,60 @@ describe('living mix', () => {
     expect(set).toBeGreaterThanOrEqual(full * 0.76);
   });
 });
+
+describe('lock screen and timer regressions', () => {
+  it('restores audible volume when lock screen resumes after in-app pause', async () => {
+    useAudioStore.getState().setVolume(0.7);
+    playerController.loadPreset(preset('noise-rain'));
+    await playerController.play();
+    await settle();
+
+    const p = live()[0];
+    playerController.pause();
+    await settle();
+    expect(p.volume).toBeCloseTo(0, 2);
+    expect(useAudioStore.getState().isPlaying).toBe(false);
+
+    // Simulate OS lock-screen resume
+    p.play();
+    p.addListener.mock.calls
+      .filter(([event]: [string]) => event === 'playbackStatusUpdate')
+      .forEach(([, cb]: [string, (s: { playing: boolean }) => void]) => cb({ playing: true }));
+
+    expect(useAudioStore.getState().isPlaying).toBe(true);
+    expect(p.volume).toBeCloseTo(0.7, 2);
+  });
+
+  it('resumes mixer channels in-app after a lock-screen pause', async () => {
+    await playerController.mixerAddChannel(preset('noise-rain'));
+    await playerController.mixerAddChannel(preset('binaural-delta'));
+    await playerController.mixerStart();
+    expect(live().every((p) => p.playing)).toBe(true);
+
+    // Simulate lock-screen pause on leader channel
+    const leader = live()[0];
+    leader.pause();
+    leader.addListener.mock.calls
+      .filter(([event]: [string]) => event === 'playbackStatusUpdate')
+      .forEach(([, cb]: [string, (s: { playing: boolean }) => void]) => cb({ playing: false }));
+
+    expect(useAudioStore.getState().isMixerPlaying).toBe(false);
+    expect(live().every((p) => !p.playing)).toBe(true);
+
+    // In-app resume must restart all native players
+    await playerController.mixerStart();
+    expect(useAudioStore.getState().isMixerPlaying).toBe(true);
+    expect(live().every((p) => p.playing)).toBe(true);
+  });
+
+  it('mixerClear clears an active sleep timer just like unload', async () => {
+    await playerController.mixerAddChannel(preset('noise-rain'));
+    await playerController.mixerStart();
+    playerController.startTimer(30);
+    expect(useAudioStore.getState().timerDuration).toBe(30);
+
+    playerController.mixerClear();
+    expect(useAudioStore.getState().timerDuration).toBeNull();
+    expect(useAudioStore.getState().timerEndsAt).toBeNull();
+  });
+});

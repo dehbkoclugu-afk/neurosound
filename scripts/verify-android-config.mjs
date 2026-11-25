@@ -12,6 +12,12 @@ const blocked = [
 const audio = (expo.plugins ?? []).find((p) => Array.isArray(p) && p[0] === 'expo-audio');
 const errors = [];
 if ('_orientationNote' in expo) errors.push('unsupported expo._orientationNote');
+if ('_localizationsNote' in (expo.ios?.infoPlist ?? {})) {
+  errors.push('unsupported ios.infoPlist._localizationsNote (pollutes native Info.plist)');
+}
+if (audio?.[1] && '_microphoneNote' in audio[1]) {
+  errors.push('unsupported expo-audio _microphoneNote option');
+}
 if (android.allowBackup !== false) errors.push('android.allowBackup must be false');
 for (const permission of blocked) {
   if (!android.blockedPermissions?.includes(permission)) errors.push(`missing ${permission}`);
